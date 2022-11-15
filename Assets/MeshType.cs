@@ -1113,7 +1113,7 @@ namespace FCopParser {
 
         }
 
-        static public int IDFromVerticies(List<TileVertex> verticies) {
+        static public int? IDFromVerticies(List<TileVertex> verticies) {
 
             foreach (var mesh in meshes) {
 
@@ -1139,7 +1139,7 @@ namespace FCopParser {
 
             }
 
-            throw new Exception("Provided Mesh does not have an ID");
+            return null;
 
         }
 

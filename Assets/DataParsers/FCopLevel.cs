@@ -476,7 +476,13 @@ namespace FCopParser {
 
         public TileBitfield Compile() {
 
-            parsedTile.number5 = MeshType.IDFromVerticies(verticies);
+            var id = MeshType.IDFromVerticies(verticies);
+
+            if (id == null) {
+                throw new Exception("No ID exists for given mesh");
+            }
+
+            parsedTile.number5 = (int)id;
             parsedTile.number2 = textureIndex;
             parsedTile.number6 = graphicsIndex;
 
