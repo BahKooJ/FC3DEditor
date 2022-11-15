@@ -70,6 +70,8 @@ public class Main : MonoBehaviour {
 
     }
 
+    FCopLevelSection copySection;
+
     // Update is called once per frame
     void Update() {
 
@@ -79,6 +81,14 @@ public class Main : MonoBehaviour {
             ListMoveItemDown();
         } else if (Input.GetKeyDown(KeyCode.Escape)) {
             Compile();
+        } else if (Input.GetKeyDown(KeyCode.O)) {
+            copySection = selectedSection.section;
+        } else if (Input.GetKeyDown(KeyCode.P)) {
+            selectedSection.section.heightMap = copySection.heightMap;
+            selectedSection.section.tileColumns = copySection.tileColumns;
+            selectedSection.section.textureCoordinates = copySection.textureCoordinates;
+            selectedSection.section.tileGraphics = copySection.tileGraphics;
+            selectedSection.RefreshMesh();
         }
     }
 

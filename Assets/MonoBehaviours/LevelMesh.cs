@@ -66,7 +66,7 @@ public class LevelMesh : MonoBehaviour {
 
                     controller.OnTileSelected(sortedTilesByTriangle[hit.triangleIndex], column, this);
 
-                    Debug.Log("Tile Selected");
+                    Debug.Log(sortedTilesByTriangle[hit.triangleIndex].parsedTile.number5);
 
                     RefreshMesh();
                 }
