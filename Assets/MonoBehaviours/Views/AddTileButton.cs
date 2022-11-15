@@ -11,7 +11,7 @@ class AddTileButton : MonoBehaviour {
 
         if (controller.selectedColumn != null) {
 
-            var newTile = new Tile(new TileBitfield(0, 0, 0, 0, 68, 0));
+            var newTile = new Tile(new TileBitfield(0, 0, 2, 0, 68, 0));
 
             controller.selectedColumn.tiles.Add(newTile);
 

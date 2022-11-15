@@ -461,6 +461,7 @@ namespace FCopParser {
     // Tiles are sorted into 4x4 chunks
     public class Tile {
 
+        public bool isStartInColumnArray;
         public List<TileVertex> verticies;
         public int textureIndex;
         public int graphicsIndex;
@@ -470,6 +471,8 @@ namespace FCopParser {
         public TileBitfield parsedTile;
 
         public Tile(TileBitfield parsedTile) {
+
+            isStartInColumnArray = parsedTile.number1 == 1;
 
             verticies = MeshType.VerticiesFromID(parsedTile.number5);
             textureIndex = parsedTile.number2;
@@ -489,6 +492,7 @@ namespace FCopParser {
                 throw new Exception("No ID exists for given mesh");
             }
 
+            parsedTile.number1 = isStartInColumnArray ? 1 : 0;
             parsedTile.number5 = (int)id;
             parsedTile.number2 = textureIndex;
             parsedTile.number6 = graphicsIndex;
