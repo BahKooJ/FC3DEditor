@@ -9,27 +9,17 @@ using static System.Collections.Specialized.BitVector32;
 
 public class Main : MonoBehaviour {
 
+    //TODO: Create tile pallet, tile graphics view, and texture view.
+
     public GameObject meshSection;
     public GameObject heightMapChannelPoint;
 
     IFFParser iffFile = new IFFParser(File.ReadAllBytes("C:/Users/Zewy/Desktop/Mp"));
-    FCopLevel level;
+    public FCopLevel level;
 
     public Texture2D levelTexturePallet;
 
     public PointListView listView;
-
-    public DropdownVertexHeightChannel dropHeight0;
-    public DropdownVertexHeightChannel dropHeight1;
-    public DropdownVertexHeightChannel dropHeight2;
-    public DropdownVertexHeightChannel dropHeight3;
-
-    public DropdownVertexPosition dropPosition0;
-    public DropdownVertexPosition dropPosition1;
-    public DropdownVertexPosition dropPosition2;
-    public DropdownVertexPosition dropPosition3;
-
-
 
     public Tile selectedTile = null;
     public TileColumn selectedColumn = null;
@@ -123,18 +113,6 @@ public class Main : MonoBehaviour {
         AddHeightObjects(1);
         AddHeightObjects(2);
         AddHeightObjects(3);
-
-        dropHeight0.dropdown.value = tile.verticies[0].heightChannel - 1;
-        dropPosition0.dropdown.value = (int)tile.verticies[0].vertexPosition - 1;
-        dropHeight1.dropdown.value = tile.verticies[1].heightChannel - 1;
-        dropPosition1.dropdown.value = (int)tile.verticies[1].vertexPosition - 1;
-        dropHeight2.dropdown.value = tile.verticies[2].heightChannel - 1;
-        dropPosition2.dropdown.value = (int)tile.verticies[2].vertexPosition - 1;
-
-        if (tile.verticies.Count > 3) {
-            dropHeight3.dropdown.value = tile.verticies[3].heightChannel - 1;
-            dropPosition3.dropdown.value = (int)tile.verticies[3].vertexPosition - 1;
-        }
 
     }
 

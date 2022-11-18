@@ -22,7 +22,7 @@ namespace FCopParser {
             this.fourCCType = fourCCType;
         }
 
-        public FileHeader? fileHeader = null;
+        public FileHeader fileHeader = null;
 
         public ChunkHeader(int index, string fourCCDeclaration, int chunkSize, string fourCCType, FileHeader fileHeader) {
             this.index = index;

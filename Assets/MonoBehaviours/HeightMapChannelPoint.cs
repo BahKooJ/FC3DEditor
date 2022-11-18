@@ -12,14 +12,14 @@ public class HeightMapChannelPoint : MonoBehaviour {
     public LevelMesh section;
     Ray ray;
     RaycastHit hit;
-    BoxCollider collider;
+    BoxCollider boxCollider;
 
     bool click = false;
     Vector3 previousMousePosition;
 
     void Start() {
 
-        collider = GetComponent<BoxCollider>();
+        boxCollider = GetComponent<BoxCollider>();
 
     }
 
@@ -36,7 +36,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
             if (Input.GetMouseButtonDown(0)) {
 
-                if (hit.colliderInstanceID == collider.GetInstanceID()) {
+                if (hit.colliderInstanceID == boxCollider.GetInstanceID()) {
 
                     Debug.Log("click");
 

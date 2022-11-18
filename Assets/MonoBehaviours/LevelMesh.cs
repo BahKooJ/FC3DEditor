@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class LevelMesh : MonoBehaviour {
 
     Mesh mesh;
-    MeshRenderer renderer;
+    MeshRenderer meshRenderer;
     MeshCollider meshCollider;
     Ray ray;
     RaycastHit hit;
@@ -35,9 +35,9 @@ public class LevelMesh : MonoBehaviour {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
         meshCollider = GetComponent<MeshCollider>();
-        renderer = GetComponent<MeshRenderer>();
+        meshRenderer = GetComponent<MeshRenderer>();
 
-        renderer.material.mainTexture = levelTexturePallet;
+        meshRenderer.material.mainTexture = levelTexturePallet;
         RefreshMesh();
 
     }
@@ -65,15 +65,6 @@ public class LevelMesh : MonoBehaviour {
                     });
 
                     controller.OnTileSelected(sortedTilesByTriangle[hit.triangleIndex], column, this);
-
-                    Debug.Log(sortedTilesByTriangle[hit.triangleIndex].parsedTile.number1);
-                    Debug.Log(sortedTilesByTriangle[hit.triangleIndex].parsedTile.number2);
-                    Debug.Log(sortedTilesByTriangle[hit.triangleIndex].parsedTile.number3);
-                    Debug.Log(sortedTilesByTriangle[hit.triangleIndex].parsedTile.number4);
-                    Debug.Log(sortedTilesByTriangle[hit.triangleIndex].parsedTile.number5);
-                    Debug.Log(sortedTilesByTriangle[hit.triangleIndex].parsedTile.number6);
-
-
 
                     RefreshMesh();
                 }

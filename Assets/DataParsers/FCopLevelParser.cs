@@ -365,6 +365,14 @@ namespace FCopParser {
             return (float)Math.Floor(offset / width) / height;
         }
 
+        static public float GetXPixel(int offset, int width = 256) {
+            return offset % width;
+        }
+
+        static public float GetYPixel(int offset, int width = 256, int height = 256) {
+            return offset / width;
+        }
+
     }
 
     public struct TileGraphics {
