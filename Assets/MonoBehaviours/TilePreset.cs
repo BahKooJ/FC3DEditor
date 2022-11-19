@@ -5,19 +5,23 @@ using System.Collections.Generic;
 
 public struct TilePreset {
 
+    // CC IS IMPORTANT!!!
+
     public static List<TilePreset> defaultPresets = new() { 
-        new TilePreset(68,0,0),
-        new TilePreset(0,0,0),
-        new TilePreset(108,0,0),
-        new TilePreset(71,0,0)
+        new TilePreset(68,0,0,0),
+        new TilePreset(0,0,0,0),
+        new TilePreset(108,2,0,0),
+        new TilePreset(71,0,0,0)
     };
 
     public int meshID;
+    public int unknownButVeryImportantNumber;
     public int textureIndex;
     public int graphicsIndex;
 
-    public TilePreset(int meshID, int textureIndex, int graphicsIndex) {
+    public TilePreset(int meshID, int unknownButVeryImportantNumber, int textureIndex, int graphicsIndex) {
         this.meshID = meshID;
+        this.unknownButVeryImportantNumber = unknownButVeryImportantNumber;
         this.textureIndex = textureIndex;
         this.graphicsIndex = graphicsIndex;
     }

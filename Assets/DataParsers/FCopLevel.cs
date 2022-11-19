@@ -465,6 +465,7 @@ namespace FCopParser {
         public List<TileVertex> verticies;
         public int textureIndex;
         public int graphicsIndex;
+        public int unknownButVeryImportantNumber;
 
         public Rotation rotation;
 
@@ -476,6 +477,8 @@ namespace FCopParser {
 
             verticies = MeshType.VerticiesFromID(parsedTile.number5);
             textureIndex = parsedTile.number2;
+
+            unknownButVeryImportantNumber = parsedTile.number3;
 
             graphicsIndex = parsedTile.number6;
 
@@ -495,6 +498,7 @@ namespace FCopParser {
             parsedTile.number1 = isStartInColumnArray ? 1 : 0;
             parsedTile.number5 = (int)id;
             parsedTile.number2 = textureIndex;
+            parsedTile.number3 = unknownButVeryImportantNumber;
             parsedTile.number6 = graphicsIndex;
 
             return parsedTile;
