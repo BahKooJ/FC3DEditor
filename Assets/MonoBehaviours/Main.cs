@@ -60,7 +60,7 @@ public class Main : MonoBehaviour {
 
     }
 
-    FCopLevelSection copySection;
+    TileColumn copyColumn;
 
     // Update is called once per frame
     void Update() {
@@ -72,12 +72,14 @@ public class Main : MonoBehaviour {
         } else if (Input.GetKeyDown(KeyCode.Escape)) {
             Compile();
         } else if (Input.GetKeyDown(KeyCode.O)) {
-            copySection = selectedSection.section;
+            copyColumn = selectedColumn;
         } else if (Input.GetKeyDown(KeyCode.P)) {
-            selectedSection.section.heightMap = copySection.heightMap;
-            selectedSection.section.tileColumns = copySection.tileColumns;
-            selectedSection.section.textureCoordinates = copySection.textureCoordinates;
-            selectedSection.section.tileGraphics = copySection.tileGraphics;
+
+            foreach(var foo in copyColumn.tiles) {
+                foo.graphicsIndex = 0;
+            }
+
+            selectedColumn.tiles = copyColumn.tiles;
             selectedSection.RefreshMesh();
         }
     }

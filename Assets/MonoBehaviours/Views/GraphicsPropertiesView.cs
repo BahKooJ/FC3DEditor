@@ -106,6 +106,8 @@ class GraphicsPropertiesView : MonoBehaviour {
 
             script.controller = controller;
 
+            script.view = this;
+
             script.index = index;
 
             item.transform.SetParent(content);

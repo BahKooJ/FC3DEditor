@@ -66,12 +66,22 @@ public class LevelMesh : MonoBehaviour {
 
                     controller.OnTileSelected(sortedTilesByTriangle[hit.triangleIndex], column, this);
 
-                    Debug.Log(sortedTilesByTriangle[hit.triangleIndex].parsedTile.number1);
-                    Debug.Log(sortedTilesByTriangle[hit.triangleIndex].parsedTile.number2);
-                    Debug.Log(sortedTilesByTriangle[hit.triangleIndex].parsedTile.number3);
-                    Debug.Log(sortedTilesByTriangle[hit.triangleIndex].parsedTile.number4);
-                    Debug.Log(sortedTilesByTriangle[hit.triangleIndex].parsedTile.number5);
-                    Debug.Log(sortedTilesByTriangle[hit.triangleIndex].parsedTile.number6);
+                    var graphic = section.tileGraphics[controller.selectedTile.graphicsIndex];
+
+                    var fooindex = 0;
+                    foreach (var foo in controller.selectedColumn.tiles) {
+
+                        Debug.Log(
+                            fooindex.ToString() + " : " + 
+                            foo.parsedTile.number1.ToString() + " " + 
+                            foo.parsedTile.number2.ToString() + " " + 
+                            foo.parsedTile.number3.ToString() + " " +
+                            foo.parsedTile.number4.ToString() + " " + 
+                            foo.parsedTile.number5.ToString() + " " +
+                            foo.parsedTile.number6.ToString());
+
+                        fooindex++;
+                    }
 
 
                     RefreshMesh();
