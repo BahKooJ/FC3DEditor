@@ -67,21 +67,17 @@ public class LevelMesh : MonoBehaviour {
                     controller.OnTileSelected(sortedTilesByTriangle[hit.triangleIndex], column, this);
 
                     var graphic = section.tileGraphics[controller.selectedTile.graphicsIndex];
+                    var foo = sortedTilesByTriangle[hit.triangleIndex];
 
-                    var fooindex = 0;
-                    foreach (var foo in controller.selectedColumn.tiles) {
 
                         Debug.Log(
-                            fooindex.ToString() + " : " + 
-                            foo.parsedTile.number1.ToString() + " " + 
-                            foo.parsedTile.number2.ToString() + " " + 
+                            foo.parsedTile.number1.ToString() + " " +
+                            foo.parsedTile.number2.ToString() + " " +
                             foo.parsedTile.number3.ToString() + " " +
-                            foo.parsedTile.number4.ToString() + " " + 
+                            foo.parsedTile.number4.ToString() + " " +
                             foo.parsedTile.number5.ToString() + " " +
                             foo.parsedTile.number6.ToString());
 
-                        fooindex++;
-                    }
 
 
                     RefreshMesh();

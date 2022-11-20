@@ -3,9 +3,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static System.Collections.Specialized.BitVector32;
 
 public class HeightMapChannelPoint : MonoBehaviour {
+
+    public GameObject setHeightTextField;
 
     public HeightPoint heightPoint;
     public int channel;
@@ -38,10 +41,28 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
                 if (hit.colliderInstanceID == boxCollider.GetInstanceID()) {
 
-                    Debug.Log("click");
-
                     click = true;
                     previousMousePosition = Input.mousePosition;
+
+                }
+
+            } else if (Input.GetMouseButtonDown(1)) {
+
+                if (hit.colliderInstanceID == boxCollider.GetInstanceID()) {
+
+
+                    var mainUI = FindObjectOfType<MainUI>();
+
+                    var obj = Instantiate(setHeightTextField, Input.mousePosition, Quaternion.identity);
+
+                    obj.transform.SetParent(mainUI.transform);
+
+                    var script = obj.GetComponent<SetHeightValueTextField>();
+
+                    script.heightPoint = heightPoint;
+                    script.channel = channel;
+                    script.geoPoint = this;
+                    script.section = section;
 
                 }
 

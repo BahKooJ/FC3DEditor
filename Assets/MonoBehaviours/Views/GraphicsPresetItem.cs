@@ -36,6 +36,15 @@ class GraphicsPresetItem : MonoBehaviour {
 
         controller.selectedTile.graphicsIndex = index;
 
+        var graphicsOffset = controller.selectedSection.section.tileGraphics[index];
+
+        Debug.Log(
+            graphicsOffset.number1.ToString() + " " +
+            graphicsOffset.number2.ToString() + " " +
+            graphicsOffset.number3.ToString() + " " +
+            graphicsOffset.number4.ToString() + " " +
+            graphicsOffset.number5.ToString());
+
         view.RefreshView();
 
     }

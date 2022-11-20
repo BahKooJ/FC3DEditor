@@ -10,25 +10,26 @@ public struct TilePreset {
     public static List<TilePreset> defaultPresets = new() { 
         new TilePreset(68,0,0,0),
         new TilePreset(0,0,0,0),
-        new TilePreset(108,2,0,0),
-        new TilePreset(71,0,0,0)
+        new TilePreset(107,3,0,0),
+        new TilePreset(71,0,0,0),
+        new TilePreset(108,3,0,0)
     };
 
     public int meshID;
-    public int unknownButVeryImportantNumber;
+    public int culling;
     public int textureIndex;
     public int graphicsIndex;
 
-    public TilePreset(int meshID, int unknownButVeryImportantNumber, int textureIndex, int graphicsIndex) {
+    public TilePreset(int meshID, int culling, int textureIndex, int graphicsIndex) {
         this.meshID = meshID;
-        this.unknownButVeryImportantNumber = unknownButVeryImportantNumber;
+        this.culling = culling;
         this.textureIndex = textureIndex;
         this.graphicsIndex = graphicsIndex;
     }
 
     public Tile Create(bool isStart) {
 
-        return new Tile(new TileBitfield(isStart ? 1 : 0, textureIndex, 2, 0, meshID,graphicsIndex));
+        return new Tile(new TileBitfield(isStart ? 1 : 0, textureIndex, culling, 0, meshID,graphicsIndex));
 
     }
 

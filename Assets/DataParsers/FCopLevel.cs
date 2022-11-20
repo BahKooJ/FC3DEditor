@@ -385,6 +385,17 @@ namespace FCopParser {
 
         }
 
+        public int GetTruePoint(int index) {
+
+            switch (index) {
+                case 1: return (int)Math.Round(height1 * multiplyer);
+                case 2: return (int)Math.Round(height2 * multiplyer);
+                case 3: return (int)Math.Round(height3 * multiplyer);
+                default: return 0;
+            }
+
+        }
+
         public void AddToPoint(float amount, int channel) {
 
             switch (channel) {
@@ -426,6 +437,48 @@ namespace FCopParser {
                     break;
                 default: break; 
             }
+
+        }
+
+        public void SetPoint(int value, int channel) {
+
+            switch (channel) {
+                case 1:
+
+                    height1 = value / multiplyer;
+
+                    if (height1 > maxValue) {
+                        height1 = maxValue;
+                    } else if (height1 < minValue) {
+                        height1 = minValue;
+                    }
+
+                    break;
+                case 2:
+
+                    height2 = value / multiplyer;
+
+                    if (height2 > maxValue) {
+                        height2 = maxValue;
+                    } else if (height2 < minValue) {
+                        height2 = minValue;
+                    }
+
+                    break;
+                case 3:
+
+                    height3 = value / multiplyer;
+
+                    if (height3 > maxValue) {
+                        height3 = maxValue;
+                    } else if (height3 < minValue) {
+                        height3 = minValue;
+                    }
+
+                    break;
+                default: break;
+            }
+
 
         }
 

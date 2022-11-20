@@ -78,49 +78,74 @@ class MainUI: MonoBehaviour {
 
     public void OnClickRotateLeftButton() {
 
-        if (controller.selectedTile.verticies.Count != 3) {
-            return;
-        }
+        if (controller.selectedTile.verticies.Count == 3) {
 
-        var verticies = controller.selectedTile.verticies;
+            var verticies = controller.selectedTile.verticies;
 
-        bool isBottomRight =
-            (verticies[0].vertexPosition == VertexPosition.TopRight) &&
-            (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
-            (verticies[2].vertexPosition == VertexPosition.BottomRight);
+            bool isBottomRight =
+                (verticies[0].vertexPosition == VertexPosition.TopRight) &&
+                (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
+                (verticies[2].vertexPosition == VertexPosition.BottomRight);
 
-        bool isBottomLeft =
-            (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
-            (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
-            (verticies[2].vertexPosition == VertexPosition.BottomRight);
+            bool isBottomLeft =
+                (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
+                (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
+                (verticies[2].vertexPosition == VertexPosition.BottomRight);
 
-        bool isTopLeft =
-            (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
-            (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
-            (verticies[2].vertexPosition == VertexPosition.TopRight);
+            bool isTopLeft =
+                (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
+                (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
+                (verticies[2].vertexPosition == VertexPosition.TopRight);
 
-        bool isTopRight =
-            (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
-            (verticies[1].vertexPosition == VertexPosition.BottomRight) &&
-            (verticies[2].vertexPosition == VertexPosition.TopRight);
+            bool isTopRight =
+                (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
+                (verticies[1].vertexPosition == VertexPosition.BottomRight) &&
+                (verticies[2].vertexPosition == VertexPosition.TopRight);
 
-        if (isBottomRight) {
-            verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
-            verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
-            verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.BottomRight);
-        } else if (isBottomLeft) {
-            verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
-            verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
-            verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.TopRight);
-        } else if (isTopLeft) {
-            verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
-            verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomRight);
-            verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.TopRight);
-        } else if (isTopRight) {
-            verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopRight);
-            verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
-            verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.BottomRight);
-        }
+            if (isBottomRight) {
+                verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
+                verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
+                verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.BottomRight);
+            } else if (isBottomLeft) {
+                verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
+                verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
+                verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.TopRight);
+            } else if (isTopLeft) {
+                verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
+                verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomRight);
+                verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.TopRight);
+            } else if (isTopRight) {
+                verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopRight);
+                verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
+                verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.BottomRight);
+            }
+
+        } 
+        
+        //else {
+
+        //    var verticies = controller.selectedTile.verticies;
+
+        //    var isWall = false;
+
+        //    var vertexToTest = verticies[0];
+        //    var verticiesToTest = verticies.GetRange(1,3);
+
+        //    foreach (var vertex in verticiesToTest) {
+
+        //        if (vertexToTest.vertexPosition == vertex.vertexPosition) {
+        //            isWall = true;
+        //            break;
+        //        }
+
+        //    }
+
+        //    if (!isWall) {
+        //        return;
+        //    }
+
+        //}
+
 
         controller.selectedSection.RefreshMesh();
 

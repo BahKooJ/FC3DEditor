@@ -75,12 +75,14 @@ public class Main : MonoBehaviour {
             copyColumn = selectedColumn;
         } else if (Input.GetKeyDown(KeyCode.P)) {
 
-            foreach(var foo in copyColumn.tiles) {
-                foo.graphicsIndex = 0;
-            }
+            //foreach (var foo in copyColumn.tiles) {
+            //    foo.graphicsIndex = 0;
+            //}
 
             selectedColumn.tiles = copyColumn.tiles;
             selectedSection.RefreshMesh();
+        } else if (Input.GetKeyDown(KeyCode.Delete)) {
+            RemoveSelectedTile();
         }
     }
 
@@ -100,6 +102,12 @@ public class Main : MonoBehaviour {
         selectedColumn = column;
         selectedSection = section;
 
+        //var foo = section.section.tileGraphics[0];
+
+        //foo.number5 = 1;
+
+        //section.section.tileGraphics[0] = foo;
+
         if (debug) {
 
             listView.Clear();
@@ -115,6 +123,18 @@ public class Main : MonoBehaviour {
         AddHeightObjects(1);
         AddHeightObjects(2);
         AddHeightObjects(3);
+
+    }
+
+    public void RemoveSelectedTile() {
+
+        if (selectedTile != null) {
+            selectedColumn.tiles.Remove(selectedTile);
+
+            selectedTile = null;
+        }
+
+        selectedSection.RefreshMesh();
 
     }
 

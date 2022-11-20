@@ -110,3 +110,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a32981446bc5a2346b10cb5adf5aea3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  setHeightTextField: {fileID: 2737967948328983806, guid: 66a9ab7a111c46848ad8bf53c31d2486, type: 3}
+  channel: 0
+  section: {fileID: 0}
