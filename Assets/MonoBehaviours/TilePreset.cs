@@ -5,7 +5,6 @@ using System.Collections.Generic;
 
 public struct TilePreset {
 
-    // CC IS IMPORTANT!!!
 
     public static List<TilePreset> defaultPresets = new() { 
         new TilePreset(68,0,0,0),

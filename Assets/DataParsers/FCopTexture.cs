@@ -10,6 +10,8 @@ namespace FCopParser {
 
     public class FCopTexture {
 
+        const int imageSize = 131072;
+
 
         public List<ChunkHeader> offsets = new List<ChunkHeader>();
 
@@ -49,7 +51,7 @@ namespace FCopParser {
 
             formattedBitmap.AddRange(bitmap);
 
-            return bitmap.ToArray();
+            return formattedBitmap.ToArray();
 
         }
 
@@ -65,6 +67,14 @@ namespace FCopParser {
             }
 
             return total.ToArray();
+
+        }
+
+        public void ImportBMP(byte[] bytes) {
+
+            var offset = BitConverter.ToInt32(bytes, 10);
+
+            bitmap = new List<byte>(bytes).GetRange(offset, imageSize);
 
         }
 

@@ -247,6 +247,12 @@ public class LevelMesh : MonoBehaviour {
 
     }
 
+    public void RefreshTexture() {
+        levelTexturePallet = controller.levelTexturePallet;
+        meshRenderer.material.mainTexture = levelTexturePallet;
+
+    }
+
     class TextureVertex {
 
         float x;

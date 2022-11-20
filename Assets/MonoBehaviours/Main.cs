@@ -37,22 +37,7 @@ public class Main : MonoBehaviour {
 
         level = new FCopLevel(iffFile.parsedData);
 
-        var texture = new Texture2D(256, 2048, TextureFormat.RGB565, false);
-        var texturePallet = new List<byte>();
-
-        texturePallet.AddRange(level.textures[0].ConvertToRGB565());
-        texturePallet.AddRange(level.textures[1].ConvertToRGB565());
-        texturePallet.AddRange(level.textures[2].ConvertToRGB565());
-        texturePallet.AddRange(level.textures[3].ConvertToRGB565());
-        texturePallet.AddRange(level.textures[4].ConvertToRGB565());
-        texturePallet.AddRange(level.textures[5].ConvertToRGB565());
-        texturePallet.AddRange(level.textures[6].ConvertToRGB565());
-        texturePallet.AddRange(level.textures[7].ConvertToRGB565());
-
-        texture.LoadRawTextureData(texturePallet.ToArray());
-        texture.Apply();
-
-        levelTexturePallet = texture;
+        RefreshTextures();
 
         listView.controller = this;
 
@@ -102,12 +87,6 @@ public class Main : MonoBehaviour {
         selectedColumn = column;
         selectedSection = section;
 
-        //var foo = section.section.tileGraphics[0];
-
-        //foo.number5 = 1;
-
-        //section.section.tileGraphics[0] = foo;
-
         if (debug) {
 
             listView.Clear();
@@ -123,6 +102,27 @@ public class Main : MonoBehaviour {
         AddHeightObjects(1);
         AddHeightObjects(2);
         AddHeightObjects(3);
+
+    }
+
+    public void RefreshTextures() {
+
+        var texture = new Texture2D(256, 2048, TextureFormat.RGB565, false);
+        var texturePallet = new List<byte>();
+
+        texturePallet.AddRange(level.textures[0].ConvertToRGB565());
+        texturePallet.AddRange(level.textures[1].ConvertToRGB565());
+        texturePallet.AddRange(level.textures[2].ConvertToRGB565());
+        texturePallet.AddRange(level.textures[3].ConvertToRGB565());
+        texturePallet.AddRange(level.textures[4].ConvertToRGB565());
+        texturePallet.AddRange(level.textures[5].ConvertToRGB565());
+        texturePallet.AddRange(level.textures[6].ConvertToRGB565());
+        texturePallet.AddRange(level.textures[7].ConvertToRGB565());
+
+        texture.LoadRawTextureData(texturePallet.ToArray());
+        texture.Apply();
+
+        levelTexturePallet = texture;
 
     }
 
