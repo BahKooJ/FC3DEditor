@@ -15,9 +15,13 @@ namespace FCopParser {
 
         public List<ChunkHeader> offsets = new List<ChunkHeader>();
 
+        public IFFDataFile rawFile;
+
         public List<byte> bitmap;
 
         public FCopTexture(IFFDataFile rawFile) {
+
+            this.rawFile = rawFile;
 
             FindChunks(rawFile.data.ToArray());
 
@@ -75,6 +79,29 @@ namespace FCopParser {
             var offset = BitConverter.ToInt32(bytes, 10);
 
             bitmap = new List<byte>(bytes).GetRange(offset, imageSize);
+
+        }
+
+        public void Compile() {
+
+            var total = new List<byte>();
+
+            var px16 = offsets.First(chunkHeader => {
+                return chunkHeader.fourCCDeclaration == "PX16";
+            });
+
+            var offset = px16.index + 8 + imageSize;
+
+            total.AddRange(rawFile.data.GetRange(0,px16.index));
+            total.AddRange(rawFile.data.GetRange(px16.index, 8));
+            total.AddRange(bitmap.GetRange(0, imageSize));
+
+            total.AddRange(rawFile.data.GetRange(offset, rawFile.data.Count - offset));
+
+            rawFile.data = total;
+            rawFile.modified = true;
+
+
 
         }
 

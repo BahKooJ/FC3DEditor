@@ -64,6 +64,7 @@ class MainUI: MonoBehaviour {
 
         if (activeGraphicsPropertiesView != null) {
             Destroy(activeGraphicsPropertiesView);
+            controller.selectedSection.RefreshMesh();
         } else {
 
             activeGraphicsPropertiesView = Instantiate(graphicsPropertiesView);

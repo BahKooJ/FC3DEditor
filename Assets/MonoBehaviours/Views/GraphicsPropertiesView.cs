@@ -6,6 +6,9 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using FCopParser;
+using System;
+using Object = UnityEngine.Object;
 
 class GraphicsPropertiesView : MonoBehaviour {
 
@@ -19,6 +22,10 @@ class GraphicsPropertiesView : MonoBehaviour {
     GameObject texturePallete;
     GameObject textureOffsets;
     GameObject graphicsPreset;
+    GameObject textureInputX;
+    GameObject textureInputY;
+
+    public TextureCoordinatesLines textureLines;
 
     void Start() {
 
@@ -82,6 +89,53 @@ class GraphicsPropertiesView : MonoBehaviour {
 
     }
 
+    public void OnClickAddTexture() {
+
+        controller.selectedSection.section.textureCoordinates.Add(0);
+
+        DestoryTextureOffsets();
+        InitTextureOffsets();
+
+    }
+
+    public void OnSetTextureCordX() {
+
+        var index = controller.selectedTile.textureIndex;
+
+        var comp = textureInputX.GetComponent<TMP_InputField>();
+
+        try {
+            controller.selectedSection.section.textureCoordinates[index] =
+                TextureCoordinate.SetXPixel(Int32.Parse(comp.text), controller.selectedSection.section.textureCoordinates[index]);
+        } catch {
+            return;
+        }
+
+        DestoryTextureOffsets();
+        InitTextureOffsets();
+        textureLines.Refresh();
+
+    }
+
+    public void OnSetTextureCordY() {
+
+        var index = controller.selectedTile.textureIndex;
+
+        var comp = textureInputY.GetComponent<TMP_InputField>();
+
+        try {
+            controller.selectedSection.section.textureCoordinates[index] =
+                TextureCoordinate.SetYPixel(Int32.Parse(comp.text), controller.selectedSection.section.textureCoordinates[index]);
+        } catch {
+            return;
+        }
+
+        DestoryTextureOffsets();
+        InitTextureOffsets();
+        textureLines.Refresh();
+
+    }
+
     void InitView() {
 
         foreach (Object obj in transform) {
@@ -102,6 +156,12 @@ class GraphicsPropertiesView : MonoBehaviour {
                     break;
                 case "Graphics Presets":
                     graphicsPreset = obj.GameObject();
+                    break;
+                case "Texture Input X":
+                    textureInputX = obj.GameObject();
+                    break;
+                case "Texture Input Y":
+                    textureInputY = obj.GameObject();
                     break;
 
             }
@@ -144,6 +204,7 @@ class GraphicsPropertiesView : MonoBehaviour {
             script.index = index;
 
             item.transform.SetParent(content);
+
 
         }
 

@@ -365,12 +365,24 @@ namespace FCopParser {
             return (float)Math.Floor(offset / width) / height;
         }
 
-        static public float GetXPixel(int offset, int width = 256) {
+        static public int GetXPixel(int offset, int width = 256) {
             return offset % width;
         }
 
-        static public float GetYPixel(int offset, int width = 256, int height = 256) {
+        static public int GetYPixel(int offset, int width = 256, int height = 256) {
             return offset / width;
+        }
+
+        static public int SetXPixel(int x, int originalValue) {
+
+            return (GetYPixel(originalValue) * 256) + x;
+
+        }
+
+        static public int SetYPixel(int y, int originalValue) {
+
+            return GetXPixel(originalValue) + (y * 256);
+
         }
 
     }

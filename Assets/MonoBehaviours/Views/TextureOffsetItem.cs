@@ -31,14 +31,19 @@ class TextureOffsetItem : MonoBehaviour {
         foreach (Object obj in transform) {
 
             obj.GameObject().GetComponent<TMP_Text>().text = index.ToString() + " : (" + textureX.ToString() + ", " + textureY.ToString() + ")";
-
         }
+
+        transform.rotation = new Quaternion(0, 0, 0, 0);
+        transform.localScale = Vector3.one;
+        transform.localPosition = Vector3.zero;
 
     }
 
     public void OnClick() {
 
         controller.selectedTile.textureIndex = index;
+
+        view.textureLines.Refresh();
 
         view.RefreshView();
 

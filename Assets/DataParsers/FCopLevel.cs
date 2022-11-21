@@ -132,6 +132,10 @@ namespace FCopParser {
                 section.Compile();
             }
 
+            foreach (var texture in textures) {
+                texture.Compile();
+            }
+
         }
 
     }
