@@ -45,7 +45,7 @@ class TextureOffsetItem : MonoBehaviour {
 
         view.textureLines.Refresh();
 
-        view.RefreshView();
+        view.RefreshTextureOffsetsView();
 
     }
 

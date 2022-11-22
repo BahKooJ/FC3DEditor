@@ -15,7 +15,11 @@ namespace FCopParser {
 
         public List<FCopTexture> textures = new List<FCopTexture>();
 
+        public IFFFileManager fileManager;
+
         public FCopLevel(IFFFileManager fileManager) {
+
+            this.fileManager = fileManager;
 
             var rawCtilFiles = fileManager.files.Where(file => {
 
@@ -43,9 +47,13 @@ namespace FCopParser {
 
             }));
 
+            var foo = 0;
+
         }
 
         public FCopLevel(int width, int height, IFFFileManager fileManager) {
+
+            this.fileManager = fileManager;
 
             layout = new List<List<int>>();
 
@@ -63,7 +71,7 @@ namespace FCopParser {
 
             }
 
-            var id = 1;
+            var id = 2;
 
             foreach (int _ in Enumerable.Range(0, height)) {
 
@@ -116,9 +124,33 @@ namespace FCopParser {
 
             }).ToList();
 
-            foreach (int ___ in Enumerable.Range(1, id)) {
-                sections.Add(new FCopLevelSectionParser(rawCtilFiles[0]).Parse(this));
+            sections.Add(new FCopLevelSectionParser(rawCtilFiles[0]).Parse(this));
+
+            foreach (var row in layout) {
+
+                foreach (var column in row) {
+
+                    if (column == 0 || column == 1) {
+                        continue;
+                    }
+
+                    var newSection = new FCopLevelSectionParser(rawCtilFiles[0]).Parse(this);
+
+                    newSection.parser.rawFile = newSection.parser.rawFile.Clone(column);
+
+                    foreach (var h in newSection.heightMap) {
+                        h.SetPoint(-120, 1);
+                        h.SetPoint(-100, 2);
+                        h.SetPoint(-80,  3);
+                    }
+
+                    sections.Add(newSection);
+
+                }
+
+
             }
+
 
             foreach (var rawFile in rawBitmapFiles) {
                 textures.Add(new FCopTexture(rawFile));
@@ -135,6 +167,12 @@ namespace FCopParser {
             foreach (var texture in textures) {
                 texture.Compile();
             }
+
+            FCopLevelLayoutParser.Compile(layout, fileManager.files.First(file => {
+
+                return file.dataFourCC == "Cptc";
+
+            }));
 
         }
 
@@ -157,7 +195,7 @@ namespace FCopParser {
         public List<TileGraphics> tileGraphics = new List<TileGraphics>();
 
         // Until the file can be fully parsed, we need to have the parser on hand
-        FCopLevelSectionParser parser;
+        public FCopLevelSectionParser parser;
 
         public FCopLevelSection(FCopLevelSectionParser parser, FCopLevel parent) {
 
@@ -300,8 +338,16 @@ namespace FCopParser {
                 foreach (var column in chunk.tileColumns) {
 
                     foreach (var tile in column.tiles) {
+                        tile.isStartInColumnArray = false;
+                    }
+
+                    column.tiles.Last().isStartInColumnArray = true;
+
+                    foreach (var tile in column.tiles) {
                         tiles.Add(tile.Compile());
                     }
+
+
 
                 }
 
@@ -358,7 +404,7 @@ namespace FCopParser {
 
     public class HeightPoint {
 
-        public const float multiplyer = 40f;
+        public const float multiplyer = 30f;
         public const float maxValue = SByte.MaxValue / multiplyer;
         public const float minValue = SByte.MinValue / multiplyer;
 

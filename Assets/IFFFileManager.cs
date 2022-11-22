@@ -36,6 +36,9 @@ namespace FCopParser {
             this.additionalData = additionalData;
         }
 
+        public IFFDataFile Clone(int newID) {
+            return new IFFDataFile(startNumber, data, dataFourCC, newID, additionalData);
+        }
 
     }
 

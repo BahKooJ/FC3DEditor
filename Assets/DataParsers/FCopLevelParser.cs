@@ -28,7 +28,7 @@ namespace FCopParser {
         static List<byte> fourCC = new List<byte>() { 116, 99, 101, 83 };
 
 
-        IFFDataFile rawFile;
+        public IFFDataFile rawFile;
 
         public short textureCordCount;
         public short tileCount;
@@ -278,8 +278,12 @@ namespace FCopParser {
 
     public abstract class FCopLevelLayoutParser {
 
+        static List<byte> fourCC = new List<byte>() { 66, 68, 82, 71 };
+
+        const int sectionCountOffset = 12;
         const int widthOffset = 16;
         const int heightOffset = 20;
+        const int worldBoarderOffset = 26;
         const int layoutOffset = 48;
 
         public static List<List<int>> Parse(IFFDataFile file) {
@@ -304,6 +308,54 @@ namespace FCopParser {
             }
 
             return layout;
+
+        }
+        
+        public static void Compile(List<List<int>> parsedData, IFFDataFile rawFile) {
+
+            var total = new List<byte>();
+
+            var maxID = 0;
+
+            foreach (var row in parsedData) {
+
+                foreach (var item in row) {
+
+                    if (item > maxID) {
+                        maxID = item;
+                    }
+
+                    total.AddRange(BitConverter.GetBytes(item * 4));
+
+                }
+
+            }
+
+            var header = new List<byte>();
+
+            header.AddRange(fourCC);
+
+            header.AddRange(BitConverter.GetBytes(total.Count + 48));
+
+            header.AddRange(BitConverter.GetBytes(0));
+
+            header.AddRange(BitConverter.GetBytes(maxID));
+
+            header.AddRange(BitConverter.GetBytes(parsedData[0].Count));
+
+            header.AddRange(BitConverter.GetBytes(parsedData.Count));
+
+            header.AddRange(BitConverter.GetBytes(0));
+            header.AddRange(BitConverter.GetBytes(0));
+            header.AddRange(BitConverter.GetBytes(0));
+            header.AddRange(BitConverter.GetBytes(4));
+            header.AddRange(BitConverter.GetBytes(0));
+            header.AddRange(BitConverter.GetBytes(0));
+
+            header.AddRange(total);
+
+            rawFile.data = header;
+            rawFile.modified = true;
 
         }
 

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using static System.Collections.Specialized.BitVector32;
@@ -14,7 +15,7 @@ public class Main : MonoBehaviour {
     public GameObject meshSection;
     public GameObject heightMapChannelPoint;
 
-    IFFParser iffFile = new IFFParser(File.ReadAllBytes("C:/Users/Zewy/Desktop/Mp"));
+    IFFParser iffFile = new IFFParser(File.ReadAllBytes("C:/Users/Zewy/Desktop/Mp MOD"));
     public FCopLevel level;
 
     public Texture2D levelTexturePallet;
@@ -74,6 +75,23 @@ public class Main : MonoBehaviour {
     public void Compile() {
 
         level.Compile();
+
+        var index = iffFile.parsedData.files.FindIndex(file => {
+
+            return file.dataFourCC == "Ctil";
+
+        });
+
+        iffFile.parsedData.files.RemoveAll(file => {
+
+            return file.dataFourCC == "Ctil";
+
+        });
+
+        foreach (var section in level.sections) {
+            iffFile.parsedData.files.Insert(index, section.parser.rawFile);
+            index++;
+        }
 
         iffFile.Compile();
 

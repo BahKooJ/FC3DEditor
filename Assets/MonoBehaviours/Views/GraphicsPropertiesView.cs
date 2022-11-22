@@ -57,6 +57,11 @@ class GraphicsPropertiesView : MonoBehaviour {
 
     }
 
+    public void RefreshTextureOffsetsView() {
+        DestoryTextureOffsets();
+        InitTextureOffsets();
+    }
+
     public void OnClickExportTexture() {
 
         var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTile.graphicsIndex];
@@ -86,6 +91,15 @@ class GraphicsPropertiesView : MonoBehaviour {
 
         controller.selectedSection.RefreshMesh();
         controller.selectedSection.RefreshTexture();
+
+    }
+
+    public void OnChangeTexturePalleteValue() {
+        var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTile.graphicsIndex];
+
+        graphics.number2 = texturePalletteDropdown.GetComponent<TMP_Dropdown>().value;
+
+        controller.selectedSection.section.tileGraphics[controller.selectedTile.graphicsIndex] = graphics;
 
     }
 

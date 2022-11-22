@@ -90,13 +90,17 @@ namespace FCopParser {
                 return chunkHeader.fourCCDeclaration == "PX16";
             });
 
+            var plut = offsets.First(chunkHeader => {
+                return chunkHeader.fourCCDeclaration == "PLUT";
+            });
+
             var offset = px16.index + 8 + imageSize;
 
             total.AddRange(rawFile.data.GetRange(0,px16.index));
             total.AddRange(rawFile.data.GetRange(px16.index, 8));
             total.AddRange(bitmap.GetRange(0, imageSize));
 
-            total.AddRange(rawFile.data.GetRange(offset, rawFile.data.Count - offset));
+            total.AddRange(rawFile.data.GetRange(plut.index, plut.chunkSize));
 
             rawFile.data = total;
             rawFile.modified = true;

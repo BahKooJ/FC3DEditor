@@ -53,7 +53,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
                     var mainUI = FindObjectOfType<MainUI>();
 
-                    var obj = Instantiate(setHeightTextField, Input.mousePosition, Quaternion.identity);
+                    var obj = Instantiate(setHeightTextField);
 
                     obj.transform.SetParent(mainUI.transform);
 

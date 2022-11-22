@@ -58,6 +58,19 @@ class MainUI: MonoBehaviour {
 
     }
 
+    void Update() {
+
+        if (Input.GetKeyDown(KeyCode.M)) {
+
+            if (activeGraphicsPropertiesView != null) {
+                Destroy(activeGraphicsPropertiesView);
+                controller.selectedSection.RefreshMesh();
+            }
+
+        }
+
+    }
+
     public void OnClickGraphicsProperitesButton() {
 
         if (controller.selectedTile == null) { return; }

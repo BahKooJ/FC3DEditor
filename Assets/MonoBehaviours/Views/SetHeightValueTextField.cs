@@ -22,6 +22,16 @@ class SetHeightValueTextField: MonoBehaviour {
         field.Select();
         field.text = heightPoint.GetTruePoint(channel).ToString();
 
+        transform.rotation = new Quaternion(0, 0, 0, 0);
+        transform.localScale = Vector3.one;
+
+        var mousePosition = Input.mousePosition;
+
+        mousePosition.y = -mousePosition.y;
+        mousePosition.x /= 100;
+
+        transform.localPosition = mousePosition;
+
     }
 
     public void OnFinished() {
