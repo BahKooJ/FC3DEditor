@@ -201,9 +201,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2af3ce8e1baa48438bd20ceba89e275, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  channel: 0
-  geoPoint: {fileID: 0}
-  section: {fileID: 0}
+  controller: {fileID: 0}
   field: {fileID: 0}
 --- !u!1 &5183766658193800741
 GameObject:

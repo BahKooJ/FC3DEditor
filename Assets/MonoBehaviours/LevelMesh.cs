@@ -64,21 +64,12 @@ public class LevelMesh : MonoBehaviour {
                         return tileColumn.x == clickX && tileColumn.y == clickY;
                     });
 
-                    controller.OnTileSelected(sortedTilesByTriangle[hit.triangleIndex], column, this);
+                    if (Input.GetKey(KeyCode.LeftShift)) {
+                        controller.SelectTiles(sortedTilesByTriangle[hit.triangleIndex], column, this);
+                    } else {
+                        controller.SelectTile(sortedTilesByTriangle[hit.triangleIndex], column, this);
 
-                    var graphic = section.tileGraphics[controller.selectedTile.graphicsIndex];
-                    var foo = sortedTilesByTriangle[hit.triangleIndex];
-
-
-                        Debug.Log(
-                            foo.parsedTile.number1.ToString() + " " +
-                            foo.parsedTile.number2.ToString() + " " +
-                            foo.parsedTile.number3.ToString() + " " +
-                            foo.parsedTile.number4.ToString() + " " +
-                            foo.parsedTile.number5.ToString() + " " +
-                            foo.parsedTile.number6.ToString());
-
-
+                    }
 
                     RefreshMesh();
                 }

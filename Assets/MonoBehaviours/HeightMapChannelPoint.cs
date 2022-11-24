@@ -10,12 +10,17 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
     public GameObject setHeightTextField;
 
+    public Main controller;
     public HeightPoint heightPoint;
     public int channel;
     public LevelMesh section;
+
+    public bool isSelected = false;
+
     Ray ray;
     RaycastHit hit;
     BoxCollider boxCollider;
+    Material material;
 
     bool click = false;
     Vector3 previousMousePosition;
@@ -23,6 +28,10 @@ public class HeightMapChannelPoint : MonoBehaviour {
     void Start() {
 
         boxCollider = GetComponent<BoxCollider>();
+
+        material = GetComponent<MeshRenderer>().material;
+
+        ResetColors();
 
     }
 
@@ -37,21 +46,22 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
         if (Physics.Raycast(ray, out hit)) {
 
-            if (Input.GetMouseButtonDown(0)) {
+            if (hit.colliderInstanceID == boxCollider.GetInstanceID()) {
 
-                if (hit.colliderInstanceID == boxCollider.GetInstanceID()) {
+                if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift)) {
+                    Select();
+                }
+
+                if (Input.GetMouseButtonDown(0)) {
 
                     click = true;
                     previousMousePosition = Input.mousePosition;
 
-                }
+                } else if (Input.GetMouseButtonDown(1)) {
 
-            } else if (Input.GetMouseButtonDown(1)) {
+                    Select();
 
-                if (hit.colliderInstanceID == boxCollider.GetInstanceID()) {
-
-
-                    var mainUI = FindObjectOfType<MainUI>();
+                    var mainUI = FindObjectOfType<GeometryEditorUI>();
 
                     var obj = Instantiate(setHeightTextField);
 
@@ -59,10 +69,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
                     var script = obj.GetComponent<SetHeightValueTextField>();
 
-                    script.heightPoint = heightPoint;
-                    script.channel = channel;
-                    script.geoPoint = this;
-                    script.section = section;
+                    script.controller = controller;
 
                 }
 
@@ -90,4 +97,24 @@ public class HeightMapChannelPoint : MonoBehaviour {
         }
 
     }
+
+    public void ResetColors() {
+        switch (channel) {
+            case 1:
+                material.color = Color.blue;
+                break;
+            case 2:
+                material.color = Color.green;
+                break;
+            case 3:
+                material.color = Color.red;
+                break;
+        }
+    }
+
+    public void Select() {
+        isSelected = true;
+        material.color = Color.white;
+    }
+
 }
