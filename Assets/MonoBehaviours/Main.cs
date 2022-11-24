@@ -385,7 +385,7 @@ public class Main : MonoBehaviour {
                 var vertex = tile.verticies[index];
 
                 if (vertex.heightChannel > 1) {
-                    tile.verticies[index] = new TileVertex(vertex.heightChannel + 1, vertex.vertexPosition);
+                    tile.verticies[index] = new TileVertex(vertex.heightChannel - 1, vertex.vertexPosition);
                 }
 
             }
@@ -427,11 +427,12 @@ public class Main : MonoBehaviour {
 
     }
 
+    // TODO: Allow importing textures even when multiple tiles are selected
     public void ImportTexture(GraphicsPropertiesView view) {
 
         if (view.bmpID == -1) { return; }
 
-        var graphics = selectedSection.section.tileGraphics[view.bmpID];
+        var graphics = selectedSection.section.tileGraphics[selectedTiles[0].graphicsIndex];
 
         level.textures[graphics.number2].ImportBMP(File.ReadAllBytes("bmp" + graphics.number2.ToString() + ".bmp"));
 

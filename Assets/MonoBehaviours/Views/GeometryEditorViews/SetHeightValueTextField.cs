@@ -61,7 +61,7 @@ class SetHeightValueTextField: MonoBehaviour {
     public void OnFinished() {
 
         if (field == null) {
-            Destroy(this.gameObject);
+            return;
         }
 
         if (field.text.Count() != 0) {

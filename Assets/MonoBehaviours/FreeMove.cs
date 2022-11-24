@@ -49,7 +49,7 @@ public class FreeMove : MonoBehaviour {
     static public bool looking = false;
 
     void Update() {
-        var fastMode = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+        var fastMode = false;
         var movementSpeed = fastMode ? this.fastMovementSpeed : this.movementSpeed;
 
         if (Input.GetKey(KeyCode.A)) {
