@@ -566,6 +566,16 @@ public class Main : MonoBehaviour {
 
     }
 
+    public void RefreshSelectedOverlays() {
+
+        foreach (var overlay in selectedTileOverlays) {
+
+            overlay.Refresh();
+
+        }
+
+    }
+
     void InitTileOverlay(Tile tile) {
 
         var overlay = Instantiate(SelectedTileOverlay);

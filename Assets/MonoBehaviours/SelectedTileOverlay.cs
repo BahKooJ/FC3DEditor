@@ -23,7 +23,26 @@ public class SelectedTileOverlay : MonoBehaviour {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
         material = GetComponent<MeshRenderer>().material;
-        material.color = Color.green;
+        material.color = new Color(0.0f,0.4f,0.0f);
+
+        Generate();
+
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+
+        mesh.RecalculateNormals();
+
+    }
+
+    public void Refresh() {
+
+        if (mesh == null) {
+            return;
+        }
+
+        mesh.Clear();
+        vertices.Clear();
+        triangles.Clear();
 
         Generate();
 

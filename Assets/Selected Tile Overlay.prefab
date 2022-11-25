@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3982175839306991766}
   - component: {fileID: 7748301741133193226}
   - component: {fileID: 4512976908341524721}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Selected Tile Overlay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 57dfb21790a922449b06901b6a85ab1f, type: 2}
+  - {fileID: 2100000, guid: 5785268a3cd3d1b40b6916e9b2d7813c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
