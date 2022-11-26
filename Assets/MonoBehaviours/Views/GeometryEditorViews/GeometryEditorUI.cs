@@ -12,8 +12,6 @@ public class GeometryEditorUI: MonoBehaviour {
     public GameObject rotateRightButton;
     public GameObject shiftHeightUpButton;
     public GameObject shiftHeightDownButton;
-    public GameObject addTilePresetButton;
-    public GameObject tilePresets;
     public GameObject graphicsPropertiesButton;
     public GameObject showTilesButton;
 
@@ -39,12 +37,6 @@ public class GeometryEditorUI: MonoBehaviour {
                 case "Shift Height Down Button":
                     shiftHeightDownButton = obj.GameObject();
                     break;
-                case "Add Tile Preset Button":
-                    addTilePresetButton = obj.GameObject();
-                    break;
-                case "Tile Presets":
-                    tilePresets = obj.GameObject();
-                    break;
                 case "Graphics Properties Button":
                     graphicsPropertiesButton = obj.GameObject();
                     break;
@@ -63,7 +55,7 @@ public class GeometryEditorUI: MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.M)) {
 
             if (activeGraphicsPropertiesView != null) {
-                controller.CloseGraphicsPropertyView(this);
+                CloseGraphicsPropertyView();
             }
 
         }
@@ -72,7 +64,19 @@ public class GeometryEditorUI: MonoBehaviour {
 
     public void OnClickGraphicsProperitesButton() {
 
-        controller.OpenGraphicsPropertyView(this);
+        if (controller.selectedTiles.Count == 0) { return; }
+
+        if (activeGraphicsPropertiesView != null) {
+            CloseGraphicsPropertyView();
+        } else {
+
+            activeGraphicsPropertiesView = Instantiate(graphicsPropertiesView);
+
+            activeGraphicsPropertiesView.GetComponent<GraphicsPropertiesView>().controller = controller;
+
+            activeGraphicsPropertiesView.transform.SetParent(transform.parent, false);
+
+        }
 
     }
 
@@ -98,6 +102,11 @@ public class GeometryEditorUI: MonoBehaviour {
 
         controller.ShiftTilesHeightDown();
 
+    }
+
+    void CloseGraphicsPropertyView() {
+        Destroy(activeGraphicsPropertiesView);
+        controller.selectedSection.RefreshMesh();
     }
 
 }

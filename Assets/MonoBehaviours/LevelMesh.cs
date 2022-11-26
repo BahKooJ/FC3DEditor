@@ -53,29 +53,28 @@ public class LevelMesh : MonoBehaviour {
 
         if (Physics.Raycast(ray, out hit)) {
 
-            if (Input.GetMouseButtonDown(0)) {
+            if (hit.colliderInstanceID == meshCollider.GetInstanceID()) {
 
-                if (hit.colliderInstanceID == meshCollider.GetInstanceID()) {
-                    
-                    int clickX = (int)Math.Floor(hit.point.x - x);
-                    int clickY = (int)Math.Floor(Math.Abs(hit.point.z + y));
+                int clickX = (int)Math.Floor(hit.point.x - x);
+                int clickY = (int)Math.Floor(Math.Abs(hit.point.z + y));
 
-                    var column = section.tileColumns.First(tileColumn => {
-                        return tileColumn.x == clickX && tileColumn.y == clickY;
-                    });
+                var column = section.tileColumns.First(tileColumn => {
+                    return tileColumn.x == clickX && tileColumn.y == clickY;
+                });
 
-                    if (Input.GetKey(KeyCode.LeftShift)) {
-                        controller.SelectTiles(sortedTilesByTriangle[hit.triangleIndex], column, this);
-                    } else {
-                        controller.SelectTile(sortedTilesByTriangle[hit.triangleIndex], column, this);
+                if (Input.GetMouseButtonDown(0)) {
 
-                    }
+                    controller.SelectTile(sortedTilesByTriangle[hit.triangleIndex], column, this);
 
                     RefreshMesh();
+
+                } else {
+
+                    controller.LookTile(sortedTilesByTriangle[hit.triangleIndex], column, this);
+
                 }
 
             }
-
         }
 
     }

@@ -86,45 +86,26 @@ public class Main : MonoBehaviour {
 
     }
 
+    public void LookTile(Tile tile, TileColumn column, LevelMesh section) {
+
+    }
+
     public void SelectTile(Tile tile, TileColumn column, LevelMesh section) {
 
-        selectedTiles.Clear();
+        if (Input.GetKey(KeyCode.LeftShift)) {
 
-        ClearTileOverlays();
-
-        selectedTiles.Add(tile);
-        selectedColumn = column;
-        selectedSection = section;
-
-        var oldPoints = new List<HeightMapChannelPoint>(heightPointObjects);
-
-        heightPointObjects.Clear();
-
-        foreach (var obj in oldPoints) {
-
-            if (!obj.isSelected) {
-                Destroy(obj.gameObject);
-            } else {
-                heightPointObjects.Add(obj);
+            if (selectedSection != null) {
+                if (selectedSection != section) {
+                    return;
+                }
             }
 
-        }
+        } else {
 
-        AddHeightObjects(0);
-        AddHeightObjects(1);
-        AddHeightObjects(2);
-        AddHeightObjects(3);
+            selectedTiles.Clear();
 
-        InitTileOverlay(tile);
+            ClearTileOverlays();
 
-    }
-
-    public void SelectTiles(Tile tile, TileColumn column, LevelMesh section) {
-
-        if (selectedSection != null) {
-            if (selectedSection != section) {
-                return;
-            }
         }
 
         selectedTiles.Add(tile);
@@ -152,10 +133,6 @@ public class Main : MonoBehaviour {
 
         InitTileOverlay(tile);
 
-    }
-
-    public void OnHeightPointSelected(HeightMapChannelPoint point) {
-        point.Select();
     }
 
     public void UnselectAndRefreshHeightPoints() {
@@ -213,29 +190,6 @@ public class Main : MonoBehaviour {
 
         selectedSection.RefreshMesh();
 
-    }
-
-    public void OpenGraphicsPropertyView(GeometryEditorUI view) {
-
-        if (selectedTiles.Count == 0) { return; }
-
-        if (view.activeGraphicsPropertiesView != null) {
-            CloseGraphicsPropertyView(view);
-        } else {
-
-            view.activeGraphicsPropertiesView = Instantiate(view.graphicsPropertiesView);
-
-            view.activeGraphicsPropertiesView.GetComponent<GraphicsPropertiesView>().controller = this;
-
-            view.activeGraphicsPropertiesView.transform.SetParent(view.transform.parent, false);
-
-        }
-
-    }
-
-    public void CloseGraphicsPropertyView(GeometryEditorUI view) {
-        Destroy(view.activeGraphicsPropertiesView);
-        selectedSection.RefreshMesh();
     }
 
     public void RotateTileLeft() {
@@ -396,61 +350,24 @@ public class Main : MonoBehaviour {
 
     }
 
-    public void ChangeTilesGraphicPreset(GraphicsPresetItem view) {
+    public void ExportTexture(int id) {
 
+        if (id == -1) { return; }
 
-        foreach (var tile in selectedTiles) {
-            tile.graphicsIndex = view.index;
-
-        }
-
-        var graphicsOffset = selectedSection.section.tileGraphics[view.index];
-
-        Debug.Log(
-            graphicsOffset.number1.ToString() + " " +
-            graphicsOffset.number2.ToString() + " " +
-            graphicsOffset.number3.ToString() + " " +
-            graphicsOffset.number4.ToString() + " " +
-            graphicsOffset.number5.ToString());
-
-        view.view.RefreshView();
-
-    }
-
-    public void ExportTexture(GraphicsPropertiesView view) {
-
-        if (view.bmpID == -1) { return; }
-
-        var graphics = selectedSection.section.tileGraphics[view.bmpID];
+        var graphics = selectedSection.section.tileGraphics[id];
 
         File.WriteAllBytes("bmp" + graphics.number2.ToString() + ".bmp", level.textures[graphics.number2].BitmapWithHeader());
 
     }
 
     // TODO: Allow importing textures even when multiple tiles are selected
-    public void ImportTexture(GraphicsPropertiesView view) {
+    public void ImportTexture(int id) {
 
-        if (view.bmpID == -1) { return; }
+        if (id == -1) { return; }
 
         var graphics = selectedSection.section.tileGraphics[selectedTiles[0].graphicsIndex];
 
         level.textures[graphics.number2].ImportBMP(File.ReadAllBytes("bmp" + graphics.number2.ToString() + ".bmp"));
-
-        view.texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
-
-        view.rectangleTileToggle.GetComponent<Toggle>().isOn = graphics.number4 == 1;
-
-        var texture = new Texture2D(256, 256, TextureFormat.RGB565, false);
-
-        texture.LoadRawTextureData(level.textures[graphics.number2].ConvertToRGB565());
-        texture.Apply();
-
-        view.texturePallete.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
-
-        RefreshTextures();
-
-        selectedSection.RefreshMesh();
-        selectedSection.RefreshTexture();
 
     }
 
@@ -467,7 +384,7 @@ public class Main : MonoBehaviour {
 
     }
 
-    public void SetTextureCordX(int x, GraphicsPropertiesView view) {
+    public void SetTextureCordX(int x) {
 
         if (selectedTiles.Count == 0) { return; }
 
@@ -488,13 +405,9 @@ public class Main : MonoBehaviour {
 
         selectedSection.section.textureCoordinates[index] = TextureCoordinate.SetXPixel(x, selectedSection.section.textureCoordinates[index]);
 
-        view.DestoryTextureOffsets();
-        view.InitTextureOffsets();
-        view.textureLines.Refresh();
-
     }
 
-    public void SetTextureCordY(int y, GraphicsPropertiesView view) {
+    public void SetTextureCordY(int y) {
 
         if (selectedTiles.Count == 0) { return; }
 
@@ -514,10 +427,6 @@ public class Main : MonoBehaviour {
         var index = selectedTiles[0].textureIndex;
 
         selectedSection.section.textureCoordinates[index] = TextureCoordinate.SetYPixel(y, selectedSection.section.textureCoordinates[index]);
-
-        view.DestoryTextureOffsets();
-        view.InitTextureOffsets();
-        view.textureLines.Refresh();
 
     }
 

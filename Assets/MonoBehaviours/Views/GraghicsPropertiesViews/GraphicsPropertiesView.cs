@@ -85,13 +85,31 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
     public void OnClickExportTexture() {
 
-        controller.ExportTexture(this);
+        controller.ExportTexture(this.bmpID);
 
     }
 
     public void OnClickImportTexture() {
 
-        controller.ImportTexture(this);
+        controller.ImportTexture(bmpID);
+
+        var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
+
+        texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
+
+        rectangleTileToggle.GetComponent<Toggle>().isOn = graphics.number4 == 1;
+
+        var texture = new Texture2D(256, 256, TextureFormat.RGB565, false);
+
+        texture.LoadRawTextureData(controller.level.textures[graphics.number2].ConvertToRGB565());
+        texture.Apply();
+
+        texturePallete.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
+
+        controller.RefreshTextures();
+
+        controller.selectedSection.RefreshMesh();
+        controller.selectedSection.RefreshTexture();
 
     }
 
@@ -115,7 +133,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
         var comp = textureInputX.GetComponent<TMP_InputField>();
 
         try {
-            controller.SetTextureCordX(Int32.Parse(comp.text), this);
+            controller.SetTextureCordX(Int32.Parse(comp.text));
         } catch {
             return;
         }
@@ -131,12 +149,14 @@ public class GraphicsPropertiesView : MonoBehaviour {
         var comp = textureInputY.GetComponent<TMP_InputField>();
 
         try {
-            controller.SetTextureCordY(Int32.Parse(comp.text), this);
+            controller.SetTextureCordY(Int32.Parse(comp.text));
         } catch {
             return;
         }
 
-
+        DestoryTextureOffsets();
+        InitTextureOffsets();
+        textureLines.Refresh();
     }
 
     void InitView() {

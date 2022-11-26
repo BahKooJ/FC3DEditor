@@ -42,7 +42,21 @@ public class GraphicsPresetItem : MonoBehaviour {
 
     public void OnClick() {
 
-        controller.ChangeTilesGraphicPreset(this);
+        foreach (var tile in controller.selectedTiles) {
+            tile.graphicsIndex = index;
+
+        }
+
+        var graphicsOffset = controller.selectedSection.section.tileGraphics[index];
+
+        Debug.Log(
+            graphicsOffset.number1.ToString() + " " +
+            graphicsOffset.number2.ToString() + " " +
+            graphicsOffset.number3.ToString() + " " +
+            graphicsOffset.number4.ToString() + " " +
+            graphicsOffset.number5.ToString());
+
+        view.RefreshView();
 
     }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AddTileButton : MonoBehaviour {
 
-    public Main controller;
+    public AddGeometryPanel view;
 
     public int defaultPreset = -1;
 
@@ -20,7 +20,7 @@ public class AddTileButton : MonoBehaviour {
 
     public void OnClick() {
 
-        controller.AddTile(preset);
+        view.Select(preset);
 
     }
 
