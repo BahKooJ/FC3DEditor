@@ -33,7 +33,7 @@ public class Main : MonoBehaviour {
 
     public bool debug = false;
 
-    public int selectedListItem = -1;
+    public EditMode editMode;
 
     void Start() {
 
@@ -46,7 +46,6 @@ public class Main : MonoBehaviour {
         RenderFullMap();
 
     }
-
 
     void Update() {
 
@@ -86,52 +85,18 @@ public class Main : MonoBehaviour {
 
     }
 
-    public void LookTile(Tile tile, TileColumn column, LevelMesh section) {
+    public void ChangeEditMode(EditMode mode) {
+        ClearAllSelectedItems();
+        editMode = mode;
+    }
 
+    public void LookTile(Tile tile, TileColumn column, LevelMesh section) {
+        editMode.LookTile(tile, column, section);
     }
 
     public void SelectTile(Tile tile, TileColumn column, LevelMesh section) {
 
-        if (Input.GetKey(KeyCode.LeftShift)) {
-
-            if (selectedSection != null) {
-                if (selectedSection != section) {
-                    return;
-                }
-            }
-
-        } else {
-
-            selectedTiles.Clear();
-
-            ClearTileOverlays();
-
-        }
-
-        selectedTiles.Add(tile);
-        selectedColumn = column;
-        selectedSection = section;
-
-        var oldPoints = new List<HeightMapChannelPoint>(heightPointObjects);
-
-        heightPointObjects.Clear();
-
-        foreach (var obj in oldPoints) {
-
-            if (!obj.isSelected) {
-                Destroy(obj.gameObject);
-            } else {
-                heightPointObjects.Add(obj);
-            }
-
-        }
-
-        AddHeightObjects(0);
-        AddHeightObjects(1);
-        AddHeightObjects(2);
-        AddHeightObjects(3);
-
-        InitTileOverlay(tile);
+        editMode.SelectTile(tile, column, section);
 
     }
 
@@ -174,8 +139,8 @@ public class Main : MonoBehaviour {
 
         if (selectedColumn != null) {
 
-            foreach (var foo in selectedColumn.tiles) {
-                foo.isStartInColumnArray = false;
+            foreach (var t in selectedColumn.tiles) {
+                t.isStartInColumnArray = false;
             }
 
             var tile = preset.Create(true);
@@ -485,7 +450,7 @@ public class Main : MonoBehaviour {
 
     }
 
-    void InitTileOverlay(Tile tile) {
+    public void InitTileOverlay(Tile tile) {
 
         var overlay = Instantiate(SelectedTileOverlay);
         var script = overlay.GetComponent<SelectedTileOverlay>();
@@ -498,7 +463,7 @@ public class Main : MonoBehaviour {
 
     }
 
-    void ClearTileOverlays() {
+    public void ClearTileOverlays() {
 
         foreach (var overlay in selectedTileOverlays) {
             Destroy(overlay.gameObject);
@@ -508,7 +473,7 @@ public class Main : MonoBehaviour {
 
     }
 
-    void AddHeightObjects(int corner) {
+    public void AddHeightObjects(int corner) {
 
         var worldX = selectedSection.x + selectedColumn.x;
         var worldY = -(selectedSection.y + selectedColumn.y);

@@ -13,11 +13,7 @@ class ToolbarView: MonoBehaviour {
 
     void Start() {
 
-        var obj = Instantiate(geometryEditorPanel);
-
-        obj.transform.SetParent(this.transform.parent,false);
-
-        activePanel = obj;
+        AddGeometryPanel();
 
     }
 
@@ -27,9 +23,15 @@ class ToolbarView: MonoBehaviour {
 
         var obj = Instantiate(geometryEditorPanel);
 
+        var script = obj.GetComponent<GeometryEditorUI>();
+
+        script.controller = controller;
+
         obj.transform.SetParent(this.transform.parent, false);
 
         activePanel = obj;
+
+        controller.ChangeEditMode(new GeometryEditMode(controller));
 
     }
 
@@ -39,9 +41,15 @@ class ToolbarView: MonoBehaviour {
 
         var obj = Instantiate(addGeometryPanel);
 
+        var script = obj.GetComponent<AddGeometryPanel>();
+
+        script.controller = controller;
+
         obj.transform.SetParent(this.transform.parent, false);
 
         activePanel = obj;
+
+        controller.ChangeEditMode(new GeometryAddMode(controller));
 
     }
 

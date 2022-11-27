@@ -15,8 +15,8 @@ public class SelectedTileOverlay : MonoBehaviour {
     Mesh mesh;
     Material material;
 
-    List<Vector3> vertices = new List<Vector3>();
-    List<int> triangles = new List<int>();
+    List<Vector3> vertices = new();
+    List<int> triangles = new();
 
     void Start() {
 
