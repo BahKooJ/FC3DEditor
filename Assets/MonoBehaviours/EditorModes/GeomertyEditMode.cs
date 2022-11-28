@@ -56,6 +56,38 @@ class GeometryEditMode : EditMode {
         main.AddHeightObjects(2);
         main.AddHeightObjects(3);
 
+        if (Input.GetKey(KeyCode.Alpha1)) {
+
+            foreach (var obj in main.heightPointObjects) {
+
+                if (obj.channel == 1) {
+                    obj.Select();
+                }
+
+            }
+
+        } else if (Input.GetKey(KeyCode.Alpha2)) {
+
+            foreach (var obj in main.heightPointObjects) {
+
+                if (obj.channel == 2) {
+                    obj.Select();
+                }
+
+            }
+
+        } else if (Input.GetKey(KeyCode.Alpha3)) {
+
+            foreach (var obj in main.heightPointObjects) {
+
+                if (obj.channel == 3) {
+                    obj.Select();
+                }
+
+            }
+
+        }
+
         main.InitTileOverlay(tile);
 
     }

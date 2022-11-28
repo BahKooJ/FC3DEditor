@@ -22,6 +22,8 @@ public class HeightMapChannelPoint : MonoBehaviour {
     BoxCollider boxCollider;
     Material material;
 
+    public bool preInitSelect = false;
+
     bool click = false;
     Vector3 previousMousePosition;
 
@@ -31,7 +33,11 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
         material = GetComponent<MeshRenderer>().material;
 
-        ResetColors();
+        if (preInitSelect) {
+            material.color = Color.white;
+        } else {
+            ResetColors();
+        }
 
     }
 
@@ -114,7 +120,11 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
     public void Select() {
         isSelected = true;
-        material.color = Color.white;
+        if (material == null) {
+            preInitSelect = true;
+        } else {
+            material.color = Color.white;
+        }
     }
 
 }

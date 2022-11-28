@@ -191,6 +191,7 @@ namespace FCopParser {
                     compiledFile.AddRange(FourCC.FILLbytes);
                     compiledFile.AddRange(BitConverter.GetBytes(difference));
 
+                    // Expection through new for unknown reason
                     foreach (int i in Enumerable.Range(0, difference - 8)) {
                         compiledFile.Add(0);
                     }
