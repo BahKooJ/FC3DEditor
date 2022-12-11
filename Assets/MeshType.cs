@@ -1125,7 +1125,7 @@ namespace FCopParser {
                 var index = 0;
                 foreach (var vertex in mesh.Value) {
 
-                    if (!(vertex.heightChannel == verticies[index].heightChannel && vertex.vertexPosition == verticies[index].vertexPosition)) {
+                    if (!mesh.Value.Contains(verticies[index])) {
                         found = false;
                         break;
                     }

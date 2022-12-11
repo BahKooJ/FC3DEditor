@@ -1,20 +1,15 @@
 ﻿
 using FCopParser;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AddTileButton : MonoBehaviour {
 
     public AddGeometryPanel view;
 
-    public int defaultPreset = -1;
-
     public TilePreset preset;
 
     void Start() {
-
-        if (defaultPreset != -1) {
-            preset = TilePreset.defaultPresets[(int)defaultPreset];
-        }
 
     }
 

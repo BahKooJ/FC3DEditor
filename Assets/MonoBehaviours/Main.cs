@@ -20,7 +20,7 @@ public class Main : MonoBehaviour {
     public GameObject heightMapChannelPoint;
     public GameObject SelectedTileOverlay;
 
-    IFFParser iffFile = new(File.ReadAllBytes("C:/Users/Zewy/Desktop/Mp MOD"));
+    IFFParser iffFile = new(File.ReadAllBytes("C:/Users/Zewy/Desktop/Mp"));
     public FCopLevel level;
 
     public Texture2D levelTexturePallet;

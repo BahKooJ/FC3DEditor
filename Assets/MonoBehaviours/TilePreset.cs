@@ -5,25 +5,18 @@ using System.Collections.Generic;
 
 public struct TilePreset {
 
-
-    public static List<TilePreset> defaultPresets = new() { 
-        new TilePreset(68,0,0,0),
-        new TilePreset(0,0,0,0),
-        new TilePreset(107,3,0,0),
-        new TilePreset(71,0,0,0),
-        new TilePreset(108,3,0,0)
-    };
-
     public int meshID;
     public int culling;
     public int textureIndex;
     public int graphicsIndex;
+    public string previewImagePath;
 
-    public TilePreset(int meshID, int culling, int textureIndex, int graphicsIndex) {
+    public TilePreset(int meshID, int culling, int textureIndex, int graphicsIndex, string previewImagePath) {
         this.meshID = meshID;
         this.culling = culling;
         this.textureIndex = textureIndex;
         this.graphicsIndex = graphicsIndex;
+        this.previewImagePath = previewImagePath;
     }
 
     public Tile Create(bool isStart) {
