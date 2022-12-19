@@ -16,14 +16,14 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
     public GameObject textureOffsetItem;
     public GameObject graphicsPresetItem;
+    public GameObject textureCoordinatePoint;
 
     public GameObject texturePalletteDropdown;
     public GameObject rectangleTileToggle;
     public GameObject texturePallete;
+    public GameObject texturePalleteImage;
     public GameObject textureOffsets;
     public GameObject graphicsPreset;
-    public GameObject textureInputX;
-    public GameObject textureInputY;
 
     public TextureCoordinatesLines textureLines;
 
@@ -32,6 +32,44 @@ public class GraphicsPropertiesView : MonoBehaviour {
     void Start() {
 
         InitView();
+
+    }
+
+    void Update() {
+
+        float axis = Input.GetAxis("Mouse ScrollWheel");
+        if (axis != 0) {
+            var scale = texturePalleteImage.transform.localScale;
+
+            scale.x += axis * 4;
+            scale.y += axis * 4;
+
+            texturePalleteImage.transform.localScale = scale;
+
+            var position = texturePalleteImage.transform.localPosition;
+
+            position.x -= 265 * (axis * 2);
+            position.y -= 265 * (axis * 2);
+
+            texturePalleteImage.transform.localPosition = position;
+
+        }
+
+        if (Input.GetMouseButton(1)) {
+            var position = texturePalleteImage.transform.localPosition;
+
+            position.x += Input.GetAxis("Mouse X") * 18;
+            position.y += Input.GetAxis("Mouse Y") * 18;
+
+            texturePalleteImage.transform.localPosition = position;
+
+        }
+
+        //Vector2 pointOnPallete = Vector2.zero;
+
+        //RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)texturePallete.transform, Input.mousePosition, Camera.main, out pointOnPallete);
+
+        //Debug.Log(pointOnPallete);
 
     }
 
@@ -69,7 +107,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
             texture.LoadRawTextureData(controller.level.textures[graphics.number2].ConvertToRGB565());
             texture.Apply();
 
-            texturePallete.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
+            texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
         }
 
         InitTextureOffsets();
@@ -104,7 +142,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
         texture.LoadRawTextureData(controller.level.textures[graphics.number2].ConvertToRGB565());
         texture.Apply();
 
-        texturePallete.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
+        texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
 
         controller.RefreshTextures();
 
@@ -128,68 +166,63 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
     }
 
-    public void OnSetTextureCordX() {
+    public void OnClickAdd3Texture() {
 
-        var comp = textureInputX.GetComponent<TMP_InputField>();
+        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(120, 120));
+        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(120, 100));
+        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(100,100));
 
-        try {
-            controller.SetTextureCordX(Int32.Parse(comp.text));
-        } catch {
-            return;
-        }
 
         DestoryTextureOffsets();
         InitTextureOffsets();
-        textureLines.Refresh();
+
+    }
+
+    public void OnClickAdd4Texture() {
+
+        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(100, 120));
+        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(120, 120));
+        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(120, 100));
+        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(100, 100));
+
+
+        DestoryTextureOffsets();
+        InitTextureOffsets();
+
+    }
+
+    public void OnSetTextureCordX() {
+
+        //var comp = textureInputX.GetComponent<TMP_InputField>();
+
+        //try {
+        //    controller.SetTextureCordX(Int32.Parse(comp.text));
+        //} catch {
+        //    return;
+        //}
+
+        DestoryTextureOffsets();
+        InitTextureOffsets();
+        textureLines.ReInit();
 
     }
 
     public void OnSetTextureCordY() {
 
-        var comp = textureInputY.GetComponent<TMP_InputField>();
+        //var comp = textureInputY.GetComponent<TMP_InputField>();
 
-        try {
-            controller.SetTextureCordY(Int32.Parse(comp.text));
-        } catch {
-            return;
-        }
+        //try {
+        //    controller.SetTextureCordY(Int32.Parse(comp.text));
+        //} catch {
+        //    return;
+        //}
 
         DestoryTextureOffsets();
         InitTextureOffsets();
-        textureLines.Refresh();
+        textureLines.ReInit();
     }
 
     void InitView() {
-
-        foreach (Object obj in transform) {
-
-            switch (obj.GameObject().name) {
-
-                case "Texture Pallette Dropdown":
-                    texturePalletteDropdown = obj.GameObject();
-                    break;
-                case "Rectangle Tile Toggle":
-                    rectangleTileToggle = obj.GameObject();
-                    break;
-                case "Texture Pallette":
-                    texturePallete = obj.GameObject();
-                    break;
-                case "Texture Offsets":
-                    textureOffsets = obj.GameObject();
-                    break;
-                case "Graphics Presets":
-                    graphicsPreset = obj.GameObject();
-                    break;
-                case "Texture Input X":
-                    textureInputX = obj.GameObject();
-                    break;
-                case "Texture Input Y":
-                    textureInputY = obj.GameObject();
-                    break;
-
-            }
-
-        }
 
         if (controller.selectedTiles.Count == 1) {
             var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
@@ -220,7 +253,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
             texture.LoadRawTextureData(controller.level.textures[graphics.number2].ConvertToRGB565());
             texture.Apply();
 
-            texturePallete.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
+            texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
         }
 
         InitTextureOffsets();

@@ -437,6 +437,10 @@ namespace FCopParser {
 
         }
 
+        static public int SetPixel(int x, int y) { 
+            return (y * 256) + x;
+        }
+
     }
 
     public struct TileGraphics {
