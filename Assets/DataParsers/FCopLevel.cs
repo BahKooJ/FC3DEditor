@@ -47,8 +47,6 @@ namespace FCopParser {
 
             }));
 
-            var foo = 0;
-
         }
 
         public FCopLevel(int width, int height, IFFFileManager fileManager) {
@@ -569,8 +567,6 @@ namespace FCopParser {
         public int textureIndex;
         public int graphicsIndex;
         public int unknownButVeryImportantNumber;
-
-        public Rotation rotation;
 
         public TileBitfield parsedTile;
 
