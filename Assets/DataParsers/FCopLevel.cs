@@ -11,9 +11,11 @@ namespace FCopParser {
 
         public List<List<int>> layout;
 
-        public List<FCopLevelSection> sections = new List<FCopLevelSection>();
+        public List<FCopLevelSection> sections = new();
 
-        public List<FCopTexture> textures = new List<FCopTexture>();
+        public List<FCopTexture> textures = new();
+
+        public List<FCopNavMesh> navMeshes = new();
 
         public IFFFileManager fileManager;
 
@@ -33,12 +35,22 @@ namespace FCopParser {
 
             }).ToList();
 
+            var rawNavMeshFiles = fileManager.files.Where(file => {
+
+                return file.dataFourCC == "Cnet";
+
+            }).ToList();
+
             foreach (var rawFile in rawCtilFiles) {
                 sections.Add(new FCopLevelSectionParser(rawFile).Parse(this));
             }
 
             foreach (var rawFile in rawBitmapFiles) {
                 textures.Add(new FCopTexture(rawFile));
+            }
+
+            foreach (var rawFile in rawNavMeshFiles) {
+                navMeshes.Add(new FCopNavMesh(rawFile));
             }
 
             layout = FCopLevelLayoutParser.Parse(fileManager.files.First(file => {
@@ -122,6 +134,12 @@ namespace FCopParser {
 
             }).ToList();
 
+            var rawNavMeshFiles = fileManager.files.Where(file => {
+
+                return file.dataFourCC == "Cnet";
+
+            }).ToList();
+
             sections.Add(new FCopLevelSectionParser(rawCtilFiles[0]).Parse(this));
 
             foreach (var row in layout) {
@@ -153,6 +171,10 @@ namespace FCopParser {
             foreach (var rawFile in rawBitmapFiles) {
                 textures.Add(new FCopTexture(rawFile));
             }
+
+            foreach (var rawFile in rawNavMeshFiles) {
+                navMeshes.Add(new FCopNavMesh(rawFile));
+            }   
 
         }
 

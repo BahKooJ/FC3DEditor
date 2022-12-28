@@ -7,6 +7,14 @@ class GeometryEditMode : EditMode {
 
     public Main main { get; set; }
 
+    public void OnCreateMode() {
+
+    }
+
+    public void OnDestroy() {
+
+    }
+
     public GeometryEditMode(Main main) {
         this.main = main;
     }

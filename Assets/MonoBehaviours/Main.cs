@@ -19,6 +19,7 @@ public class Main : MonoBehaviour {
     public GameObject meshSection;
     public GameObject heightMapChannelPoint;
     public GameObject SelectedTileOverlay;
+    public GameObject NavMeshPoint;
 
     IFFParser iffFile = new(File.ReadAllBytes("C:/Users/Zewy/Desktop/Mp"));
     public FCopLevel level;
@@ -86,8 +87,15 @@ public class Main : MonoBehaviour {
     }
 
     public void ChangeEditMode(EditMode mode) {
+
+        if (editMode != null) {
+            editMode.OnDestroy();
+        }
+
         ClearAllSelectedItems();
         editMode = mode;
+        editMode.OnCreateMode();
+
     }
 
     public void LookTile(Tile tile, TileColumn column, LevelMesh section) {

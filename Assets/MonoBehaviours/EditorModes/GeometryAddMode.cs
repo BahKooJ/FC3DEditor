@@ -12,6 +12,14 @@ public class GeometryAddMode : EditMode {
         this.main = main;
     }
 
+    public void OnCreateMode() {
+
+    }
+
+    public void OnDestroy() {
+
+    }
+
     public void LookTile(Tile tile, TileColumn column, LevelMesh section) {
 
         if (column != main.selectedColumn && main.selectedColumn != null) {

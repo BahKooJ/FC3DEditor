@@ -53,5 +53,22 @@ class ToolbarView: MonoBehaviour {
 
     }
 
+    public void SelectNavMeshEdit() {
+
+        Destroy(activePanel);
+
+        var obj = Instantiate(addGeometryPanel);
+
+        var script = obj.GetComponent<AddGeometryPanel>();
+
+        script.controller = controller;
+
+        obj.transform.SetParent(this.transform.parent, false);
+
+        activePanel = obj;
+
+        controller.ChangeEditMode(new NavMeshEditMode(controller));
+
+    }
 
 }
