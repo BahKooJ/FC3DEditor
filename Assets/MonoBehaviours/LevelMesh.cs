@@ -10,9 +10,7 @@ public class LevelMesh : MonoBehaviour {
 
     Mesh mesh;
     MeshRenderer meshRenderer;
-    MeshCollider meshCollider;
-    Ray ray;
-    RaycastHit hit;
+    public MeshCollider meshCollider;
 
     public FCopLevelSection section;
     public Texture2D levelTexturePallet;
@@ -24,7 +22,7 @@ public class LevelMesh : MonoBehaviour {
     List<int> triangles = new List<int>();
     List<Vector2> textureCords = new List<Vector2>();
 
-    List<Tile> sortedTilesByTriangle = new List<Tile>();
+    public List<Tile> sortedTilesByTriangle = new List<Tile>();
 
     public float x = 0;
     public float y = 0;
@@ -44,38 +42,7 @@ public class LevelMesh : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-
-        if (!FreeMove.looking) {
-            return;
-        }
-
-        ray = Camera.main.ViewportPointToRay(new Vector3(0.5f,0.5f));
-
-        if (Physics.Raycast(ray, out hit)) {
-
-            if (hit.colliderInstanceID == meshCollider.GetInstanceID()) {
-
-                int clickX = (int)Math.Floor(hit.point.x - x);
-                int clickY = (int)Math.Floor(Math.Abs(hit.point.z + y));
-
-                var column = section.tileColumns.First(tileColumn => {
-                    return tileColumn.x == clickX && tileColumn.y == clickY;
-                });
-
-                if (Input.GetMouseButtonDown(0)) {
-
-                    controller.SelectTile(sortedTilesByTriangle[hit.triangleIndex], column, this);
-
-                    RefreshMesh();
-
-                } else {
-
-                    controller.LookTile(sortedTilesByTriangle[hit.triangleIndex], column, this);
-
-                }
-
-            }
-        }
+       
 
     }
 

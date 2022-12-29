@@ -5,6 +5,8 @@ public interface EditMode {
 
     public Main main { get; set; }
 
+    public void Update();
+
     public void OnCreateMode();
 
     public void OnDestroy();

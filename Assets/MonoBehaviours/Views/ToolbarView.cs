@@ -6,6 +6,7 @@ class ToolbarView: MonoBehaviour {
 
     public GameObject geometryEditorPanel;
     public GameObject addGeometryPanel;
+    public GameObject navMeshEditPanel;
 
     public Main controller;
 
@@ -55,19 +56,21 @@ class ToolbarView: MonoBehaviour {
 
     public void SelectNavMeshEdit() {
 
+        var editMode = new NavMeshEditMode(controller);
+
         Destroy(activePanel);
 
-        var obj = Instantiate(addGeometryPanel);
+        var obj = Instantiate(navMeshEditPanel);
 
-        var script = obj.GetComponent<AddGeometryPanel>();
+        var script = obj.GetComponent<NavMeshEditPanel>();
 
-        script.controller = controller;
+        script.controller = editMode;
 
         obj.transform.SetParent(this.transform.parent, false);
 
         activePanel = obj;
 
-        controller.ChangeEditMode(new NavMeshEditMode(controller));
+        controller.ChangeEditMode(editMode);
 
     }
 

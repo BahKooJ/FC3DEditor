@@ -47,6 +47,8 @@ namespace FCopParser {
 
     public class NavNode {
 
+        public static int invalid = 1023;
+
         public int index;
         public int nextNodeA;
         public int nextNodeB;

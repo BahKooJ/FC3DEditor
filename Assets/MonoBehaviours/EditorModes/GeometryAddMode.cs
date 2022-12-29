@@ -12,6 +12,14 @@ public class GeometryAddMode : EditMode {
         this.main = main;
     }
 
+    public void Update() {
+
+        if (FreeMove.looking) {
+            main.TestRayOnLevelMesh();
+        }
+
+    }
+
     public void OnCreateMode() {
 
     }

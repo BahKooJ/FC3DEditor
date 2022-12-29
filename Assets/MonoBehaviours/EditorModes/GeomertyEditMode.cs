@@ -7,6 +7,14 @@ class GeometryEditMode : EditMode {
 
     public Main main { get; set; }
 
+    public void Update() {
+        
+        if (FreeMove.looking) {
+            main.TestRayOnLevelMesh();
+        }
+
+    }
+
     public void OnCreateMode() {
 
     }
@@ -14,6 +22,7 @@ class GeometryEditMode : EditMode {
     public void OnDestroy() {
 
     }
+
 
     public GeometryEditMode(Main main) {
         this.main = main;

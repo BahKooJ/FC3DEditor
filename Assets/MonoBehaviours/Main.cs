@@ -20,9 +20,12 @@ public class Main : MonoBehaviour {
     public GameObject heightMapChannelPoint;
     public GameObject SelectedTileOverlay;
     public GameObject NavMeshPoint;
+    public GameObject line3d;
 
     IFFParser iffFile = new(File.ReadAllBytes("C:/Users/Zewy/Desktop/Mp"));
     public FCopLevel level;
+
+    public List<LevelMesh> sectionMeshes = new();
 
     public Texture2D levelTexturePallet;
 
@@ -50,6 +53,8 @@ public class Main : MonoBehaviour {
 
     void Update() {
 
+        editMode.Update();
+
         if (Input.GetKeyDown(KeyCode.Equals)) {
             Compile();
         } else if (Input.GetKeyDown(KeyCode.C)) {
@@ -57,6 +62,46 @@ public class Main : MonoBehaviour {
         } else if (Input.GetKeyDown(KeyCode.Delete)) {
             RemoveSelectedTiles();
         }
+    }
+
+    public void TestRayOnLevelMesh() {
+
+        var ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit)) {
+
+            foreach (var section in sectionMeshes) {
+
+                if (hit.colliderInstanceID == section.meshCollider.GetInstanceID()) {
+
+                    int clickX = (int)Math.Floor(hit.point.x - section.x);
+                    int clickY = (int)Math.Floor(Math.Abs(hit.point.z + section.y));
+
+                    var column = section.section.tileColumns.First(tileColumn => {
+                        return tileColumn.x == clickX && tileColumn.y == clickY;
+                    });
+
+                    if (Input.GetMouseButtonDown(0)) {
+
+                        SelectTile(section.sortedTilesByTriangle[hit.triangleIndex], column, section);
+
+                        section.RefreshMesh();
+
+                    } else {
+
+                        LookTile(section.sortedTilesByTriangle[hit.triangleIndex], column, section);
+
+                    }
+
+                }
+
+
+            }
+
+        }
+
     }
 
     public void Compile() {
@@ -556,6 +601,7 @@ public class Main : MonoBehaviour {
                     script.controller = this;
                     script.x = x;
                     script.y = y;
+                    sectionMeshes.Add(script);
                 }
 
                 x += 16;
