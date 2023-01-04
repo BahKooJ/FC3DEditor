@@ -1,11 +1,14 @@
 ﻿
 
 using FCopParser;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class NavNodePoint : MonoBehaviour {
 
     static float yPadding = 0.3f;
+
+    public SphereCollider sphereCollider;
 
     public NavNode node;
 
@@ -13,7 +16,9 @@ public class NavNodePoint : MonoBehaviour {
 
     public LineRenderer nextNodeLineA = null;
     public LineRenderer nextNodeLineB = null;
-    public LineRenderer nextNodeLineC = null ;
+    public LineRenderer nextNodeLineC = null;
+
+    public List<NavNodePoint> previousPoints = new();
 
     void Start() {
 
@@ -26,7 +31,6 @@ public class NavNodePoint : MonoBehaviour {
         RaycastHit hit;
 
         if (Physics.Raycast(transform.position, Vector3.down, out hit, Mathf.Infinity, 1)) {
-            print("Found an object - distance: " + hit.distance);
 
             var pos = transform.position;
 
@@ -35,7 +39,22 @@ public class NavNodePoint : MonoBehaviour {
             transform.position = pos;
 
         } else {
-            print("No object found");
+            print("No floor found");
+        }
+
+    }
+
+    public void ChangePosition(Vector3 pos) {
+
+        node.x = Mathf.RoundToInt(pos.x * 32f);
+        node.y = Mathf.RoundToInt(pos.z * -32f);
+
+        Create();
+
+        RefreshLines();
+
+        foreach (var node in previousPoints) {
+            node.RefreshLines();
         }
 
     }

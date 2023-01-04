@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1345092867978044048}
   - component: {fileID: 9037256266016245241}
   - component: {fileID: 7110440522010822053}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Nav Node Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -110,4 +110,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 483606b6c8c88a34e8bd6996bb10b933, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineRenderer: {fileID: 0}
+  sphereCollider: {fileID: 9037256266016245241}
+  nextNodeLineA: {fileID: 0}
+  nextNodeLineB: {fileID: 0}
+  nextNodeLineC: {fileID: 0}

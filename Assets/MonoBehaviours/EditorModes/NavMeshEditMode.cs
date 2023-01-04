@@ -10,11 +10,101 @@ public class NavMeshEditMode : EditMode {
 
     public List<GameObject> lines = new();
 
+    public AxisControl selectedNavNode = null;
+
+    public NavNodePoint navNodeToAdd = null;
+
     public NavMeshEditMode(Main main) {
         this.main = main;
     }
 
     public void Update() {
+
+        if (navNodeToAdd != null) {
+
+            if (Input.GetMouseButtonDown(0)) {
+
+                var node = new NavNode(navNodes.Count, NavNode.invalid, NavNode.invalid, NavNode.invalid,
+                    Mathf.RoundToInt(navNodeToAdd.transform.position.x * 32f),
+                    Mathf.RoundToInt(navNodeToAdd.transform.position.z * -32f), false);
+
+                navNodeToAdd.node = node;
+
+                navNodeToAdd.Create();
+
+                navNodes.Add(navNodeToAdd);
+
+                navNodeToAdd = null;
+
+            } else {
+
+                var hitPos = main.CursorOnLevelMesh();
+
+                if (hitPos != null) {
+
+                    navNodeToAdd.transform.position = (Vector3)hitPos;
+
+                }
+
+            }
+
+        } else if (selectedNavNode != null) {
+
+            if (Input.GetKey(KeyCode.LeftShift)) {
+
+                var hitPos = main.CursorOnLevelMesh();
+
+                if (hitPos != null) {
+
+                    selectedNavNode.action((Vector3)hitPos);
+
+                    selectedNavNode.transform.position = selectedNavNode.controlledObject.transform.position;
+
+                }
+
+            }
+
+        }
+
+        if (Input.GetMouseButtonDown(0)) {
+
+            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, 8)) {
+
+                foreach (var node in navNodes) {
+
+                    if (hit.colliderInstanceID == node.sphereCollider.GetInstanceID()) {
+
+                        if (selectedNavNode != null) {
+                            Object.Destroy(selectedNavNode.gameObject);
+                        }
+
+                        var axisControl = Object.Instantiate(main.axisControl);
+                        var script = axisControl.GetComponent<AxisControl>();
+
+                        script.controlledObject = node.gameObject;
+
+                        script.action = (newPos) => {
+
+                            node.ChangePosition(newPos);
+
+                            return true;
+                        };
+
+                        selectedNavNode = script;
+
+                        break;
+
+                    }
+
+                }
+
+            }
+
+        }
 
     }
 
@@ -72,6 +162,29 @@ public class NavMeshEditMode : EditMode {
 
         foreach (var node in navNodes) {
             node.RefreshLines();
+
+            if (node.node.nextNodeA != NavNode.invalid) {
+
+                var nextNode = navNodes[node.node.nextNodeA];
+
+                nextNode.previousPoints.Add(node);
+
+            }
+            if (node.node.nextNodeB != NavNode.invalid) {
+
+                var nextNode = navNodes[node.node.nextNodeB];
+
+                nextNode.previousPoints.Add(node);
+
+            }
+            if (node.node.nextNodeC != NavNode.invalid) {
+
+                var nextNode = navNodes[node.node.nextNodeC];
+
+                nextNode.previousPoints.Add(node);
+
+            }
+
         }
 
     }
@@ -89,6 +202,10 @@ public class NavMeshEditMode : EditMode {
         }
 
         lines.Clear();
+
+        if (selectedNavNode != null) {
+            Object.Destroy(selectedNavNode.gameObject);
+        }
 
     }
 

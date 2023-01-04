@@ -21,6 +21,7 @@ public class Main : MonoBehaviour {
     public GameObject SelectedTileOverlay;
     public GameObject NavMeshPoint;
     public GameObject line3d;
+    public GameObject axisControl;
 
     IFFParser iffFile = new(File.ReadAllBytes("C:/Users/Zewy/Desktop/Mp"));
     public FCopLevel level;
@@ -70,7 +71,7 @@ public class Main : MonoBehaviour {
 
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit)) {
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, 1)) {
 
             foreach (var section in sectionMeshes) {
 
@@ -101,6 +102,38 @@ public class Main : MonoBehaviour {
             }
 
         }
+
+    }
+
+    public Vector3? CursorOnLevelMesh() {
+
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, 1)) {
+
+            foreach (var section in sectionMeshes) {
+
+                if (hit.colliderInstanceID == section.meshCollider.GetInstanceID()) {
+
+                    int clickX = (int)Math.Floor(hit.point.x - section.x);
+                    int clickY = (int)Math.Floor(Math.Abs(hit.point.z + section.y));
+
+                    var column = section.section.tileColumns.First(tileColumn => {
+                        return tileColumn.x == clickX && tileColumn.y == clickY;
+                    });
+
+                    return hit.point;
+
+                }
+
+
+            }
+
+        }
+
+        return null;
 
     }
 
