@@ -507,6 +507,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31810d5e2f7e6f14c847d37cc00d42d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  navMeshButton: {fileID: 5736727435919276717, guid: 93fc30b745c8ea849945de5fc5aa0bcc, type: 3}
+  listView: {fileID: 8125455122635452116}
 --- !u!1 &8125455122958852513
 GameObject:
   m_ObjectHideFlags: 0

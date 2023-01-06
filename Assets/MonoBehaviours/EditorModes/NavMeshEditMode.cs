@@ -1,10 +1,15 @@
 ﻿
 using FCopParser;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public class NavMeshEditMode : EditMode {
     public Main main { get; set; }
+
+    public int selectedNavMesh = 0;
 
     public List<NavNodePoint> navNodes = new();
 
@@ -13,6 +18,7 @@ public class NavMeshEditMode : EditMode {
     public AxisControl selectedNavNode = null;
 
     public NavNodePoint navNodeToAdd = null;
+    public (NavNodePoint, LineRenderer)? pathToAdd = null;
 
     public NavMeshEditMode(Main main) {
         this.main = main;
@@ -24,11 +30,15 @@ public class NavMeshEditMode : EditMode {
 
             if (Input.GetMouseButtonDown(0)) {
 
-                var node = new NavNode(navNodes.Count, NavNode.invalid, NavNode.invalid, NavNode.invalid,
+                var node = new NavNode(navNodes.Count,
                     Mathf.RoundToInt(navNodeToAdd.transform.position.x * 32f),
                     Mathf.RoundToInt(navNodeToAdd.transform.position.z * -32f), false);
 
+                main.level.navMeshes[selectedNavMesh].nodes.Add(node);
+
                 navNodeToAdd.node = node;
+
+                navNodeToAdd.controller = this;
 
                 navNodeToAdd.Create();
 
@@ -48,7 +58,64 @@ public class NavMeshEditMode : EditMode {
 
             }
 
-        } else if (selectedNavNode != null) {
+            return;
+
+        }
+
+        if (pathToAdd != null) {
+
+            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, 8)) {
+
+                foreach (var node in navNodes) {
+
+                    if (hit.colliderInstanceID == node.sphereCollider.GetInstanceID()) {
+
+                        pathToAdd.Value.Item2.SetPosition(1, node.transform.position);
+
+                        if (Input.GetMouseButtonDown(0)) {
+
+                            var index = Array.IndexOf(pathToAdd.Value.Item1.node.nextNode, NavNode.invalid);
+
+                            pathToAdd.Value.Item1.node.nextNode[index] = node.node.index;
+
+                            pathToAdd.Value.Item1.RefreshLines();
+                            node.RefreshLines();
+
+                            node.previousPoints.Add(pathToAdd.Value.Item1);
+
+                            Object.Destroy(pathToAdd.Value.Item2.gameObject);
+
+                            pathToAdd = null;
+
+                        }
+
+                        break;
+
+                    }
+
+                }
+
+            } else {
+
+                var hitPos = main.CursorOnLevelMesh();
+
+                if (hitPos != null) {
+
+                    pathToAdd.Value.Item2.SetPosition(1, (Vector3)hitPos);
+
+                }
+
+            }
+
+            return;
+
+        }
+
+        if (selectedNavNode != null) {
 
             if (Input.GetKey(KeyCode.LeftShift)) {
 
@@ -62,6 +129,8 @@ public class NavMeshEditMode : EditMode {
 
                 }
 
+            } else if (Input.GetKey(KeyCode.Delete)) {
+                DeleteNode();
             }
 
         }
@@ -78,9 +147,7 @@ public class NavMeshEditMode : EditMode {
 
                     if (hit.colliderInstanceID == node.sphereCollider.GetInstanceID()) {
 
-                        if (selectedNavNode != null) {
-                            Object.Destroy(selectedNavNode.gameObject);
-                        }
+                        UnselectNode();
 
                         var axisControl = Object.Instantiate(main.axisControl);
                         var script = axisControl.GetComponent<AxisControl>();
@@ -106,11 +173,87 @@ public class NavMeshEditMode : EditMode {
 
         }
 
+        if (Input.GetMouseButtonDown(1)) {
+
+            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, 8)) {
+
+                foreach (var node in navNodes) {
+
+                    if (hit.colliderInstanceID == node.sphereCollider.GetInstanceID()) {
+
+                        UnselectNode();
+
+                        if (node.nextNodeLines.Last() != null) {
+                            break;
+                        }
+
+                        var lineObject = Object.Instantiate(main.line3d);
+
+                        var line = lineObject.GetComponent<LineRenderer>();
+
+                        line.SetPosition(0, node.transform.position);
+
+                        pathToAdd = (node, line);
+
+                        break;
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+    void DeleteNode() {
+
+        var indexOfDeletedNode = selectedNavNode.controlledObject.GetComponent<NavNodePoint>().node.index;
+
+        OnDestroy();
+
+        main.level.navMeshes[selectedNavMesh].nodes.RemoveAt(indexOfDeletedNode);
+
+        foreach (var node in main.level.navMeshes[selectedNavMesh].nodes) {
+
+            if (node.index > indexOfDeletedNode) {
+
+                node.index--;
+
+            }
+
+            foreach (var index in Enumerable.Range(0, node.nextNode.Count())) {
+
+                if (node.nextNode[index] == indexOfDeletedNode) {
+                    node.nextNode[index] = NavNode.invalid;
+                } else if (node.nextNode[index] > indexOfDeletedNode && node.nextNode[index] != NavNode.invalid) {
+                    node.nextNode[index]--;
+                }
+
+            }
+
+        }
+
+        OnCreateMode();
+
+    }
+
+    public void UnselectNode() {
+
+        if (selectedNavNode != null) {
+            Object.Destroy(selectedNavNode.gameObject);
+        }
+
     }
 
     public void OnCreateMode() {
 
-        foreach (var node in main.level.navMeshes[0].nodes) {
+        foreach (var node in main.level.navMeshes[selectedNavMesh].nodes) {
 
             var nodeObject = Object.Instantiate(main.NavMeshPoint);
 
@@ -119,40 +262,6 @@ public class NavMeshEditMode : EditMode {
             script.node = node;
 
             script.controller = this;
-
-            if (node.nextNodeA != NavNode.invalid) {
-
-                var lineObject = Object.Instantiate(main.line3d);
-
-                var line = lineObject.GetComponent<LineRenderer>();
-
-                script.nextNodeLineA = line;
-
-                lines.Add(lineObject);
-
-            }
-            if (node.nextNodeB != NavNode.invalid) {
-
-                var lineObject = Object.Instantiate(main.line3d);
-
-                var line = lineObject.GetComponent<LineRenderer>();
-
-                script.nextNodeLineB = line;
-
-                lines.Add(lineObject);
-
-            }
-            if (node.nextNodeC != NavNode.invalid) {
-
-                var lineObject = Object.Instantiate(main.line3d);
-
-                var line = lineObject.GetComponent<LineRenderer>();
-
-                script.nextNodeLineC = line;
-
-                lines.Add(lineObject);
-
-            }
 
             script.Create();
 
@@ -163,25 +272,13 @@ public class NavMeshEditMode : EditMode {
         foreach (var node in navNodes) {
             node.RefreshLines();
 
-            if (node.node.nextNodeA != NavNode.invalid) {
+            foreach (var index in Enumerable.Range(0, node.nextNodeLines.Count())) {
 
-                var nextNode = navNodes[node.node.nextNodeA];
+                if (node.node.nextNode[index] != NavNode.invalid) {
+                    var nextNode = navNodes[node.node.nextNode[index]];
 
-                nextNode.previousPoints.Add(node);
-
-            }
-            if (node.node.nextNodeB != NavNode.invalid) {
-
-                var nextNode = navNodes[node.node.nextNodeB];
-
-                nextNode.previousPoints.Add(node);
-
-            }
-            if (node.node.nextNodeC != NavNode.invalid) {
-
-                var nextNode = navNodes[node.node.nextNodeC];
-
-                nextNode.previousPoints.Add(node);
+                    nextNode.previousPoints.Add(node);
+                }
 
             }
 
@@ -203,18 +300,12 @@ public class NavMeshEditMode : EditMode {
 
         lines.Clear();
 
-        if (selectedNavNode != null) {
-            Object.Destroy(selectedNavNode.gameObject);
-        }
+        UnselectNode();
 
     }
 
-    public void LookTile(Tile tile, TileColumn column, LevelMesh section) {
+    public void LookTile(Tile tile, TileColumn column, LevelMesh section) { }
 
-    }
-
-    public void SelectTile(Tile tile, TileColumn column, LevelMesh section) {
-
-    }
+    public void SelectTile(Tile tile, TileColumn column, LevelMesh section) { }
 
 }

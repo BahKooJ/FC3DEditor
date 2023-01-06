@@ -184,6 +184,10 @@ namespace FCopParser {
                 section.Compile();
             }
 
+            foreach (var navMesh in navMeshes) {
+                navMesh.Compile();
+            }
+
             foreach (var texture in textures) {
                 texture.Compile();
             }

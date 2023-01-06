@@ -2,6 +2,8 @@
 
 using FCopParser;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class NavNodePoint : MonoBehaviour {
@@ -14,9 +16,7 @@ public class NavNodePoint : MonoBehaviour {
 
     public NavMeshEditMode controller;
 
-    public LineRenderer nextNodeLineA = null;
-    public LineRenderer nextNodeLineB = null;
-    public LineRenderer nextNodeLineC = null;
+    public LineRenderer[] nextNodeLines = new LineRenderer[3] { null, null, null };
 
     public List<NavNodePoint> previousPoints = new();
 
@@ -61,42 +61,65 @@ public class NavNodePoint : MonoBehaviour {
 
     public void RefreshLines() {
 
-        if (nextNodeLineA != null) {
+        foreach (var index in Enumerable.Range(0, nextNodeLines.Count())) {
 
-            var nextNode = controller.navNodes[node.nextNodeA];
+            if (node.nextNode[index] == NavNode.invalid && nextNodeLines[index] != null) {
+                Destroy(nextNodeLines[index].gameObject);
+                nextNodeLines[index] = null;
+            }
 
-            nextNodeLineA.SetPosition(0, transform.position);
+            if (node.nextNode[index] != NavNode.invalid && nextNodeLines[index] == null) {
 
-            nextNodeLineA.SetPosition(1, nextNode.transform.position);
+                var lineObject = Object.Instantiate(controller.main.line3d);
 
-            nextNodeLineA.startColor = Color.blue;
-            nextNodeLineA.endColor = Color.blue;
+                var lineRenderer = lineObject.GetComponent<LineRenderer>();
+
+                nextNodeLines[index] = lineRenderer;
+
+                controller.lines.Add(lineObject);
+
+            }
+
+            var line = nextNodeLines[index];
+
+            if (line != null) {
+
+                var nextNode = controller.navNodes[node.nextNode[index]];
+
+                line.SetPosition(0, transform.position);
+
+                line.SetPosition(1, nextNode.transform.position);
+
+                switch (index) {
+                    case 0:
+                        line.startColor = Color.blue;
+                        line.endColor = Color.blue;
+                        break;
+                    case 1:
+                        line.startColor = Color.green;
+                        line.endColor = Color.green;
+                        break;
+                    case 2:
+                        line.startColor = Color.red;
+                        line.endColor = Color.red;
+                        break;
+                }
+
+            }
 
         }
-        if (nextNodeLineB != null) {
 
-            var nextNode = controller.navNodes[node.nextNodeB];
+    }
 
-            nextNodeLineB.SetPosition(0, transform.position);
+    public void ClearPaths() {
 
-            nextNodeLineB.SetPosition(1, nextNode.transform.position);
+        foreach (var index in Enumerable.Range(0, node.nextNode.Count())) {
 
-            nextNodeLineB.startColor = Color.green;
-            nextNodeLineB.endColor = Color.green;
+            node.nextNode[index] = NavNode.invalid;
 
         }
-        if (nextNodeLineC != null) {
 
-            var nextNode = controller.navNodes[node.nextNodeC];
-
-            nextNodeLineC.SetPosition(0, transform.position);
-
-            nextNodeLineC.SetPosition(1, nextNode.transform.position);
-
-            nextNodeLineC.startColor = Color.red;
-            nextNodeLineC.endColor = Color.red;
-
-        }
+        RefreshLines();
 
     }
 
