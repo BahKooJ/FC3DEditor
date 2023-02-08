@@ -74,4 +74,24 @@ class ToolbarView: MonoBehaviour {
 
     }
 
+    public void SelectActorEditMode() {
+
+        var editMode = new ActorEditMode(controller);
+
+        Destroy(activePanel);
+
+        //var obj = Instantiate(navMeshEditPanel);
+
+        //var script = obj.GetComponent<NavMeshEditPanel>();
+
+        //script.controller = editMode;
+
+        //obj.transform.SetParent(this.transform.parent, false);
+
+        //activePanel = obj;
+
+        controller.ChangeEditMode(editMode);
+
+    }
+
 }

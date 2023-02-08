@@ -102,7 +102,8 @@ namespace FCopParser {
 
                     subFileName = header.subFileName;
 
-                } else if (header.fourCCDeclaration == FourCC.MSIC) {
+                } 
+                else if (header.fourCCDeclaration == FourCC.MSIC) {
 
                     if (fileMananger.music == null) {
 
@@ -110,7 +111,8 @@ namespace FCopParser {
 
                         fileMananger.music.Value.Value.AddRange(CopyOfRange(header.index + 28, header.index + header.chunkSize).ToList());
 
-                    } else {
+                    } 
+                    else {
 
                         //todo: Magic number 28 is the size of the music header, there are two numbers after the header that are unknown
 
@@ -124,12 +126,20 @@ namespace FCopParser {
 
                     if (file == null && header.fileHeader != null) {
 
-                        file = new IFFDataFile(header.fileHeader.startNumber, new List<byte>(), header.fileHeader.fourCCData, header.fileHeader.dataID, header.fileHeader.actData.ToList());
+                        file = new IFFDataFile(
+                            header.fileHeader.startNumber, 
+                            new List<byte>(), 
+                            header.fileHeader.fourCCData, 
+                            header.fileHeader.dataID, 
+                            header.fileHeader.actData.ToList()
+                        );
+
                         dataChunksToAdd = DataChunksBySize(header.fileHeader.dataSize);
 
                     }
 
-                } else if (header.fourCCType == FourCC.SDAT && file != null && dataChunksToAdd != 0) {
+                } 
+                else if (header.fourCCType == FourCC.SDAT && file != null && dataChunksToAdd != 0) {
 
                     file.data.AddRange(CopyOfRange(header.index + chunkHeaderLength, header.index + header.chunkSize).ToList());
                     dataChunksToAdd--;
@@ -146,7 +156,8 @@ namespace FCopParser {
 
                             file = null;
 
-                        } else {
+                        } 
+                        else {
 
                             fileMananger.files.Add(file);
                             file = null;
@@ -452,7 +463,8 @@ namespace FCopParser {
 
                     continue;
 
-                } else {
+                } 
+                else {
 
                     current24kSectionSize += size;
 
@@ -470,7 +482,8 @@ namespace FCopParser {
 
                         offsets.Add(new ChunkHeader(offset, fourCC, size, fourCCType));
 
-                    } else if (fourCCType == FourCC.SHDR) {
+                    } 
+                    else if (fourCCType == FourCC.SHDR) {
 
                         var offsetOfHeader = offset + chunkHeaderLength;
 
@@ -480,17 +493,19 @@ namespace FCopParser {
                         var dataSize = BytesToInt(offsetOfHeader + 12);
                         var remainingData = CopyOfRange(offsetOfHeader + 16, offset + size);
 
-                        offsets.Add(new ChunkHeader(offset, fourCC, size, fourCCType,
-                            new FileHeader(startNumber, fourCCData, dataID, dataSize, remainingData.ToArray()
-                            )));
+                        var fileHeader = new FileHeader(startNumber, fourCCData, dataID, dataSize, remainingData.ToArray());
 
-                    } else {
+                        offsets.Add(new ChunkHeader(offset, fourCC, size, fourCCType, fileHeader));
+
+                    } 
+                    else {
 
                         offsets.Add(new ChunkHeader(offset, fourCC, size, fourCCType));
 
                     }
 
-                } else if (fourCC == FourCC.SWVR) {
+                } 
+                else if (fourCC == FourCC.SWVR) {
 
                     var fourCCType = BytesToStringReversed(offset + 16, 4);
 
@@ -514,7 +529,8 @@ namespace FCopParser {
                     offsets.Add(new ChunkHeader(offset, fourCC, size, fourCCType, fileName));
 
 
-                } else {
+                } 
+                else {
 
                     offsets.Add(new ChunkHeader(offset, fourCC, size));
 
@@ -570,6 +586,5 @@ namespace FCopParser {
         }
 
     }
-
 
 }

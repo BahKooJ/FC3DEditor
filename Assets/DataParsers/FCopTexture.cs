@@ -126,14 +126,11 @@ namespace FCopParser {
 
         }
 
-        public static string Reverse(string s) {
+        string BytesToStringReversed(byte[] bytes, int offset, int length) {
+            var s = Encoding.Default.GetString(bytes, offset, length);
             char[] charArray = s.ToCharArray();
             Array.Reverse(charArray);
             return new string(charArray);
-        }
-
-        string BytesToStringReversed(byte[] bytes, int offset, int length) {
-            return Reverse(Encoding.Default.GetString(bytes, offset, length));
         }
 
     }

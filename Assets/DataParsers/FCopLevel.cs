@@ -17,6 +17,8 @@ namespace FCopParser {
 
         public List<FCopNavMesh> navMeshes = new();
 
+        public List<FCopActor> actors = new();
+
         public IFFFileManager fileManager;
 
         public FCopLevel(IFFFileManager fileManager) {
@@ -41,6 +43,12 @@ namespace FCopParser {
 
             }).ToList();
 
+            var rawActorFiles = fileManager.files.Where(file => {
+
+                return file.dataFourCC == "Cact" || file.dataFourCC == "Csac";
+
+            }).ToList();
+
             foreach (var rawFile in rawCtilFiles) {
                 sections.Add(new FCopLevelSectionParser(rawFile).Parse(this));
             }
@@ -51,6 +59,18 @@ namespace FCopParser {
 
             foreach (var rawFile in rawNavMeshFiles) {
                 navMeshes.Add(new FCopNavMesh(rawFile));
+            }
+
+            foreach (var rawFile in rawActorFiles) {
+
+                var actor = new FCopActor(rawFile);
+
+                if (actor.objectType == 36) {
+                    actors.Add(new FCopTurretActor(rawFile));
+                } else {
+                    actors.Add(new FCopActor(rawFile));
+                }
+
             }
 
             layout = FCopLevelLayoutParser.Parse(fileManager.files.First(file => {
@@ -87,7 +107,7 @@ namespace FCopParser {
 
                 layout.Add(new List<int>());
 
-                layout.Last().AddRange(new List<int>() { 1,1,1,1 });
+                layout.Last().AddRange(new List<int>() { 1, 1, 1, 1 });
 
                 foreach (int i in Enumerable.Range(0, width)) {
                     layout.Last().Add(id);
@@ -157,7 +177,7 @@ namespace FCopParser {
                     foreach (var h in newSection.heightMap) {
                         h.SetPoint(-120, 1);
                         h.SetPoint(-100, 2);
-                        h.SetPoint(-80,  3);
+                        h.SetPoint(-80, 3);
                     }
 
                     sections.Add(newSection);
@@ -174,7 +194,7 @@ namespace FCopParser {
 
             foreach (var rawFile in rawNavMeshFiles) {
                 navMeshes.Add(new FCopNavMesh(rawFile));
-            }   
+            }
 
         }
 

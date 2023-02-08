@@ -13,13 +13,14 @@ using UnityEngine.Networking.Types;
 using UnityEngine.UI;
 using static System.Collections.Specialized.BitVector32;
 
-// This object is responsible for handling all callbacks from views as well as handle the IFF file.
+// TODO: Shouldn't the majority of these methods be in thier edit mode?
 public class Main : MonoBehaviour {
 
     public GameObject meshSection;
     public GameObject heightMapChannelPoint;
     public GameObject SelectedTileOverlay;
     public GameObject NavMeshPoint;
+    public GameObject ActorObject;
     public GameObject line3d;
     public GameObject axisControl;
 
