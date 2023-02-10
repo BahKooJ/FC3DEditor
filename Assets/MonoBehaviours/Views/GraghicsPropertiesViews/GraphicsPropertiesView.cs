@@ -12,7 +12,7 @@ using Object = UnityEngine.Object;
 
 public class GraphicsPropertiesView : MonoBehaviour {
 
-    public Main controller;
+    public GeometryEditMode controller;
 
     public GameObject textureOffsetItem;
     public GameObject graphicsPresetItem;
@@ -104,7 +104,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
             var texture = new Texture2D(256, 256, TextureFormat.RGB565, false);
 
-            texture.LoadRawTextureData(controller.level.textures[graphics.number2].ConvertToRGB565());
+            texture.LoadRawTextureData(controller.main.level.textures[graphics.number2].ConvertToRGB565());
             texture.Apply();
 
             texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
@@ -139,12 +139,12 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
         var texture = new Texture2D(256, 256, TextureFormat.RGB565, false);
 
-        texture.LoadRawTextureData(controller.level.textures[graphics.number2].ConvertToRGB565());
+        texture.LoadRawTextureData(controller.main.level.textures[graphics.number2].ConvertToRGB565());
         texture.Apply();
 
         texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
 
-        controller.RefreshTextures();
+        controller.main.RefreshTextures();
 
         controller.selectedSection.RefreshMesh();
         controller.selectedSection.RefreshTexture();
@@ -250,7 +250,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
             var texture = new Texture2D(256, 256, TextureFormat.RGB565, false);
 
-            texture.LoadRawTextureData(controller.level.textures[graphics.number2].ConvertToRGB565());
+            texture.LoadRawTextureData(controller.main.level.textures[graphics.number2].ConvertToRGB565());
             texture.Apply();
 
             texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);

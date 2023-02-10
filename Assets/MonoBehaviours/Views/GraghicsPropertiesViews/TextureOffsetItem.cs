@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class TextureOffsetItem : MonoBehaviour {
 
-    public Main controller;
+    public GeometryEditMode controller;
     public GraphicsPropertiesView view;
 
     public int index;

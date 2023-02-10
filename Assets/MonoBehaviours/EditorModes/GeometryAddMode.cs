@@ -1,5 +1,7 @@
 ﻿
 using FCopParser;
+using System.Collections.Generic;
+using UnityEngine;
 using static System.Collections.Specialized.BitVector32;
 
 public class GeometryAddMode : EditMode {
@@ -7,6 +9,10 @@ public class GeometryAddMode : EditMode {
     public Main main { get; set; }
 
     public TilePreset? selectedTilePreset = null;
+
+    public TileColumn selectedColumn = null;
+    public LevelMesh selectedSection = null;
+    public SelectedTileOverlay tileOverlay = null;
 
     public GeometryAddMode(Main main) {
         this.main = main;
@@ -25,25 +31,26 @@ public class GeometryAddMode : EditMode {
     }
 
     public void OnDestroy() {
-
+        ClearAllSelectedItems();
     }
 
     public void LookTile(Tile tile, TileColumn column, LevelMesh section) {
 
-        if (column != main.selectedColumn && main.selectedColumn != null) {
+        // Checks to see if a new column is being looked at, if so it clears the overlay for a new one to be added. Otherwise it returns.
+        if (column != selectedColumn && selectedColumn != null) {
 
-            main.ClearTileOverlays();
+            ClearOverlay();
 
-        } else if (column == main.selectedColumn) {
+        } else if (column == selectedColumn) {
             return;
         }
 
-        main.selectedColumn = column;
-        main.selectedSection = section;
+        selectedColumn = column;
+        selectedSection = section;
 
         if (selectedTilePreset != null) {
 
-            main.InitTileOverlay(((TilePreset)selectedTilePreset).Create(false));
+            InitTileOverlay(((TilePreset)selectedTilePreset).Create(false));
 
         }
 
@@ -54,26 +61,75 @@ public class GeometryAddMode : EditMode {
 
         if (selectedTilePreset == null) { return; }
 
-        main.selectedColumn = column;
-        main.selectedSection = section;
+        selectedColumn = column;
+        selectedSection = section;
 
-        main.AddTile((TilePreset)selectedTilePreset);
-
-        main.selectedTiles.Clear();
+        AddTile((TilePreset)selectedTilePreset);
 
     }
 
     public void RefreshTilePlacementOverlay() {
 
-        if (main.selectedColumn == null) { return; }
+        if (selectedColumn == null) { return; }
 
-        main.ClearTileOverlays();
+        ClearOverlay();
 
         if (selectedTilePreset != null) {
 
-            main.InitTileOverlay(((TilePreset)selectedTilePreset).Create(false));
+            InitTileOverlay(((TilePreset)selectedTilePreset).Create(false));
 
         }
 
     }
+
+    void ClearOverlay() {
+
+        if (tileOverlay != null) {
+            Object.Destroy(tileOverlay.gameObject);
+        }
+
+        tileOverlay = null;
+
+    }
+
+    void InitTileOverlay(Tile tile) {
+
+        var overlay = Object.Instantiate(main.SelectedTileOverlay);
+        var script = overlay.GetComponent<SelectedTileOverlay>();
+        script.controller = main;
+        script.tile = tile;
+        script.column = selectedColumn;
+        tileOverlay = script;
+        overlay.transform.SetParent(selectedSection.transform);
+        overlay.transform.localPosition = Vector3.zero;
+
+    }
+
+    void AddTile(TilePreset preset) {
+
+        if (selectedColumn != null) {
+
+            foreach (var t in selectedColumn.tiles) {
+                t.isStartInColumnArray = false;
+            }
+
+            var tile = preset.Create(true);
+
+            selectedColumn.tiles.Add(tile);
+
+        }
+
+        selectedSection.RefreshMesh();
+
+    }
+
+    void ClearAllSelectedItems() {
+
+        ClearOverlay();
+
+        selectedColumn = null;
+        selectedSection = null;
+
+    }
+
 }

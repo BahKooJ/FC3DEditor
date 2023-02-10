@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class GeometryEditorUI: MonoBehaviour {
 
-    public Main controller;
+    public GeometryEditMode controller;
 
     public GameObject rotateLeftButton;
     public GameObject rotateRightButton;

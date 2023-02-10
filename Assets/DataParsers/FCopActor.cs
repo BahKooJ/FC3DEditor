@@ -84,4 +84,31 @@ namespace FCopParser {
 
     }
 
+    public class FCopBaseTurretActor : FCopActor {
+
+        public Team teamHostileToThis;
+        public Team miniMapColor;
+
+        public Team hostileTowards;
+
+        public int rotation;
+
+
+        public FCopBaseTurretActor(IFFDataFile rawFile) : base(rawFile) {
+
+            teamHostileToThis = Utils.BytesToShort(rawFile.data.ToArray(), 36) == 1 ? Team.RED : Team.BLUE;
+            miniMapColor = Utils.BytesToShort(rawFile.data.ToArray(), 38) == 1 ? Team.RED : Team.BLUE;
+            hostileTowards = Utils.BytesToShort(rawFile.data.ToArray(), 50) == 1 ? Team.RED : Team.BLUE;
+
+            rotation = Utils.BytesToShort(rawFile.data.ToArray(), 64);
+
+        }
+
+    }
+
+    public enum Team {
+        RED = 1,
+        BLUE = 2
+    }
+
 }

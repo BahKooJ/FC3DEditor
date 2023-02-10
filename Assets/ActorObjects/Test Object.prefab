@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 501853464087151362}
   - component: {fileID: 501853464087151363}
   - component: {fileID: 501853464087151364}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -110,7 +110,7 @@ GameObject:
   - component: {fileID: 501853464491965825}
   - component: {fileID: 501853464491965826}
   - component: {fileID: 501853464491965827}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Direction
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -205,8 +205,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3459732723384177906}
-  - component: {fileID: 4993283086167628342}
-  m_Layer: 0
+  - component: {fileID: 6591771780368373652}
+  m_Layer: 3
   m_Name: Test Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -229,7 +229,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4993283086167628342
+--- !u!114 &6591771780368373652
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -238,6 +238,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5284000438615368468}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6e6d57539bf24c42944fa6be2a0afbf, type: 3}
+  m_Script: {fileID: 11500000, guid: bd96d883d0b40534bb0f641cf89f7a1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actCollider: {fileID: 501853464087151364}

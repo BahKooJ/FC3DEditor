@@ -13,14 +13,18 @@ using UnityEngine.Networking.Types;
 using UnityEngine.UI;
 using static System.Collections.Specialized.BitVector32;
 
-// TODO: Shouldn't the majority of these methods be in thier edit mode?
 public class Main : MonoBehaviour {
 
     public GameObject meshSection;
     public GameObject heightMapChannelPoint;
     public GameObject SelectedTileOverlay;
     public GameObject NavMeshPoint;
-    public GameObject ActorObject;
+
+    public GameObject BlankActor;
+    public GameObject TurretActorObject;
+    public GameObject BaseTurretActorObject;
+
+
     public GameObject line3d;
     public GameObject axisControl;
 
@@ -30,12 +34,6 @@ public class Main : MonoBehaviour {
     public List<LevelMesh> sectionMeshes = new();
 
     public Texture2D levelTexturePallet;
-
-    public List<Tile> selectedTiles = new();
-    public TileColumn selectedColumn = null;
-    public LevelMesh selectedSection = null;
-    public List<HeightMapChannelPoint> heightPointObjects = new();
-    public List<SelectedTileOverlay> selectedTileOverlays = new();
 
     public bool debug = false;
 
@@ -59,11 +57,8 @@ public class Main : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.Equals)) {
             Compile();
-        } else if (Input.GetKeyDown(KeyCode.C)) {
-            ClearAllSelectedItems();
-        } else if (Input.GetKeyDown(KeyCode.Delete)) {
-            RemoveSelectedTiles();
         }
+
     }
 
     public void TestRayOnLevelMesh() {
@@ -171,7 +166,6 @@ public class Main : MonoBehaviour {
             editMode.OnDestroy();
         }
 
-        ClearAllSelectedItems();
         editMode = mode;
         editMode.OnCreateMode();
 
@@ -184,309 +178,6 @@ public class Main : MonoBehaviour {
     public void SelectTile(Tile tile, TileColumn column, LevelMesh section) {
 
         editMode.SelectTile(tile, column, section);
-
-    }
-
-    public void UnselectAndRefreshHeightPoints() {
-
-        foreach (var obj in heightPointObjects) {
-
-            Destroy(obj.gameObject);
-
-        }
-
-        heightPointObjects.Clear();
-
-        AddHeightObjects(0);
-        AddHeightObjects(1);
-        AddHeightObjects(2);
-        AddHeightObjects(3);
-
-    }
-
-    public void ClearAllSelectedItems() {
-
-        selectedTiles.Clear();
-        ClearTileOverlays();
-
-        foreach (var obj in heightPointObjects) {
-
-            Destroy(obj.gameObject);
-
-        }
-
-        heightPointObjects.Clear();
-
-        selectedColumn = null;
-        selectedSection = null;
-
-    }
-
-    public void AddTile(TilePreset preset) {
-
-        if (selectedColumn != null) {
-
-            foreach (var t in selectedColumn.tiles) {
-                t.isStartInColumnArray = false;
-            }
-
-            var tile = preset.Create(true);
-
-            selectedColumn.tiles.Add(tile);
-
-            selectedTiles.Clear();
-
-            selectedTiles.Add(tile);
-
-        }
-
-        selectedSection.RefreshMesh();
-
-    }
-
-    public void RotateTileLeft() {
-
-        if (selectedTiles.Count == 0) { return; }
-
-        foreach (var tile in selectedTiles) {
-
-            if (tile.verticies.Count == 3) {
-
-                var verticies = tile.verticies;
-
-                bool isBottomRight =
-                    (verticies[0].vertexPosition == VertexPosition.TopRight) &&
-                    (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
-                    (verticies[2].vertexPosition == VertexPosition.BottomRight);
-
-                bool isBottomLeft =
-                    (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
-                    (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
-                    (verticies[2].vertexPosition == VertexPosition.BottomRight);
-
-                bool isTopLeft =
-                    (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
-                    (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
-                    (verticies[2].vertexPosition == VertexPosition.TopRight);
-
-                bool isTopRight =
-                    (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
-                    (verticies[1].vertexPosition == VertexPosition.BottomRight) &&
-                    (verticies[2].vertexPosition == VertexPosition.TopRight);
-
-                if (isBottomRight) {
-                    verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
-                    verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
-                    verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.BottomRight);
-                } else if (isBottomLeft) {
-                    verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
-                    verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
-                    verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.TopRight);
-                } else if (isTopLeft) {
-                    verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
-                    verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomRight);
-                    verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.TopRight);
-                } else if (isTopRight) {
-                    verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopRight);
-                    verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
-                    verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.BottomRight);
-                }
-
-            }
-
-        }
-
-        selectedSection.RefreshMesh();
-
-    }
-
-    public void RotateTileRight() {
-
-        if (selectedTiles.Count == 0) { return; }
-
-        foreach (var tile in selectedTiles) {
-
-            if (tile.verticies.Count == 3) {
-
-                var verticies = tile.verticies;
-
-                bool isBottomRight =
-                    (verticies[0].vertexPosition == VertexPosition.TopRight) &&
-                    (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
-                    (verticies[2].vertexPosition == VertexPosition.BottomRight);
-
-                bool isBottomLeft =
-                    (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
-                    (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
-                    (verticies[2].vertexPosition == VertexPosition.BottomRight);
-
-                bool isTopLeft =
-                    (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
-                    (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
-                    (verticies[2].vertexPosition == VertexPosition.TopRight);
-
-                bool isTopRight =
-                    (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
-                    (verticies[1].vertexPosition == VertexPosition.BottomRight) &&
-                    (verticies[2].vertexPosition == VertexPosition.TopRight);
-
-                if (isBottomRight) {
-                    verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
-                    verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
-                    verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.TopRight);
-                } else if (isBottomLeft) {
-                    verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
-                    verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
-                    verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.TopRight);
-                } else if (isTopLeft) {
-                    verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
-                    verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
-                    verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.BottomRight);
-                } else if (isTopRight) {
-                    verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopRight);
-                    verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
-                    verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.BottomRight);
-                }
-
-            }
-
-        }
-
-        selectedSection.RefreshMesh();
-
-    }
-
-    // TODO: If shifting height for wall to high will cause MeshID error
-    public void ShiftTilesHeightUp() {
-
-        if (selectedTiles.Count == 0) { return; }
-
-        foreach (var tile in selectedTiles) {
-
-            foreach (var index in Enumerable.Range(0, tile.verticies.Count)) {
-
-                var vertex = tile.verticies[index];
-
-                if (vertex.heightChannel < 3) {
-                    tile.verticies[index] = new TileVertex(vertex.heightChannel + 1, vertex.vertexPosition);
-                }
-
-            }
-
-        }
-
-        selectedSection.RefreshMesh();
-
-    }
-
-    // TODO: If shifting height for wall to low will cause MeshID error
-    public void ShiftTilesHeightDown() {
-
-        if (selectedTiles.Count == 0) { return; }
-
-        foreach (var tile in selectedTiles) {
-
-            foreach (var index in Enumerable.Range(0, tile.verticies.Count)) {
-
-                var vertex = tile.verticies[index];
-
-                if (vertex.heightChannel > 1) {
-                    tile.verticies[index] = new TileVertex(vertex.heightChannel - 1, vertex.vertexPosition);
-                }
-
-            }
-
-        }
-
-        selectedSection.RefreshMesh();
-
-    }
-
-    public void ExportTexture(int id) {
-
-        if (id == -1) { return; }
-
-        var graphics = selectedSection.section.tileGraphics[id];
-
-        File.WriteAllBytes("bmp" + graphics.number2.ToString() + ".bmp", level.textures[graphics.number2].BitmapWithHeader());
-
-    }
-
-    // TODO: Allow importing textures even when multiple tiles are selected
-    public void ImportTexture(int id) {
-
-        if (id == -1) { return; }
-
-        var graphics = selectedSection.section.tileGraphics[selectedTiles[0].graphicsIndex];
-
-        level.textures[graphics.number2].ImportBMP(File.ReadAllBytes("bmp" + graphics.number2.ToString() + ".bmp"));
-
-    }
-
-    public void ChangeTexturePallette(int palletteOffset) {
-
-        foreach (var tile in selectedTiles) {
-            var graphics = selectedSection.section.tileGraphics[tile.graphicsIndex];
-
-            graphics.number2 = palletteOffset;
-
-            selectedSection.section.tileGraphics[tile.graphicsIndex] = graphics;
-
-        }
-
-    }
-
-    public void SetTextureCordX(int x) {
-
-        if (selectedTiles.Count == 0) { return; }
-
-        if (selectedTiles.Count > 1) {
-
-            var textureIndex = selectedTiles[0].textureIndex;
-            foreach (var tile in selectedTiles) {
-
-                if (textureIndex != tile.textureIndex) {
-                    return;
-                }
-
-            }
-
-        }
-
-        var index = selectedTiles[0].textureIndex;
-
-        selectedSection.section.textureCoordinates[index] = TextureCoordinate.SetXPixel(x, selectedSection.section.textureCoordinates[index]);
-
-    }
-
-    public void SetTextureCordY(int y) {
-
-        if (selectedTiles.Count == 0) { return; }
-
-        if (selectedTiles.Count > 1) {
-
-            var textureIndex = selectedTiles[0].textureIndex;
-            foreach (var tile in selectedTiles) {
-
-                if (textureIndex != tile.textureIndex) {
-                    return;
-                }
-
-            }
-
-        }
-
-        var index = selectedTiles[0].textureIndex;
-
-        selectedSection.section.textureCoordinates[index] = TextureCoordinate.SetYPixel(y, selectedSection.section.textureCoordinates[index]);
-
-    }
-
-    public void SetTextureIndex(int index) {
-
-        foreach (var tile in selectedTiles) {
-            tile.textureIndex = index;
-        }
 
     }
 
@@ -508,104 +199,6 @@ public class Main : MonoBehaviour {
         texture.Apply();
 
         levelTexturePallet = texture;
-
-    }
-
-    public void RemoveSelectedTiles() {
-
-        if (selectedTiles.Count == 0) { return; }
-
-        foreach (var tile in selectedTiles) {
-            
-            selectedColumn.tiles.Remove(tile);
-
-        }
-
-        selectedTiles.Clear();
-
-        selectedSection.RefreshMesh();
-
-    }
-
-    public void RefreshSelectedOverlays() {
-
-        foreach (var overlay in selectedTileOverlays) {
-
-            overlay.Refresh();
-
-        }
-
-    }
-
-    public void InitTileOverlay(Tile tile) {
-
-        var overlay = Instantiate(SelectedTileOverlay);
-        var script = overlay.GetComponent<SelectedTileOverlay>();
-        script.controller = this;
-        script.tile = tile;
-        script.column = selectedColumn;
-        selectedTileOverlays.Add(script);
-        overlay.transform.SetParent(selectedSection.transform);
-        overlay.transform.localPosition = Vector3.zero;
-
-    }
-
-    public void ClearTileOverlays() {
-
-        foreach (var overlay in selectedTileOverlays) {
-            Destroy(overlay.gameObject);
-        }
-
-        selectedTileOverlays.Clear();
-
-    }
-
-    public void AddHeightObjects(int corner) {
-
-        var worldX = selectedSection.x + selectedColumn.x;
-        var worldY = -(selectedSection.y + selectedColumn.y);
-
-        switch (corner) {
-            case 1:
-                worldX += 1;
-                break;
-            case 2:
-                worldY -= 1;
-                break;
-            case 3:
-                worldX += 1;
-                worldY -= 1;
-                break;
-            default:
-                break;
-        }
-
-        var point = Instantiate(heightMapChannelPoint, new Vector3(worldX, selectedColumn.heights[corner].height1, worldY), Quaternion.identity);
-        var script = point.GetComponent<HeightMapChannelPoint>();
-        script.heightPoint = selectedColumn.heights[corner];
-        script.controller = this;
-        script.channel = 1;
-        script.section = selectedSection;
-
-        heightPointObjects.Add(script);
-
-        point = Instantiate(heightMapChannelPoint, new Vector3(worldX, selectedColumn.heights[corner].height2, worldY), Quaternion.identity);
-        script = point.GetComponent<HeightMapChannelPoint>();
-        script.heightPoint = selectedColumn.heights[corner];
-        script.controller = this;
-        script.channel = 2;
-        script.section = selectedSection;
-
-        heightPointObjects.Add(script);
-
-        point = Instantiate(heightMapChannelPoint, new Vector3(worldX, selectedColumn.heights[corner].height3, worldY), Quaternion.identity);
-        script = point.GetComponent<HeightMapChannelPoint>();
-        script.heightPoint = selectedColumn.heights[corner];
-        script.controller = this;
-        script.channel = 3;
-        script.section = selectedSection;
-
-        heightPointObjects.Add(script);
 
     }
 

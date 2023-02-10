@@ -10,7 +10,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
     public GameObject setHeightTextField;
 
-    public Main controller;
+    public GeometryEditMode controller;
     public HeightPoint heightPoint;
     public int channel;
     public LevelMesh section;
@@ -89,6 +89,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
                 click = false;
                 section.RefreshMesh();
+                controller.RefreshSelectedOverlays();
 
             }
 

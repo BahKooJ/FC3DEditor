@@ -1087,7 +1087,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d67470d0210ac554ca7c1657ec4a8b20, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 310ee314fcbbeb547a40695ee740b82b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1138,7 +1138,9 @@ MonoBehaviour:
   heightMapChannelPoint: {fileID: 1298310605505145416, guid: 804d2b1c507598948a3e68434291bfc0, type: 3}
   SelectedTileOverlay: {fileID: 3982175839306991789, guid: c11d8fe31bdf1aa4887436153193d9c9, type: 3}
   NavMeshPoint: {fileID: 6317055660841323228, guid: d716506ed78901d468e87343a95f5955, type: 3}
-  ActorObject: {fileID: 5284000438615368468, guid: 950b781f248e7c8499c7c03c5c2c291b, type: 3}
+  BlankActor: {fileID: 1640186847095666650, guid: 49bee21158884a8459dfdc42e65ffd06, type: 3}
+  TurretActorObject: {fileID: 5284000438615368468, guid: 950b781f248e7c8499c7c03c5c2c291b, type: 3}
+  BaseTurretActorObject: {fileID: 5284000438615368468, guid: 7cbaeea11b8467842a34976e5f2402c1, type: 3}
   line3d: {fileID: 2980094452611837016, guid: 8dd5e36aa455bea41b061af29dbf9f7d, type: 3}
   axisControl: {fileID: 1974907386336203002, guid: 7b27df81061c44540be73f4e43af113d, type: 3}
   sectionMeshes: []

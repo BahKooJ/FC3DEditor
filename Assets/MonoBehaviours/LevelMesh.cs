@@ -202,8 +202,6 @@ public class LevelMesh : MonoBehaviour {
 
         meshCollider.sharedMesh = mesh;
 
-        controller.RefreshSelectedOverlays();
-
     }
 
     public void RefreshTexture() {

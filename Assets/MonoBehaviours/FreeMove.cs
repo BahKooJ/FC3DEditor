@@ -102,13 +102,16 @@ public class FreeMove : MonoBehaviour {
         //    StopLooking();
         //}
 
-        if (Input.GetKey(KeyCode.M)) {
-            StartLooking();
+        if (Input.GetMouseButtonUp(2)) {
+
+            if (looking) {
+                StopLooking();
+            } else {
+                StartLooking();
+            }
+
         }
 
-        if (Input.GetKey(KeyCode.N)) {
-            StopLooking();
-        }
     }
 
     void OnDisable() {

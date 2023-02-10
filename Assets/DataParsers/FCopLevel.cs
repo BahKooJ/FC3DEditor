@@ -65,10 +65,16 @@ namespace FCopParser {
 
                 var actor = new FCopActor(rawFile);
 
-                if (actor.objectType == 36) {
-                    actors.Add(new FCopTurretActor(rawFile));
-                } else {
-                    actors.Add(new FCopActor(rawFile));
+                switch (actor.objectType) {
+                    case 8:
+                        actors.Add(new FCopBaseTurretActor(rawFile));
+                        break;
+                    case 36:
+                        actors.Add(new FCopTurretActor(rawFile));
+                        break;
+                    default:
+                        actors.Add(new FCopActor(rawFile));
+                        break;
                 }
 
             }

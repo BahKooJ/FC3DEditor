@@ -1,16 +1,30 @@
 ﻿
 using FCopParser;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using UnityEngine;
 
-class GeometryEditMode : EditMode {
+public class GeometryEditMode : EditMode {
 
     public Main main { get; set; }
+
+    public List<Tile> selectedTiles = new();
+    public TileColumn selectedColumn = null;
+    public LevelMesh selectedSection = null;
+    public List<HeightMapChannelPoint> heightPointObjects = new();
+    public List<SelectedTileOverlay> selectedTileOverlays = new();
 
     public void Update() {
         
         if (FreeMove.looking) {
             main.TestRayOnLevelMesh();
+        }
+
+        if (Input.GetKeyDown(KeyCode.C)) {
+            ClearAllSelectedItems();
+        } else if (Input.GetKeyDown(KeyCode.Delete)) {
+            RemoveSelectedTiles();
         }
 
     }
@@ -20,7 +34,7 @@ class GeometryEditMode : EditMode {
     }
 
     public void OnDestroy() {
-
+        ClearAllSelectedItems();
     }
 
 
@@ -34,48 +48,56 @@ class GeometryEditMode : EditMode {
 
     public void SelectTile(Tile tile, TileColumn column, LevelMesh section) {
 
+        // If shift is held then multiple tiles can be selected
         if (Input.GetKey(KeyCode.LeftShift)) {
 
-            if (main.selectedSection != null) {
-                if (main.selectedSection != section) {
+            // Checks if the new selected tile is inside the selected Section, if it is not this method cannot continue.
+            if (selectedSection != null) {
+                if (selectedSection != section) {
                     return;
                 }
             }
 
         } else {
 
-            main.selectedTiles.Clear();
+            // Clears the selected tile(s).
+            selectedTiles.Clear();
 
-            main.ClearTileOverlays();
+            ClearTileOverlays();
 
         }
 
-        main.selectedTiles.Add(tile);
-        main.selectedColumn = column;
-        main.selectedSection = section;
+        // Adds selected tile and updates remaining selected data
+        selectedTiles.Add(tile);
+        selectedColumn = column;
+        selectedSection = section;
 
-        var oldPoints = new List<HeightMapChannelPoint>(main.heightPointObjects);
+        // Removes only non selected HeightMapChannelPoints.
+        var oldPoints = new List<HeightMapChannelPoint>(heightPointObjects);
 
-        main.heightPointObjects.Clear();
+        heightPointObjects.Clear();
 
         foreach (var obj in oldPoints) {
 
             if (!obj.isSelected) {
                 Object.Destroy(obj.gameObject);
             } else {
-                main.heightPointObjects.Add(obj);
+                heightPointObjects.Add(obj);
             }
 
         }
 
-        main.AddHeightObjects(0);
-        main.AddHeightObjects(1);
-        main.AddHeightObjects(2);
-        main.AddHeightObjects(3);
+        // Re-adds HeightMapChannelPoints (0 = top left, 1 = top right, 2 = bottom left, 3 = bottom right)
+        AddHeightObjects(0);
+        AddHeightObjects(1);
+        AddHeightObjects(2);
+        AddHeightObjects(3);
 
+
+        // If the number of the height channel is held down, all HeightMapChannelPoints will be selected in the column.
         if (Input.GetKey(KeyCode.Alpha1)) {
 
-            foreach (var obj in main.heightPointObjects) {
+            foreach (var obj in heightPointObjects) {
 
                 if (obj.channel == 1) {
                     obj.Select();
@@ -85,7 +107,7 @@ class GeometryEditMode : EditMode {
 
         } else if (Input.GetKey(KeyCode.Alpha2)) {
 
-            foreach (var obj in main.heightPointObjects) {
+            foreach (var obj in heightPointObjects) {
 
                 if (obj.channel == 2) {
                     obj.Select();
@@ -95,7 +117,7 @@ class GeometryEditMode : EditMode {
 
         } else if (Input.GetKey(KeyCode.Alpha3)) {
 
-            foreach (var obj in main.heightPointObjects) {
+            foreach (var obj in heightPointObjects) {
 
                 if (obj.channel == 3) {
                     obj.Select();
@@ -105,7 +127,341 @@ class GeometryEditMode : EditMode {
 
         }
 
-        main.InitTileOverlay(tile);
+        InitTileOverlay(tile);
 
     }
+
+    public void UnselectAndRefreshHeightPoints() {
+
+        foreach (var obj in heightPointObjects) {
+
+            Object.Destroy(obj.gameObject);
+
+        }
+
+        heightPointObjects.Clear();
+
+        AddHeightObjects(0);
+        AddHeightObjects(1);
+        AddHeightObjects(2);
+        AddHeightObjects(3);
+
+    }
+
+    public void RefreshSelectedOverlays() {
+
+        foreach (var overlay in selectedTileOverlays) {
+
+            overlay.Refresh();
+
+        }
+
+    }
+
+    public void RotateTileLeft() {
+
+        if (selectedTiles.Count == 0) { return; }
+
+        foreach (var tile in selectedTiles) {
+
+            if (tile.verticies.Count == 3) {
+
+                var verticies = tile.verticies;
+
+                bool isBottomRight =
+                    (verticies[0].vertexPosition == VertexPosition.TopRight) &&
+                    (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
+                    (verticies[2].vertexPosition == VertexPosition.BottomRight);
+
+                bool isBottomLeft =
+                    (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
+                    (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
+                    (verticies[2].vertexPosition == VertexPosition.BottomRight);
+
+                bool isTopLeft =
+                    (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
+                    (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
+                    (verticies[2].vertexPosition == VertexPosition.TopRight);
+
+                bool isTopRight =
+                    (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
+                    (verticies[1].vertexPosition == VertexPosition.BottomRight) &&
+                    (verticies[2].vertexPosition == VertexPosition.TopRight);
+
+                if (isBottomRight) {
+                    verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
+                    verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
+                    verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.BottomRight);
+                } else if (isBottomLeft) {
+                    verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
+                    verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
+                    verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.TopRight);
+                } else if (isTopLeft) {
+                    verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
+                    verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomRight);
+                    verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.TopRight);
+                } else if (isTopRight) {
+                    verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopRight);
+                    verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
+                    verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.BottomRight);
+                }
+
+            }
+
+        }
+
+        selectedSection.RefreshMesh();
+
+    }
+
+    public void RotateTileRight() {
+
+        if (selectedTiles.Count == 0) { return; }
+
+        foreach (var tile in selectedTiles) {
+
+            if (tile.verticies.Count == 3) {
+
+                var verticies = tile.verticies;
+
+                bool isBottomRight =
+                    (verticies[0].vertexPosition == VertexPosition.TopRight) &&
+                    (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
+                    (verticies[2].vertexPosition == VertexPosition.BottomRight);
+
+                bool isBottomLeft =
+                    (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
+                    (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
+                    (verticies[2].vertexPosition == VertexPosition.BottomRight);
+
+                bool isTopLeft =
+                    (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
+                    (verticies[1].vertexPosition == VertexPosition.BottomLeft) &&
+                    (verticies[2].vertexPosition == VertexPosition.TopRight);
+
+                bool isTopRight =
+                    (verticies[0].vertexPosition == VertexPosition.TopLeft) &&
+                    (verticies[1].vertexPosition == VertexPosition.BottomRight) &&
+                    (verticies[2].vertexPosition == VertexPosition.TopRight);
+
+                if (isBottomRight) {
+                    verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
+                    verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
+                    verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.TopRight);
+                } else if (isBottomLeft) {
+                    verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
+                    verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
+                    verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.TopRight);
+                } else if (isTopLeft) {
+                    verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopLeft);
+                    verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
+                    verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.BottomRight);
+                } else if (isTopRight) {
+                    verticies[0] = new TileVertex(verticies[0].heightChannel, VertexPosition.TopRight);
+                    verticies[1] = new TileVertex(verticies[1].heightChannel, VertexPosition.BottomLeft);
+                    verticies[2] = new TileVertex(verticies[2].heightChannel, VertexPosition.BottomRight);
+                }
+
+            }
+
+        }
+
+        selectedSection.RefreshMesh();
+
+    }
+
+    // TODO: If shifting height for wall to high will cause MeshID error
+    public void ShiftTilesHeightUp() {
+
+        if (selectedTiles.Count == 0) { return; }
+
+        foreach (var tile in selectedTiles) {
+
+            foreach (var index in Enumerable.Range(0, tile.verticies.Count)) {
+
+                var vertex = tile.verticies[index];
+
+                if (vertex.heightChannel < 3) {
+                    tile.verticies[index] = new TileVertex(vertex.heightChannel + 1, vertex.vertexPosition);
+                }
+
+            }
+
+        }
+
+        selectedSection.RefreshMesh();
+
+    }
+
+    // TODO: If shifting height for wall to low will cause MeshID error
+    public void ShiftTilesHeightDown() {
+
+        if (selectedTiles.Count == 0) { return; }
+
+        foreach (var tile in selectedTiles) {
+
+            foreach (var index in Enumerable.Range(0, tile.verticies.Count)) {
+
+                var vertex = tile.verticies[index];
+
+                if (vertex.heightChannel > 1) {
+                    tile.verticies[index] = new TileVertex(vertex.heightChannel - 1, vertex.vertexPosition);
+                }
+
+            }
+
+        }
+
+        selectedSection.RefreshMesh();
+
+    }
+
+    public void ExportTexture(int id) {
+
+        if (id == -1) { return; }
+
+        var graphics = selectedSection.section.tileGraphics[id];
+
+        File.WriteAllBytes("bmp" + graphics.number2.ToString() + ".bmp", main.level.textures[graphics.number2].BitmapWithHeader());
+
+    }
+
+    // TODO: Allow importing textures even when multiple tiles are selected
+    public void ImportTexture(int id) {
+
+        if (id == -1) { return; }
+
+        var graphics = selectedSection.section.tileGraphics[selectedTiles[0].graphicsIndex];
+
+        main.level.textures[graphics.number2].ImportBMP(File.ReadAllBytes("bmp" + graphics.number2.ToString() + ".bmp"));
+
+    }
+
+    public void ChangeTexturePallette(int palletteOffset) {
+
+        foreach (var tile in selectedTiles) {
+            var graphics = selectedSection.section.tileGraphics[tile.graphicsIndex];
+
+            graphics.number2 = palletteOffset;
+
+            selectedSection.section.tileGraphics[tile.graphicsIndex] = graphics;
+
+        }
+
+    }
+
+    public void SetTextureIndex(int index) {
+
+        foreach (var tile in selectedTiles) {
+            tile.textureIndex = index;
+        }
+
+    }
+
+    void ClearAllSelectedItems() {
+
+        selectedTiles.Clear();
+        ClearTileOverlays();
+
+        foreach (var obj in heightPointObjects) {
+
+            Object.Destroy(obj.gameObject);
+
+        }
+
+        heightPointObjects.Clear();
+
+        selectedColumn = null;
+        selectedSection = null;
+
+    }
+
+    void ClearTileOverlays() {
+
+        foreach (var overlay in selectedTileOverlays) {
+            Object.Destroy(overlay.gameObject);
+        }
+
+        selectedTileOverlays.Clear();
+
+    }
+
+    void RemoveSelectedTiles() {
+
+        if (selectedTiles.Count == 0) { return; }
+
+        foreach (var tile in selectedTiles) {
+
+            selectedColumn.tiles.Remove(tile);
+
+        }
+
+        selectedTiles.Clear();
+
+        selectedSection.RefreshMesh();
+
+    }
+
+    void AddHeightObjects(int corner) {
+
+        var worldX = selectedSection.x + selectedColumn.x;
+        var worldY = -(selectedSection.y + selectedColumn.y);
+
+        switch (corner) {
+            case 1:
+                worldX += 1;
+                break;
+            case 2:
+                worldY -= 1;
+                break;
+            case 3:
+                worldX += 1;
+                worldY -= 1;
+                break;
+            default:
+                break;
+        }
+
+        var point = Object.Instantiate(main.heightMapChannelPoint, new Vector3(worldX, selectedColumn.heights[corner].height1, worldY), Quaternion.identity);
+        var script = point.GetComponent<HeightMapChannelPoint>();
+        script.heightPoint = selectedColumn.heights[corner];
+        script.controller = this;
+        script.channel = 1;
+        script.section = selectedSection;
+
+        heightPointObjects.Add(script);
+
+        point = Object.Instantiate(main.heightMapChannelPoint, new Vector3(worldX, selectedColumn.heights[corner].height2, worldY), Quaternion.identity);
+        script = point.GetComponent<HeightMapChannelPoint>();
+        script.heightPoint = selectedColumn.heights[corner];
+        script.controller = this;
+        script.channel = 2;
+        script.section = selectedSection;
+
+        heightPointObjects.Add(script);
+
+        point = Object.Instantiate(main.heightMapChannelPoint, new Vector3(worldX, selectedColumn.heights[corner].height3, worldY), Quaternion.identity);
+        script = point.GetComponent<HeightMapChannelPoint>();
+        script.heightPoint = selectedColumn.heights[corner];
+        script.controller = this;
+        script.channel = 3;
+        script.section = selectedSection;
+
+        heightPointObjects.Add(script);
+
+    }
+
+    void InitTileOverlay(Tile tile) {
+
+        var overlay = Object.Instantiate(main.SelectedTileOverlay);
+        var script = overlay.GetComponent<SelectedTileOverlay>();
+        script.controller = main;
+        script.tile = tile;
+        script.column = selectedColumn;
+        selectedTileOverlays.Add(script);
+        overlay.transform.SetParent(selectedSection.transform);
+        overlay.transform.localPosition = Vector3.zero;
+
+    }
+
 }

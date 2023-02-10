@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class GraphicsPresetItem : MonoBehaviour {
 
-    public Main controller;
+    public GeometryEditMode controller;
     public GraphicsPropertiesView view;
 
     public int index;

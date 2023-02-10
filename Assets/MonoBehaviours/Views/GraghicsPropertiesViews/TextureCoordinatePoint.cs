@@ -7,7 +7,7 @@ class TextureCoordinatePoint : MonoBehaviour {
 
     public int index;
     public int textureOffset;
-    public Main controller;
+    public GeometryEditMode controller;
     public RectTransform imageTransform;
     public TextureCoordinatesLines lines;
 

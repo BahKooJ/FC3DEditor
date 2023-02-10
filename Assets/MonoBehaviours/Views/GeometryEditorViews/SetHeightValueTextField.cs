@@ -9,7 +9,7 @@ using UnityEngine;
 
 class SetHeightValueTextField: MonoBehaviour {
 
-    public Main controller;
+    public GeometryEditMode controller;
 
     public TMP_InputField field;
 
@@ -80,6 +80,8 @@ class SetHeightValueTextField: MonoBehaviour {
 
         controller.UnselectAndRefreshHeightPoints();
         controller.selectedSection.RefreshMesh();
+
+        controller.RefreshSelectedOverlays();
 
         Destroy(this.gameObject);
 

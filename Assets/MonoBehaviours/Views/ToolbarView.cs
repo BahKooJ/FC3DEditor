@@ -22,17 +22,19 @@ class ToolbarView: MonoBehaviour {
 
         Destroy(activePanel);
 
+        var editMode = new GeometryEditMode(controller);
+
         var obj = Instantiate(geometryEditorPanel);
 
         var script = obj.GetComponent<GeometryEditorUI>();
 
-        script.controller = controller;
+        script.controller = editMode;
 
         obj.transform.SetParent(this.transform.parent, false);
 
         activePanel = obj;
 
-        controller.ChangeEditMode(new GeometryEditMode(controller));
+        controller.ChangeEditMode(editMode);
 
     }
 

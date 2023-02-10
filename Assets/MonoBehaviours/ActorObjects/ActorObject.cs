@@ -1,15 +1,28 @@
 ﻿
 
 using FCopParser;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class ActorObject : MonoBehaviour {
+
+    public Collider actCollider;
 
     public ActorEditMode controller;
 
     public FCopActor actor;
 
-    void Start() {
+    public void ChangePosition(Vector3 pos) {
+
+        actor.x = Mathf.RoundToInt(pos.x * 8192f);
+        actor.y = Mathf.RoundToInt(pos.z * -8192f);
+
+        Create();
+
+    }
+
+
+    public void Create() {
 
         transform.position = new Vector3(actor.x / 8192f, 100f, -(actor.y / 8192f));
 
@@ -27,12 +40,11 @@ public class ActorObject : MonoBehaviour {
             print("No floor found");
         }
 
-        if (actor is FCopTurretActor) {
-            var turret = (FCopTurretActor)actor;
+    }
 
-            transform.rotation = Quaternion.Euler(0f, (turret.rotation / 4096f) * 360, 0f);
+    void Start() {
 
-        }
+        Create();
 
     }
 
