@@ -13,6 +13,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
     public GeometryEditMode controller;
     public HeightPoint heightPoint;
     public int channel;
+    public int cornerWhenSelected;
     public LevelMesh section;
 
     public bool isSelected = false;
@@ -58,12 +59,15 @@ public class HeightMapChannelPoint : MonoBehaviour {
                     Select();
                 }
 
+                MoveTileChannelUpOrDown();
+
                 if (Input.GetMouseButtonDown(0)) {
 
                     click = true;
                     previousMousePosition = Input.mousePosition;
 
-                } else if (Input.GetMouseButtonDown(1)) {
+                } 
+                else if (Input.GetMouseButtonDown(1)) {
 
                     Select();
 
@@ -126,6 +130,59 @@ public class HeightMapChannelPoint : MonoBehaviour {
         } else {
             material.color = Color.white;
         }
+    }
+
+    void MoveTileChannelUpOrDown() {
+
+        float axis = Input.GetAxis("Mouse ScrollWheel");
+        if (axis != 0) {
+
+            if (controller.selectedTiles.Count == 1) {
+
+                var tile = controller.selectedTiles[0];
+
+                var vertexIndex = tile.verticies.IndexOf(new TileVertex(channel, (VertexPosition)cornerWhenSelected));
+
+                if (vertexIndex != -1) {
+
+                    if (axis > 0) {
+
+                        if (tile.verticies[vertexIndex].heightChannel < 3) {
+
+                            var vertex = tile.verticies[vertexIndex];
+
+                            vertex.heightChannel++;
+
+                            tile.verticies[vertexIndex] = vertex;
+
+                            controller.selectedSection.RefreshMesh();
+                            controller.RefreshSelectedOverlays();
+
+                        }
+
+                    } else {
+
+                        if (tile.verticies[vertexIndex].heightChannel > 1) {
+
+                            var vertex = tile.verticies[vertexIndex];
+
+                            vertex.heightChannel--;
+
+                            tile.verticies[vertexIndex] = vertex;
+
+                            controller.selectedSection.RefreshMesh();
+                            controller.RefreshSelectedOverlays();
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
     }
 
 }

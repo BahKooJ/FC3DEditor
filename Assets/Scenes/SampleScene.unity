@@ -1145,9 +1145,6 @@ MonoBehaviour:
   axisControl: {fileID: 1974907386336203002, guid: 7b27df81061c44540be73f4e43af113d, type: 3}
   sectionMeshes: []
   levelTexturePallet: {fileID: 0}
-  selectedSection: {fileID: 0}
-  heightPointObjects: []
-  selectedTileOverlays: []
   debug: 0
 --- !u!4 &1522062005
 Transform:

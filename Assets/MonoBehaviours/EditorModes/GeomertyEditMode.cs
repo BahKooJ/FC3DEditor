@@ -37,7 +37,6 @@ public class GeometryEditMode : EditMode {
         ClearAllSelectedItems();
     }
 
-
     public GeometryEditMode(Main main) {
         this.main = main;
     }
@@ -291,6 +290,8 @@ public class GeometryEditMode : EditMode {
 
         selectedSection.RefreshMesh();
 
+        RefreshSelectedOverlays();
+
     }
 
     // TODO: If shifting height for wall to low will cause MeshID error
@@ -313,6 +314,8 @@ public class GeometryEditMode : EditMode {
         }
 
         selectedSection.RefreshMesh();
+
+        RefreshSelectedOverlays();
 
     }
 
@@ -400,6 +403,9 @@ public class GeometryEditMode : EditMode {
 
         selectedSection.RefreshMesh();
 
+        ClearAllSelectedItems();
+
+
     }
 
     void AddHeightObjects(int corner) {
@@ -427,6 +433,7 @@ public class GeometryEditMode : EditMode {
         script.heightPoint = selectedColumn.heights[corner];
         script.controller = this;
         script.channel = 1;
+        script.cornerWhenSelected = corner + 1;
         script.section = selectedSection;
 
         heightPointObjects.Add(script);
@@ -436,6 +443,7 @@ public class GeometryEditMode : EditMode {
         script.heightPoint = selectedColumn.heights[corner];
         script.controller = this;
         script.channel = 2;
+        script.cornerWhenSelected = corner + 1;
         script.section = selectedSection;
 
         heightPointObjects.Add(script);
@@ -445,6 +453,7 @@ public class GeometryEditMode : EditMode {
         script.heightPoint = selectedColumn.heights[corner];
         script.controller = this;
         script.channel = 3;
+        script.cornerWhenSelected = corner + 1;
         script.section = selectedSection;
 
         heightPointObjects.Add(script);

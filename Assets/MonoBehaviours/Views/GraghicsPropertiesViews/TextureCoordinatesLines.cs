@@ -12,7 +12,7 @@ public class TextureCoordinatesLines : MonoBehaviour {
 
     LineRenderer lineRenderer;
 
-    List<GameObject> points = new();
+    public List<GameObject> points = new();
 
     void Start() {
 

@@ -23,7 +23,12 @@ public class SelectedTileOverlay : MonoBehaviour {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
         material = GetComponent<MeshRenderer>().material;
-        material.color = new Color(0.0f,0.4f,0.0f);
+
+        if (MeshType.IDFromVerticies(tile.verticies) == null) {
+            material.color = Color.red;
+        } else {
+            material.color = new Color(0.0f, 0.4f, 0.0f);
+        }
 
         Generate();
 
@@ -43,6 +48,12 @@ public class SelectedTileOverlay : MonoBehaviour {
         mesh.Clear();
         vertices.Clear();
         triangles.Clear();
+
+        if (MeshType.IDFromVerticies(tile.verticies) == null) {
+            material.color = Color.red;
+        } else {
+            material.color = new Color(0.0f, 0.4f, 0.0f);
+        }
 
         Generate();
 

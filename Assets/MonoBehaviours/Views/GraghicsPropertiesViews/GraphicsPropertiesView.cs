@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using FCopParser;
 using System;
 using Object = UnityEngine.Object;
+using System.Collections.Generic;
 
 public class GraphicsPropertiesView : MonoBehaviour {
 
@@ -154,6 +155,17 @@ public class GraphicsPropertiesView : MonoBehaviour {
     public void OnChangeTexturePalleteValue() {
 
         controller.ChangeTexturePallette(texturePalletteDropdown.GetComponent<TMP_Dropdown>().value);
+
+        var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
+
+        texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
+
+        var texture = new Texture2D(256, 256, TextureFormat.RGB565, false);
+
+        texture.LoadRawTextureData(controller.main.level.textures[graphics.number2].ConvertToRGB565());
+        texture.Apply();
+
+        texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
 
     }
 
@@ -323,6 +335,102 @@ public class GraphicsPropertiesView : MonoBehaviour {
         foreach (Object obj in content.transform) {
             Destroy(obj.GameObject());
         }
+
+    }
+
+    public void CloseWindow() {
+        controller.selectedSection.RefreshMesh();
+        Destroy(gameObject);
+    }
+
+    public void OnClickAddTileGraphics() {
+
+        controller.selectedSection.section.tileGraphics.Add(new TileGraphics(116,1,0,1,0));
+
+        DestoryGraphicsPreset();
+        InitGraphicsPreset();
+
+    }
+
+    public void OnClickRotateClockwise() {
+
+        List<Vector2> oldPoints = new();
+
+        foreach (var point in textureLines.points) {
+            oldPoints.Add(point.transform.localPosition);
+        }
+
+        int index = 1;
+        foreach (var point in textureLines.points) {
+
+            var script = point.GetComponent<TextureCoordinatePoint>();
+
+            if (index == oldPoints.Count) {
+
+                var vector = oldPoints[0];
+
+                script.ChangePosition((int)vector.x, (int)vector.y);
+
+            } else {
+
+                var vector = oldPoints[index];
+
+                script.ChangePosition((int)vector.x, (int)vector.y);
+
+            }
+
+            index++;
+
+        }
+
+    }
+
+    public void OnClickRotateCounterClockwise() {
+
+        List<Vector2> oldPoints = new();
+
+        foreach (var point in textureLines.points) {
+            oldPoints.Add(point.transform.localPosition);
+        }
+
+        int index = oldPoints.Count - 1;
+        foreach (var point in textureLines.points) {
+
+            var script = point.GetComponent<TextureCoordinatePoint>();
+
+            if (index == oldPoints.Count - 1) {
+
+                var vector = oldPoints.Last();
+
+                script.ChangePosition((int)vector.x, (int)vector.y);
+
+                index = -1;
+
+            } else {
+
+                var vector = oldPoints[index];
+
+                script.ChangePosition((int)vector.x, (int)vector.y);
+
+            }
+
+            index++;
+
+        }
+
+    }
+
+    public void OnClickCopyTextureCoords() {
+
+        foreach (var point in textureLines.points) {
+            controller.selectedSection.section.textureCoordinates.Add(
+                TextureCoordinate.SetPixel((int)point.transform.localPosition.x, (int)point.transform.localPosition.y)
+                );
+
+        }
+
+        DestoryTextureOffsets();
+        InitTextureOffsets();
 
     }
 

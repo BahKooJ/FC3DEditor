@@ -96,12 +96,6 @@ public class FreeMove : MonoBehaviour {
         //    transform.position = transform.position + transform.forward * axis * zoomSensitivity;
         //}
 
-        //if (Input.GetKeyDown(KeyCode.Mouse1)) {
-        //    StartLooking();
-        //} else if (Input.GetKeyUp(KeyCode.Mouse1)) {
-        //    StopLooking();
-        //}
-
         if (Input.GetMouseButtonUp(2)) {
 
             if (looking) {

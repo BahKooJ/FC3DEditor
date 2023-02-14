@@ -28,7 +28,9 @@ public class Main : MonoBehaviour {
     public GameObject line3d;
     public GameObject axisControl;
 
-    IFFParser iffFile = new(File.ReadAllBytes("C:/Users/Zewy/Desktop/Mp"));
+    //IFFParser iffFile = new(File.ReadAllBytes("C:/Users/Zewy/Desktop/ConFt"));
+    IFFParser iffFile = new(File.ReadAllBytes("Mp MOD"));
+
     public FCopLevel level;
 
     public List<LevelMesh> sectionMeshes = new();
