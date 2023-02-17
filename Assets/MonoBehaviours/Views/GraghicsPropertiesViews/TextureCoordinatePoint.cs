@@ -7,6 +7,7 @@ class TextureCoordinatePoint : MonoBehaviour {
 
     public int index;
     public int textureOffset;
+    public bool isGlobalPoint;
     public GeometryEditMode controller;
     public RectTransform imageTransform;
     public TextureCoordinatesLines lines;
@@ -24,7 +25,12 @@ class TextureCoordinatePoint : MonoBehaviour {
 
         transform.localPosition = pos;
 
-        controller.selectedSection.section.textureCoordinates[index] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
+        // Tests if the index is for the section or for a global texture/clipboard.
+        if (isGlobalPoint) {
+            GraphicsPropertiesView.textureCoordsClipboard[index] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
+        } else {
+            controller.selectedSection.section.textureCoordinates[index] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
+        }
 
     }
 
@@ -32,7 +38,12 @@ class TextureCoordinatePoint : MonoBehaviour {
 
         transform.localPosition = new Vector2(x, y);
 
-        controller.selectedSection.section.textureCoordinates[index] = TextureCoordinate.SetPixel(x, y);
+        // Tests if the index is for the section or for a global texture/clipboard.
+        if (isGlobalPoint) {
+            GraphicsPropertiesView.textureCoordsClipboard[index] = TextureCoordinate.SetPixel(x, y);
+        } else {
+            controller.selectedSection.section.textureCoordinates[index] = TextureCoordinate.SetPixel(x, y);
+        }
 
     }
 
@@ -70,6 +81,7 @@ class TextureCoordinatePoint : MonoBehaviour {
 
     }
 
+    // --Event methods called by Unity--
     public void MouseDown() {
 
         drag = true;

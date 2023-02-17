@@ -13,22 +13,27 @@ using System.Collections.Generic;
 
 public class GraphicsPropertiesView : MonoBehaviour {
 
+    public static List<int> textureCoordsClipboard = new();
+
     public GeometryEditMode controller;
 
+    // --Prefabs--
     public GameObject textureOffsetItem;
     public GameObject graphicsPresetItem;
     public GameObject textureCoordinatePoint;
 
+    // --View References--
     public GameObject texturePalletteDropdown;
     public GameObject rectangleTileToggle;
     public GameObject texturePallete;
     public GameObject texturePalleteImage;
     public GameObject textureOffsets;
     public GameObject graphicsPreset;
-
     public TextureCoordinatesLines textureLines;
 
     public int bmpID;
+    public int? globalTextureCoordIndex = null;
+
 
     void Start() {
 
@@ -276,7 +281,6 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
     public void InitTextureOffsets() {
 
-        var content = textureOffsets.transform.GetChild(0).GameObject().transform.GetChild(0);
 
         foreach (var index in Enumerable.Range(0, controller.selectedSection.section.textureCoordinates.Count)) {
 
@@ -290,8 +294,25 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
             script.index = index;
 
-            item.transform.SetParent(content);
+            item.transform.SetParent(textureOffsets.transform);
 
+        }
+
+        foreach (var index in Enumerable.Range(0, textureCoordsClipboard.Count)) {
+
+            var item = Instantiate(textureOffsetItem);
+
+            var script = item.GetComponent<TextureOffsetItem>();
+
+            script.controller = controller;
+
+            script.view = this;
+
+            script.index = index;
+
+            script.isGlobal = true;
+
+            item.transform.SetParent(textureOffsets.transform);
 
         }
 
@@ -320,9 +341,8 @@ public class GraphicsPropertiesView : MonoBehaviour {
     }
 
     public void DestoryTextureOffsets() {
-        var content = textureOffsets.transform.GetChild(0).GameObject().transform.GetChild(0);
 
-        foreach (Object obj in content.transform) {
+        foreach (Object obj in textureOffsets.transform) {
             Destroy(obj.GameObject());
         }
 
@@ -424,6 +444,20 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
         foreach (var point in textureLines.points) {
             controller.selectedSection.section.textureCoordinates.Add(
+                TextureCoordinate.SetPixel((int)point.transform.localPosition.x, (int)point.transform.localPosition.y)
+                );
+
+        }
+
+        DestoryTextureOffsets();
+        InitTextureOffsets();
+
+    }
+
+    public void OnClickCopyTextureCoordsToClipboard() {
+
+        foreach (var point in textureLines.points) {
+            textureCoordsClipboard.Add(
                 TextureCoordinate.SetPixel((int)point.transform.localPosition.x, (int)point.transform.localPosition.y)
                 );
 

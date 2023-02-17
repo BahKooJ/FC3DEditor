@@ -12,18 +12,35 @@ public class TextureOffsetItem : MonoBehaviour {
 
     public int index;
 
+    public bool isGlobal = false;
+
     Image image;
 
 
     void Start() {
 
-        var textureOffset = controller.selectedSection.section.textureCoordinates[index];
+        int textureOffset;
+
+        if (isGlobal) {
+            textureOffset = GraphicsPropertiesView.textureCoordsClipboard[index];
+        } else {
+            textureOffset = controller.selectedSection.section.textureCoordinates[index];
+        }
 
         image = GetComponent<Image>();
 
         if (controller.selectedTiles.Count == 1) {
 
-            if (controller.selectedTiles[0].textureIndex == index) {
+            if (isGlobal) {
+
+                if (view.globalTextureCoordIndex == index) {
+                    image.color = new Color(0.2f, 0.1f, 0.2f);
+                } else {
+                    image.color = new Color(0.2f, 0.2f, 0.1f);
+                }
+
+            } 
+            else if (controller.selectedTiles[0].textureIndex == index) {
                 image.color = new Color(0.1f, 0.2f, 0.1f);
             }
 
@@ -45,7 +62,12 @@ public class TextureOffsetItem : MonoBehaviour {
 
     public void OnClick() {
 
-        controller.SetTextureIndex(index);
+        if (isGlobal) {
+            view.globalTextureCoordIndex = index;
+        } else {
+            view.globalTextureCoordIndex = null;
+            controller.SetTextureIndex(index);
+        }
 
         view.textureLines.ReInit();
 
