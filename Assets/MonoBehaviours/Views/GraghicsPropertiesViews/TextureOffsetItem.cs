@@ -29,7 +29,7 @@ public class TextureOffsetItem : MonoBehaviour {
 
         image = GetComponent<Image>();
 
-        if (controller.selectedTiles.Count == 1) {
+        if (controller.selectedTiles.Count > 0) {
 
             if (isGlobal) {
 

@@ -468,4 +468,13 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
     }
 
+    public void OnClickClearClipboard() {
+
+        textureCoordsClipboard.Clear();
+        globalTextureCoordIndex = null;
+
+        RefreshTextureOffsetsView();
+
+    }
+
 }

@@ -120,7 +120,6 @@ public class TextureCoordinatesLines : MonoBehaviour {
 
         textureCoords.Clear();
 
-        int index;
         List<int> coords;
 
         if (view.globalTextureCoordIndex != null) {
