@@ -21,6 +21,8 @@ public class GeometryEditorUI: MonoBehaviour {
 
     void Start() {
 
+        controller.view = this;
+
         foreach (Object obj in transform) {
 
             switch (obj.GameObject().name) {

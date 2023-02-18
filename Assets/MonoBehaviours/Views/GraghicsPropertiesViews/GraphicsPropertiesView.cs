@@ -30,6 +30,9 @@ public class GraphicsPropertiesView : MonoBehaviour {
     public GameObject textureOffsets;
     public GameObject graphicsPreset;
     public TextureCoordinatesLines textureLines;
+    public GameObject textureTilePreview;
+
+    public TileTexturePreview tilePreview;
 
     public int bmpID;
     public int? globalTextureCoordIndex = null;
@@ -38,6 +41,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
     void Start() {
 
         InitView();
+        InitTilePreview();
 
     }
 
@@ -45,37 +49,132 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
         float axis = Input.GetAxis("Mouse ScrollWheel");
         if (axis != 0) {
-            var scale = texturePalleteImage.transform.localScale;
 
-            scale.x += axis * 4;
-            scale.y += axis * 4;
+            if (IsCursorInTexturePallete()) {
 
-            texturePalleteImage.transform.localScale = scale;
+                var scale = texturePalleteImage.transform.localScale;
 
-            var position = texturePalleteImage.transform.localPosition;
+                scale.x += axis * 4;
+                scale.y += axis * 4;
 
-            position.x -= 265 * (axis * 2);
-            position.y -= 265 * (axis * 2);
+                texturePalleteImage.transform.localScale = scale;
 
-            texturePalleteImage.transform.localPosition = position;
+                var position = texturePalleteImage.transform.localPosition;
+
+                position.x -= 265 * (axis * 2);
+                position.y -= 265 * (axis * 2);
+
+                texturePalleteImage.transform.localPosition = position;
+
+            }
+            else if (IsCursorInTilePreview()) {
+
+                var scale = tilePreview.transform.localScale;
+
+                scale.x -= axis * 32;
+                scale.y += axis * 32;
+                scale.z += axis * 32;
+
+                tilePreview.transform.localScale = scale;
+
+            }
+
 
         }
 
         if (Input.GetMouseButton(1)) {
-            var position = texturePalleteImage.transform.localPosition;
 
-            position.x += Input.GetAxis("Mouse X") * 18;
-            position.y += Input.GetAxis("Mouse Y") * 18;
+            if (IsCursorInTexturePallete()) {
 
-            texturePalleteImage.transform.localPosition = position;
+                var position = texturePalleteImage.transform.localPosition;
+
+                position.x += Input.GetAxis("Mouse X") * 18;
+                position.y += Input.GetAxis("Mouse Y") * 18;
+
+                texturePalleteImage.transform.localPosition = position;
+
+            }
+            else if (IsCursorInTilePreview()) {
+
+                var rotateY = Input.GetAxis("Mouse X") * 800 * Mathf.Deg2Rad;
+                var rotateZ = Input.GetAxis("Mouse Y") * 400 * Mathf.Deg2Rad;
+
+                //TODO: Only rotates correctly from left to right
+                tilePreview.transform.Rotate(Vector3.left, rotateZ);
+
+                var rotation = tilePreview.transform.localEulerAngles;
+
+                rotation.y += rotateY;
+
+                tilePreview.transform.localEulerAngles = rotation;
+
+            }
 
         }
 
-        //Vector2 pointOnPallete = Vector2.zero;
+    }
 
-        //RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)texturePallete.transform, Input.mousePosition, Camera.main, out pointOnPallete);
+    bool IsCursorInTexturePallete() {
 
-        //Debug.Log(pointOnPallete);
+        Vector2 pointOnPallete = Vector2.zero;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)texturePallete.transform, Input.mousePosition, Camera.main, out pointOnPallete);
+
+        var palleteRect = (RectTransform)texturePallete.transform;
+
+        return pointOnPallete.x < palleteRect.rect.width && pointOnPallete.y < palleteRect.rect.height;
+
+    }
+
+    bool IsCursorInTilePreview() {
+
+        Vector2 pointOnPallete = Vector2.zero;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)textureTilePreview.transform, Input.mousePosition, Camera.main, out pointOnPallete);
+
+        var rect = (RectTransform)textureTilePreview.transform;
+
+        return pointOnPallete.x < rect.rect.width && pointOnPallete.y < rect.rect.height;
+
+    }
+
+    void InitView() {
+
+        if (controller.selectedTiles.Count == 1) {
+            var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
+
+            rectangleTileToggle.GetComponent<Toggle>().isOn = graphics.number4 == 1;
+        }
+
+        var sameTexture = true;
+
+        bmpID = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex].number2; ;
+        foreach (var tile in controller.selectedTiles) {
+
+            if (bmpID != controller.selectedSection.section.tileGraphics[tile.graphicsIndex].number2) {
+                sameTexture = false;
+                bmpID = -1;
+                break;
+            }
+
+        }
+
+        if (sameTexture) {
+            var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
+
+            texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
+
+            var texture = new Texture2D(256, 256, TextureFormat.RGB565, false);
+
+            texture.LoadRawTextureData(controller.main.level.textures[graphics.number2].ConvertToRGB565());
+            texture.Apply();
+
+            texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
+        }
+
+        InitTextureOffsets();
+
+        InitGraphicsPreset();
 
     }
 
@@ -120,162 +219,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
         InitGraphicsPreset();
 
-    }
-
-    public void RefreshTextureOffsetsView() {
-        DestoryTextureOffsets();
-        InitTextureOffsets();
-    }
-
-    public void OnClickExportTexture() {
-
-        controller.ExportTexture(this.bmpID);
-
-    }
-
-    public void OnClickImportTexture() {
-
-        controller.ImportTexture(bmpID);
-
-        var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
-
-        texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
-
-        rectangleTileToggle.GetComponent<Toggle>().isOn = graphics.number4 == 1;
-
-        var texture = new Texture2D(256, 256, TextureFormat.RGB565, false);
-
-        texture.LoadRawTextureData(controller.main.level.textures[graphics.number2].ConvertToRGB565());
-        texture.Apply();
-
-        texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
-
-        controller.main.RefreshTextures();
-
-        controller.selectedSection.RefreshMesh();
-        controller.selectedSection.RefreshTexture();
-
-    }
-
-    public void OnChangeTexturePalleteValue() {
-
-        controller.ChangeTexturePallette(texturePalletteDropdown.GetComponent<TMP_Dropdown>().value);
-
-        var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
-
-        texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
-
-        var texture = new Texture2D(256, 256, TextureFormat.RGB565, false);
-
-        texture.LoadRawTextureData(controller.main.level.textures[graphics.number2].ConvertToRGB565());
-        texture.Apply();
-
-        texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
-
-    }
-
-    public void OnClickAddTexture() {
-
-        controller.selectedSection.section.textureCoordinates.Add(0);
-
-        DestoryTextureOffsets();
-        InitTextureOffsets();
-
-    }
-
-    public void OnClickAdd3Texture() {
-
-        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(120, 120));
-        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(120, 100));
-        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(100,100));
-
-
-        DestoryTextureOffsets();
-        InitTextureOffsets();
-
-    }
-
-    public void OnClickAdd4Texture() {
-
-        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(100, 120));
-        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(120, 120));
-        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(120, 100));
-        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(100, 100));
-
-
-        DestoryTextureOffsets();
-        InitTextureOffsets();
-
-    }
-
-    public void OnSetTextureCordX() {
-
-        //var comp = textureInputX.GetComponent<TMP_InputField>();
-
-        //try {
-        //    controller.SetTextureCordX(Int32.Parse(comp.text));
-        //} catch {
-        //    return;
-        //}
-
-        DestoryTextureOffsets();
-        InitTextureOffsets();
-        textureLines.ReInit();
-
-    }
-
-    public void OnSetTextureCordY() {
-
-        //var comp = textureInputY.GetComponent<TMP_InputField>();
-
-        //try {
-        //    controller.SetTextureCordY(Int32.Parse(comp.text));
-        //} catch {
-        //    return;
-        //}
-
-        DestoryTextureOffsets();
-        InitTextureOffsets();
-        textureLines.ReInit();
-    }
-
-    void InitView() {
-
-        if (controller.selectedTiles.Count == 1) {
-            var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
-
-            rectangleTileToggle.GetComponent<Toggle>().isOn = graphics.number4 == 1;
-        }
-
-        var sameTexture = true;
-
-        bmpID = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex].number2; ;
-        foreach (var tile in controller.selectedTiles) {
-
-            if (bmpID != controller.selectedSection.section.tileGraphics[tile.graphicsIndex].number2) {
-                sameTexture = false;
-                bmpID = -1;
-                break;
-            }
-
-        }
-
-        if (sameTexture) {
-            var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
-
-            texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
-
-            var texture = new Texture2D(256, 256, TextureFormat.RGB565, false);
-
-            texture.LoadRawTextureData(controller.main.level.textures[graphics.number2].ConvertToRGB565());
-            texture.Apply();
-
-            texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
-        }
-
-        InitTextureOffsets();
-
-        InitGraphicsPreset();
+        tilePreview.Refresh();
 
     }
 
@@ -358,9 +302,142 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
     }
 
+    public void RefreshTextureOffsetsView() {
+        DestoryTextureOffsets();
+        InitTextureOffsets();
+    }
+
+    void InitTilePreview() {
+
+        var overlay = Instantiate(controller.main.TileTexturePreview);
+        var script = overlay.GetComponent<TileTexturePreview>();
+        script.controller = controller.main;
+        script.tile = controller.selectedTiles[0];
+        script.column = controller.selectedColumn;
+        script.section = controller.selectedSection.section;
+        overlay.transform.SetParent(textureTilePreview.transform, false);
+
+        tilePreview = script;
+
+    }
+
+    // --Event Handlers--
+
     public void CloseWindow() {
         controller.selectedSection.RefreshMesh();
         Destroy(gameObject);
+    }
+
+    public void OnClickExportTexture() {
+
+        controller.ExportTexture(this.bmpID);
+
+    }
+
+    public void OnClickImportTexture() {
+
+        controller.ImportTexture(bmpID);
+
+        var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
+
+        texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
+
+        rectangleTileToggle.GetComponent<Toggle>().isOn = graphics.number4 == 1;
+
+        var texture = new Texture2D(256, 256, TextureFormat.RGB565, false);
+
+        texture.LoadRawTextureData(controller.main.level.textures[graphics.number2].ConvertToRGB565());
+        texture.Apply();
+
+        texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
+
+        controller.main.RefreshTextures();
+
+        controller.selectedSection.RefreshMesh();
+        controller.selectedSection.RefreshTexture();
+
+    }
+
+    public void OnChangeTexturePalleteValue() {
+
+        controller.ChangeTexturePallette(texturePalletteDropdown.GetComponent<TMP_Dropdown>().value);
+
+        var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
+
+        texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
+
+        var texture = new Texture2D(256, 256, TextureFormat.RGB565, false);
+
+        texture.LoadRawTextureData(controller.main.level.textures[graphics.number2].ConvertToRGB565());
+        texture.Apply();
+
+        texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
+
+    }
+
+    public void OnClickAddTexture() {
+
+        controller.selectedSection.section.textureCoordinates.Add(0);
+
+        DestoryTextureOffsets();
+        InitTextureOffsets();
+
+    }
+
+    public void OnClickAdd3Texture() {
+
+        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(120, 120));
+        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(120, 100));
+        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(100, 100));
+
+
+        DestoryTextureOffsets();
+        InitTextureOffsets();
+
+    }
+
+    public void OnClickAdd4Texture() {
+
+        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(100, 120));
+        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(120, 120));
+        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(120, 100));
+        controller.selectedSection.section.textureCoordinates.Add(TextureCoordinate.SetPixel(100, 100));
+
+
+        DestoryTextureOffsets();
+        InitTextureOffsets();
+
+    }
+
+    public void OnSetTextureCordX() {
+
+        //var comp = textureInputX.GetComponent<TMP_InputField>();
+
+        //try {
+        //    controller.SetTextureCordX(Int32.Parse(comp.text));
+        //} catch {
+        //    return;
+        //}
+
+        DestoryTextureOffsets();
+        InitTextureOffsets();
+        textureLines.ReInit();
+
+    }
+
+    public void OnSetTextureCordY() {
+
+        //var comp = textureInputY.GetComponent<TMP_InputField>();
+
+        //try {
+        //    controller.SetTextureCordY(Int32.Parse(comp.text));
+        //} catch {
+        //    return;
+        //}
+
+        DestoryTextureOffsets();
+        InitTextureOffsets();
+        textureLines.ReInit();
     }
 
     public void OnClickAddTileGraphics() {

@@ -15,6 +15,12 @@ public class GeometryEditMode : EditMode {
     public List<HeightMapChannelPoint> heightPointObjects = new();
     public List<SelectedTileOverlay> selectedTileOverlays = new();
 
+    public GeometryEditorUI view;
+
+    public bool IsGraphicsViewOpen() {
+        return view.activeGraphicsPropertiesView != null;
+    }
+
     public void Update() {
         
         if (FreeMove.looking) {

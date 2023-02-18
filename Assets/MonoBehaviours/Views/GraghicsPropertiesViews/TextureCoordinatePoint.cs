@@ -9,6 +9,7 @@ class TextureCoordinatePoint : MonoBehaviour {
     public int textureOffset;
     public bool isGlobalPoint;
     public GeometryEditMode controller;
+    public GraphicsPropertiesView view;
     public RectTransform imageTransform;
     public TextureCoordinatesLines lines;
 
@@ -30,6 +31,7 @@ class TextureCoordinatePoint : MonoBehaviour {
             GraphicsPropertiesView.textureCoordsClipboard[index] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
         } else {
             controller.selectedSection.section.textureCoordinates[index] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
+            view.tilePreview.Refresh();
         }
 
     }
@@ -43,6 +45,7 @@ class TextureCoordinatePoint : MonoBehaviour {
             GraphicsPropertiesView.textureCoordsClipboard[index] = TextureCoordinate.SetPixel(x, y);
         } else {
             controller.selectedSection.section.textureCoordinates[index] = TextureCoordinate.SetPixel(x, y);
+            view.tilePreview.Refresh();
         }
 
     }

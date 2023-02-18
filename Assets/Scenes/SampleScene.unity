@@ -1137,6 +1137,7 @@ MonoBehaviour:
   meshSection: {fileID: 3982175839306991789, guid: d2f3b92a7ae38644b87000c94b6447b4, type: 3}
   heightMapChannelPoint: {fileID: 1298310605505145416, guid: 804d2b1c507598948a3e68434291bfc0, type: 3}
   SelectedTileOverlay: {fileID: 3982175839306991789, guid: c11d8fe31bdf1aa4887436153193d9c9, type: 3}
+  TileTexturePreview: {fileID: 3982175839306991789, guid: 2759ef5779e33c643944bdeae490ddfa, type: 3}
   NavMeshPoint: {fileID: 6317055660841323228, guid: d716506ed78901d468e87343a95f5955, type: 3}
   BlankActor: {fileID: 1640186847095666650, guid: 49bee21158884a8459dfdc42e65ffd06, type: 3}
   TurretActorObject: {fileID: 5284000438615368468, guid: 950b781f248e7c8499c7c03c5c2c291b, type: 3}

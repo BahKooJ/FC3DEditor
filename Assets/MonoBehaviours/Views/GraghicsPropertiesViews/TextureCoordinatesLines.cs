@@ -56,6 +56,7 @@ public class TextureCoordinatesLines : MonoBehaviour {
             script.index = index + it;
             script.textureOffset = coord;
             script.controller = view.controller;
+            script.view = view;
             script.isGlobalPoint = view.globalTextureCoordIndex == null ? false : true;
             script.imageTransform = (RectTransform)view.texturePalleteImage.transform;
             script.lines = this;

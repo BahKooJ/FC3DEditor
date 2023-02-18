@@ -210,19 +210,4 @@ public class LevelMesh : MonoBehaviour {
 
     }
 
-    class TextureVertex {
-
-        float x;
-        float y;
-
-        VertexPosition position;
-
-        public TextureVertex(float x, float y, VertexPosition position) {
-            this.x = x;
-            this.y = y;
-            this.position = position;
-        }
-
-    }
-
 }

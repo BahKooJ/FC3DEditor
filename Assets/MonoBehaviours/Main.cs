@@ -18,6 +18,7 @@ public class Main : MonoBehaviour {
     public GameObject meshSection;
     public GameObject heightMapChannelPoint;
     public GameObject SelectedTileOverlay;
+    public GameObject TileTexturePreview;
     public GameObject NavMeshPoint;
 
     public GameObject BlankActor;

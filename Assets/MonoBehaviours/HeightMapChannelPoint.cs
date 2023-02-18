@@ -45,7 +45,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
     void Update() {
         
-        if (FreeMove.looking) {
+        if (FreeMove.looking || controller.IsGraphicsViewOpen()) {
             return;
         }
 

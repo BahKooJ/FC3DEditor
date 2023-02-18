@@ -70,7 +70,7 @@ public class TextureOffsetItem : MonoBehaviour {
         }
 
         view.textureLines.ReInit();
-
+        view.tilePreview.Refresh();
         view.RefreshTextureOffsetsView();
 
     }
