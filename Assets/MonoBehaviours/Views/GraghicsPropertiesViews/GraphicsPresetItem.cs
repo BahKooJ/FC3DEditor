@@ -20,7 +20,7 @@ public class GraphicsPresetItem : MonoBehaviour {
 
         image = GetComponent<Image>();
 
-        if (controller.selectedTiles.Count == 1) {
+        if (controller.selectedTiles.Count > 0) {
 
             if (controller.selectedTiles[0].graphicsIndex == index) {
                 image.color = new Color(0.1f, 0.2f, 0.1f);

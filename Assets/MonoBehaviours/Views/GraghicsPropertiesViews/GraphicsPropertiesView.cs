@@ -140,7 +140,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
     void InitView() {
 
-        if (controller.selectedTiles.Count == 1) {
+        if (controller.selectedTiles.Count > 0) {
             var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
 
             rectangleTileToggle.GetComponent<Toggle>().isOn = graphics.number4 == 1;
@@ -183,7 +183,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
         DestoryTextureOffsets();
         DestoryGraphicsPreset();
 
-        if (controller.selectedTiles.Count == 1) { 
+        if (controller.selectedTiles.Count > 0) { 
             var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
 
             rectangleTileToggle.GetComponent<Toggle>().isOn = graphics.number4 == 1;
@@ -551,6 +551,24 @@ public class GraphicsPropertiesView : MonoBehaviour {
         globalTextureCoordIndex = null;
 
         RefreshTextureOffsetsView();
+
+    }
+
+    public void OnValueChangedRectTile(bool toggled) {
+
+        if (controller == null) {
+            return;
+        }
+
+        if (controller.selectedTiles.Count == 0) {
+            return;
+        }
+
+        var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
+
+        graphics.number4 = toggled ? 1 : 0;
+
+        controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex] = graphics;
 
     }
 

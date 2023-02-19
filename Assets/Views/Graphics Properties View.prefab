@@ -899,7 +899,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
+  m_ScrollSensitivity: 90
   m_Viewport: {fileID: 7504552826650759461}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 4083421747947801094}
@@ -3895,7 +3895,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
+  m_ScrollSensitivity: 50
   m_Viewport: {fileID: 3399725931561113938}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 7110306821409497604}
@@ -4167,7 +4167,19 @@ MonoBehaviour:
   m_Group: {fileID: 0}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3045479289170928946}
+        m_TargetAssemblyTypeName: GraphicsPropertiesView, Assembly-CSharp
+        m_MethodName: OnValueChangedRectTile
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_IsOn: 1
 --- !u!1 &8172781144749383649
 GameObject:
@@ -4690,6 +4702,7 @@ MonoBehaviour:
   graphicsPreset: {fileID: 7814778167924032753}
   textureLines: {fileID: 3536345401244055557}
   textureTilePreview: {fileID: 1067821260078188285}
+  tilePreview: {fileID: 0}
   bmpID: 0
 --- !u!1 &8679280700666796702
 GameObject:
