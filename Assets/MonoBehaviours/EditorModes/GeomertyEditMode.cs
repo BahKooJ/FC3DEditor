@@ -14,6 +14,7 @@ public class GeometryEditMode : EditMode {
     public LevelMesh selectedSection = null;
     public List<HeightMapChannelPoint> heightPointObjects = new();
     public List<SelectedTileOverlay> selectedTileOverlays = new();
+    public GameObject selectedSectionOverlay = null;
 
     public GeometryEditorUI view;
 
@@ -76,6 +77,12 @@ public class GeometryEditMode : EditMode {
         selectedTiles.Add(tile);
         selectedColumn = column;
         selectedSection = section;
+
+        if (selectedSectionOverlay != null) {
+            Object.Destroy(selectedSectionOverlay);
+        }
+
+        selectedSectionOverlay = Object.Instantiate(main.SectionBoarders, new Vector3(section.x, 0, -section.y), Quaternion.identity);
 
         // Removes only non selected HeightMapChannelPoints.
         var oldPoints = new List<HeightMapChannelPoint>(heightPointObjects);
@@ -377,6 +384,12 @@ public class GeometryEditMode : EditMode {
             Object.Destroy(obj.gameObject);
 
         }
+
+        if (selectedSectionOverlay != null) {
+            Object.Destroy(selectedSectionOverlay);
+            selectedSectionOverlay = null;
+        }
+
 
         heightPointObjects.Clear();
 

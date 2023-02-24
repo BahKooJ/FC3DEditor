@@ -187,7 +187,9 @@ namespace FCopParser {
 
                 var bitField = new BitArray(byteField);
 
+                // Tile count
                 var bitNumber6 = Utils.CopyBitsOfRange(bitField, 0, 6);
+                // Index of tiles
                 var bitNumber10 = Utils.CopyBitsOfRange(bitField, 6, 16);
 
                 thirdSectionBitfields.Add(new ThirdSectionBitfield(
@@ -376,9 +378,9 @@ namespace FCopParser {
 
     public struct ThirdSectionBitfield {
 
-        // 6 bit
+        // 6 bit - Tile count
         public int number1;
-        // 10 bit
+        // 10 bit - Index of tiles;
         public int number2;
 
         public ThirdSectionBitfield(int number1, int number2) {

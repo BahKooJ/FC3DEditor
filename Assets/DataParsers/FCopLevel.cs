@@ -264,18 +264,17 @@ namespace FCopParser {
             var y = 0;
             foreach (var parseColumn in parser.thirdSectionBitfields) {
 
+                // Grabs the tiles for the column in the tiles array. Number 2 is the index of the tiles and number 1 is the count.
                 var parsedTiles = parser.tiles.GetRange(parseColumn.number2, parseColumn.number1);
 
-                //if (parsedTiles.Count > 2) {
-                //    Console.WriteLine("pain");
-                //}
-
+                // Makes the parsed bitfield into a Tile object.
                 var tiles = new List<Tile>();
 
                 foreach (var parsedTile in parsedTiles) {
                     tiles.Add(new Tile(parsedTile));
                 }
 
+                // Grabs the heights. The heights have already been added so it uses the local height array.
                 var heights = new List<HeightPoint>();
 
                 heights.Add(GetHeightPoint(x, y));
@@ -331,6 +330,7 @@ namespace FCopParser {
 
         }
 
+        // Compiles the class back into a Ctil Future Cop can read. The changes are applied to the parser object.
         public void Compile() {
 
             List<HeightPoint3> heightPoints = new List<HeightPoint3>();
@@ -343,6 +343,10 @@ namespace FCopParser {
                 heightPoints.Add(point.Compile());
             }
 
+            // IMPORTANT: The tile column array inside the Ctil is sorted from left to right, HOWEVER the tile array is not.
+            // The tile array stores tiles inside a 4x4 tile chunk. The tiles inside this chunk move from left to right,
+            // and chunks move from left to right as well. What needs to be done is take the sorted tile columns and move 
+            // them to the 4x4 chunk pattern. This needs to be done for the tile array alone.
             var x = 0;
             var y = 0;
             var chunkX = 0;
@@ -387,12 +391,14 @@ namespace FCopParser {
 
                 foreach (var column in chunk.tileColumns) {
 
+                    // Makes sure the last tile value is correct
                     foreach (var tile in column.tiles) {
                         tile.isStartInColumnArray = false;
                     }
 
                     column.tiles.Last().isStartInColumnArray = true;
 
+                    // Now that the tile columns are sorted to fit the 4x4 chunk pattern in the tile array, we can simple add the tiles.
                     foreach (var tile in column.tiles) {
                         tiles.Add(tile.Compile());
                     }
@@ -403,6 +409,7 @@ namespace FCopParser {
 
             }
 
+            // Because the tiles are now no longer sorted left to right, it finds the correct index of the tiles for the columns.
             var previousOffsetFromChunk = new Dictionary<int, int>() { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 } };
             var previousChunkY = 0;
             foreach (var column in tileColumns) {
@@ -448,6 +455,11 @@ namespace FCopParser {
 
             parser.Compile();
 
+        }
+
+        public void RotateClockwise() {
+            // X becomes Y
+            // Y becomes X - length
         }
 
     }
