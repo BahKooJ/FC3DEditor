@@ -34,6 +34,15 @@ public class GeometryEditMode : EditMode {
             RemoveSelectedTiles();
         }
 
+        if (Input.GetKeyDown(KeyCode.U)) {
+
+            if (selectedSection != null) {
+                selectedSection.section.RotateCounterClockwise();
+                selectedSection.RefreshMesh();
+            }
+
+        }
+
     }
 
     public void OnCreateMode() {

@@ -457,9 +457,55 @@ namespace FCopParser {
 
         }
 
-        public void RotateClockwise() {
+        public void RotateCounterClockwise() {
             // X becomes Y
             // Y becomes X - length
+
+            var newHeightOrder = new List<HeightPoint>();
+
+            foreach (var hy in Enumerable.Range(0,17)) {
+
+                foreach (var hx in Enumerable.Range(0, 17)) {
+                    newHeightOrder.Add(GetHeightPoint(16 - hy, hx));
+                }
+
+            }
+
+            heightMap = newHeightOrder;
+
+            var newTileColum = new List<TileColumn>();
+
+            foreach (var ty in Enumerable.Range(0, 16)) {
+
+                foreach (var tx in Enumerable.Range(0, 16)) {
+                    var column = tileColumns[(tx * 16) + (15 - ty)];
+
+                    var heights = new List<HeightPoint>();
+
+                    heights.Add(GetHeightPoint(tx, ty));
+                    heights.Add(GetHeightPoint(tx + 1, ty));
+                    heights.Add(GetHeightPoint(tx, ty + 1));
+                    heights.Add(GetHeightPoint(tx + 1, ty + 1));
+
+                    column.x = tx;
+                    column.y = ty;
+                    column.heights = heights;
+
+                    newTileColum.Add(column);
+                }
+
+            }
+
+            tileColumns = newTileColum;
+
+            foreach (var column in tileColumns) {
+
+                foreach (var tile in column.tiles) {
+
+                }
+
+            }
+
         }
 
     }
