@@ -10,6 +10,7 @@ using TMPro;
 using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.Networking.Types;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using static System.Collections.Specialized.BitVector32;
 
@@ -31,7 +32,7 @@ public class Main : MonoBehaviour {
     public GameObject axisControl;
 
     //IFFParser iffFile = new(File.ReadAllBytes("C:/Users/Zewy/Desktop/ConFt"));
-    IFFParser iffFile = new(File.ReadAllBytes("Mp MOD"));
+    IFFParser iffFile;
 
     public FCopLevel level;
 
@@ -44,6 +45,8 @@ public class Main : MonoBehaviour {
     public EditMode editMode;
 
     void Start() {
+
+        iffFile = new(File.ReadAllBytes(StaticFileDate.SRC_FILE_NAME));
 
         Application.targetFrameRate = 60;
 
@@ -59,8 +62,13 @@ public class Main : MonoBehaviour {
 
         editMode.Update();
 
-        if (Input.GetKeyDown(KeyCode.Equals)) {
+        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.S)) {
+            Debug.Log("Saving File");
             Compile();
+        }
+        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.Backspace))
+        {
+            SceneManager.LoadScene("Loading Scene");
         }
 
     }
@@ -160,7 +168,7 @@ public class Main : MonoBehaviour {
 
         iffFile.Compile();
 
-        File.WriteAllBytes("Mp MOD", iffFile.bytes);
+        File.WriteAllBytes(StaticFileDate.SRC_FILE_NAME, iffFile.bytes);
 
     }
 
