@@ -597,14 +597,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1458537781}
-  m_LocalRotation: {x: 0.1437129, y: -0, z: -0, w: 0.98961943}
-  m_LocalPosition: {x: 0.4, y: 2.26, z: -4.82}
+  m_LocalRotation: {x: 0.19659817, y: -0, z: -0, w: 0.9804842}
+  m_LocalPosition: {x: 0.4, y: 2.61, z: -4.82}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 16.526, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 22.676, y: 0, z: 0}
 --- !u!1 &2095660014
 GameObject:
   m_ObjectHideFlags: 0
@@ -634,8 +634,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f4a28999bde94d43a523267b1155a0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meshIDtext: {fileID: 1290383031}
   tilePreviewPrefab: {fileID: 3982175839306991789, guid: c11d8fe31bdf1aa4887436153193d9c9, type: 3}
+  staticHeightPointPrefab: {fileID: 1298310605505145416, guid: 580927f31628b7a48b4e39086242486a, type: 3}
+  meshIDtext: {fileID: 1290383031}
   tilePreview: {fileID: 0}
 --- !u!4 &2095660016
 Transform:

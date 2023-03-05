@@ -1,6 +1,5 @@
 ﻿
 using FCopParser;
-using Newtonsoft.Json.Bson;
 using System.Collections.Generic;
 using UnityEngine;
 using static System.Collections.Specialized.BitVector32;
