@@ -22,6 +22,8 @@ public class GeometryEditMode : EditMode {
         return view.activeGraphicsPropertiesView != null;
     }
 
+    FCopLevelSection tempCopySection = null;
+
     public void Update() {
         
         if (FreeMove.looking) {
@@ -41,6 +43,23 @@ public class GeometryEditMode : EditMode {
                 selectedSection.RefreshMesh();
             }
 
+        }
+
+        if (Input.GetKeyDown(KeyCode.I)) {
+
+            if (selectedSection != null) {
+                selectedSection.section.MirorVertically();
+                selectedSection.RefreshMesh();
+            }
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.O)) {
+            tempCopySection = selectedSection.section;
+        }
+        if (Input.GetKeyDown(KeyCode.P)) {
+            selectedSection.section.Overwrite(tempCopySection);
+            selectedSection.RefreshMesh();
         }
 
     }

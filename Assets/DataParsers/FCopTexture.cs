@@ -137,13 +137,13 @@ namespace FCopParser {
 
     public class XRGB555 {
 
-        bool x;
+        public bool x;
 
         const double maxChannelValue = 31;
 
-        int r;
-        int g;
-        int b;
+        public int r;
+        public int g;
+        public int b;
 
         public XRGB555(bool x, int r, int g, int b) {
             this.x = x;

@@ -31,7 +31,7 @@ public class Main : MonoBehaviour {
     public GameObject axisControl;
 
     //IFFParser iffFile = new(File.ReadAllBytes("C:/Users/Zewy/Desktop/ConFt"));
-    IFFParser iffFile = new(File.ReadAllBytes("Mp"));
+    IFFParser iffFile = new(File.ReadAllBytes("Mp MOD"));
 
     public FCopLevel level;
 

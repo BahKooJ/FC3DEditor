@@ -500,11 +500,176 @@ namespace FCopParser {
 
             foreach (var column in tileColumns) {
 
+                var validTiles = new List<Tile>();
+
                 foreach (var tile in column.tiles) {
+
+                    var counterClockVertices = new List<TileVertex>();
+
+                    foreach (var vertex in tile.verticies) {
+
+                        switch(vertex.vertexPosition) {
+
+                            case VertexPosition.TopLeft:
+                                counterClockVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.BottomLeft));
+                                break;
+                            case VertexPosition.TopRight:
+                                counterClockVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.TopLeft));
+                                break;
+                            case VertexPosition.BottomLeft:
+                                counterClockVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.BottomRight));
+                                break;
+                            case VertexPosition.BottomRight:
+                                counterClockVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.TopRight));
+                                break;
+
+                        }
+
+                    }
+
+                    var counterClockID = MeshType.IDFromVerticies(counterClockVertices);
+
+                    if (counterClockID != null) {
+                        tile.verticies = MeshType.VerticiesFromID((int)counterClockID);
+                        validTiles.Add(tile);
+                    } 
 
                 }
 
+                column.tiles = validTiles;
             }
+
+        }
+
+        public void MirorVertically() {
+
+            var newHeightOrder = new List<HeightPoint>();
+
+            foreach (var hy in Enumerable.Range(0, 17)) {
+
+                foreach (var hx in Enumerable.Range(0, 17)) {
+                    newHeightOrder.Add(GetHeightPoint(16 - hx, hy));
+                }
+
+            }
+
+            heightMap = newHeightOrder;
+
+            var newTileColum = new List<TileColumn>();
+
+            foreach (var ty in Enumerable.Range(0, 16)) {
+
+                foreach (var tx in Enumerable.Range(0, 16)) {
+                    var column = tileColumns[(ty * 16) + (15 - tx)];
+
+                    var heights = new List<HeightPoint>();
+
+                    heights.Add(GetHeightPoint(tx, ty));
+                    heights.Add(GetHeightPoint(tx + 1, ty));
+                    heights.Add(GetHeightPoint(tx, ty + 1));
+                    heights.Add(GetHeightPoint(tx + 1, ty + 1));
+
+                    column.x = tx;
+                    column.y = ty;
+                    column.heights = heights;
+
+                    newTileColum.Add(column);
+                }
+
+            }
+
+            tileColumns = newTileColum;
+
+            foreach (var column in tileColumns) {
+
+                var validTiles = new List<Tile>();
+
+                foreach (var tile in column.tiles) {
+
+                    var mirorVertices = new List<TileVertex>();
+
+                    foreach (var vertex in tile.verticies) {
+
+                        switch (vertex.vertexPosition) {
+
+                            case VertexPosition.TopLeft:
+                                mirorVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.TopRight));
+                                break;
+                            case VertexPosition.TopRight:
+                                mirorVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.TopLeft));
+                                break;
+                            case VertexPosition.BottomLeft:
+                                mirorVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.BottomRight));
+                                break;
+                            case VertexPosition.BottomRight:
+                                mirorVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.BottomLeft));
+                                break;
+
+                        }
+
+                    }
+
+                    var mirorVID = MeshType.IDFromVerticies(mirorVertices);
+
+                    if (mirorVID != null) {
+                        tile.verticies = MeshType.VerticiesFromID((int)mirorVID);
+                        validTiles.Add(tile);
+                    }
+
+                }
+
+                column.tiles = validTiles;
+            }
+
+
+        }
+
+        public void Overwrite(FCopLevelSection section) {
+
+            heightMap.Clear();
+            foreach (var newHeight in section.heightMap) {
+                heightMap.Add(new HeightPoint(newHeight.height1, newHeight.height2, newHeight.height3));
+            }
+
+            tileColumns.Clear();
+            var x = 0;
+            var y = 0;
+            foreach (var newColumn in section.tileColumns) {
+
+                var newTiles = new List<Tile>();
+
+                foreach (var newTile in newColumn.tiles) {
+                    newTiles.Add(new Tile(newTile.Compile()));
+                }
+
+                var heights = new List<HeightPoint>();
+
+                heights.Add(GetHeightPoint(x, y));
+                heights.Add(GetHeightPoint(x + 1, y));
+                heights.Add(GetHeightPoint(x, y + 1));
+                heights.Add(GetHeightPoint(x + 1, y + 1));
+
+                tileColumns.Add(new TileColumn(x, y, newTiles, heights));
+
+                x++;
+                if (x == 16) {
+                    y++;
+                    x = 0;
+                }
+
+            }
+
+            textureCoordinates = new List<int>(section.textureCoordinates);
+
+            colors.Clear();
+
+            foreach (var newColor in section.colors) {
+
+                colors.Add(new XRGB555(newColor.x, newColor.r, newColor.g, newColor.b));
+
+            }
+
+            tileGraphics = new List<TileGraphics>(section.tileGraphics);
 
         }
 
