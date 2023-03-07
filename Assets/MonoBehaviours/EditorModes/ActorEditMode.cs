@@ -61,7 +61,13 @@ public class ActorEditMode : EditMode {
             }
 
         }
-        
+
+        main.dynamicInputsDisplay.UpdateDynamicDisplay(
+            "Actor Inputs \r\n" +
+            "\r\n" +
+            "Mouse Left -> Move / Select actor\r\n" +
+            "\r\n" +
+            "Left Shift -> Move current actor to mouse\r\n");
     }
 
     public void OnDestroy() {
@@ -74,6 +80,7 @@ public class ActorEditMode : EditMode {
 
         actors.Clear();
 
+        main.dynamicInputsDisplay.UpdateDynamicDisplay(main.dynamicInputsDefault);
     }
 
     public void Update() {

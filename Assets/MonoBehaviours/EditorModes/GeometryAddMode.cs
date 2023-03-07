@@ -27,11 +27,16 @@ public class GeometryAddMode : EditMode {
     }
 
     public void OnCreateMode() {
-
+        main.dynamicInputsDisplay.UpdateDynamicDisplay(
+            "Mesh Adding Inputs \r\n" +
+            "\r\n" +
+            "No special inputs pressent see editor border for commands");
     }
 
     public void OnDestroy() {
         ClearAllSelectedItems();
+
+        main.dynamicInputsDisplay.UpdateDynamicDisplay(main.dynamicInputsDefault);
     }
 
     public void LookTile(Tile tile, TileColumn column, LevelMesh section) {

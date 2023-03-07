@@ -44,9 +44,16 @@ public class Main : MonoBehaviour {
 
     public EditMode editMode;
 
-    void Start() {
+    public InputGuideSwitch dynamicInputsDisplay;
+    public string dynamicInputsDefault;
 
-        iffFile = new(File.ReadAllBytes(StaticFileDate.SRC_FILE_NAME));
+    void Start() {
+        if (File.Exists(StaticFileDate.SRC_FILE_NAME)){
+            iffFile = new(File.ReadAllBytes(StaticFileDate.SRC_FILE_NAME));
+        } else
+        {
+            iffFile = new(File.ReadAllBytes(PlayerPrefs.GetString("SrcFileName")));
+        }
 
         Application.targetFrameRate = 60;
 

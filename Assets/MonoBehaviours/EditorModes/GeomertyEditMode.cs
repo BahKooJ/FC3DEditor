@@ -65,11 +65,27 @@ public class GeometryEditMode : EditMode {
     }
 
     public void OnCreateMode() {
-
+        main.dynamicInputsDisplay.UpdateDynamicDisplay(
+            "Mesh Edit Inputs \r\n" +
+            "\r\n" +
+            "Mouse Left (In Locked Mode) -> Select tiles\r\n" +
+            "Mouse Left (In Free Mode) -> Edit selected tiles\r\n" +
+            "\r\n" +
+            "LeftShift -> Select multiple tiles\r\n" +
+            "Delete -> Delete selected tile\r\n" +
+            "\r\n" +
+            "U -> Rotate selected chunk\r\n" +
+            "I -> Rotate selected chunk\r\n" +
+            "O -> Copy !!\r\n" +
+            "(No past funktion)" +
+            "P -> ??? !!\r\n" +
+            "(Breaks the editor)");
     }
 
     public void OnDestroy() {
         ClearAllSelectedItems();
+
+        main.dynamicInputsDisplay.UpdateDynamicDisplay(main.dynamicInputsDefault);
     }
 
     public GeometryEditMode(Main main) {

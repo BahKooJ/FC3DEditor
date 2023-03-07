@@ -284,6 +284,18 @@ public class NavMeshEditMode : EditMode {
 
         }
 
+        main.dynamicInputsDisplay.UpdateDynamicDisplay(
+            "Nave Mesh Input\r\n" +
+            "\r\n" +
+            "Mouse Left -> Move / Select Node\r\n" +
+            "Mouse Right -> Make new Path !!\r\n" +
+            "(Missing Input)\r\n" +
+            "Not Implemented -> Destroy Path" +
+            "\r\n" +
+            "Left Shift -> Move current node to mouse\r\n" +
+            "Delet -> Destroys Path Node !!\r\n" +
+            "(Missing Input)\r\n" +
+            "Not Implemented -> Create Path Node\r\n");
     }
 
     public void OnDestroy() {
@@ -302,6 +314,7 @@ public class NavMeshEditMode : EditMode {
 
         UnselectNode();
 
+        main.dynamicInputsDisplay.UpdateDynamicDisplay(main.dynamicInputsDefault);
     }
 
     public void LookTile(Tile tile, TileColumn column, LevelMesh section) { }

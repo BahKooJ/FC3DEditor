@@ -1,48 +1,49 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class InputGuideSwitch : MonoBehaviour
 {
-    public List<GameObject> menu1;
-    public List<GameObject> menu2;
+    public List<GameObject> help;
+    public TextMeshProUGUI dynamicHelp;
+    public Main main;
 
-    bool isInMenu1;
+    bool isDisplay;
 
     // Start is called before the first frame update
     void Start()
     {
-        UpdateMenu1(true);
-        UpdateMenu2(false);
-        isInMenu1 = true;
+        DisplayHelp(false);
+        isDisplay = false;
+        main = FindObjectOfType<Main>();
+        main.dynamicInputsDisplay = this;
+        UpdateDynamicDisplay(main.dynamicInputsDefault);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            SwitchMenu();
+        }
     }
 
     public void SwitchMenu()
     {
-        isInMenu1 = !isInMenu1;
-        UpdateMenu1(isInMenu1);
-        UpdateMenu2(!isInMenu1);
+        isDisplay = !isDisplay;
+        DisplayHelp(isDisplay);
     }
 
-    public void UpdateMenu1(bool active)
+    public void DisplayHelp(bool active)
     {
-        foreach (GameObject go in menu1)
+        foreach (GameObject go in help)
         {
             go.SetActive(active);
         }
     }
-
-    public void UpdateMenu2(bool active)
-    {
-        foreach (GameObject go in menu2)
-        {
-            go.SetActive(active);
-        }
+    public void UpdateDynamicDisplay(string newValue) {
+        dynamicHelp.SetText(newValue);
     }
 }
