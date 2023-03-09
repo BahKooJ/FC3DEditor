@@ -63,7 +63,7 @@ public class AddGeometryPanel : MonoBehaviour {
                 new TilePreset(89, 3, 0, 0, "PresetsIcon/presetTriangleWallRightLeftTopH2H3"),
                 new TilePreset(83, 3, 0, 0, "PresetsIcon/presetTriangleWallTopLeftH1H2"),
                 new TilePreset(85, 3, 0, 0, "PresetsIcon/presetTriangleWallTopLeftH2H3"),
-                new TilePreset(80, 3, 0, 0, "PresetsIcon/presetTriangleWallTopRightH1H2"),
+                new TilePreset(79, 3, 0, 0, "PresetsIcon/presetTriangleWallTopRightH1H2"),
                 new TilePreset(81, 3, 0, 0, "PresetsIcon/presetTriangleWallTopRightH2H3"),
             }
         }

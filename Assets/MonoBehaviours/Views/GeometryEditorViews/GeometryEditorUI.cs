@@ -111,5 +111,11 @@ public class GeometryEditorUI: MonoBehaviour {
         controller.selectedSection.RefreshMesh();
     }
 
+    public void OnClickDuplicateTileGraphicsButton() {
+
+        controller.DuplicateTileGraphics();
+
+    }
+
 }
 

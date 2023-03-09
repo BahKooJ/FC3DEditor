@@ -24,10 +24,11 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
     // --View References--
     public GameObject texturePalletteDropdown;
-    public GameObject rectangleTileToggle;
+    public Toggle rectangleTileToggle;
     public GameObject texturePallete;
     public GameObject texturePalleteImage;
     public GameObject textureOffsets;
+    public ScrollRect textureScrollView;
     public GameObject graphicsPreset;
     public TextureCoordinatesLines textureLines;
     public GameObject textureTilePreview;
@@ -138,13 +139,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
     }
 
-    void InitView() {
-
-        if (controller.selectedTiles.Count > 0) {
-            var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
-
-            rectangleTileToggle.GetComponent<Toggle>().isOn = graphics.number4 == 1;
-        }
+    void InitTexturePallette() {
 
         var sameTexture = true;
 
@@ -160,17 +155,26 @@ public class GraphicsPropertiesView : MonoBehaviour {
         }
 
         if (sameTexture) {
+
             var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
 
             texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
 
-            var texture = new Texture2D(256, 256, TextureFormat.RGB565, false);
+            texturePalleteImage.GetComponent<Image>().sprite = controller.main.bmpTextures[graphics.number2];
 
-            texture.LoadRawTextureData(controller.main.level.textures[graphics.number2].ConvertToRGB565());
-            texture.Apply();
-
-            texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
         }
+
+    }
+
+    void InitView() {
+
+        if (controller.selectedTiles.Count > 0) {
+            var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
+
+            rectangleTileToggle.GetComponent<Toggle>().isOn = graphics.number4 == 1;
+        }
+
+        InitTexturePallette();
 
         InitTextureOffsets();
 
@@ -189,31 +193,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
             rectangleTileToggle.GetComponent<Toggle>().isOn = graphics.number4 == 1;
         }
 
-        var sameTexture = true;
-
-        bmpID = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex].number2; ;
-        foreach (var tile in controller.selectedTiles) {
-
-            if (bmpID != controller.selectedSection.section.tileGraphics[tile.graphicsIndex].number2) {
-                sameTexture = false;
-                bmpID = -1;
-                break;
-            }
-
-        }
-
-        if (sameTexture) {
-            var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
-
-            texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
-
-            var texture = new Texture2D(256, 256, TextureFormat.RGB565, false);
-
-            texture.LoadRawTextureData(controller.main.level.textures[graphics.number2].ConvertToRGB565());
-            texture.Apply();
-
-            texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
-        }
+        InitTexturePallette();
 
         InitTextureOffsets();
 
@@ -259,6 +239,11 @@ public class GraphicsPropertiesView : MonoBehaviour {
             item.transform.SetParent(textureOffsets.transform);
 
         }
+
+        //var itemCount = textureOffsets.transform.childCount;
+        //var scrollDistance = (controller.selectedTiles[0].textureIndex) / (itemCount);
+
+        //textureScrollView.verticalNormalizedPosition = 1 - scrollDistance;
 
     }
 
@@ -344,14 +329,9 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
         rectangleTileToggle.GetComponent<Toggle>().isOn = graphics.number4 == 1;
 
-        var texture = new Texture2D(256, 256, TextureFormat.RGB565, false);
-
-        texture.LoadRawTextureData(controller.main.level.textures[graphics.number2].ConvertToRGB565());
-        texture.Apply();
-
-        texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
-
         controller.main.RefreshTextures();
+
+        InitTexturePallette();
 
         controller.selectedSection.RefreshMesh();
         controller.selectedSection.RefreshTexture();
@@ -366,12 +346,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
         texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
 
-        var texture = new Texture2D(256, 256, TextureFormat.RGB565, false);
-
-        texture.LoadRawTextureData(controller.main.level.textures[graphics.number2].ConvertToRGB565());
-        texture.Apply();
-
-        texturePalleteImage.GetComponent<Image>().sprite = Sprite.Create(texture, new Rect(0, 0, 256, 256), Vector2.zero);
+        InitTexturePallette();
 
     }
 
@@ -482,6 +457,64 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
     }
 
+    public void OnFlipTextureCoordsVertically() {
+
+        var minX = textureLines.points.Min(obj => {
+            return obj.transform.localPosition.x;
+        });
+
+        var maxX = textureLines.points.Max(obj => {
+            return obj.transform.localPosition.x;
+        });
+
+        var width = maxX - minX;
+        var center = width / 2;
+
+        foreach (var point in textureLines.points) {
+
+            var localX = point.transform.localPosition.x - minX;
+
+            var distanceFromCenter = localX - center;
+
+            var vFlippedX = center - distanceFromCenter;
+
+            var script = point.GetComponent<TextureCoordinatePoint>();
+
+            script.ChangePosition((int)(minX + vFlippedX), (int)point.transform.localPosition.y);
+
+        }
+
+    }
+
+    public void OnFlipTextureCoordsHorizontally() {
+
+        var minY = textureLines.points.Min(obj => {
+            return obj.transform.localPosition.y;
+        });
+
+        var maxY = textureLines.points.Max(obj => {
+            return obj.transform.localPosition.y;
+        });
+
+        var height = maxY - minY;
+        var center = height / 2;
+
+        foreach (var point in textureLines.points) {
+
+            var localY = point.transform.localPosition.y - minY;
+
+            var distanceFromCenter = localY - center;
+
+            var vFlippedY = center - distanceFromCenter;
+
+            var script = point.GetComponent<TextureCoordinatePoint>();
+
+            script.ChangePosition((int)point.transform.localPosition.x, (int)(minY + vFlippedY));
+
+        }
+
+    }
+
     public void OnClickRotateCounterClockwise() {
 
         List<Vector2> oldPoints = new();
@@ -554,7 +587,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
     }
 
-    public void OnValueChangedRectTile(bool toggled) {
+    public void OnValueChangedRectTile() {
 
         if (controller == null) {
             return;
@@ -566,7 +599,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
         var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
 
-        graphics.number4 = toggled ? 1 : 0;
+        graphics.number4 = rectangleTileToggle.isOn ? 1 : 0;
 
         controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex] = graphics;
 

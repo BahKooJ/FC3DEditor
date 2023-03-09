@@ -360,6 +360,25 @@ public class GeometryEditMode : EditMode {
 
     }
 
+    public void DuplicateTileGraphics() {
+
+        if (selectedTiles.Count < 2) { return; }
+
+        var firstTile = selectedTiles[0];
+
+        foreach (var tile in selectedTiles) {
+
+            tile.textureIndex = firstTile.textureIndex;
+            tile.graphicsIndex = firstTile.graphicsIndex;
+
+        }
+
+        selectedSection.RefreshMesh();
+
+        ClearAllSelectedItems();
+
+    }
+
     public void ExportTexture(int id) {
 
         if (id == -1) { return; }

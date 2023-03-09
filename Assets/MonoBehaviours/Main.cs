@@ -39,6 +39,8 @@ public class Main : MonoBehaviour {
 
     public Texture2D levelTexturePallet;
 
+    public List<Sprite> bmpTextures = new();
+
     public bool debug = false;
 
     public EditMode editMode;
@@ -186,6 +188,17 @@ public class Main : MonoBehaviour {
     }
 
     public void RefreshTextures() {
+
+        foreach (var bmp in level.textures) {
+
+            var bmpTexture = new Texture2D(256, 256, TextureFormat.RGB565, false);
+
+            bmpTexture.LoadRawTextureData(bmp.ConvertToRGB565());
+            bmpTexture.Apply();
+
+            bmpTextures.Add(Sprite.Create(bmpTexture, new Rect(0, 0, 256, 256), Vector2.zero));
+
+        }
 
         var texture = new Texture2D(256, 2048, TextureFormat.RGB565, false);
         var texturePallet = new List<byte>();
