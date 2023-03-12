@@ -76,11 +76,11 @@ public class FreeMove : MonoBehaviour {
             transform.position = transform.position + (-transform.up * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKey(KeyCode.R) || Input.GetKey(KeyCode.PageUp)) {
+        if (Input.GetKey(KeyCode.Space)) {
             transform.position = transform.position + (Vector3.up * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKey(KeyCode.F) || Input.GetKey(KeyCode.PageDown)) {
+        if (Input.GetKey(KeyCode.LeftControl)) {
             transform.position = transform.position + (-Vector3.up * movementSpeed * Time.deltaTime);
         }
 

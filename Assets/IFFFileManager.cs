@@ -27,6 +27,7 @@ namespace FCopParser {
         public int dataID;
         public List<byte> additionalData;
         public bool modified = false;
+        public bool ignore = false;
 
         public IFFDataFile(int startNumber, List<byte> data, string dataFourCC, int dataID, List<byte> additionalData) {
             this.startNumber = startNumber;

@@ -218,6 +218,10 @@ namespace FCopParser {
                 texture.Compile();
             }
 
+            foreach (var actor in actors) {
+                actor.Compile();
+            }
+
             FCopLevelLayoutParser.Compile(layout, fileManager.files.First(file => {
 
                 return file.dataFourCC == "Cptc";

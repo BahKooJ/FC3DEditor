@@ -2,6 +2,7 @@
 
 using System;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class AxisControl: MonoBehaviour {
 
@@ -19,8 +20,12 @@ public class AxisControl: MonoBehaviour {
     Axis click = Axis.None;
     Vector2 previousMouse = Vector2.zero;
 
+    bool rotate = false;
+
     public GameObject controlledObject;
-    public Func<Vector3, bool> action = (par) => { return false; };
+    public Func<Vector3, bool> moveCallback = (par) => { return false; };
+    public Func<float, bool> rotateCallback = (par) => { return false; };
+
 
     void Start() {
 
@@ -29,6 +34,21 @@ public class AxisControl: MonoBehaviour {
     }
 
     void Update() {
+
+        if (Input.GetKeyDown(KeyCode.R)) {
+            rotate = true;
+        }
+        if (Input.GetKeyUp(KeyCode.R)) {
+            rotate = false;
+        }
+
+        if (rotate) {
+
+            rotateCallback(previousMouse.x - Input.mousePosition.x);
+
+            previousMouse = Input.mousePosition;
+
+        }
 
         if (Input.GetMouseButton(0)) {
 
@@ -79,7 +99,7 @@ public class AxisControl: MonoBehaviour {
 
             transform.position = pos;
 
-            if (action(pos)) {
+            if (moveCallback(pos)) {
                 transform.position = controlledObject.transform.position;
             } else {
                 controlledObject.transform.position = pos;

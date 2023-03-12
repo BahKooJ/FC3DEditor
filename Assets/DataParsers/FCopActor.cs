@@ -5,6 +5,13 @@ using System.Collections.Generic;
 
 namespace FCopParser {
 
+    /*
+     * 11 - prop
+     * 14 - interactable
+     * 16 - item
+     * 
+     * 
+     */
     public class FCopActor {
 
         const int idOffset = 8;
@@ -17,13 +24,26 @@ namespace FCopParser {
         public int x;
         public int y;
 
+        public IFFDataFile rawFile;
+
         public FCopActor(IFFDataFile rawFile) {
+
+            this.rawFile = rawFile;
 
             id = Utils.BytesToInt(rawFile.data.ToArray(), 8);
             objectType = Utils.BytesToInt(rawFile.data.ToArray(), 12);
             y = Utils.BytesToInt(rawFile.data.ToArray(), 16);
             x = Utils.BytesToInt(rawFile.data.ToArray(), 24);
 
+
+        }
+
+        public void Compile() {
+
+            rawFile.data.RemoveRange(yOffset, 4);
+            rawFile.data.InsertRange(yOffset, BitConverter.GetBytes(y));
+            rawFile.data.RemoveRange(xOffset, 4);
+            rawFile.data.InsertRange(xOffset, BitConverter.GetBytes(x));
 
         }
 

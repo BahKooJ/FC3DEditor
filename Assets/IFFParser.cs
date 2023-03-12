@@ -310,6 +310,8 @@ namespace FCopParser {
 
             foreach (var file in parsedData.files) {
 
+                if (file.ignore) { continue; }
+
                 CompileDataFile(file);
 
             }

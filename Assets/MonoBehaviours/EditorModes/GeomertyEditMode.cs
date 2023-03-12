@@ -86,11 +86,11 @@ public class GeometryEditMode : EditMode {
         if (Input.GetKey(KeyCode.LeftShift)) {
 
             // Checks if the new selected tile is inside the selected Section, if it is not this method cannot continue.
-            if (selectedSection != null) {
-                if (selectedSection != section) {
-                    return;
-                }
-            }
+            //if (selectedSection != null) {
+            //    if (selectedSection != section) {
+            //        return;
+            //    }
+            //}
 
         } else {
 

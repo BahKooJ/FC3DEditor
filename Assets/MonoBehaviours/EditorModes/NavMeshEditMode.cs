@@ -123,7 +123,7 @@ public class NavMeshEditMode : EditMode {
 
                 if (hitPos != null) {
 
-                    selectedNavNode.action((Vector3)hitPos);
+                    selectedNavNode.moveCallback((Vector3)hitPos);
 
                     selectedNavNode.transform.position = selectedNavNode.controlledObject.transform.position;
 
@@ -154,7 +154,7 @@ public class NavMeshEditMode : EditMode {
 
                         script.controlledObject = node.gameObject;
 
-                        script.action = (newPos) => {
+                        script.moveCallback = (newPos) => {
 
                             node.ChangePosition(newPos);
 

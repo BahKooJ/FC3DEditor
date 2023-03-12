@@ -86,7 +86,7 @@ public class ActorEditMode : EditMode {
 
                 if (hitPos != null) {
 
-                    selectedActor.action((Vector3)hitPos);
+                    selectedActor.moveCallback((Vector3)hitPos);
 
                     selectedActor.transform.position = selectedActor.controlledObject.transform.position;
 
@@ -121,7 +121,7 @@ public class ActorEditMode : EditMode {
 
                         script.controlledObject = act.gameObject;
 
-                        script.action = (newPos) => {
+                        script.moveCallback = (newPos) => {
 
                             act.ChangePosition(newPos);
 
@@ -141,6 +141,9 @@ public class ActorEditMode : EditMode {
 
         }
 
+        if (Input.GetKeyDown(KeyCode.Delete)) {
+            deleteActor();
+        }
 
     }
 
@@ -149,6 +152,25 @@ public class ActorEditMode : EditMode {
         if (selectedActor != null) {
             Object.Destroy(selectedActor.gameObject);
         }
+
+    }
+
+    void deleteActor() {
+
+        if (selectedActor == null) {
+            return;
+        }
+
+        var actorObject = selectedActor.controlledObject.GetComponent<ActorObject>();
+
+        main.level.actors.Remove(actorObject.actor);
+
+        actors.Remove(actorObject);
+        actorObject.actor.rawFile.ignore = true;
+
+        Object.Destroy(actorObject.gameObject);
+
+        UnselectActor();
 
     }
 

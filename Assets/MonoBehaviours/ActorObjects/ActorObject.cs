@@ -21,6 +21,10 @@ public class ActorObject : MonoBehaviour {
 
     }
 
+    public void ChangeRotation() {
+
+    }
+
 
     public void Create() {
 
