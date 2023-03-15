@@ -38,7 +38,7 @@ namespace FCopParser {
 
         }
 
-        public void Compile() {
+        virtual public void Compile() {
 
             rawFile.data.RemoveRange(yOffset, 4);
             rawFile.data.InsertRange(yOffset, BitConverter.GetBytes(y));
@@ -94,11 +94,17 @@ namespace FCopParser {
 
     public class FCopTurretActor : FCopActor {
 
-        public int rotation;
+        public ActorRotation rotation;
 
         public FCopTurretActor(IFFDataFile rawFile) : base(rawFile) {
 
-            rotation = Utils.BytesToShort(rawFile.data.ToArray(), 64);
+            rotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(rawFile.data.ToArray(), 64));
+
+        }
+
+        override public void Compile() {
+            base.Compile();
+
 
         }
 
@@ -111,7 +117,7 @@ namespace FCopParser {
 
         public Team hostileTowards;
 
-        public int rotation;
+        public ActorRotation rotation;
 
 
         public FCopBaseTurretActor(IFFDataFile rawFile) : base(rawFile) {
@@ -120,7 +126,19 @@ namespace FCopParser {
             miniMapColor = Utils.BytesToShort(rawFile.data.ToArray(), 38) == 1 ? Team.RED : Team.BLUE;
             hostileTowards = Utils.BytesToShort(rawFile.data.ToArray(), 50) == 1 ? Team.RED : Team.BLUE;
 
-            rotation = Utils.BytesToShort(rawFile.data.ToArray(), 64);
+            rotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(rawFile.data.ToArray(), 64));
+
+        }
+
+    }
+
+    public class FCopStaticPropActor : FCopActor {
+
+        public ActorRotation rotation;
+
+        public FCopStaticPropActor(IFFDataFile rawFile) : base(rawFile) {
+
+            rotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(rawFile.data.ToArray(), 36));
 
         }
 
@@ -129,6 +147,52 @@ namespace FCopParser {
     public enum Team {
         RED = 1,
         BLUE = 2
+    }
+
+    public struct ActorRotation {
+
+        public static int maxRotation = 4096;
+
+        public int compiledRotation;
+
+        public float parsedRotation;
+
+        public ActorRotation SetRotationParse(float newRotation) {
+
+            parsedRotation = newRotation;
+
+            float degreeRotation = newRotation;
+
+            if (newRotation < 0) {
+
+                degreeRotation = newRotation + 360;
+
+            }
+
+            compiledRotation = (int)(degreeRotation / 360f * maxRotation);
+
+            return this;
+
+        }
+
+        public ActorRotation SetRotationCompiled(int newRotation) {
+
+            compiledRotation = newRotation;
+
+            float rotationPrecentage = newRotation / maxRotation;
+
+            float degreeRoation = 360 * rotationPrecentage;
+
+            if (degreeRoation > 180) {
+                parsedRotation = 360 - degreeRoation;
+            }
+
+            parsedRotation = degreeRoation;
+
+            return this;
+
+        }
+
     }
 
 }

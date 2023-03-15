@@ -23,6 +23,7 @@ public class Main : MonoBehaviour {
     public GameObject NavMeshPoint;
 
     public GameObject BlankActor;
+    public GameObject StaticPropActorObject;
     public GameObject TurretActorObject;
     public GameObject BaseTurretActorObject;
 

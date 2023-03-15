@@ -11,7 +11,7 @@ public class TurretActorObject : ActorObject {
 
         var turret = (FCopTurretActor)actor;
 
-        transform.rotation = Quaternion.Euler(0f, (turret.rotation / 4096f) * 360, 0f);
+        transform.rotation = Quaternion.Euler(0f, turret.rotation.parsedRotation, 0f);
 
     }
 

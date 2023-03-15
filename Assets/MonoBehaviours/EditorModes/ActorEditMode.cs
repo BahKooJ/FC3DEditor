@@ -44,6 +44,15 @@ public class ActorEditMode : EditMode {
                     CreateActor(actor, baseTurret.GetComponent<BaseTurretActorObject>());
 
                     break;
+
+                case FCopStaticPropActor:
+
+                    var prop = Object.Instantiate(main.StaticPropActorObject);
+
+                    CreateActor(actor, prop.GetComponent<StaticActorObject>());
+
+                    break;
+
                 case FCopTurretActor:
 
                     var turret = Object.Instantiate(main.TurretActorObject);

@@ -69,6 +69,9 @@ namespace FCopParser {
                     case 8:
                         actors.Add(new FCopBaseTurretActor(rawFile));
                         break;
+                    case 11:
+                        actors.Add(new FCopStaticPropActor(rawFile));
+                        break;
                     case 36:
                         actors.Add(new FCopTurretActor(rawFile));
                         break;

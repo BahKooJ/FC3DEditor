@@ -15,7 +15,7 @@ public class BaseTurretActorObject : ActorObject {
 
         sphereRender.material.color = baseTurret.hostileTowards == Team.BLUE ? Color.red : Color.blue;
 
-        transform.rotation = Quaternion.Euler(0f, (baseTurret.rotation / 4096f) * 360, 0f);
+        transform.rotation = Quaternion.Euler(0f, baseTurret.rotation.parsedRotation, 0f);
 
     }
 
