@@ -19,4 +19,14 @@ public class BaseTurretActorObject : ActorObject {
 
     }
 
+    public override void ChangeRotation(float y) {
+
+        var baseTurret = (FCopBaseTurretActor)actor;
+
+        baseTurret.rotation += y;
+
+        transform.rotation = Quaternion.Euler(0f, baseTurret.rotation.parsedRotation, 0f);
+
+    }
+
 }

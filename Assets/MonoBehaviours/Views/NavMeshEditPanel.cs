@@ -3,14 +3,17 @@
 using FCopParser;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
-class NavMeshEditPanel : MonoBehaviour {
+public class NavMeshEditPanel : MonoBehaviour {
 
     public NavMeshEditMode controller;
 
     public GameObject navMeshButton;
 
     public GameObject listView;
+
+    public Toggle isStartToggle;
 
     void Start() {
 
@@ -25,6 +28,10 @@ class NavMeshEditPanel : MonoBehaviour {
 
         }
 
+    }
+
+    public void RefeshCheck() {
+        isStartToggle.isOn = controller.selectedNavNode.controlledObject.GetComponent<NavNodePoint>().node.isStartingPoint;
     }
 
     public void AddNode() {
@@ -53,6 +60,16 @@ class NavMeshEditPanel : MonoBehaviour {
         controller.selectedNavMesh = index;
         controller.OnDestroy();
         controller.OnCreateMode();
+
+    }
+
+    public void OnValueChangeStartToggle() {
+
+        if (controller == null) { return; }
+
+        if (controller.selectedNavNode == null) { return; }
+
+        controller.selectedNavNode.controlledObject.GetComponent<NavNodePoint>().node.isStartingPoint = isStartToggle.isOn;
 
     }
 

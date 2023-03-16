@@ -7,7 +7,12 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 
 public class NavMeshEditMode : EditMode {
+
+    static public Vector3 savedPosition = Vector3.zero;
+
     public Main main { get; set; }
+
+    public NavMeshEditPanel view;
 
     public int selectedNavMesh = 0;
 
@@ -163,6 +168,8 @@ public class NavMeshEditMode : EditMode {
 
                         selectedNavNode = script;
 
+                        view.RefeshCheck();
+
                         break;
 
                     }
@@ -209,6 +216,21 @@ public class NavMeshEditMode : EditMode {
 
         }
 
+        if (Input.GetKeyDown(KeyCode.Insert)) {
+            ClearNavMesh();
+        }
+
+        if (Input.GetKeyDown(KeyCode.PageUp)) {
+            savedPosition = selectedNavNode.controlledObject.transform.position;
+        }
+
+        if (Input.GetKeyDown(KeyCode.PageDown)) {
+
+            var node = selectedNavNode.controlledObject.GetComponent<NavNodePoint>();
+            node.ChangePosition(savedPosition);
+
+        }
+
     }
 
     void DeleteNode() {
@@ -238,6 +260,16 @@ public class NavMeshEditMode : EditMode {
             }
 
         }
+
+        OnCreateMode();
+
+    }
+
+    void ClearNavMesh() {
+
+        main.level.navMeshes[selectedNavMesh].nodes.Clear();
+
+        OnDestroy();
 
         OnCreateMode();
 

@@ -39,7 +39,7 @@ public class NavNodePoint : MonoBehaviour {
             transform.position = pos;
 
         } else {
-            print("No floor found");
+            print("No floor found: " + transform.position.x.ToString() + " " + transform.position.z.ToString());
         }
 
     }

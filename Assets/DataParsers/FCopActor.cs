@@ -105,6 +105,8 @@ namespace FCopParser {
         override public void Compile() {
             base.Compile();
 
+            rawFile.data.RemoveRange(64, 2);
+            rawFile.data.InsertRange(64, BitConverter.GetBytes((short)rotation.compiledRotation));
 
         }
 
@@ -130,6 +132,14 @@ namespace FCopParser {
 
         }
 
+        override public void Compile() {
+            base.Compile();
+
+            rawFile.data.RemoveRange(64, 2);
+            rawFile.data.InsertRange(64, BitConverter.GetBytes((short)rotation.compiledRotation));
+
+        }
+
     }
 
     public class FCopStaticPropActor : FCopActor {
@@ -138,7 +148,15 @@ namespace FCopParser {
 
         public FCopStaticPropActor(IFFDataFile rawFile) : base(rawFile) {
 
-            rotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(rawFile.data.ToArray(), 36));
+            rotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(rawFile.data.ToArray(), 46));
+
+        }
+
+        override public void Compile() {
+            base.Compile();
+
+            rawFile.data.RemoveRange(46, 2);
+            rawFile.data.InsertRange(46, BitConverter.GetBytes((short)rotation.compiledRotation));
 
         }
 
@@ -156,6 +174,23 @@ namespace FCopParser {
         public int compiledRotation;
 
         public float parsedRotation;
+
+        public ActorRotation SetRotationDegree(float newRotation) {
+
+            if (newRotation > 180f) {
+                parsedRotation = 360f - newRotation;
+            }
+            if (newRotation < -180f) {
+                parsedRotation = newRotation + 360f;
+            }
+
+            parsedRotation = newRotation;
+
+            compiledRotation = (int)(newRotation / 360f * maxRotation);
+
+            return this;
+
+        }
 
         public ActorRotation SetRotationParse(float newRotation) {
 
@@ -179,18 +214,22 @@ namespace FCopParser {
 
             compiledRotation = newRotation;
 
-            float rotationPrecentage = newRotation / maxRotation;
+            float rotationPrecentage = (float)newRotation / (float)maxRotation;
 
-            float degreeRoation = 360 * rotationPrecentage;
+            float degreeRoation = 360f * rotationPrecentage;
 
-            if (degreeRoation > 180) {
-                parsedRotation = 360 - degreeRoation;
+            if (degreeRoation > 180f) {
+                parsedRotation = 360f - degreeRoation;
             }
 
             parsedRotation = degreeRoation;
 
             return this;
 
+        }
+
+        public static ActorRotation operator +(ActorRotation a, float b) {
+            return a.SetRotationDegree(a.parsedRotation + b);
         }
 
     }

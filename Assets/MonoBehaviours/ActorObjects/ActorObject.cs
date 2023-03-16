@@ -21,7 +21,7 @@ public class ActorObject : MonoBehaviour {
 
     }
 
-    public void ChangeRotation() {
+    virtual public void ChangeRotation(float y) {
 
     }
 

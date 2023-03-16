@@ -72,6 +72,8 @@ class ToolbarView: MonoBehaviour {
 
         activePanel = obj;
 
+        editMode.view = script;
+
         controller.ChangeEditMode(editMode);
 
     }

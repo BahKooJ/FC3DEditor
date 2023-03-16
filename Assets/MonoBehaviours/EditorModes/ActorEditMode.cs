@@ -137,6 +137,13 @@ public class ActorEditMode : EditMode {
                             return true;
                         };
 
+                        script.rotateCallback = (y) => {
+
+                            act.ChangeRotation(y);
+
+                            return true;
+                        };
+
                         selectedActor = script;
 
                         break;
@@ -152,6 +159,11 @@ public class ActorEditMode : EditMode {
 
         if (Input.GetKeyDown(KeyCode.Delete)) {
             deleteActor();
+        }
+
+        if (Input.GetKeyDown(KeyCode.PageDown)) {
+            var act = selectedActor.controlledObject.GetComponent<ActorObject>();
+            act.ChangePosition(NavMeshEditMode.savedPosition);
         }
 
     }

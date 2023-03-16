@@ -16,4 +16,14 @@ public class StaticActorObject : ActorObject {
 
     }
 
+    public override void ChangeRotation(float y) {
+
+        var prop = (FCopStaticPropActor)actor;
+
+        prop.rotation += y;
+
+        transform.rotation = Quaternion.Euler(0f, prop.rotation.parsedRotation, 0f);
+
+    }
+
 }
