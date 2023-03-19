@@ -32,9 +32,9 @@ namespace FCopParser {
             this.fileHeader = fileHeader;
         }
 
-        public string subFileName = "";
+        public byte[] subFileName;
 
-        public ChunkHeader(int index, string fourCCDeclaration, int chunkSize, string fourCCType, string subFileName) {
+        public ChunkHeader(int index, string fourCCDeclaration, int chunkSize, string fourCCType, byte[] subFileName) {
             this.index = index;
             this.fourCCDeclaration = fourCCDeclaration;
             this.chunkSize = chunkSize;
