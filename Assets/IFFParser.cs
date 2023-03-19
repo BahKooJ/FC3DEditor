@@ -416,7 +416,7 @@ namespace FCopParser {
                     compiledFile.AddRange(chunkHeader);
                     compiledFile.AddRange(parsedData.music.Value.Value.GetRange(chunkedMusicOffset, musicChunkSizeWithoutHeader));
 
-                    chunkedMusicOffset += dataChunkSizeWithoutHeader;
+                    chunkedMusicOffset += musicChunkSizeWithoutHeader;
                     musicLoopNumberIteration += musicLoopNumberIncrease;
                 }
 
