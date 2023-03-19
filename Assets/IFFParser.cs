@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 
 namespace FCopParser {
-    class IFFParser {
+    public class IFFParser {
 
         // ---Constants---
 
@@ -448,6 +448,10 @@ namespace FCopParser {
 
             int offset = 0;
             int current24kSectionSize = 0;
+
+            if (BytesToStringReversed(offset, 4) != FourCC.CTRL) {
+                throw new InvalidFileException();
+            }
 
             while (offset < bytes.Length) {
 

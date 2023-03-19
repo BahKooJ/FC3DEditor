@@ -36,31 +36,31 @@ public class GeometryEditMode : EditMode {
             RemoveSelectedTiles();
         }
 
-        if (Input.GetKeyDown(KeyCode.U)) {
+        //if (Input.GetKeyDown(KeyCode.U)) {
 
-            if (selectedSection != null) {
-                selectedSection.section.RotateCounterClockwise();
-                selectedSection.RefreshMesh();
-            }
+        //    if (selectedSection != null) {
+        //        selectedSection.section.RotateCounterClockwise();
+        //        selectedSection.RefreshMesh();
+        //    }
 
-        }
+        //}
 
-        if (Input.GetKeyDown(KeyCode.I)) {
+        //if (Input.GetKeyDown(KeyCode.I)) {
 
-            if (selectedSection != null) {
-                selectedSection.section.MirorVertically();
-                selectedSection.RefreshMesh();
-            }
+        //    if (selectedSection != null) {
+        //        selectedSection.section.MirorVertically();
+        //        selectedSection.RefreshMesh();
+        //    }
 
-        }
+        //}
 
-        if (Input.GetKeyDown(KeyCode.O)) {
-            tempCopySection = selectedSection.section;
-        }
-        if (Input.GetKeyDown(KeyCode.P)) {
-            selectedSection.section.Overwrite(tempCopySection);
-            selectedSection.RefreshMesh();
-        }
+        //if (Input.GetKeyDown(KeyCode.O)) {
+        //    tempCopySection = selectedSection.section;
+        //}
+        //if (Input.GetKeyDown(KeyCode.P)) {
+        //    selectedSection.section.Overwrite(tempCopySection);
+        //    selectedSection.RefreshMesh();
+        //}
 
     }
 
@@ -86,11 +86,11 @@ public class GeometryEditMode : EditMode {
         if (Input.GetKey(KeyCode.LeftShift)) {
 
             // Checks if the new selected tile is inside the selected Section, if it is not this method cannot continue.
-            //if (selectedSection != null) {
-            //    if (selectedSection != section) {
-            //        return;
-            //    }
-            //}
+            if (selectedSection != null) {
+                if (selectedSection != section) {
+                    return;
+                }
+            }
 
         } else {
 

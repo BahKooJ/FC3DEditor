@@ -8,8 +8,6 @@ using Object = UnityEngine.Object;
 
 public class NavMeshEditMode : EditMode {
 
-    static public Vector3 savedPosition = Vector3.zero;
-
     public Main main { get; set; }
 
     public NavMeshEditPanel view;
@@ -213,21 +211,6 @@ public class NavMeshEditMode : EditMode {
                 }
 
             }
-
-        }
-
-        if (Input.GetKeyDown(KeyCode.Insert)) {
-            ClearNavMesh();
-        }
-
-        if (Input.GetKeyDown(KeyCode.PageUp)) {
-            savedPosition = selectedNavNode.controlledObject.transform.position;
-        }
-
-        if (Input.GetKeyDown(KeyCode.PageDown)) {
-
-            var node = selectedNavNode.controlledObject.GetComponent<NavNodePoint>();
-            node.ChangePosition(savedPosition);
 
         }
 

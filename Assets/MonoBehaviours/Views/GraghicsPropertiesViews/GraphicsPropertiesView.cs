@@ -38,11 +38,23 @@ public class GraphicsPropertiesView : MonoBehaviour {
     public int bmpID;
     public int? globalTextureCoordIndex = null;
 
+    void ScaleToScreen() {
+
+        var screenWdith = Screen.height - 32;
+
+        var multiplier = screenWdith / ((RectTransform)transform).rect.height;
+
+        transform.localScale = new Vector3(multiplier, multiplier, multiplier);
+
+    }
+
 
     void Start() {
 
         InitView();
         InitTilePreview();
+
+        ScaleToScreen();
 
     }
 

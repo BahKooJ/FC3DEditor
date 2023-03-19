@@ -161,11 +161,6 @@ public class ActorEditMode : EditMode {
             deleteActor();
         }
 
-        if (Input.GetKeyDown(KeyCode.PageDown)) {
-            var act = selectedActor.controlledObject.GetComponent<ActorObject>();
-            act.ChangePosition(NavMeshEditMode.savedPosition);
-        }
-
     }
 
     public void UnselectActor() {

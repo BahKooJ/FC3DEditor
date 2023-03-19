@@ -31,9 +31,7 @@ public class Main : MonoBehaviour {
     public GameObject line3d;
     public GameObject axisControl;
 
-    //IFFParser iffFile = new(File.ReadAllBytes("C:/Users/Zewy/Desktop/ConFt"));
-    IFFParser iffFile = new(File.ReadAllBytes("Mp MOD"));
-
+    IFFParser iffFile;
     public FCopLevel level;
 
     public List<LevelMesh> sectionMeshes = new();
@@ -48,9 +46,10 @@ public class Main : MonoBehaviour {
 
     void Start() {
 
-        Application.targetFrameRate = 60;
+        iffFile = FileManagerMain.iffFile;
+        level = FileManagerMain.level;
 
-        level = new FCopLevel(iffFile.parsedData);
+        Application.targetFrameRate = 60;
 
         RefreshTextures();
 
@@ -62,7 +61,7 @@ public class Main : MonoBehaviour {
 
         editMode.Update();
 
-        if (Input.GetKeyDown(KeyCode.Equals)) {
+        if (Input.GetKeyDown(KeyCode.F5)) {
             Compile();
         }
 
@@ -163,7 +162,7 @@ public class Main : MonoBehaviour {
 
         iffFile.Compile();
 
-        File.WriteAllBytes("Mp MOD", iffFile.bytes);
+        File.WriteAllBytes(FileManagerMain.savePath, iffFile.bytes);
 
     }
 
