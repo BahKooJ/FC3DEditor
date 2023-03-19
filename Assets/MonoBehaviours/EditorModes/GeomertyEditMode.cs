@@ -3,6 +3,7 @@ using FCopParser;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 public class GeometryEditMode : EditMode {
@@ -22,7 +23,7 @@ public class GeometryEditMode : EditMode {
         return view.activeGraphicsPropertiesView != null;
     }
 
-    FCopLevelSection tempCopySection = null;
+    FCopLevelSection copySection = null;
 
     public void Update() {
         
@@ -36,31 +37,6 @@ public class GeometryEditMode : EditMode {
             RemoveSelectedTiles();
         }
 
-        //if (Input.GetKeyDown(KeyCode.U)) {
-
-        //    if (selectedSection != null) {
-        //        selectedSection.section.RotateCounterClockwise();
-        //        selectedSection.RefreshMesh();
-        //    }
-
-        //}
-
-        //if (Input.GetKeyDown(KeyCode.I)) {
-
-        //    if (selectedSection != null) {
-        //        selectedSection.section.MirorVertically();
-        //        selectedSection.RefreshMesh();
-        //    }
-
-        //}
-
-        //if (Input.GetKeyDown(KeyCode.O)) {
-        //    tempCopySection = selectedSection.section;
-        //}
-        //if (Input.GetKeyDown(KeyCode.P)) {
-        //    selectedSection.section.Overwrite(tempCopySection);
-        //    selectedSection.RefreshMesh();
-        //}
 
     }
 
@@ -101,8 +77,22 @@ public class GeometryEditMode : EditMode {
 
         }
 
-        // Adds selected tile and updates remaining selected data
-        selectedTiles.Add(tile);
+        
+        // Checks to see if the tiles vertex count is the same as the first selected tile
+        // This needs to be done because there are many differences in triangle tiles and rect tiles 
+        if (selectedTiles.Count == 0) {
+
+            selectedTiles.Add(tile);
+
+        } else if (selectedTiles[0].verticies.Count == tile.verticies.Count) {
+
+            selectedTiles.Add(tile);
+
+        } else {
+            return;
+        }
+
+        // Updates the remaining data
         selectedColumn = column;
         selectedSection = section;
 
@@ -421,6 +411,40 @@ public class GeometryEditMode : EditMode {
 
     }
 
+    public void CopySectionData() {
+
+        if (selectedSection != null) {
+            copySection = selectedSection.section;
+        }
+
+    }
+
+    public void PasteSectionData() {
+
+        if (EditorUtility.DisplayDialog("Warning", "This will overwrite all current map data, are you sure you want to continue?", "OK", "Cancel")) {
+
+            if (selectedSection != null && copySection != null) {
+                selectedSection.section.Overwrite(copySection);
+                selectedSection.RefreshMesh();
+            }
+
+        }
+
+    }
+
+    public void MirrorSectionVertically() {
+
+        if (EditorUtility.DisplayDialog("Warning", "Some level data might get removed or corrupted, are you sure you want to continue?", "OK", "Cancel")) {
+
+            if (selectedSection != null) {
+                selectedSection.section.MirorVertically();
+                selectedSection.RefreshMesh();
+            }
+
+        }
+
+    }
+
     void ClearAllSelectedItems() {
 
         selectedTiles.Clear();
@@ -458,6 +482,11 @@ public class GeometryEditMode : EditMode {
     void RemoveSelectedTiles() {
 
         if (selectedTiles.Count == 0) { return; }
+
+        if (selectedColumn.tiles.Count == 1) {
+            EditorUtility.DisplayDialog("Cannot Remove Tile", "At least one tile must be present in a tile column", "OK");
+            return;
+        }
 
         foreach (var tile in selectedTiles) {
 

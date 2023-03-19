@@ -8,13 +8,6 @@ public class GeometryEditorUI: MonoBehaviour {
 
     public GeometryEditMode controller;
 
-    public GameObject rotateLeftButton;
-    public GameObject rotateRightButton;
-    public GameObject shiftHeightUpButton;
-    public GameObject shiftHeightDownButton;
-    public GameObject graphicsPropertiesButton;
-    public GameObject showTilesButton;
-
     public GameObject graphicsPropertiesView;
 
     public GameObject activeGraphicsPropertiesView = null;
@@ -23,38 +16,12 @@ public class GeometryEditorUI: MonoBehaviour {
 
         controller.view = this;
 
-        foreach (Object obj in transform) {
-
-            switch (obj.GameObject().name) {
-
-                case "Rotate Left Button":
-                    rotateLeftButton = obj.GameObject();
-                    break;
-                case "Rotate Right Button":
-                    rotateRightButton = obj.GameObject();
-                    break;
-                case "Shift Height Up Button":
-                    shiftHeightUpButton = obj.GameObject();
-                    break;
-                case "Shift Height Down Button":
-                    shiftHeightDownButton = obj.GameObject();
-                    break;
-                case "Graphics Properties Button":
-                    graphicsPropertiesButton = obj.GameObject();
-                    break;
-                case "Show Tiles Button":
-                    showTilesButton = obj.GameObject();
-                    break;
-
-            }
-
-        }
 
     }
 
     void Update() {
 
-        if (Input.GetKeyDown(KeyCode.M)) {
+        if (Input.GetKeyDown(KeyCode.Escape)) {
 
             if (activeGraphicsPropertiesView != null) {
                 CloseGraphicsPropertyView();
@@ -116,6 +83,16 @@ public class GeometryEditorUI: MonoBehaviour {
         controller.DuplicateTileGraphics();
 
     }
+
+    public void OnClickCopySectionDataButton() {
+        controller.CopySectionData();
+    }
+
+    public void OnClickPasteSectionDataButton() {
+        controller.PasteSectionData();
+    }
+
+
 
 }
 

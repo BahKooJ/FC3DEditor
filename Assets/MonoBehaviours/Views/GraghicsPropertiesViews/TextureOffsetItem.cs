@@ -62,16 +62,7 @@ public class TextureOffsetItem : MonoBehaviour {
 
     public void OnClick() {
 
-        if (isGlobal) {
-            view.globalTextureCoordIndex = index;
-        } else {
-            view.globalTextureCoordIndex = null;
-            controller.SetTextureIndex(index);
-        }
-
-        view.textureLines.ReInit();
-        view.tilePreview.Refresh();
-        view.RefreshTextureOffsetsView();
+        view.ChangeTextureIndex(index, isGlobal);
 
     }
 

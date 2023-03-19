@@ -873,7 +873,7 @@ namespace FCopParser {
             var id = MeshType.IDFromVerticies(verticies);
 
             if (id == null) {
-                throw new Exception("No ID exists for given mesh");
+                throw new MeshIDException();
             }
 
             parsedTile.number1 = isStartInColumnArray ? 1 : 0;

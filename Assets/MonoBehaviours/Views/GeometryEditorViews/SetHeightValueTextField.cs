@@ -69,7 +69,21 @@ class SetHeightValueTextField: MonoBehaviour {
             foreach (var point in controller.heightPointObjects) {
 
                 if (point.isSelected) {
-                    point.heightPoint.SetPoint(Int32.Parse(field.text), point.channel);
+
+                    try {
+                        point.heightPoint.SetPoint(Int32.Parse(field.text), point.channel);
+                    } catch (FormatException) {
+
+                        controller.UnselectAndRefreshHeightPoints();
+                        controller.selectedSection.RefreshMesh();
+
+                        controller.RefreshSelectedOverlays();
+
+                        Destroy(this.gameObject);
+
+                        return;
+                    }
+
                     point.transform.position = new Vector3(point.transform.position.x, point.heightPoint.GetPoint(point.channel), point.transform.position.z);
 
                 }

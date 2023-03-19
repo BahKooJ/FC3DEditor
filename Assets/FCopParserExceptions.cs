@@ -10,4 +10,11 @@ namespace FCopParser {
 
     }
 
+    public class MeshIDException : Exception {
+
+        public MeshIDException() {
+        }
+
+    }
+
 }

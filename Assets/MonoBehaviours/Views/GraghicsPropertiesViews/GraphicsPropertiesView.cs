@@ -10,6 +10,7 @@ using FCopParser;
 using System;
 using Object = UnityEngine.Object;
 using System.Collections.Generic;
+using UnityEditor;
 
 public class GraphicsPropertiesView : MonoBehaviour {
 
@@ -302,6 +303,27 @@ public class GraphicsPropertiesView : MonoBehaviour {
     public void RefreshTextureOffsetsView() {
         DestoryTextureOffsets();
         InitTextureOffsets();
+    }
+
+    public void ChangeTextureIndex(int index, bool isGlobal) {
+
+        var verticieCount = controller.selectedTiles[0].verticies.Count;
+        if (controller.selectedSection.section.textureCoordinates.Count - index < verticieCount) {
+            EditorUtility.DisplayDialog("Invalid Texture Count", verticieCount + " or more texture coordinates need to be available", "OK");
+            return;
+        }
+
+        if (isGlobal) {
+            globalTextureCoordIndex = index;
+        } else {
+            globalTextureCoordIndex = null;
+            controller.SetTextureIndex(index);
+        }
+
+        textureLines.ReInit();
+        tilePreview.Refresh();
+        RefreshTextureOffsetsView();
+
     }
 
     void InitTilePreview() {

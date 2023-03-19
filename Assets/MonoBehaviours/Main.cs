@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using TMPro;
 using Unity.VisualScripting.Antlr3.Runtime;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking.Types;
 using UnityEngine.UI;
@@ -141,7 +142,14 @@ public class Main : MonoBehaviour {
 
     public void Compile() {
 
-        level.Compile();
+        try {
+            level.Compile();
+        } catch (MeshIDException) {
+            EditorUtility.DisplayDialog("Invalid Level Geometry", "One or more tiles geomtry is invalid." +
+                " This error can be cause by manually changing the height channel of a vertex. The selected tile overlay" +
+                " will be red if the geometry is invalid.", "OK");
+            return;
+        }
 
         var index = iffFile.parsedData.files.FindIndex(file => {
 
