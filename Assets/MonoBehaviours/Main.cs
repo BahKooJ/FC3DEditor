@@ -1,18 +1,10 @@
 using FCopParser;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using TMPro;
-using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Networking.Types;
-using UnityEngine.UI;
-using static System.Collections.Specialized.BitVector32;
 
 public class Main : MonoBehaviour {
 
