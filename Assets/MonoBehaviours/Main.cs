@@ -47,6 +47,8 @@ public class Main : MonoBehaviour {
 
     void Start() {
 
+        Physics.queriesHitBackfaces = true;
+
         iffFile = FileManagerMain.iffFile;
         level = FileManagerMain.level;
 
