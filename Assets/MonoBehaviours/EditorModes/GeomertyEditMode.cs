@@ -421,7 +421,7 @@ public class GeometryEditMode : EditMode {
 
     public void PasteSectionData() {
 
-        if (EditorUtility.DisplayDialog("Warning", "This will overwrite all current map data, are you sure you want to continue?", "OK", "Cancel")) {
+        if (DialogWindowUtil.Dialog("Warning", "This will overwrite all current map data, are you sure you want to continue?", "OK", "Cancel")) {
 
             if (selectedSection != null && copySection != null) {
                 selectedSection.section.Overwrite(copySection);
@@ -434,7 +434,7 @@ public class GeometryEditMode : EditMode {
 
     public void MirrorSectionVertically() {
 
-        if (EditorUtility.DisplayDialog("Warning", "Some level data might get removed or corrupted, are you sure you want to continue?", "OK", "Cancel")) {
+        if (DialogWindowUtil.Dialog("Warning", "Some level data might get removed or corrupted, are you sure you want to continue?", "OK", "Cancel")) {
 
             if (selectedSection != null) {
                 selectedSection.section.MirorVertically();
@@ -484,7 +484,7 @@ public class GeometryEditMode : EditMode {
         if (selectedTiles.Count == 0) { return; }
 
         if (selectedColumn.tiles.Count == 1) {
-            EditorUtility.DisplayDialog("Cannot Remove Tile", "At least one tile must be present in a tile column", "OK");
+            DialogWindowUtil.Dialog("Cannot Remove Tile", "At least one tile must be present in a tile column", "OK");
             return;
         }
 

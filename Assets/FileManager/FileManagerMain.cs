@@ -17,7 +17,7 @@ public class FileManagerMain : MonoBehaviour {
 
     public void OpenFile() {
 
-        var path = EditorUtility.OpenFilePanel("Open Mission File", "", "");
+        var path = DialogWindowUtil.OpenFile("Open Mission File");
 
         if (path.Length != 0) {
 
@@ -26,7 +26,7 @@ public class FileManagerMain : MonoBehaviour {
             try {
                 iffFile = new IFFParser(fileContent);
             } catch (InvalidFileException) {
-                EditorUtility.DisplayDialog("Select Future Cop mission File", "This file is not a mission file", "OK");
+                DialogWindowUtil.Dialog("Select Future Cop mission File", "This file is not a mission file", "OK");
             }
 
             foreach (Transform child in canvas) {
@@ -43,7 +43,7 @@ public class FileManagerMain : MonoBehaviour {
 
     public string SetSavePath() {
 
-        var path = EditorUtility.SaveFilePanel("Save Path", "", "", "");
+        var path = DialogWindowUtil.SaveFile("Save Path");
         savePath = path;
 
         return path;

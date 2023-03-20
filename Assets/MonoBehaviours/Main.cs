@@ -139,7 +139,7 @@ public class Main : MonoBehaviour {
         try {
             level.Compile();
         } catch (MeshIDException) {
-            EditorUtility.DisplayDialog("Invalid Level Geometry", "One or more tiles geomtry is invalid." +
+            DialogWindowUtil.Dialog("Invalid Level Geometry", "One or more tiles geomtry is invalid." +
                 " This error can be cause by manually changing the height channel of a vertex. The selected tile overlay" +
                 " will be red if the geometry is invalid.", "OK");
             return;

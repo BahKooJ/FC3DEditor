@@ -1,7 +1,6 @@
 ﻿
 
 using FCopParser;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class ActorObject : MonoBehaviour {

@@ -24,7 +24,7 @@ public class MapOpenerView : MonoBehaviour {
         if (path != "") {
             pathString.text = path;
         } else {
-            EditorUtility.DisplayDialog("Select Save Path", "Please select a file path to save the mission file", "OK");
+            DialogWindowUtil.Dialog("Select Save Path", "Please select a file path to save the mission file", "OK");
         }
 
     }
@@ -39,7 +39,7 @@ public class MapOpenerView : MonoBehaviour {
     public void OnClickOpen() {
 
         if (FileManagerMain.savePath == "") {
-            EditorUtility.DisplayDialog("Select Save Path", "Please select a file path to save the mission file", "OK");
+            DialogWindowUtil.Dialog("Select Save Path", "Please select a file path to save the mission file", "OK");
             return;
         }
 
