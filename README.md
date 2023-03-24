@@ -22,12 +22,13 @@ Please note that this editor is still very early in development and improvements
 
 # Getting Started
 
-When you first start up the editor a home page of two buttons will appear, open level, and settings (Not yet implemented).
+When you first start up the editor the left will have a list view and a settings button at the bottom of the screen (Not yet implemented).
+This list view will show files put in the "MissionFiles" folder in the directory of the editor. Copy over mission files from Future Cop and paste them into this folder to open them.
 You can find the mission files in the in "C:\Program Files (x86)\Electronic Arts\Future Cop\missions".
 
-![openfileexample](https://user-images.githubusercontent.com/71286169/226211022-41c1ef48-020f-4959-8b50-01ab78427245.PNG)
+![openfileexample](https://user-images.githubusercontent.com/71286169/227432641-b86bb0c3-4014-4e98-aba0-bb9cd49c2cde.PNG)
 
-After opening a mission file, click on "Save Path" and choose a path to save the modified level. This will not create a file right away, rather it will be the save path of the file if you do choose to save. The button to save is "F5"
+After opening a mission file, type in the name or save path of the mission file. This will not create a file right away, rather it will be the save path of the file if you do choose to save. The button to save is "F5"
 
 Checking "Override map data '' will clear all level geometry and make a new layout based on the provided width and height. The width and height represent the width and height of sections the playable area of the level has. This is useful for creating custom maps from scratch. If left uncheck the level will load with the existing level geometry.
 
