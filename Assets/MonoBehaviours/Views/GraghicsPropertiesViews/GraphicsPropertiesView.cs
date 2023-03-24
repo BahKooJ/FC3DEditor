@@ -309,7 +309,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
         var verticieCount = controller.selectedTiles[0].verticies.Count;
         if (controller.selectedSection.section.textureCoordinates.Count - index < verticieCount) {
-            DialogWindowUtil.Dialog("Invalid Texture Count", verticieCount + " or more texture coordinates need to be available", "OK");
+            DialogWindowUtil.Dialog("Invalid Texture Count", verticieCount + " or more texture coordinates need to be available");
             return;
         }
 

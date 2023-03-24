@@ -1,27 +1,32 @@
 ﻿
 
+using System;
 using System.Linq;
 using UnityEditor;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 public class DialogWindowUtil {
 
-    public static string OpenFile(string title, string path = "", string extension = "") {
+    static public GameObject prefab;
+    static public GameObject canvas;
 
-        return EditorUtility.OpenFilePanel(title, path, extension);
-    }
+    public static void Dialog(string title, string message, Func<bool> confirmAction = null) {
 
-    public static string SaveFile(string title, string path = "", string name = "", string extension = "") {
-        return EditorUtility.SaveFilePanel(title, path, name, extension);
-    }
+        var window = Object.Instantiate(prefab);
 
-    public static bool Dialog(string title, string message, string confirm, string cancel = "") {
+        var script = window.GetComponent<DialogWindow>();
 
-        if (cancel.Count() == 0) {
-            return EditorUtility.DisplayDialog(title, message, confirm);
+        script.title.text = title;
+        script.message.text = message;
+
+        if (confirmAction == null) {
+            script.cancelButton.SetActive(false);
         } else {
-            return EditorUtility.DisplayDialog(title, message, confirm, cancel);
-
+            script.confirmAction = confirmAction;
         }
+
+        window.transform.SetParent(canvas.transform, false);
 
     }
 

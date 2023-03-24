@@ -12,20 +12,14 @@ public class MapOpenerView : MonoBehaviour {
 
     public FileManagerMain main;
 
-    public TMP_Text pathString;
+    public TMP_InputField pathString;
     public Toggle overrideMapData;
     public TMP_InputField widthField;
     public TMP_InputField heightField;
 
-    public void OnClickSavePath() {
+    void Start() {
 
-        var path = main.SetSavePath();
-
-        if (path != "") {
-            pathString.text = path;
-        } else {
-            DialogWindowUtil.Dialog("Select Save Path", "Please select a file path to save the mission file", "OK");
-        }
+        pathString.text = FileManagerMain.savePath;
 
     }
 
@@ -36,10 +30,14 @@ public class MapOpenerView : MonoBehaviour {
 
     }
 
+    public void OnTextPathChange() {
+        FileManagerMain.savePath = pathString.text;
+    }
+
     public void OnClickOpen() {
 
         if (FileManagerMain.savePath == "") {
-            DialogWindowUtil.Dialog("Select Save Path", "Please select a file path to save the mission file", "OK");
+            DialogWindowUtil.Dialog("Select Save Path", "Please select a file path to save the mission file");
             return;
         }
 

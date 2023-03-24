@@ -24,6 +24,8 @@ public class Main : MonoBehaviour {
     public GameObject line3d;
     public GameObject axisControl;
 
+    public GameObject canvas;
+
     IFFParser iffFile;
     public FCopLevel level;
 
@@ -38,6 +40,8 @@ public class Main : MonoBehaviour {
     public EditMode editMode;
 
     void Start() {
+
+        DialogWindowUtil.canvas = canvas;
 
         Physics.queriesHitBackfaces = true;
 
@@ -141,7 +145,7 @@ public class Main : MonoBehaviour {
         } catch (MeshIDException) {
             DialogWindowUtil.Dialog("Invalid Level Geometry", "One or more tiles geomtry is invalid." +
                 " This error can be cause by manually changing the height channel of a vertex. The selected tile overlay" +
-                " will be red if the geometry is invalid.", "OK");
+                " will be red if the geometry is invalid.");
             return;
         }
 

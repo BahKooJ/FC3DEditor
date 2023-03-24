@@ -10,44 +10,40 @@ public class FileManagerMain : MonoBehaviour {
     public RectTransform canvas;
 
     public GameObject MapOpenerView;
+    public GameObject DialogWindow;
+
 
     public static IFFParser iffFile;
     public static FCopLevel level;
-    public static string savePath = "";
+    public static string savePath = "Output/";
 
-    public void OpenFile() {
+    void Start() {
 
-        var path = DialogWindowUtil.OpenFile("Open Mission File");
+        DialogWindowUtil.prefab = DialogWindow;
+        DialogWindowUtil.canvas = canvas.gameObject;
 
-        if (path.Length != 0) {
 
-            var fileContent = File.ReadAllBytes(path);
+    }
 
-            try {
-                iffFile = new IFFParser(fileContent);
-            } catch (InvalidFileException) {
-                DialogWindowUtil.Dialog("Select Future Cop mission File", "This file is not a mission file", "OK");
-            }
+    public void OpenFile(string path) {
 
-            foreach (Transform child in canvas) {
-                Destroy(child.gameObject);
-            }
+        var fileContent = File.ReadAllBytes(path);
 
-            var view = Instantiate(MapOpenerView);
-            view.GetComponent<MapOpenerView>().main = this;
-            view.transform.SetParent(canvas, false);
-
+        try {
+            iffFile = new IFFParser(fileContent);
+        } catch (InvalidFileException) {
+            DialogWindowUtil.Dialog("Select Future Cop mission File", "This file is not a mission file");
         }
 
+        foreach (Transform child in canvas) {
+            Destroy(child.gameObject);
+        }
+
+        var view = Instantiate(MapOpenerView);
+        view.GetComponent<MapOpenerView>().main = this;
+        view.transform.SetParent(canvas, false);
+
     }
 
-    public string SetSavePath() {
-
-        var path = DialogWindowUtil.SaveFile("Save Path");
-        savePath = path;
-
-        return path;
-
-    }
 
 }

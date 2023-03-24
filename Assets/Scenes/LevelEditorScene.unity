@@ -1052,6 +1052,7 @@ MonoBehaviour:
   BaseTurretActorObject: {fileID: 5284000438615368468, guid: 7cbaeea11b8467842a34976e5f2402c1, type: 3}
   line3d: {fileID: 2980094452611837016, guid: 8dd5e36aa455bea41b061af29dbf9f7d, type: 3}
   axisControl: {fileID: 1974907386336203002, guid: 7b27df81061c44540be73f4e43af113d, type: 3}
+  canvas: {fileID: 494504592}
   sectionMeshes: []
   levelTexturePallet: {fileID: 0}
   bmpTextures: []
