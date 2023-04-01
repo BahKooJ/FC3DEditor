@@ -41,9 +41,14 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
     void ScaleToScreen() {
 
-        var screenWdith = Screen.height - 32;
+        var screenWidth = Screen.width - 32;
+        var screenHeight = Screen.height - 32;
 
-        var multiplier = screenWdith / ((RectTransform)transform).rect.height;
+        var multiplierWidth = screenWidth / ((RectTransform)transform).rect.width;
+
+        var multiplierHeight = screenHeight / ((RectTransform)transform).rect.height;
+
+        var multiplier = new float[] { multiplierWidth, multiplierHeight }.Min();
 
         transform.localScale = new Vector3(multiplier, multiplier, multiplier);
 
