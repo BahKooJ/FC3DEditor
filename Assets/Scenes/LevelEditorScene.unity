@@ -135,6 +135,7 @@ GameObject:
   - component: {fileID: 97189096}
   - component: {fileID: 97189095}
   - component: {fileID: 97189094}
+  - component: {fileID: 97189097}
   m_Layer: 6
   m_Name: Nav Mesh Editor Tool
   m_TagString: Untagged
@@ -256,6 +257,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 97189092}
   m_CullTransparentMesh: 1
+--- !u!114 &97189097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 97189092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9852bc11470150943b0b03d6b805e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
+  message: Navigation Mesh Editing Mode
+  canvas: {fileID: 494504596}
 --- !u!1 &296040949
 GameObject:
   m_ObjectHideFlags: 0
@@ -268,6 +284,7 @@ GameObject:
   - component: {fileID: 296040953}
   - component: {fileID: 296040952}
   - component: {fileID: 296040951}
+  - component: {fileID: 296040954}
   m_Layer: 6
   m_Name: Geometry Editor Tool
   m_TagString: Untagged
@@ -389,6 +406,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 296040949}
   m_CullTransparentMesh: 1
+--- !u!114 &296040954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296040949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9852bc11470150943b0b03d6b805e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
+  message: Geometry Editing Mode
+  canvas: {fileID: 494504596}
 --- !u!1 &494504592
 GameObject:
   m_ObjectHideFlags: 0
@@ -681,6 +713,7 @@ GameObject:
   - component: {fileID: 1137386963}
   - component: {fileID: 1137386962}
   - component: {fileID: 1137386961}
+  - component: {fileID: 1137386964}
   m_Layer: 6
   m_Name: Add Geometry Tool
   m_TagString: Untagged
@@ -802,6 +835,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1137386959}
   m_CullTransparentMesh: 1
+--- !u!114 &1137386964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1137386959}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9852bc11470150943b0b03d6b805e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
+  message: Tile Building Mode
+  canvas: {fileID: 494504596}
 --- !u!1 &1204068304
 GameObject:
   m_ObjectHideFlags: 0
@@ -890,6 +938,7 @@ GameObject:
   - component: {fileID: 1395905703}
   - component: {fileID: 1395905702}
   - component: {fileID: 1395905701}
+  - component: {fileID: 1395905704}
   m_Layer: 6
   m_Name: Actor Editor Tool
   m_TagString: Untagged
@@ -1011,6 +1060,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1395905699}
   m_CullTransparentMesh: 1
+--- !u!114 &1395905704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1395905699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9852bc11470150943b0b03d6b805e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
+  message: Actor Editing Mode (WIP)
+  canvas: {fileID: 494504596}
 --- !u!1 &1522062003
 GameObject:
   m_ObjectHideFlags: 0

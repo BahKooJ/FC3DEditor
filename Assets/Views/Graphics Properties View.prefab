@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 7855003954353933759}
   - component: {fileID: 4737081964609546697}
   - component: {fileID: 2679315746464843158}
+  - component: {fileID: 8876867089763198678}
   m_Layer: 6
   m_Name: Add Four Texture Coords
   m_TagString: Untagged
@@ -209,6 +210,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &8876867089763198678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1058888598596730136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9852bc11470150943b0b03d6b805e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
+  message: Add 4 Texture Offsets
 --- !u!1 &1067821260078188285
 GameObject:
   m_ObjectHideFlags: 0
@@ -1945,6 +1960,7 @@ GameObject:
   - component: {fileID: 4850587531509113663}
   - component: {fileID: 330477390649046413}
   - component: {fileID: 6162188376616812538}
+  - component: {fileID: 6535624385079346787}
   m_Layer: 6
   m_Name: Add Tile Graphics
   m_TagString: Untagged
@@ -2066,6 +2082,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &6535624385079346787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3752409058150314750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9852bc11470150943b0b03d6b805e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
+  message: Add New Tile Graphics
 --- !u!1 &3826879558817776118
 GameObject:
   m_ObjectHideFlags: 0
@@ -2078,6 +2108,7 @@ GameObject:
   - component: {fileID: 7404691444014056637}
   - component: {fileID: 5112919902884539493}
   - component: {fileID: 232395418457517648}
+  - component: {fileID: 3432396031830022154}
   m_Layer: 6
   m_Name: Rotate Clockwise Button
   m_TagString: Untagged
@@ -2199,6 +2230,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &3432396031830022154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3826879558817776118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9852bc11470150943b0b03d6b805e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
+  message: Rotate Texture Offset Order Clockwise
 --- !u!1 &4067288197640752476
 GameObject:
   m_ObjectHideFlags: 0
@@ -2593,6 +2638,7 @@ GameObject:
   - component: {fileID: 4627293039240390332}
   - component: {fileID: 9038447457059995729}
   - component: {fileID: 8412953080356938274}
+  - component: {fileID: 7662810344417934911}
   m_Layer: 6
   m_Name: Copy Texture Coords Button
   m_TagString: Untagged
@@ -2714,6 +2760,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &7662810344417934911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4781713847548571453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9852bc11470150943b0b03d6b805e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
+  message: Clone Texture Offsets
 --- !u!1 &4851335316488099424
 GameObject:
   m_ObjectHideFlags: 0
@@ -3014,6 +3074,7 @@ GameObject:
   - component: {fileID: 1677788557207391121}
   - component: {fileID: 685253384904700254}
   - component: {fileID: 9143690172313462474}
+  - component: {fileID: 1604375448002277461}
   m_Layer: 6
   m_Name: Flip Texture Coords Vertically Button
   m_TagString: Untagged
@@ -3135,6 +3196,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1604375448002277461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5608261204611261103}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9852bc11470150943b0b03d6b805e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
+  message: Flip Texture Offest Order Vertically
 --- !u!1 &5653557010267000431
 GameObject:
   m_ObjectHideFlags: 0
@@ -3147,6 +3222,7 @@ GameObject:
   - component: {fileID: 2495826431825926119}
   - component: {fileID: 4892717331929220192}
   - component: {fileID: 2970535923840266368}
+  - component: {fileID: 4053035778468637904}
   m_Layer: 6
   m_Name: Rotate Counter-Clockwise Button
   m_TagString: Untagged
@@ -3268,6 +3344,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &4053035778468637904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5653557010267000431}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9852bc11470150943b0b03d6b805e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
+  message: Rotate Texture Offset Order Counter-Clockwise
 --- !u!1 &5730826753792442490
 GameObject:
   m_ObjectHideFlags: 0
@@ -3904,6 +3994,7 @@ GameObject:
   - component: {fileID: 8631031713894339616}
   - component: {fileID: 8766600141289177303}
   - component: {fileID: 5066065361835239399}
+  - component: {fileID: 3333020384454473155}
   m_Layer: 6
   m_Name: Flip Texture Coords Horizontally Button
   m_TagString: Untagged
@@ -4025,6 +4116,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &3333020384454473155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6987643201205118304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9852bc11470150943b0b03d6b805e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
+  message: Flip Texture Offset Order Horizontally
 --- !u!1 &7681705150458662525
 GameObject:
   m_ObjectHideFlags: 0
@@ -4728,6 +4833,7 @@ GameObject:
   - component: {fileID: 8668769559757699014}
   - component: {fileID: 3568416262900535538}
   - component: {fileID: 5012206581815168420}
+  - component: {fileID: 3014653281390111268}
   m_Layer: 6
   m_Name: Copy Texture Coords To Clipboard
   m_TagString: Untagged
@@ -4849,6 +4955,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &3014653281390111268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8396187102666909763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9852bc11470150943b0b03d6b805e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
+  message: Copy Texture Offsets to Clipboard
 --- !u!1 &8489185098824900896
 GameObject:
   m_ObjectHideFlags: 0
@@ -5427,6 +5547,7 @@ GameObject:
   - component: {fileID: 8844804283245131068}
   - component: {fileID: 677953397000502672}
   - component: {fileID: 5202555197999163468}
+  - component: {fileID: 5056158521524585918}
   m_Layer: 6
   m_Name: Add Three Texture Coords
   m_TagString: Untagged
@@ -5548,3 +5669,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &5056158521524585918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9175041199019025943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9852bc11470150943b0b03d6b805e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
+  message: Add 3 Texture Offsets

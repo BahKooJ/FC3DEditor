@@ -148,6 +148,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7228343785681220714}
   - component: {fileID: 7471705111253372825}
+  - component: {fileID: 7465875382383538364}
   m_Layer: 6
   m_Name: Is Start Toggle
   m_TagString: Untagged
@@ -236,6 +237,20 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   m_IsOn: 1
+--- !u!114 &7465875382383538364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1777381532587211789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9852bc11470150943b0b03d6b805e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
+  message: Is Start of a Path
 --- !u!1 &2377100098570160789
 GameObject:
   m_ObjectHideFlags: 0
@@ -649,6 +664,7 @@ GameObject:
   - component: {fileID: 8125455122541376516}
   - component: {fileID: 8125455122541376517}
   - component: {fileID: 8125455122541376518}
+  - component: {fileID: 7915284475982010554}
   m_Layer: 6
   m_Name: Add Node Button
   m_TagString: Untagged
@@ -770,6 +786,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &7915284475982010554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8125455122541376512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9852bc11470150943b0b03d6b805e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
+  message: Add New Navigation Node
 --- !u!1 &8125455122635452116
 GameObject:
   m_ObjectHideFlags: 0
@@ -1284,6 +1314,7 @@ GameObject:
   - component: {fileID: 8125455123663346468}
   - component: {fileID: 8125455123663346469}
   - component: {fileID: 8125455123663346470}
+  - component: {fileID: 4702988481881154605}
   m_Layer: 6
   m_Name: Remove Paths Button
   m_TagString: Untagged
@@ -1405,3 +1436,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &4702988481881154605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8125455123663346464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9852bc11470150943b0b03d6b805e0a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
+  message: Clear All Next Node Paths

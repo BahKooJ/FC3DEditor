@@ -1,0 +1,3 @@
+DEV 0.1.0
+- Added info boxes to UI elements
+- Removed "Show Tiles Button"
