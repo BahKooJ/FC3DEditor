@@ -87,6 +87,14 @@ public class FreeMove : MonoBehaviour {
         if (looking) {
             float newRotationX = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * freeLookSensitivity;
             float newRotationY = transform.localEulerAngles.x - Input.GetAxis("Mouse Y") * freeLookSensitivity;
+
+            if (newRotationY > 90f && newRotationY < 180) {
+                newRotationY = 90f;
+            }
+            if (newRotationY < 270f && newRotationY > 180) {
+                newRotationY = 270f;
+            }
+
             transform.localEulerAngles = new Vector3(newRotationY, newRotationX, 0f);
         }
 
