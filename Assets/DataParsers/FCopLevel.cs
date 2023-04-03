@@ -17,6 +17,8 @@ namespace FCopParser {
 
         public List<FCopNavMesh> navMeshes = new();
 
+        public List<FCopObject> objects = new();
+
         public List<FCopActor> actors = new();
 
         public IFFFileManager fileManager;
@@ -43,6 +45,12 @@ namespace FCopParser {
 
             }).ToList();
 
+            var rawObjectFiles = fileManager.files.Where(file => {
+
+                return file.dataFourCC == "Cobj";
+
+            }).ToList();
+
             var rawActorFiles = fileManager.files.Where(file => {
 
                 return file.dataFourCC == "Cact" || file.dataFourCC == "Csac";
@@ -59,6 +67,10 @@ namespace FCopParser {
 
             foreach (var rawFile in rawNavMeshFiles) {
                 navMeshes.Add(new FCopNavMesh(rawFile));
+            }
+
+            foreach (var rawFile in rawObjectFiles) {
+                objects.Add(new FCopObject(rawFile));
             }
 
             foreach (var rawFile in rawActorFiles) {
