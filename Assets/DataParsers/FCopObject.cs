@@ -137,7 +137,7 @@ namespace FCopParser {
         void ParseUVMaps() {
 
             var header = offsets.First(header => {
-                return header.fourCCDeclaration == FourCC.fourDVL;
+                return header.fourCCDeclaration == FourCC.threeDTL;
             });
 
             var bytes = rawFile.data.GetRange(header.index, header.chunkSize);

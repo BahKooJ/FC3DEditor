@@ -51,11 +51,18 @@ public class ObjectMesh : MonoBehaviour {
 
         void GenerateTriangle(FCopObject.FCopPolygon polygon) {
 
+            if (polygon.textureIndex / 16 >= fCopObject.uvMaps.Count) {
+                Debug.Log(polygon.textureIndex / 16);
+                Debug.Log(fCopObject.uvMaps.Count);
+                return;
+
+            }
+
+            var uvMap = fCopObject.uvMaps[polygon.textureIndex / 16];
+
             AddVertex(fCopObject.vertices[polygon.vertices[0]]);
             AddVertex(fCopObject.vertices[polygon.vertices[1]]);
             AddVertex(fCopObject.vertices[polygon.vertices[2]]);
-
-            var uvMap = fCopObject.uvMaps[polygon.textureIndex / 16];
 
             textureCords.Add(new Vector2(uvMap.x[0] / 256, (uvMap.y[0] + (256 * uvMap.textureResourceIndex)) / 2048));
             textureCords.Add(new Vector2(uvMap.x[1] / 256, (uvMap.y[1] + (256 * uvMap.textureResourceIndex)) / 2048));
@@ -71,18 +78,19 @@ public class ObjectMesh : MonoBehaviour {
 
         void GenerateSquare(FCopObject.FCopPolygon polygon) {
 
-            AddVertex(fCopObject.vertices[polygon.vertices[0]]);
-            AddVertex(fCopObject.vertices[polygon.vertices[1]]);
-            AddVertex(fCopObject.vertices[polygon.vertices[2]]);
-            AddVertex(fCopObject.vertices[polygon.vertices[3]]);
-
             if (polygon.textureIndex / 16 >= fCopObject.uvMaps.Count) {
                 Debug.Log(polygon.textureIndex / 16);
                 Debug.Log(fCopObject.uvMaps.Count);
+                return;
 
             }
 
             var uvMap = fCopObject.uvMaps[polygon.textureIndex / 16];
+
+            AddVertex(fCopObject.vertices[polygon.vertices[0]]);
+            AddVertex(fCopObject.vertices[polygon.vertices[1]]);
+            AddVertex(fCopObject.vertices[polygon.vertices[2]]);
+            AddVertex(fCopObject.vertices[polygon.vertices[3]]);
 
             textureCords.Add(new Vector2(uvMap.x[0] / 256, (uvMap.y[0] + (256 * uvMap.textureResourceIndex)) / 2048));
             textureCords.Add(new Vector2(uvMap.x[1] / 256, (uvMap.y[1] + (256 * uvMap.textureResourceIndex)) / 2048));
