@@ -21,7 +21,11 @@ public class DialogWindow : MonoBehaviour {
 
     public void OnClickOK() {
 
-        confirmAction();
+        if (confirmAction != null) {
+
+            confirmAction();
+
+        }
 
         Destroy(this.gameObject);
 

@@ -49,12 +49,14 @@ namespace FCopParser {
 
         public List<FCopPolygon> polygons = new();
         public List<FCopVertex> vertices = new();
+        public List<FCopUVMap> uvMaps = new();
 
         public FCopObject(IFFDataFile rawFile) {
             this.rawFile = rawFile;
             FindStartChunkOffset();
             ParseVertices();
             ParsePolygons();
+            ParseUVMaps();
             var bonk = 3;
         }
 
@@ -132,6 +134,33 @@ namespace FCopParser {
 
         }
 
+        void ParseUVMaps() {
+
+            var header = offsets.First(header => {
+                return header.fourCCDeclaration == FourCC.fourDVL;
+            });
+
+            var bytes = rawFile.data.GetRange(header.index, header.chunkSize);
+
+            var uvMapCount = (header.chunkSize - 12) / 16;
+
+            var offset = 12;
+
+            foreach (var i in Enumerable.Range(0, uvMapCount)) {
+
+                uvMaps.Add(new FCopUVMap(
+                    Utils.BytesToInt(bytes.ToArray(), offset + 12),
+                    new List<int> { bytes[offset + 4], bytes[offset + 6], bytes[offset + 8], bytes[offset + 10] },
+                    new List<int> { bytes[offset + 5], bytes[offset + 7], bytes[offset + 9], bytes[offset + 11] }
+                    ));
+
+                offset += 16;
+
+            }
+
+
+        }
+
         string Reverse(string s) {
             char[] charArray = s.ToCharArray();
             Array.Reverse(charArray);
@@ -178,6 +207,21 @@ namespace FCopParser {
                 this.textureIndex = textureIndex;
                 this.vertices = vertices;
                 this.normals = normals;
+            }
+
+        }
+
+        public class FCopUVMap {
+
+            public int textureResourceIndex;
+
+            public List<int> x;
+            public List<int> y;
+
+            public FCopUVMap(int textureResourceIndex, List<int> x, List<int> y) {
+                this.textureResourceIndex = textureResourceIndex;
+                this.x = x;
+                this.y = y;
             }
 
         }

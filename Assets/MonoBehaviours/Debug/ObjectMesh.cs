@@ -2,6 +2,7 @@ using FCopParser;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class ObjectMesh : MonoBehaviour {
 
@@ -9,20 +10,30 @@ public class ObjectMesh : MonoBehaviour {
 
     public FCopObject fCopObject;
 
+    public ObjectDebug controller;
+
     Mesh mesh;
+    Material material;
 
     List<Vector3> vertices = new();
     List<int> triangles = new();
+    List<Vector2> textureCords = new();
+
 
     void Start() {
 
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
+        material = GetComponent<MeshRenderer>().material;
+
+        material.mainTexture = controller.levelTexturePallet;
 
         Generate();
 
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
+
+        mesh.uv = textureCords.ToArray();
 
         mesh.RecalculateNormals();
 
@@ -32,7 +43,23 @@ public class ObjectMesh : MonoBehaviour {
 
         var vertexIndex = 0;
 
+        void AddVertex(FCopObject.FCopVertex vertex) {
+
+            vertices.Add(new Vector3(vertex.x * scale, vertex.y * scale, vertex.z * scale));
+
+        }
+
         void GenerateTriangle(FCopObject.FCopPolygon polygon) {
+
+            AddVertex(fCopObject.vertices[polygon.vertices[0]]);
+            AddVertex(fCopObject.vertices[polygon.vertices[1]]);
+            AddVertex(fCopObject.vertices[polygon.vertices[2]]);
+
+            var uvMap = fCopObject.uvMaps[polygon.textureIndex / 16];
+
+            textureCords.Add(new Vector2(uvMap.x[0] / 256, (uvMap.y[0] + (256 * uvMap.textureResourceIndex)) / 2048));
+            textureCords.Add(new Vector2(uvMap.x[1] / 256, (uvMap.y[1] + (256 * uvMap.textureResourceIndex)) / 2048));
+            textureCords.Add(new Vector2(uvMap.x[2] / 256, (uvMap.y[2] + (256 * uvMap.textureResourceIndex)) / 2048));
 
             triangles.Add(polygon.vertices[0]);
             triangles.Add(polygon.vertices[1]);
@@ -44,6 +71,24 @@ public class ObjectMesh : MonoBehaviour {
 
         void GenerateSquare(FCopObject.FCopPolygon polygon) {
 
+            AddVertex(fCopObject.vertices[polygon.vertices[0]]);
+            AddVertex(fCopObject.vertices[polygon.vertices[1]]);
+            AddVertex(fCopObject.vertices[polygon.vertices[2]]);
+            AddVertex(fCopObject.vertices[polygon.vertices[3]]);
+
+            if (polygon.textureIndex / 16 >= fCopObject.uvMaps.Count) {
+                Debug.Log(polygon.textureIndex / 16);
+                Debug.Log(fCopObject.uvMaps.Count);
+
+            }
+
+            var uvMap = fCopObject.uvMaps[polygon.textureIndex / 16];
+
+            textureCords.Add(new Vector2(uvMap.x[0] / 256, (uvMap.y[0] + (256 * uvMap.textureResourceIndex)) / 2048));
+            textureCords.Add(new Vector2(uvMap.x[1] / 256, (uvMap.y[1] + (256 * uvMap.textureResourceIndex)) / 2048));
+            textureCords.Add(new Vector2(uvMap.x[2] / 256, (uvMap.y[2] + (256 * uvMap.textureResourceIndex)) / 2048));
+            textureCords.Add(new Vector2(uvMap.x[3] / 256, (uvMap.y[3] + (256 * uvMap.textureResourceIndex)) / 2048));
+
             triangles.Add(polygon.vertices[0]);
             triangles.Add(polygon.vertices[1]);
             triangles.Add(polygon.vertices[2]);
@@ -53,12 +98,6 @@ public class ObjectMesh : MonoBehaviour {
             triangles.Add(polygon.vertices[0]);
 
             vertexIndex += 4;
-
-        }
-
-        foreach (var vertex in fCopObject.vertices) {
-
-            vertices.Add(new Vector3(vertex.x * scale, vertex.y * scale, vertex.z * scale));
 
         }
 

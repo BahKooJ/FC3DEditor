@@ -168,6 +168,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cube: {fileID: 1298310605505145416, guid: 580927f31628b7a48b4e39086242486a, type: 3}
+  meshPrefab: {fileID: 3982175839306991789, guid: 8d9aa84093398e5458aa180203865e97, type: 3}
+  bmpTextures: []
+  levelTexturePallet: {fileID: 0}
 --- !u!1 &620931956
 GameObject:
   m_ObjectHideFlags: 0
