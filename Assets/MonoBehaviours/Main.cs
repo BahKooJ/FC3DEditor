@@ -16,9 +16,7 @@ public class Main : MonoBehaviour {
     public GameObject NavMeshPoint;
 
     public GameObject BlankActor;
-    public GameObject StaticPropActorObject;
-    public GameObject TurretActorObject;
-    public GameObject BaseTurretActorObject;
+    public GameObject ObjectMesh;
 
 
     public GameObject line3d;
@@ -206,7 +204,7 @@ public class Main : MonoBehaviour {
 
         }
 
-        var texture = new Texture2D(256, 2048, TextureFormat.RGB565, false);
+        var texture = new Texture2D(256, 2560, TextureFormat.RGB565, false);
         var texturePallet = new List<byte>();
 
         texturePallet.AddRange(level.textures[0].ConvertToRGB565());
@@ -217,6 +215,8 @@ public class Main : MonoBehaviour {
         texturePallet.AddRange(level.textures[5].ConvertToRGB565());
         texturePallet.AddRange(level.textures[6].ConvertToRGB565());
         texturePallet.AddRange(level.textures[7].ConvertToRGB565());
+        texturePallet.AddRange(level.textures[8].ConvertToRGB565());
+        texturePallet.AddRange(level.textures[9].ConvertToRGB565());
 
         texture.LoadRawTextureData(texturePallet.ToArray());
         texture.Apply();

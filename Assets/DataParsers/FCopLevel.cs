@@ -75,22 +75,7 @@ namespace FCopParser {
 
             foreach (var rawFile in rawActorFiles) {
 
-                var actor = new FCopActor(rawFile);
-
-                switch (actor.objectType) {
-                    case 8:
-                        actors.Add(new FCopBaseTurretActor(rawFile));
-                        break;
-                    case 11:
-                        actors.Add(new FCopStaticPropActor(rawFile));
-                        break;
-                    case 36:
-                        actors.Add(new FCopTurretActor(rawFile));
-                        break;
-                    default:
-                        actors.Add(new FCopActor(rawFile));
-                        break;
-                }
+                actors.Add(new FCopActor(rawFile));
 
             }
 

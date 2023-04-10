@@ -3,3 +3,6 @@ DEV 0.1.0
 - Removed "Show Tiles Button"
 - Fixed Graphics Properties View scales incorrectly
 - Fixed camera jitter when looking directly down or up
+
+DEV 0.1.1
+- Fixed major bug causing the editor to crash if a dialog window didn't have a confirm action

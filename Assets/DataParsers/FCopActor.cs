@@ -2,6 +2,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine.UIElements;
 
 namespace FCopParser {
 
@@ -14,15 +17,44 @@ namespace FCopParser {
      */
     public class FCopActor {
 
+        public static class FourCC {
+
+            public const string tACT = "tACT";
+            public const string aRSL = "aRSL";
+            public const string Cobj = "Cobj";
+            public const string NULL = "NULL";
+            public const string tSAC = "tSAC";
+            public const string Cnet = "Cnet";
+
+        }
+
+        public struct FCopResource {
+
+            public string fourCC;
+            public int id;
+
+            public FCopResource(string fourCC, int id) {
+                this.fourCC = fourCC;
+                this.id = id;
+            }
+
+        }
+
         const int idOffset = 8;
         const int objectTypeOffset = 12;
         const int yOffset = 16;
         const int xOffset = 24;
 
+        public List<ChunkHeader> offsets = new();
+
         public int id;
         public int objectType;
         public int x;
         public int y;
+
+        public List<FCopResource> resourceReferences = new();
+
+        public FCopActorScript script;
 
         public IFFDataFile rawFile;
 
@@ -30,10 +62,26 @@ namespace FCopParser {
 
             this.rawFile = rawFile;
 
+            FindStartChunkOffset();
+
             id = Utils.BytesToInt(rawFile.data.ToArray(), 8);
             objectType = Utils.BytesToInt(rawFile.data.ToArray(), 12);
             y = Utils.BytesToInt(rawFile.data.ToArray(), 16);
             x = Utils.BytesToInt(rawFile.data.ToArray(), 24);
+
+            ParseResourceReferences();
+
+            switch(objectType) {
+                case 8:
+                    script = new FCopScript8(this);
+                    break;
+                case 11:
+                    script = new FCopScript11(this);
+                    break;
+                case 36:
+                    script = new FCopScript36(this);
+                    break;
+            }
 
 
         }
@@ -47,6 +95,63 @@ namespace FCopParser {
 
         }
 
+        void ParseResourceReferences() {
+
+            var header = offsets.First(header => {
+                return header.fourCCDeclaration == FourCC.aRSL;
+            });
+
+            var bytes = rawFile.data.GetRange(header.index, header.chunkSize);
+
+            var offset = 12;
+
+            var refCount = (header.chunkSize - 12) / 8;
+
+            foreach (var i in Enumerable.Range(0, refCount)) {
+
+                var fourCC = Reverse(Encoding.Default.GetString(bytes.ToArray(), offset, 4));
+                var id = BitConverter.ToInt32(bytes.ToArray(), offset + 4);
+
+                resourceReferences.Add(new FCopResource(fourCC, id));
+
+                offset += 8;
+
+            }
+
+        }
+
+        void FindStartChunkOffset() {
+
+            offsets.Clear();
+
+            int offset = 0;
+
+            while (offset < rawFile.data.Count) {
+
+                var fourCC = BytesToStringReversed(offset, 4);
+                var size = BytesToInt(offset + 4);
+
+                offsets.Add(new ChunkHeader(offset, fourCC, size));
+
+                offset += size;
+
+            }
+
+        }
+
+        string Reverse(string s) {
+            char[] charArray = s.ToCharArray();
+            Array.Reverse(charArray);
+            return new string(charArray);
+        }
+
+        int BytesToInt(int offset) {
+            return BitConverter.ToInt32(rawFile.data.ToArray(), offset);
+        }
+
+        string BytesToStringReversed(int offset, int length) {
+            return Reverse(Encoding.Default.GetString(rawFile.data.ToArray(), offset, length));
+        }
 
         public static IFFDataFile AddNetrualTurretTempMethod(int id, int x, int y) {
 
@@ -92,27 +197,15 @@ namespace FCopParser {
 
     }
 
-    public class FCopTurretActor : FCopActor {
+    public interface FCopActorScript {
 
-        public ActorRotation rotation;
-
-        public FCopTurretActor(IFFDataFile rawFile) : base(rawFile) {
-
-            rotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(rawFile.data.ToArray(), 64));
-
-        }
-
-        override public void Compile() {
-            base.Compile();
-
-            rawFile.data.RemoveRange(64, 2);
-            rawFile.data.InsertRange(64, BitConverter.GetBytes((short)rotation.compiledRotation));
-
-        }
+        public FCopActor actor { get; set; }
 
     }
 
-    public class FCopBaseTurretActor : FCopActor {
+    public class FCopScript8 : FCopActorScript {
+
+        public FCopActor actor { get; set; }
 
         public Team teamHostileToThis;
         public Team miniMapColor;
@@ -121,8 +214,10 @@ namespace FCopParser {
 
         public ActorRotation rotation;
 
+        public FCopScript8(FCopActor actor) {
+            this.actor = actor;
 
-        public FCopBaseTurretActor(IFFDataFile rawFile) : base(rawFile) {
+            var rawFile = actor.rawFile;
 
             teamHostileToThis = Utils.BytesToShort(rawFile.data.ToArray(), 36) == 1 ? Team.RED : Team.BLUE;
             miniMapColor = Utils.BytesToShort(rawFile.data.ToArray(), 38) == 1 ? Team.RED : Team.BLUE;
@@ -132,33 +227,59 @@ namespace FCopParser {
 
         }
 
-        override public void Compile() {
-            base.Compile();
+        //override public void Compile() {
+        //    base.Compile();
 
-            rawFile.data.RemoveRange(64, 2);
-            rawFile.data.InsertRange(64, BitConverter.GetBytes((short)rotation.compiledRotation));
+        //    rawFile.data.RemoveRange(64, 2);
+        //    rawFile.data.InsertRange(64, BitConverter.GetBytes((short)rotation.compiledRotation));
 
-        }
+        //}
 
     }
 
-    public class FCopStaticPropActor : FCopActor {
+    public class FCopScript11 : FCopActorScript {
+
+        public FCopActor actor { get; set; }
 
         public ActorRotation rotation;
 
-        public FCopStaticPropActor(IFFDataFile rawFile) : base(rawFile) {
+        public FCopScript11(FCopActor actor) {
+            this.actor = actor;
 
-            rotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(rawFile.data.ToArray(), 46));
+            rotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 46));
+
+        }
+
+        //override public void Compile() {
+        //    base.Compile();
+
+        //    rawFile.data.RemoveRange(46, 2);
+        //    rawFile.data.InsertRange(46, BitConverter.GetBytes((short)rotation.compiledRotation));
+
+        //}
+
+    }
+
+    public class FCopScript36 : FCopActorScript {
+
+        public FCopActor actor { get; set; }
+
+        public ActorRotation rotation;
+
+        public FCopScript36(FCopActor actor) {
+            this.actor = actor;
+
+            rotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 64));
 
         }
 
-        override public void Compile() {
-            base.Compile();
+        //override public void Compile() {
+        //    base.Compile();
 
-            rawFile.data.RemoveRange(46, 2);
-            rawFile.data.InsertRange(46, BitConverter.GetBytes((short)rotation.compiledRotation));
+        //    rawFile.data.RemoveRange(64, 2);
+        //    rawFile.data.InsertRange(64, BitConverter.GetBytes((short)rotation.compiledRotation));
 
-        }
+        //}
 
     }
 

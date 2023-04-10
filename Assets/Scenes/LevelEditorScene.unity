@@ -271,7 +271,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
   message: Navigation Mesh Editing Mode
-  canvas: {fileID: 494504596}
 --- !u!1 &296040949
 GameObject:
   m_ObjectHideFlags: 0
@@ -420,7 +419,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
   message: Geometry Editing Mode
-  canvas: {fileID: 494504596}
 --- !u!1 &494504592
 GameObject:
   m_ObjectHideFlags: 0
@@ -849,7 +847,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
   message: Tile Building Mode
-  canvas: {fileID: 494504596}
 --- !u!1 &1204068304
 GameObject:
   m_ObjectHideFlags: 0
@@ -1074,7 +1071,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
   message: Actor Editing Mode (WIP)
-  canvas: {fileID: 494504596}
 --- !u!1 &1522062003
 GameObject:
   m_ObjectHideFlags: 0
@@ -1111,9 +1107,7 @@ MonoBehaviour:
   SectionBoarders: {fileID: 2168547336867362444, guid: 9ea2ba9bd14a6d84f92bbce323964dbf, type: 3}
   NavMeshPoint: {fileID: 6317055660841323228, guid: d716506ed78901d468e87343a95f5955, type: 3}
   BlankActor: {fileID: 1640186847095666650, guid: 49bee21158884a8459dfdc42e65ffd06, type: 3}
-  StaticPropActorObject: {fileID: 5284000438615368468, guid: 458b3920f0798c1498fa4bb01e8c9108, type: 3}
-  TurretActorObject: {fileID: 5284000438615368468, guid: 950b781f248e7c8499c7c03c5c2c291b, type: 3}
-  BaseTurretActorObject: {fileID: 5284000438615368468, guid: 7cbaeea11b8467842a34976e5f2402c1, type: 3}
+  ObjectMesh: {fileID: 3982175839306991789, guid: 8d9aa84093398e5458aa180203865e97, type: 3}
   line3d: {fileID: 2980094452611837016, guid: 8dd5e36aa455bea41b061af29dbf9f7d, type: 3}
   axisControl: {fileID: 1974907386336203002, guid: 7b27df81061c44540be73f4e43af113d, type: 3}
   canvas: {fileID: 494504592}

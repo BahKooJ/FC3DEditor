@@ -1,6 +1,8 @@
 ﻿
 
 using FCopParser;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ActorObject : MonoBehaviour {
@@ -10,6 +12,8 @@ public class ActorObject : MonoBehaviour {
     public ActorEditMode controller;
 
     public FCopActor actor;
+
+    public List<ObjectMesh> objects = new();
 
     public void ChangePosition(Vector3 pos) {
 
@@ -41,6 +45,38 @@ public class ActorObject : MonoBehaviour {
 
         } else {
             print("No floor found");
+        }
+
+        foreach (var resRef in actor.resourceReferences) {
+
+            if (resRef.fourCC == FCopActor.FourCC.Cobj) {
+
+                var obj = controller.main.level.objects.First(obj => { return obj.rawFile.dataID == resRef.id; });
+
+                var gameObject = Instantiate(controller.main.ObjectMesh);
+
+                var script = gameObject.GetComponent<ObjectMesh>();
+
+                script.controller = controller.main;
+
+                script.fCopObject = obj;
+
+                if (!script.failed) {
+
+                    var cube = transform.Find("Cube");
+
+                    if (cube != null) {
+                        Destroy(cube.gameObject);
+                    }
+
+                    objects.Add(script);
+
+                }
+
+                gameObject.transform.SetParent(transform, false);
+
+            }
+
         }
 
     }

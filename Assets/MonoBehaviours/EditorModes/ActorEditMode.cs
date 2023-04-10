@@ -33,40 +33,9 @@ public class ActorEditMode : EditMode {
 
         foreach (var actor in main.level.actors) {
 
+            var nodeObject = Object.Instantiate(main.BlankActor);
 
-            switch (actor) {
-
-                case FCopBaseTurretActor:
-
-                    var baseTurret = Object.Instantiate(main.BaseTurretActorObject);
-
-                    CreateActor(actor, baseTurret.GetComponent<BaseTurretActorObject>());
-
-                    break;
-
-                case FCopStaticPropActor:
-
-                    var prop = Object.Instantiate(main.StaticPropActorObject);
-
-                    CreateActor(actor, prop.GetComponent<StaticActorObject>());
-
-                    break;
-
-                case FCopTurretActor:
-
-                    var turret = Object.Instantiate(main.TurretActorObject);
-
-                    CreateActor(actor, turret.GetComponent<TurretActorObject>());
-
-                    break;
-                default:
-
-                    var nodeObject = Object.Instantiate(main.BlankActor);
-
-                    CreateActor(actor, nodeObject.GetComponent<ActorObject>());
-
-                    break;
-            }
+            CreateActor(actor, nodeObject.GetComponent<ActorObject>());
 
         }
         
@@ -118,7 +87,30 @@ public class ActorEditMode : EditMode {
 
                 foreach (var act in actors) {
 
-                    if (hit.colliderInstanceID == act.actCollider.GetInstanceID()) {
+                    var didHit = false;
+
+
+                    if (act.actCollider != null) {
+
+                        if (hit.colliderInstanceID == act.actCollider.GetInstanceID()) {
+                            didHit = true;
+                        }
+
+                    } else {
+
+                        foreach (var obj in act.objects) {
+
+                            if (hit.colliderInstanceID == obj.meshCollider.GetInstanceID()) {
+                                didHit = true;
+                            }
+
+                        }
+
+                    }
+
+
+
+                    if (didHit) {
 
                         Debug.Log(act.actor.id + " : " + act.actor.objectType);
 

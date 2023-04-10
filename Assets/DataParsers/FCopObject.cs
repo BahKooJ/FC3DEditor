@@ -45,7 +45,7 @@ namespace FCopParser {
 
         public List<ChunkHeader> offsets = new();
 
-        IFFDataFile rawFile;
+        public IFFDataFile rawFile;
 
         public List<FCopPolygon> polygons = new();
         public List<FCopVertex> vertices = new();

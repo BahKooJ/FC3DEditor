@@ -1,4 +1,5 @@
 using FCopParser;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,29 +7,40 @@ using UnityEngine.UIElements;
 
 public class ObjectMesh : MonoBehaviour {
 
-    const float scale = 0.01f;
+    const float scale = 512f;
 
     public FCopObject fCopObject;
 
-    public ObjectDebug controller;
+    public Main controller;
 
     Mesh mesh;
     Material material;
+    public MeshCollider meshCollider;
 
     List<Vector3> vertices = new();
     List<int> triangles = new();
     List<Vector2> textureCords = new();
+
+    public bool failed = false;
 
 
     void Start() {
 
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
+        meshCollider = GetComponent<MeshCollider>();
+
         material = GetComponent<MeshRenderer>().material;
 
         material.mainTexture = controller.levelTexturePallet;
 
-        Generate();
+        try {
+            Generate();
+        } catch {
+            failed = true;
+            Debug.LogWarning("Failed to create mesh for object " + fCopObject.rawFile.dataID);
+            return;
+        }
 
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
@@ -36,6 +48,8 @@ public class ObjectMesh : MonoBehaviour {
         mesh.uv = textureCords.ToArray();
 
         mesh.RecalculateNormals();
+
+        meshCollider.sharedMesh = mesh;
 
     }
 
@@ -45,7 +59,16 @@ public class ObjectMesh : MonoBehaviour {
 
         void AddVertex(FCopObject.FCopVertex vertex) {
 
-            vertices.Add(new Vector3(vertex.x * scale, vertex.y * scale, vertex.z * scale));
+            vertices.Add(new Vector3(vertex.x / scale, vertex.y / scale, vertex.z / scale));
+
+        }
+
+        void AddSingleTextureCoord(FCopObject.FCopUVMap uvMap, int index) {
+
+            var x = uvMap.x[index] / 256f;
+            var y = (uvMap.y[index] + (256 * uvMap.textureResourceIndex)) / 2560f;
+
+            textureCords.Add(new Vector2(x, y));
 
         }
 
@@ -63,16 +86,18 @@ public class ObjectMesh : MonoBehaviour {
             AddVertex(fCopObject.vertices[polygon.vertices[0]]);
             AddVertex(fCopObject.vertices[polygon.vertices[1]]);
             AddVertex(fCopObject.vertices[polygon.vertices[2]]);
+            AddVertex(fCopObject.vertices[polygon.vertices[3]]);
 
-            textureCords.Add(new Vector2(uvMap.x[0] / 256, (uvMap.y[0] + (256 * uvMap.textureResourceIndex)) / 2048));
-            textureCords.Add(new Vector2(uvMap.x[1] / 256, (uvMap.y[1] + (256 * uvMap.textureResourceIndex)) / 2048));
-            textureCords.Add(new Vector2(uvMap.x[2] / 256, (uvMap.y[2] + (256 * uvMap.textureResourceIndex)) / 2048));
+            AddSingleTextureCoord(uvMap, 0);
+            AddSingleTextureCoord(uvMap, 1);
+            AddSingleTextureCoord(uvMap, 2);
+            AddSingleTextureCoord(uvMap, 3);
 
-            triangles.Add(polygon.vertices[0]);
-            triangles.Add(polygon.vertices[1]);
-            triangles.Add(polygon.vertices[2]);
+            triangles.Add(vertexIndex);
+            triangles.Add(vertexIndex + 1);
+            triangles.Add(vertexIndex + 2);
 
-            vertexIndex += 3;
+            vertexIndex += 4;
 
         }
 
@@ -92,18 +117,18 @@ public class ObjectMesh : MonoBehaviour {
             AddVertex(fCopObject.vertices[polygon.vertices[2]]);
             AddVertex(fCopObject.vertices[polygon.vertices[3]]);
 
-            textureCords.Add(new Vector2(uvMap.x[0] / 256, (uvMap.y[0] + (256 * uvMap.textureResourceIndex)) / 2048));
-            textureCords.Add(new Vector2(uvMap.x[1] / 256, (uvMap.y[1] + (256 * uvMap.textureResourceIndex)) / 2048));
-            textureCords.Add(new Vector2(uvMap.x[2] / 256, (uvMap.y[2] + (256 * uvMap.textureResourceIndex)) / 2048));
-            textureCords.Add(new Vector2(uvMap.x[3] / 256, (uvMap.y[3] + (256 * uvMap.textureResourceIndex)) / 2048));
+            AddSingleTextureCoord(uvMap, 0);
+            AddSingleTextureCoord(uvMap, 1);
+            AddSingleTextureCoord(uvMap, 2);
+            AddSingleTextureCoord(uvMap, 3);
 
-            triangles.Add(polygon.vertices[0]);
-            triangles.Add(polygon.vertices[1]);
-            triangles.Add(polygon.vertices[2]);
+            triangles.Add(vertexIndex);
+            triangles.Add(vertexIndex + 1);
+            triangles.Add(vertexIndex + 2);
 
-            triangles.Add(polygon.vertices[2]);
-            triangles.Add(polygon.vertices[3]);
-            triangles.Add(polygon.vertices[0]);
+            triangles.Add(vertexIndex + 2);
+            triangles.Add(vertexIndex + 3);
+            triangles.Add(vertexIndex);
 
             vertexIndex += 4;
 
