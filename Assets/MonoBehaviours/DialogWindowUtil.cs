@@ -30,4 +30,14 @@ public class DialogWindowUtil {
 
     }
 
+    public static void FileLog(string message) {
+
+    }
+
+    public static void FileLogError(string message) {
+
+        throw new Exception(message);
+
+    }
+
 }

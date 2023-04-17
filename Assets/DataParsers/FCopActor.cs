@@ -15,6 +15,7 @@ namespace FCopParser {
      * 
      * 
      */
+
     public class FCopActor {
 
         public static class FourCC {
@@ -212,7 +213,9 @@ namespace FCopParser {
 
         public Team hostileTowards;
 
-        public ActorRotation rotation;
+        public ActorRotation headRotation;
+
+        public ActorRotation baseRotation;
 
         public FCopScript8(FCopActor actor) {
             this.actor = actor;
@@ -223,7 +226,8 @@ namespace FCopParser {
             miniMapColor = Utils.BytesToShort(rawFile.data.ToArray(), 38) == 1 ? Team.RED : Team.BLUE;
             hostileTowards = Utils.BytesToShort(rawFile.data.ToArray(), 50) == 1 ? Team.RED : Team.BLUE;
 
-            rotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(rawFile.data.ToArray(), 64));
+            headRotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 64));
+            baseRotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 78));
 
         }
 
@@ -262,14 +266,20 @@ namespace FCopParser {
 
     public class FCopScript36 : FCopActorScript {
 
+        //
+
         public FCopActor actor { get; set; }
 
-        public ActorRotation rotation;
+        public ActorRotation headRotation;
+
+        public ActorRotation baseRotation;
+
 
         public FCopScript36(FCopActor actor) {
             this.actor = actor;
 
-            rotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 64));
+            headRotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 64));
+            baseRotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 78));
 
         }
 

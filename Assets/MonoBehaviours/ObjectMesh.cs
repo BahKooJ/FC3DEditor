@@ -2,6 +2,7 @@ using FCopParser;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -23,6 +24,36 @@ public class ObjectMesh : MonoBehaviour {
 
     public bool failed = false;
 
+    public float maxY = 0f;
+    public float minY = 0f;
+
+    public void Create() {
+
+        try {
+            Generate();
+        } catch {
+            failed = true;
+            return;
+        }
+
+        var verticesSet = new HashSet<Vector3>(vertices);
+
+        if (verticesSet.Count < 3) {
+            failed = true;
+        }
+
+        if (!failed) {
+
+            maxY = vertices.Max(v => { return v.y; });
+            minY = vertices.Min(v => { return v.y; });
+
+        } else {
+
+            Debug.LogWarning("Failed to create mesh for object " + fCopObject.rawFile.dataID);
+
+        }
+
+    }
 
     void Start() {
 
@@ -34,22 +65,22 @@ public class ObjectMesh : MonoBehaviour {
 
         material.mainTexture = controller.levelTexturePallet;
 
-        try {
-            Generate();
-        } catch {
-            failed = true;
-            Debug.LogWarning("Failed to create mesh for object " + fCopObject.rawFile.dataID);
-            return;
+        if (vertices.Count == 0 && failed == false) {
+            Create();
         }
 
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
+        if (!failed) {
 
-        mesh.uv = textureCords.ToArray();
+            mesh.vertices = vertices.ToArray();
+            mesh.triangles = triangles.ToArray();
 
-        mesh.RecalculateNormals();
+            mesh.uv = textureCords.ToArray();
 
-        meshCollider.sharedMesh = mesh;
+            mesh.RecalculateNormals();
+
+            meshCollider.sharedMesh = mesh;
+
+        }
 
     }
 
@@ -77,6 +108,7 @@ public class ObjectMesh : MonoBehaviour {
             if (polygon.textureIndex / 16 >= fCopObject.uvMaps.Count) {
                 Debug.Log(polygon.textureIndex / 16);
                 Debug.Log(fCopObject.uvMaps.Count);
+                failed = true;
                 return;
 
             }
@@ -106,6 +138,7 @@ public class ObjectMesh : MonoBehaviour {
             if (polygon.textureIndex / 16 >= fCopObject.uvMaps.Count) {
                 Debug.Log(polygon.textureIndex / 16);
                 Debug.Log(fCopObject.uvMaps.Count);
+                failed = true;
                 return;
 
             }
