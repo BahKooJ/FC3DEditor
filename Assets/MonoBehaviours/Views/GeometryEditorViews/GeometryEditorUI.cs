@@ -92,6 +92,18 @@ public class GeometryEditorUI: MonoBehaviour {
         controller.PasteSectionData();
     }
 
+    public void OnClickMirrorSectionVerticallyButton() {
+        controller.MirrorSectionVertically();
+    }
+
+    public void OnClickMirrorSectionHorizontallyButton() {
+        controller.MirrorSectionHorizontally();
+    }
+
+    public void OnClickMirrorSectionDiagonallyButton() {
+        controller.MirrorSectionDiagonally();
+    }
+
 
 
 }

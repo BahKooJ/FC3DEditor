@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UnityEngine.UIElements;
 
 namespace FCopParser {
 
@@ -81,6 +80,9 @@ namespace FCopParser {
                     break;
                 case 36:
                     script = new FCopScript36(this);
+                    break;
+                case 95:
+                    script = new FCopScript95(this);
                     break;
             }
 
@@ -290,6 +292,29 @@ namespace FCopParser {
         //    rawFile.data.InsertRange(64, BitConverter.GetBytes((short)rotation.compiledRotation));
 
         //}
+
+    }
+
+    public class FCopScript95 : FCopActorScript {
+
+        public FCopActor actor { get; set; }
+
+        public int number1;
+        public int number2;
+        public int number3;
+        public int number4;
+        public int number5;
+
+        public FCopScript95(FCopActor actor) {
+
+            number1 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 28);
+            number2 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 30);
+            number3 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 32);
+            number4 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 34);
+            number5 = Utils.BytesToInt(actor.rawFile.data.ToArray(), 36);
+
+
+        }
 
     }
 

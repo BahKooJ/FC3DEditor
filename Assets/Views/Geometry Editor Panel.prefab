@@ -124,7 +124,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 3856923388056757550}
         m_TargetAssemblyTypeName: GeometryEditorUI, Assembly-CSharp
-        m_MethodName: OnClickDuplicateTileGraphicsButton
+        m_MethodName: OnClickMirrorSectionHorizontallyButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -147,7 +147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
-  message: Flip Section Vertically (Not Implemented)
+  message: Flip Section Vertically
 --- !u!1 &2004277410393005838
 GameObject:
   m_ObjectHideFlags: 0
@@ -272,7 +272,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 3856923388056757550}
         m_TargetAssemblyTypeName: GeometryEditorUI, Assembly-CSharp
-        m_MethodName: OnClickDuplicateTileGraphicsButton
+        m_MethodName: OnClickMirrorSectionDiagonallyButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -295,7 +295,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
-  message: Flip Section Diagonally (Not Implemented)
+  message: Flip Section Diagonally
 --- !u!1 &2320175245299699749
 GameObject:
   m_ObjectHideFlags: 0
@@ -1531,7 +1531,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 3856923388056757550}
         m_TargetAssemblyTypeName: GeometryEditorUI, Assembly-CSharp
-        m_MethodName: OnClickDuplicateTileGraphicsButton
+        m_MethodName: OnClickMirrorSectionVerticallyButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1554,4 +1554,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
-  message: Flip Section Horizontally (Not Implemented)
+  message: Flip Section Horizontally

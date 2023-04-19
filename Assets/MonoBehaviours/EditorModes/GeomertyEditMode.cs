@@ -435,15 +435,52 @@ public class GeometryEditMode : EditMode {
 
     public void MirrorSectionVertically() {
 
-        DialogWindowUtil.Dialog("Warning", "This will overwrite all current map data, are you sure you want to continue?", () => {
+        DialogWindowUtil.Dialog("Warning",
+            "Some tiles cannot be mirrored correct and may be deleted. This will overwrite all current map data, are you sure you want to continue?",
+            () => {
 
-            if (selectedSection != null) {
-                selectedSection.section.MirorVertically();
-                selectedSection.RefreshMesh();
-            }
+                if (selectedSection != null) {
+                    selectedSection.section.MirrorVertically();
+                    selectedSection.RefreshMesh();
+                }
 
-            return true;
-        });
+                return true;
+
+            });
+
+    }
+
+    public void MirrorSectionHorizontally() {
+
+        DialogWindowUtil.Dialog("Warning",
+            "Some tiles cannot be mirrored correct and may be deleted. This will overwrite all current map data, are you sure you want to continue?",
+            () => {
+
+                if (selectedSection != null) {
+                    selectedSection.section.MirrorHorizontally();
+                    selectedSection.RefreshMesh();
+                }
+
+                return true;
+
+            });
+
+    }
+
+    public void MirrorSectionDiagonally() {
+
+        DialogWindowUtil.Dialog("Warning",
+            "Some tiles cannot be mirrored correct and may be deleted. This will overwrite all current map data, are you sure you want to continue?",
+            () => {
+
+                if (selectedSection != null) {
+                    selectedSection.section.MirrorDiagonally();
+                    selectedSection.RefreshMesh();
+                }
+
+                return true;
+
+            });
 
     }
 

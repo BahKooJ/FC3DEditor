@@ -112,6 +112,13 @@ public class ActorEditMode : EditMode {
 
                     if (didHit) {
 
+                        if (act.actor.script is FCopScript95) {
+
+                            var script95 = act.actor.script as FCopScript95;
+
+                            Debug.Log(script95.number1 + " " + script95.number2 + " " + script95.number3 + " " + script95.number4 + " " + script95.number5);
+                        }
+
                         Debug.Log(act.actor.id + " : " + act.actor.objectType);
 
                         UnselectActor();

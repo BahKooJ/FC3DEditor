@@ -63,10 +63,10 @@ public class MeshIDDebug: MonoBehaviour {
                         counterClockVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.BottomLeft));
                         break;
                     case VertexPosition.TopRight:
-                        counterClockVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.TopLeft));
+                        counterClockVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.BottomRight));
                         break;
                     case VertexPosition.BottomLeft:
-                        counterClockVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.BottomRight));
+                        counterClockVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.TopLeft));
                         break;
                     case VertexPosition.BottomRight:
                         counterClockVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.TopRight));

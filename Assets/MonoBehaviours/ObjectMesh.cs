@@ -106,8 +106,6 @@ public class ObjectMesh : MonoBehaviour {
         void GenerateTriangle(FCopObject.FCopPolygon polygon) {
 
             if (polygon.textureIndex / 16 >= fCopObject.uvMaps.Count) {
-                Debug.Log(polygon.textureIndex / 16);
-                Debug.Log(fCopObject.uvMaps.Count);
                 failed = true;
                 return;
 
@@ -136,8 +134,6 @@ public class ObjectMesh : MonoBehaviour {
         void GenerateSquare(FCopObject.FCopPolygon polygon) {
 
             if (polygon.textureIndex / 16 >= fCopObject.uvMaps.Count) {
-                Debug.Log(polygon.textureIndex / 16);
-                Debug.Log(fCopObject.uvMaps.Count);
                 failed = true;
                 return;
 

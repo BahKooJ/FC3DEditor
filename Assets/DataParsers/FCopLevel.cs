@@ -461,16 +461,14 @@ namespace FCopParser {
 
         }
 
-        public void RotateCounterClockwise() {
-            // X becomes Y
-            // Y becomes X - length
+        public void MirrorDiagonally() {
 
             var newHeightOrder = new List<HeightPoint>();
 
-            foreach (var hy in Enumerable.Range(0,17)) {
+            foreach (var hy in Enumerable.Range(0, 17)) {
 
                 foreach (var hx in Enumerable.Range(0, 17)) {
-                    newHeightOrder.Add(GetHeightPoint(16 - hy, hx));
+                    newHeightOrder.Add(GetHeightPoint(16 - hx, 16 - hy));
                 }
 
             }
@@ -482,7 +480,7 @@ namespace FCopParser {
             foreach (var ty in Enumerable.Range(0, 16)) {
 
                 foreach (var tx in Enumerable.Range(0, 16)) {
-                    var column = tileColumns[(tx * 16) + (15 - ty)];
+                    var column = tileColumns[((15 - ty) * 16) + (15 - tx)];
 
                     var heights = new List<HeightPoint>();
 
@@ -502,41 +500,76 @@ namespace FCopParser {
 
             tileColumns = newTileColum;
 
+            var movedTiles = new List<Tile>();
+
             foreach (var column in tileColumns) {
 
                 var validTiles = new List<Tile>();
 
                 foreach (var tile in column.tiles) {
 
-                    var counterClockVertices = new List<TileVertex>();
+                    if (movedTiles.Contains(tile)) {
+                        validTiles.Add(tile);
+                        continue;
+                    }
+
+                    int ogMeshID = (int)MeshType.IDFromVerticies(tile.verticies);
+
+                    var mirorVertices = new List<TileVertex>();
 
                     foreach (var vertex in tile.verticies) {
 
-                        switch(vertex.vertexPosition) {
+                        switch (vertex.vertexPosition) {
 
                             case VertexPosition.TopLeft:
-                                counterClockVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.BottomLeft));
+                                mirorVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.BottomRight));
                                 break;
                             case VertexPosition.TopRight:
-                                counterClockVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.TopLeft));
+                                mirorVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.BottomLeft));
                                 break;
                             case VertexPosition.BottomLeft:
-                                counterClockVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.BottomRight));
+                                mirorVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.TopRight));
                                 break;
                             case VertexPosition.BottomRight:
-                                counterClockVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.TopRight));
+                                mirorVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.TopLeft));
                                 break;
 
                         }
 
                     }
 
-                    var counterClockID = MeshType.IDFromVerticies(counterClockVertices);
+                    var mirorVID = MeshType.IDFromVerticies(mirorVertices);
 
-                    if (counterClockID != null) {
-                        tile.verticies = MeshType.VerticiesFromID((int)counterClockID);
+                    if (mirorVID != null) {
+                        tile.verticies = MeshType.VerticiesFromID((int)mirorVID);
                         validTiles.Add(tile);
-                    } 
+                    } else {
+
+                        if (new int[] { 71, 72, 73, 74, 75, 76, 77, 78, 107, 109 }.Contains(ogMeshID)) {
+
+                            if (column.x < 15) {
+
+                                var nextColumn = tileColumns[(column.y * 16) + (column.x + 1)];
+
+                                nextColumn.tiles.Add(tile);
+                                movedTiles.Add(tile);
+
+                            }
+
+                        } else if (new int[] { 79, 80, 81, 82, 83, 84, 85, 86, 108, 110 }.Contains(ogMeshID)) {
+
+                            if (column.y < 15) {
+
+                                var nextColumn = tileColumns[((column.y + 1) * 16) + (column.x)];
+
+                                nextColumn.tiles.Add(tile);
+                                movedTiles.Add(tile);
+
+                            }
+
+                        }
+
+                    }
 
                 }
 
@@ -545,7 +578,7 @@ namespace FCopParser {
 
         }
 
-        public void MirorVertically() {
+        public void MirrorVertically() {
 
             var newHeightOrder = new List<HeightPoint>();
 
@@ -584,11 +617,20 @@ namespace FCopParser {
 
             tileColumns = newTileColum;
 
+            var movedTiles = new List<Tile>();
+
             foreach (var column in tileColumns) {
 
                 var validTiles = new List<Tile>();
 
                 foreach (var tile in column.tiles) {
+
+                    if (movedTiles.Contains(tile)) {
+                        validTiles.Add(tile);
+                        continue;
+                    }
+
+                    int ogMeshID = (int)MeshType.IDFromVerticies(tile.verticies);
 
                     var mirorVertices = new List<TileVertex>();
 
@@ -618,6 +660,21 @@ namespace FCopParser {
                     if (mirorVID != null) {
                         tile.verticies = MeshType.VerticiesFromID((int)mirorVID);
                         validTiles.Add(tile);
+                    } else {
+
+                        if (new int[] { 71, 72, 73, 74, 75, 76, 77, 78, 107, 109 }.Contains(ogMeshID)) {
+
+                            if (column.x < 15) {
+
+                                var nextColumn = tileColumns[(column.y * 16) + (column.x + 1)];
+
+                                nextColumn.tiles.Add(tile);
+                                movedTiles.Add(tile);
+
+                            }
+
+                        }
+
                     }
 
                 }
@@ -627,6 +684,114 @@ namespace FCopParser {
 
 
         }
+
+        public void MirrorHorizontally() {
+
+            var newHeightOrder = new List<HeightPoint>();
+
+            foreach (var hy in Enumerable.Range(0, 17)) {
+
+                foreach (var hx in Enumerable.Range(0, 17)) {
+                    newHeightOrder.Add(GetHeightPoint(hx, 16 - hy));
+                }
+
+            }
+
+            heightMap = newHeightOrder;
+
+            var newTileColum = new List<TileColumn>();
+
+            foreach (var ty in Enumerable.Range(0, 16)) {
+
+                foreach (var tx in Enumerable.Range(0, 16)) {
+                    var column = tileColumns[((15 - ty) * 16) + tx];
+
+                    var heights = new List<HeightPoint>();
+
+                    heights.Add(GetHeightPoint(tx, ty));
+                    heights.Add(GetHeightPoint(tx + 1, ty));
+                    heights.Add(GetHeightPoint(tx, ty + 1));
+                    heights.Add(GetHeightPoint(tx + 1, ty + 1));
+
+                    column.x = tx;
+                    column.y = ty;
+                    column.heights = heights;
+
+                    newTileColum.Add(column);
+                }
+
+            }
+
+            tileColumns = newTileColum;
+
+            var movedTiles = new List<Tile>();
+
+            foreach (var column in tileColumns) {
+
+                var validTiles = new List<Tile>();
+
+                foreach (var tile in column.tiles) {
+
+                    if (movedTiles.Contains(tile)) {
+                        validTiles.Add(tile);
+                        continue;
+                    }
+
+                    int ogMeshID = (int)MeshType.IDFromVerticies(tile.verticies);
+
+                    var mirorVertices = new List<TileVertex>();
+
+                    foreach (var vertex in tile.verticies) {
+
+                        switch (vertex.vertexPosition) {
+
+                            case VertexPosition.TopLeft:
+                                mirorVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.BottomLeft));
+                                break;
+                            case VertexPosition.TopRight:
+                                mirorVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.BottomRight));
+                                break;
+                            case VertexPosition.BottomLeft:
+                                mirorVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.TopLeft));
+                                break;
+                            case VertexPosition.BottomRight:
+                                mirorVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.TopRight));
+                                break;
+
+                        }
+
+                    }
+
+                    var mirorVID = MeshType.IDFromVerticies(mirorVertices);
+
+                    if (mirorVID != null) {
+                        tile.verticies = MeshType.VerticiesFromID((int)mirorVID);
+                        validTiles.Add(tile);
+                    } else {
+
+                        if (new int[] { 79, 80, 81, 82, 83, 84, 85, 86, 108, 110 }.Contains(ogMeshID)) {
+
+                            if (column.y < 15) {
+
+                                var nextColumn = tileColumns[((column.y + 1) * 16) + (column.x)];
+
+                                nextColumn.tiles.Add(tile);
+                                movedTiles.Add(tile);
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+                column.tiles = validTiles;
+            }
+
+
+        }
+
 
         public void Overwrite(FCopLevelSection section) {
 

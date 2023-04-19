@@ -80,7 +80,8 @@ public class ActorObject : MonoBehaviour {
         if (actor.script is FCopScript36 || actor.script is FCopScript8) {
 
             if (objects.Count != 2) {
-                DialogWindowUtil.FileLogError("Actor script 36/8 doesn't have 2 models?");
+                Debug.LogWarning("Actor script 36/8 doesn't have 2 models?");
+                return;
             }
 
             var headPos = objects[0].transform.localPosition;
