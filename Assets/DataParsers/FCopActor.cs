@@ -105,7 +105,9 @@ namespace FCopParser {
             rawFile.data.RemoveRange(xOffset, 4);
             rawFile.data.InsertRange(xOffset, BitConverter.GetBytes(x));
 
-            script.Compile();
+            if (script != null) {
+                script.Compile();
+            }
 
         }
 
