@@ -72,11 +72,20 @@ namespace FCopParser {
             ParseResourceReferences();
 
             switch(objectType) {
+                case 5:
+                    script = new FCopScript5(this);
+                    break;
                 case 8:
                     script = new FCopScript8(this);
                     break;
+                case 9:
+                    script = new FCopScript9(this);
+                    break;
                 case 11:
                     script = new FCopScript11(this);
+                    break;
+                case 28:
+                    script = new FCopScript28(this);
                     break;
                 case 36:
                     script = new FCopScript36(this);
@@ -95,6 +104,8 @@ namespace FCopParser {
             rawFile.data.InsertRange(yOffset, BitConverter.GetBytes(y));
             rawFile.data.RemoveRange(xOffset, 4);
             rawFile.data.InsertRange(xOffset, BitConverter.GetBytes(x));
+
+            script.Compile();
 
         }
 
@@ -204,6 +215,31 @@ namespace FCopParser {
 
         public FCopActor actor { get; set; }
 
+        public void Compile() {
+
+        }
+
+        public void ChangeRotation(float y) {
+
+        }
+
+    }
+
+    public class FCopScript5 : FCopActorScript {
+
+        public FCopActor actor { get; set; }
+
+        public int textureOffset;
+
+        public FCopScript5(FCopActor actor) {
+            this.actor = actor;
+
+            var rawFile = actor.rawFile;
+
+            textureOffset = Utils.BytesToShort(rawFile.data.ToArray(), 42);
+
+        }
+
     }
 
     public class FCopScript8 : FCopActorScript {
@@ -212,7 +248,7 @@ namespace FCopParser {
 
         public Team teamHostileToThis;
         public Team miniMapColor;
-
+        public int textureOffset;
         public Team hostileTowards;
 
         public ActorRotation headRotation;
@@ -226,6 +262,7 @@ namespace FCopParser {
 
             teamHostileToThis = Utils.BytesToShort(rawFile.data.ToArray(), 36) == 1 ? Team.RED : Team.BLUE;
             miniMapColor = Utils.BytesToShort(rawFile.data.ToArray(), 38) == 1 ? Team.RED : Team.BLUE;
+            textureOffset = Utils.BytesToShort(rawFile.data.ToArray(), 42);
             hostileTowards = Utils.BytesToShort(rawFile.data.ToArray(), 50) == 1 ? Team.RED : Team.BLUE;
 
             headRotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 64));
@@ -233,13 +270,35 @@ namespace FCopParser {
 
         }
 
-        //override public void Compile() {
-        //    base.Compile();
+        public void Compile() {
 
-        //    rawFile.data.RemoveRange(64, 2);
-        //    rawFile.data.InsertRange(64, BitConverter.GetBytes((short)rotation.compiledRotation));
+            actor.rawFile.data.RemoveRange(64, 2);
+            actor.rawFile.data.InsertRange(64, BitConverter.GetBytes((short)headRotation.compiledRotation));
 
-        //}
+        }
+
+        public void ChangeRotation(float y) {
+
+            headRotation += y;
+
+        }
+
+    }
+
+    public class FCopScript9 : FCopActorScript {
+
+        public FCopActor actor { get; set; }
+
+        public int textureOffset;
+
+        public FCopScript9(FCopActor actor) {
+            this.actor = actor;
+
+            var rawFile = actor.rawFile;
+
+            textureOffset = Utils.BytesToShort(rawFile.data.ToArray(), 42);
+
+        }
 
     }
 
@@ -256,13 +315,35 @@ namespace FCopParser {
 
         }
 
-        //override public void Compile() {
-        //    base.Compile();
+        public void Compile() {
 
-        //    rawFile.data.RemoveRange(46, 2);
-        //    rawFile.data.InsertRange(46, BitConverter.GetBytes((short)rotation.compiledRotation));
+            actor.rawFile.data.RemoveRange(46, 2);
+            actor.rawFile.data.InsertRange(46, BitConverter.GetBytes((short)rotation.compiledRotation));
 
-        //}
+        }
+
+        public void ChangeRotation(float y) {
+
+            rotation += y;
+
+        }
+
+    }
+
+    public class FCopScript28 : FCopActorScript {
+
+        public FCopActor actor { get; set; }
+
+        public int textureOffset;
+
+        public FCopScript28(FCopActor actor) {
+            this.actor = actor;
+
+            var rawFile = actor.rawFile;
+
+            textureOffset = Utils.BytesToShort(rawFile.data.ToArray(), 42);
+
+        }
 
     }
 
@@ -285,13 +366,18 @@ namespace FCopParser {
 
         }
 
-        //override public void Compile() {
-        //    base.Compile();
+        public void Compile() {
 
-        //    rawFile.data.RemoveRange(64, 2);
-        //    rawFile.data.InsertRange(64, BitConverter.GetBytes((short)rotation.compiledRotation));
+            actor.rawFile.data.RemoveRange(64, 2);
+            actor.rawFile.data.InsertRange(64, BitConverter.GetBytes((short)headRotation.compiledRotation));
 
-        //}
+        }
+
+        public void ChangeRotation(float y) {
+
+            headRotation += y;
+
+        }
 
     }
 

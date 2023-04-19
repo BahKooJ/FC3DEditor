@@ -24,7 +24,15 @@ public class ActorObject : MonoBehaviour {
 
     }
 
-    virtual public void ChangeRotation(float y) {
+    public void ChangeRotation(float y) {
+
+        if (actor.script == null) {
+            return;
+        }
+
+        actor.script.ChangeRotation(y);
+
+        SetRotation();
 
     }
 
@@ -51,6 +59,8 @@ public class ActorObject : MonoBehaviour {
                 script.controller = controller.main;
 
                 script.fCopObject = obj;
+
+                script.textureOffset = SetTextureOffset();
 
                 script.Create();
 
@@ -90,6 +100,32 @@ public class ActorObject : MonoBehaviour {
 
         }
 
+        SetRotation();
+
+    }
+
+    void SetToCurrentPosition() {
+
+        transform.position = new Vector3(actor.x / 8192f, 100f, -(actor.y / 8192f));
+
+        RaycastHit hit;
+
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, Mathf.Infinity, 1)) {
+
+            var pos = transform.position;
+
+            pos.y = hit.point.y;
+
+            transform.position = pos;
+
+        } else {
+            print("No floor found");
+        }
+
+    }
+
+    void SetRotation() {
+
         switch (actor.script) {
 
             case FCopScript8:
@@ -118,24 +154,22 @@ public class ActorObject : MonoBehaviour {
 
     }
 
-    void SetToCurrentPosition() {
+    int SetTextureOffset() {
 
-        transform.position = new Vector3(actor.x / 8192f, 100f, -(actor.y / 8192f));
+        switch (actor.script) {
 
-        RaycastHit hit;
-
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, Mathf.Infinity, 1)) {
-
-            var pos = transform.position;
-
-            pos.y = hit.point.y;
-
-            transform.position = pos;
-
-        } else {
-            print("No floor found");
+            case FCopScript5:
+                return ((FCopScript5)actor.script).textureOffset;
+            case FCopScript8:
+                return ((FCopScript8)actor.script).textureOffset;
+            case FCopScript9:
+                return ((FCopScript9)actor.script).textureOffset;
+            case FCopScript28:
+                return ((FCopScript28)actor.script).textureOffset;
+            default:
+                return 0;
         }
-
+    
     }
 
     void Start() {
