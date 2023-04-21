@@ -300,19 +300,29 @@ public class GeometryEditMode : EditMode {
 
     }
 
-    // TODO: If shifting height for wall to high will cause MeshID error
     public void ShiftTilesHeightUp() {
 
         if (selectedTiles.Count == 0) { return; }
 
         foreach (var tile in selectedTiles) {
 
+            var previousVerticies = new List<TileVertex>(tile.verticies);
+            var newVerticies = new HashSet<TileVertex>();
+
             foreach (var index in Enumerable.Range(0, tile.verticies.Count)) {
 
                 var vertex = tile.verticies[index];
 
                 if (vertex.heightChannel < 3) {
-                    tile.verticies[index] = new TileVertex(vertex.heightChannel + 1, vertex.vertexPosition);
+
+                    vertex.heightChannel += 1;
+
+                    newVerticies.Add(vertex);
+
+                }
+
+                if (newVerticies.Count == previousVerticies.Count) {
+                    tile.verticies = newVerticies.ToList();
                 }
 
             }
@@ -325,19 +335,29 @@ public class GeometryEditMode : EditMode {
 
     }
 
-    // TODO: If shifting height for wall to low will cause MeshID error
     public void ShiftTilesHeightDown() {
 
         if (selectedTiles.Count == 0) { return; }
 
         foreach (var tile in selectedTiles) {
 
+            var previousVerticies = new List<TileVertex>(tile.verticies);
+            var newVerticies = new HashSet<TileVertex>();
+
             foreach (var index in Enumerable.Range(0, tile.verticies.Count)) {
 
                 var vertex = tile.verticies[index];
 
                 if (vertex.heightChannel > 1) {
-                    tile.verticies[index] = new TileVertex(vertex.heightChannel - 1, vertex.vertexPosition);
+
+                    vertex.heightChannel -= 1;
+
+                    newVerticies.Add(vertex);
+
+                }
+
+                if (newVerticies.Count == previousVerticies.Count) {
+                    tile.verticies = newVerticies.ToList();
                 }
 
             }

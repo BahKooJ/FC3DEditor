@@ -153,6 +153,10 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
                             vertex.heightChannel++;
 
+                            if (tile.verticies.Contains(vertex)) {
+                                return;
+                            }
+
                             tile.verticies[vertexIndex] = vertex;
 
                             controller.selectedSection.RefreshMesh();
@@ -167,6 +171,10 @@ public class HeightMapChannelPoint : MonoBehaviour {
                             var vertex = tile.verticies[vertexIndex];
 
                             vertex.heightChannel--;
+
+                            if (tile.verticies.Contains(vertex)) {
+                                return;
+                            }
 
                             tile.verticies[vertexIndex] = vertex;
 
