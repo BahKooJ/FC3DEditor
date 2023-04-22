@@ -1226,6 +1226,7 @@ MonoBehaviour:
   geometryEditorPanel: {fileID: 3856923388056757546, guid: 858b7f8b5ba36d545b65761f02f6c839, type: 3}
   addGeometryPanel: {fileID: 306264782225130835, guid: a97d4e7c941515a40a11f8fde8f57775, type: 3}
   navMeshEditPanel: {fileID: 8125455122715925531, guid: b8928b5d349e764418e533ee88954ce3, type: 3}
+  actorEditPanel: {fileID: 306264782225130835, guid: 39bb8ac002bf44442b3426027684b4ec, type: 3}
   controller: {fileID: 1522062004}
   activePanel: {fileID: 0}
 --- !u!1 &1785395850

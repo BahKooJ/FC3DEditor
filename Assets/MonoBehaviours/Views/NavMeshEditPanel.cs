@@ -73,4 +73,16 @@ public class NavMeshEditPanel : MonoBehaviour {
 
     }
 
+    public void ClearNavMesh() {
+
+        controller.ClearNavMesh();
+
+    }
+
+    public void CopyNavNodeCoords() {
+
+        controller.CopyNavNodeCoords();
+
+    }
+
 }

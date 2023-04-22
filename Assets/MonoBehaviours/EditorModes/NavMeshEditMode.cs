@@ -8,6 +8,8 @@ using Object = UnityEngine.Object;
 
 public class NavMeshEditMode : EditMode {
 
+    public static Vector3? copiedNavNodeCoords = null;
+
     public Main main { get; set; }
 
     public NavMeshEditPanel view;
@@ -248,7 +250,17 @@ public class NavMeshEditMode : EditMode {
 
     }
 
-    void ClearNavMesh() {
+    public void CopyNavNodeCoords() {
+
+        if (selectedNavNode != null) {
+
+            copiedNavNodeCoords = selectedNavNode.controlledObject.transform.position;
+
+        }
+
+    }
+
+    public void ClearNavMesh() {
 
         main.level.navMeshes[selectedNavMesh].nodes.Clear();
 

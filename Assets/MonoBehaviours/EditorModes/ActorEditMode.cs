@@ -188,6 +188,20 @@ public class ActorEditMode : EditMode {
 
     }
 
+    public void PasteNavNodeCoords() {
+
+        if (selectedActor != null) {
+
+            if (NavMeshEditMode.copiedNavNodeCoords != null) {
+
+                selectedActor.transform.position = (Vector3)NavMeshEditMode.copiedNavNodeCoords;
+                selectedActor.moveCallback((Vector3)NavMeshEditMode.copiedNavNodeCoords);
+
+            }
+
+        }
+
+    }
 
     public void LookTile(Tile tile, TileColumn column, LevelMesh section) { }
 
