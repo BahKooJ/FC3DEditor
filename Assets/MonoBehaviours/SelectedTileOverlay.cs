@@ -9,7 +9,6 @@ public class SelectedTileOverlay : MonoBehaviour {
     public Main controller;
 
     public Tile tile;
-    public TileColumn column;
 
     Mesh mesh;
     Material material;
@@ -75,19 +74,19 @@ public class SelectedTileOverlay : MonoBehaviour {
                 switch (point.vertexPosition) {
 
                     case VertexPosition.TopLeft:
-                        vertices.Add(new Vector3(x: column.x, y: column.heights[0].GetPoint(point.heightChannel), z: column.y));
+                        vertices.Add(new Vector3(x: tile.column.x, y: tile.column.heights[0].GetPoint(point.heightChannel), z: tile.column.y));
 
                         break;
                     case VertexPosition.TopRight:
-                        vertices.Add(new Vector3(x: column.x + 1, y: column.heights[1].GetPoint(point.heightChannel), z: column.y));
+                        vertices.Add(new Vector3(x: tile.column.x + 1, y: tile.column.heights[1].GetPoint(point.heightChannel), z: tile.column.y));
 
                         break;
                     case VertexPosition.BottomLeft:
-                        vertices.Add(new Vector3(x: column.x, y: column.heights[2].GetPoint(point.heightChannel), z: column.y + 1));
+                        vertices.Add(new Vector3(x: tile.column.x, y: tile.column.heights[2].GetPoint(point.heightChannel), z: tile.column.y + 1));
 
                         break;
                     case VertexPosition.BottomRight:
-                        vertices.Add(new Vector3(x: column.x + 1, y: column.heights[3].GetPoint(point.heightChannel), z: column.y + 1));
+                        vertices.Add(new Vector3(x: tile.column.x + 1, y: tile.column.heights[3].GetPoint(point.heightChannel), z: tile.column.y + 1));
 
                         break;
                 }

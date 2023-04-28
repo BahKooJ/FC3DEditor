@@ -27,33 +27,15 @@ namespace FCopParser {
 
             this.fileManager = fileManager;
 
+            layout = FCopLevelLayoutParser.Parse(fileManager.files.First(file => {
+
+                return file.dataFourCC == "Cptc";
+
+            }));
+
             var rawCtilFiles = fileManager.files.Where(file => {
 
                 return file.dataFourCC == "Ctil";
-
-            }).ToList();
-
-            var rawBitmapFiles = fileManager.files.Where(file => {
-
-                return file.dataFourCC == "Cbmp";
-
-            }).ToList();
-
-            var rawNavMeshFiles = fileManager.files.Where(file => {
-
-                return file.dataFourCC == "Cnet";
-
-            }).ToList();
-
-            var rawObjectFiles = fileManager.files.Where(file => {
-
-                return file.dataFourCC == "Cobj";
-
-            }).ToList();
-
-            var rawActorFiles = fileManager.files.Where(file => {
-
-                return file.dataFourCC == "Cact" || file.dataFourCC == "Csac";
 
             }).ToList();
 
@@ -61,29 +43,7 @@ namespace FCopParser {
                 sections.Add(new FCopLevelSectionParser(rawFile).Parse(this));
             }
 
-            foreach (var rawFile in rawBitmapFiles) {
-                textures.Add(new FCopTexture(rawFile));
-            }
-
-            foreach (var rawFile in rawNavMeshFiles) {
-                navMeshes.Add(new FCopNavMesh(rawFile));
-            }
-
-            foreach (var rawFile in rawObjectFiles) {
-                objects.Add(new FCopObject(rawFile));
-            }
-
-            foreach (var rawFile in rawActorFiles) {
-
-                actors.Add(new FCopActor(rawFile));
-
-            }
-
-            layout = FCopLevelLayoutParser.Parse(fileManager.files.First(file => {
-
-                return file.dataFourCC == "Cptc";
-
-            }));
+            InitData();
 
         }
 
@@ -154,18 +114,6 @@ namespace FCopParser {
 
             }).ToList();
 
-            var rawBitmapFiles = fileManager.files.Where(file => {
-
-                return file.dataFourCC == "Cbmp";
-
-            }).ToList();
-
-            var rawNavMeshFiles = fileManager.files.Where(file => {
-
-                return file.dataFourCC == "Cnet";
-
-            }).ToList();
-
             sections.Add(new FCopLevelSectionParser(rawCtilFiles[0]).Parse(this));
 
             foreach (var row in layout) {
@@ -193,6 +141,35 @@ namespace FCopParser {
 
             }
 
+            InitData();
+
+        }
+
+        void InitData() {
+
+            var rawBitmapFiles = fileManager.files.Where(file => {
+
+                return file.dataFourCC == "Cbmp";
+
+            }).ToList();
+
+            var rawNavMeshFiles = fileManager.files.Where(file => {
+
+                return file.dataFourCC == "Cnet";
+
+            }).ToList();
+
+            var rawObjectFiles = fileManager.files.Where(file => {
+
+                return file.dataFourCC == "Cobj";
+
+            }).ToList();
+
+            var rawActorFiles = fileManager.files.Where(file => {
+
+                return file.dataFourCC == "Cact" || file.dataFourCC == "Csac";
+
+            }).ToList();
 
             foreach (var rawFile in rawBitmapFiles) {
                 textures.Add(new FCopTexture(rawFile));
@@ -200,6 +177,16 @@ namespace FCopParser {
 
             foreach (var rawFile in rawNavMeshFiles) {
                 navMeshes.Add(new FCopNavMesh(rawFile));
+            }
+
+            foreach (var rawFile in rawObjectFiles) {
+                objects.Add(new FCopObject(rawFile));
+            }
+
+            foreach (var rawFile in rawActorFiles) {
+
+                actors.Add(new FCopActor(rawFile));
+
             }
 
         }
@@ -238,6 +225,8 @@ namespace FCopParser {
 
         public const int heightMapWdith = 17;
 
+        public const int tileColumnsWidth = 16;
+
         public List<HeightPoint> heightMap = new List<HeightPoint>();
 
         public List<TileColumn> tileColumns = new List<TileColumn>();
@@ -274,10 +263,6 @@ namespace FCopParser {
                 // Makes the parsed bitfield into a Tile object.
                 var tiles = new List<Tile>();
 
-                foreach (var parsedTile in parsedTiles) {
-                    tiles.Add(new Tile(parsedTile));
-                }
-
                 // Grabs the heights. The heights have already been added so it uses the local height array.
                 var heights = new List<HeightPoint>();
 
@@ -286,7 +271,13 @@ namespace FCopParser {
                 heights.Add(GetHeightPoint(x, y + 1));
                 heights.Add(GetHeightPoint(x + 1, y + 1));
 
-                tileColumns.Add(new TileColumn(x, y, tiles, heights));
+                var column = new TileColumn(x, y, tiles, heights);
+
+                foreach (var parsedTile in parsedTiles) {
+                    tiles.Add(new Tile(parsedTile, column));
+                }
+
+                tileColumns.Add(column);
 
                 x++;
                 if (x == 16) {
@@ -304,6 +295,10 @@ namespace FCopParser {
 
         public HeightPoint GetHeightPoint(int x, int y) {
             return heightMap[(y * heightMapWdith) + x];
+        }
+
+        public TileColumn GetTileColumn(int x, int y) {
+            return tileColumns[(y * tileColumnsWidth) + x];
         }
 
         class Chunk {
@@ -551,6 +546,8 @@ namespace FCopParser {
 
                                 var nextColumn = tileColumns[(column.y * 16) + (column.x + 1)];
 
+                                tile.column = nextColumn;
+
                                 nextColumn.tiles.Add(tile);
                                 movedTiles.Add(tile);
 
@@ -561,6 +558,8 @@ namespace FCopParser {
                             if (column.y < 15) {
 
                                 var nextColumn = tileColumns[((column.y + 1) * 16) + (column.x)];
+
+                                tile.column = nextColumn;
 
                                 nextColumn.tiles.Add(tile);
                                 movedTiles.Add(tile);
@@ -667,6 +666,8 @@ namespace FCopParser {
                             if (column.x < 15) {
 
                                 var nextColumn = tileColumns[(column.y * 16) + (column.x + 1)];
+
+                                tile.column = nextColumn;
 
                                 nextColumn.tiles.Add(tile);
                                 movedTiles.Add(tile);
@@ -775,6 +776,8 @@ namespace FCopParser {
 
                                 var nextColumn = tileColumns[((column.y + 1) * 16) + (column.x)];
 
+                                tile.column = nextColumn;
+
                                 nextColumn.tiles.Add(tile);
                                 movedTiles.Add(tile);
 
@@ -807,10 +810,6 @@ namespace FCopParser {
 
                 var newTiles = new List<Tile>();
 
-                foreach (var newTile in newColumn.tiles) {
-                    newTiles.Add(new Tile(newTile.Compile()));
-                }
-
                 var heights = new List<HeightPoint>();
 
                 heights.Add(GetHeightPoint(x, y));
@@ -818,7 +817,13 @@ namespace FCopParser {
                 heights.Add(GetHeightPoint(x, y + 1));
                 heights.Add(GetHeightPoint(x + 1, y + 1));
 
-                tileColumns.Add(new TileColumn(x, y, newTiles, heights));
+                var column = new TileColumn(x, y, newTiles, heights);
+
+                foreach (var newTile in newColumn.tiles) {
+                    newTiles.Add(new Tile(newTile.Compile(), column));
+                }
+
+                tileColumns.Add(column);
 
                 x++;
                 if (x == 16) {
@@ -1006,6 +1011,8 @@ namespace FCopParser {
     // Tiles are sorted into 4x4 chunks
     public class Tile {
 
+        public TileColumn column;
+
         public bool isStartInColumnArray;
         public List<TileVertex> verticies;
         public int textureIndex;
@@ -1014,7 +1021,9 @@ namespace FCopParser {
 
         public TileBitfield parsedTile;
 
-        public Tile(TileBitfield parsedTile) {
+        public Tile(TileBitfield parsedTile, TileColumn column) {
+
+            this.column = column;
 
             isStartInColumnArray = parsedTile.number1 == 1;
 

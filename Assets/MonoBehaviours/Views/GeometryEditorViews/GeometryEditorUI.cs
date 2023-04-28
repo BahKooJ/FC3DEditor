@@ -49,18 +49,6 @@ public class GeometryEditorUI: MonoBehaviour {
 
     }
 
-    public void OnClickRotateLeftButton() {
-
-        controller.RotateTileLeft();
-
-    }
-
-    public void OnClickRotateRightButton() {
-
-        controller.RotateTileRight();
-
-    }
-
     public void OnClickShiftHeightUpButton() {
 
         controller.ShiftTilesHeightUp();

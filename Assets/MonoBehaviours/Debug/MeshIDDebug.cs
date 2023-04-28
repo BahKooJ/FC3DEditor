@@ -25,12 +25,11 @@ public class MeshIDDebug: MonoBehaviour {
             new HeightPoint(0,1,2), new HeightPoint(0,1,2), new HeightPoint(0,1,2), new HeightPoint(0,1,2)
         });
 
-        exampleTile = new Tile(new TileBitfield(0, 0, 0, 0, meshID, 0));
+        exampleTile = new Tile(new TileBitfield(0, 0, 0, 0, meshID, 0), exampleColumn);
 
         var overlay = Instantiate(tilePreviewPrefab);
         var script = overlay.GetComponent<SelectedTileOverlay>();
         script.tile = exampleTile;
-        script.column = exampleColumn;
         tilePreview = script;
 
         AddHeightObjects(0);
@@ -46,7 +45,7 @@ public class MeshIDDebug: MonoBehaviour {
 
             meshID++;
 
-            exampleTile = new Tile(new TileBitfield(0, 0, 0, 0, meshID, 0));
+            exampleTile = new Tile(new TileBitfield(0, 0, 0, 0, meshID, 0), exampleColumn);
 
             meshIDtext.text = meshID.ToString();
 
@@ -89,7 +88,7 @@ public class MeshIDDebug: MonoBehaviour {
 
             meshID--;
 
-            exampleTile = new Tile(new TileBitfield(0, 0, 0, 0, meshID, 0));
+            exampleTile = new Tile(new TileBitfield(0, 0, 0, 0, meshID, 0), exampleColumn);
 
             meshIDtext.text = meshID.ToString();
 

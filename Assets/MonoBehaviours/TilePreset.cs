@@ -19,9 +19,9 @@ public struct TilePreset {
         this.previewImagePath = previewImagePath;
     }
 
-    public Tile Create(bool isStart) {
+    public Tile Create(bool isStart, TileColumn column) {
 
-        return new Tile(new TileBitfield(isStart ? 1 : 0, textureIndex, culling, 0, meshID,graphicsIndex));
+        return new Tile(new TileBitfield(isStart ? 1 : 0, textureIndex, culling, 0, meshID,graphicsIndex), column);
 
     }
 

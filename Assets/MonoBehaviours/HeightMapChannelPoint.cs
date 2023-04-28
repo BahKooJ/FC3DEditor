@@ -15,6 +15,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
     public int channel;
     public int cornerWhenSelected;
     public LevelMesh section;
+    public TileColumn tileColumn;
 
     public bool isSelected = false;
 
@@ -49,37 +50,40 @@ public class HeightMapChannelPoint : MonoBehaviour {
             return;
         }
 
-        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetAxis("Mouse ScrollWheel") != 0) {
 
-        if (Physics.Raycast(ray, out hit)) {
+            ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            if (hit.colliderInstanceID == boxCollider.GetInstanceID()) {
+            if (Physics.Raycast(ray, out hit)) {
 
-                if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift)) {
-                    Select();
-                }
+                if (hit.colliderInstanceID == boxCollider.GetInstanceID()) {
 
-                MoveTileChannelUpOrDown();
+                    if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift)) {
+                        Select();
+                    }
 
-                if (Input.GetMouseButtonDown(0)) {
+                    MoveTileChannelUpOrDown();
 
-                    click = true;
-                    previousMousePosition = Input.mousePosition;
+                    if (Input.GetMouseButtonDown(0)) {
 
-                } 
-                else if (Input.GetMouseButtonDown(1)) {
+                        click = true;
+                        previousMousePosition = Input.mousePosition;
 
-                    Select();
+                    } else if (Input.GetMouseButtonDown(1)) {
 
-                    var mainUI = FindObjectOfType<GeometryEditorUI>();
+                        Select();
 
-                    var obj = Instantiate(setHeightTextField);
+                        var mainUI = FindObjectOfType<GeometryEditorUI>();
 
-                    obj.transform.SetParent(mainUI.transform);
+                        var obj = Instantiate(setHeightTextField);
 
-                    var script = obj.GetComponent<SetHeightValueTextField>();
+                        obj.transform.SetParent(mainUI.transform);
 
-                    script.controller = controller;
+                        var script = obj.GetComponent<SetHeightValueTextField>();
+
+                        script.controller = controller;
+
+                    }
 
                 }
 

@@ -50,7 +50,7 @@ public class GeometryAddMode : EditMode {
 
         if (selectedTilePreset != null) {
 
-            InitTileOverlay(((TilePreset)selectedTilePreset).Create(false));
+            InitTileOverlay(((TilePreset)selectedTilePreset).Create(false, selectedColumn));
 
         }
 
@@ -76,7 +76,7 @@ public class GeometryAddMode : EditMode {
 
         if (selectedTilePreset != null) {
 
-            InitTileOverlay(((TilePreset)selectedTilePreset).Create(false));
+            InitTileOverlay(((TilePreset)selectedTilePreset).Create(false, selectedColumn));
 
         }
 
@@ -98,7 +98,6 @@ public class GeometryAddMode : EditMode {
         var script = overlay.GetComponent<SelectedTileOverlay>();
         script.controller = main;
         script.tile = tile;
-        script.column = selectedColumn;
         tileOverlay = script;
         overlay.transform.SetParent(selectedSection.transform);
         overlay.transform.localPosition = Vector3.zero;
@@ -113,7 +112,7 @@ public class GeometryAddMode : EditMode {
                 t.isStartInColumnArray = false;
             }
 
-            var tile = preset.Create(true);
+            var tile = preset.Create(true, selectedColumn);
 
             selectedColumn.tiles.Add(tile);
 
