@@ -15,7 +15,7 @@ class ToolbarView: MonoBehaviour {
 
     void Start() {
 
-        AddGeometryPanel();
+        SelectGeometryEditorTool();
 
     }
 

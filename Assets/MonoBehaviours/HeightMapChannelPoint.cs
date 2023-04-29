@@ -19,9 +19,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
     public bool isSelected = false;
 
-    Ray ray;
-    RaycastHit hit;
-    BoxCollider boxCollider;
+    public BoxCollider boxCollider;
     Material material;
 
     public bool preInitSelect = false;
@@ -46,51 +44,6 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
     void Update() {
         
-        if (FreeMove.looking || controller.IsGraphicsViewOpen()) {
-            return;
-        }
-
-        if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetAxis("Mouse ScrollWheel") != 0) {
-
-            ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(ray, out hit)) {
-
-                if (hit.colliderInstanceID == boxCollider.GetInstanceID()) {
-
-                    if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift)) {
-                        Select();
-                    }
-
-                    MoveTileChannelUpOrDown();
-
-                    if (Input.GetMouseButtonDown(0)) {
-
-                        click = true;
-                        previousMousePosition = Input.mousePosition;
-
-                    } else if (Input.GetMouseButtonDown(1)) {
-
-                        Select();
-
-                        var mainUI = FindObjectOfType<GeometryEditorUI>();
-
-                        var obj = Instantiate(setHeightTextField);
-
-                        obj.transform.SetParent(mainUI.transform);
-
-                        var script = obj.GetComponent<SetHeightValueTextField>();
-
-                        script.controller = controller;
-
-                    }
-
-                }
-
-            }
-
-        }
-
         if (click) {
 
             if (Input.GetMouseButtonUp(0)) {
@@ -136,7 +89,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
         }
     }
 
-    void MoveTileChannelUpOrDown() {
+    public void MoveTileChannelUpOrDown() {
 
         float axis = Input.GetAxis("Mouse ScrollWheel");
         if (axis != 0) {
@@ -194,6 +147,29 @@ public class HeightMapChannelPoint : MonoBehaviour {
             }
 
         }
+
+    }
+
+    public void Click() {
+
+        click = true;
+        previousMousePosition = Input.mousePosition;
+
+    }
+
+    public void ChangeExactHeight() {
+
+        Select();
+
+        var mainUI = FindObjectOfType<GeometryEditorUI>();
+
+        var obj = Instantiate(setHeightTextField);
+
+        obj.transform.SetParent(mainUI.GetComponentInParent<Canvas>().rootCanvas.transform, false);
+
+        var script = obj.GetComponent<SetHeightValueTextField>();
+
+        script.controller = controller;
 
     }
 

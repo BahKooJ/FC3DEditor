@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using static System.Collections.Specialized.BitVector32;
 using Object = UnityEngine.Object;
 
 public class GeometryEditMode : EditMode {
@@ -22,7 +23,13 @@ public class GeometryEditMode : EditMode {
     public GeometryEditorUI view;
 
     public bool IsGraphicsViewOpen() {
-        return view.activeGraphicsPropertiesView != null;
+
+        if (view != null) {
+            return view.activeGraphicsPropertiesView != null;
+        }
+
+        return false;
+
     }
 
     FCopLevelSection copySection = null;
@@ -32,6 +39,8 @@ public class GeometryEditMode : EditMode {
         if (FreeMove.looking) {
             main.TestRayOnLevelMesh();
         }
+
+        TestHeightMapChannelSelection();
 
         if (Input.GetKeyDown(KeyCode.C)) {
             ClearAllSelectedItems();
@@ -202,6 +211,52 @@ public class GeometryEditMode : EditMode {
     }
 
     #region Local Methods
+
+    void TestHeightMapChannelSelection() {
+
+        if (FreeMove.looking || IsGraphicsViewOpen()) {
+            return;
+        }
+
+        if (!Input.GetMouseButtonDown(0) && !Input.GetMouseButtonDown(1) && Input.GetAxis("Mouse ScrollWheel") == 0) {
+            return;
+        }
+
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, 8)) {
+
+            foreach (var channel in heightPointObjects) {
+
+                if (hit.colliderInstanceID == channel.boxCollider.GetInstanceID()) {
+
+                    if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift)) {
+                        channel.Select();
+                    }
+
+                    channel.MoveTileChannelUpOrDown();
+
+                    if (Input.GetMouseButtonDown(0)) {
+
+                        channel.Click();
+
+                    }
+
+                    if (Input.GetMouseButtonDown(1)) {
+
+                        channel.ChangeExactHeight();
+
+                    }
+                
+                }
+
+            }
+
+
+        }
+
+    }
 
     void ClearAllSelectedItems() {
 

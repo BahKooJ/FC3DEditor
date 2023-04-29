@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2342934426176880773}
   - component: {fileID: 2623890169316926694}
   - component: {fileID: -8681443153959358204}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: HeightMapChannelPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,7 +111,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   setHeightTextField: {fileID: 2737967948328983806, guid: 66a9ab7a111c46848ad8bf53c31d2486, type: 3}
-  controller: {fileID: 0}
   channel: 0
+  cornerWhenSelected: 0
   section: {fileID: 0}
   isSelected: 0
+  preInitSelect: 0

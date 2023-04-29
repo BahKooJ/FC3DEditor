@@ -46,15 +46,7 @@ class SetHeightValueTextField: MonoBehaviour {
             field.text = firstSelectedHeight.heightPoint.GetTruePoint(firstSelectedHeight.channel).ToString();
         }
 
-        transform.rotation = new Quaternion(0, 0, 0, 0);
-        transform.localScale = Vector3.one;
-
-        var mousePosition = Input.mousePosition;
-
-        mousePosition.y = -mousePosition.y;
-        mousePosition.x /= 100;
-
-        transform.localPosition = mousePosition;
+        ((RectTransform)transform).anchoredPosition = Input.mousePosition;
 
     }
 
