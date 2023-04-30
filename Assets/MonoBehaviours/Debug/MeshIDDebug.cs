@@ -22,7 +22,7 @@ public class MeshIDDebug: MonoBehaviour {
     void Start () {
 
         exampleColumn = new TileColumn(0, 0, new(), new() {
-            new HeightPoint(0,1,2), new HeightPoint(0,1,2), new HeightPoint(0,1,2), new HeightPoint(0,1,2)
+            new HeightPoints(0,1,2), new HeightPoints(0,1,2), new HeightPoints(0,1,2), new HeightPoints(0,1,2)
         });
 
         exampleTile = new Tile(new TileBitfield(0, 0, 0, 0, meshID, 0), exampleColumn);

@@ -43,7 +43,22 @@ public class GeometryEditMode : EditMode {
         TestHeightMapChannelSelection();
 
         if (Input.GetKeyDown(KeyCode.C)) {
-            ClearAllSelectedItems();
+
+            var wasSelectedHeights = false;
+
+            foreach (var height in heightPointObjects) {
+
+                if (height.isSelected) {
+                    wasSelectedHeights = true;
+                    height.DeSelect();
+                }
+
+            }
+
+            if (!wasSelectedHeights) {
+                ClearAllSelectedItems();
+            }
+
         } else if (Input.GetKeyDown(KeyCode.Delete)) {
             RemoveSelectedTiles();
         }
@@ -93,42 +108,12 @@ public class GeometryEditMode : EditMode {
         selectedSection = section;
 
         // Selects a range of tiles if the mutli-select modifier is held.
-        if (Input.GetKey(KeyCode.LeftAlt)) {
+        if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKey(KeyCode.LeftShift)) {
 
-            var xDif = column.x - oldColumn.x;
-            var yDif = column.y - oldColumn.y;
-
-            var xOrigin = oldColumn.x;
-            var yOrigin = oldColumn.y;
-
-            if (xDif < 0) {
-                xOrigin = column.x;
-            }
-            if (yDif < 0) {
-                yOrigin = column.y;
-            }
-
-            foreach (var y in Enumerable.Range(yOrigin, Math.Abs(yDif) + 1)) {
-
-                foreach (var x in Enumerable.Range(xOrigin, Math.Abs(xDif) + 1)) {
-
-                    var itColumn = selectedSection.section.GetTileColumn(x, y);
-
-                    foreach (var itTile in itColumn.tiles) {
-
-                        if (selectedTiles[0].verticies.Count == itTile.verticies.Count) {
-
-                            SelectTile(itTile, false);
-
-                        }
-
-                    }
-
-                }
-
-            }
+            SelectRangeOfTiles(oldColumn, column);
 
         }
+
         // Checks to see if the tiles vertex count is the same as the first selected tile
         // This needs to be done because there are many differences in triangle tiles and rect tiles 
         else if (selectedTiles.Count == 0) {
@@ -165,10 +150,10 @@ public class GeometryEditMode : EditMode {
         }
 
         // Re-adds HeightMapChannelPoints (0 = top left, 1 = top right, 2 = bottom left, 3 = bottom right)
-        AddHeightObjects(0);
-        AddHeightObjects(1);
-        AddHeightObjects(2);
-        AddHeightObjects(3);
+        AddHeightObjects(VertexPosition.TopLeft);
+        AddHeightObjects(VertexPosition.TopRight);
+        AddHeightObjects(VertexPosition.BottomLeft);
+        AddHeightObjects(VertexPosition.BottomRight);
 
 
         // If the number of the height channel is held down, all HeightMapChannelPoints will be selected in the column.
@@ -232,16 +217,16 @@ public class GeometryEditMode : EditMode {
                 if (hit.colliderInstanceID == channel.boxCollider.GetInstanceID()) {
 
                     if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift)) {
-                        channel.Select();
-                    }
 
-                    channel.MoveTileChannelUpOrDown();
+                        channel.SelectOrDeSelect();
 
-                    if (Input.GetMouseButtonDown(0)) {
+                    } else if (Input.GetMouseButtonDown(0)) {
 
                         channel.Click();
 
                     }
+
+                    channel.MoveTileChannelUpOrDown();
 
                     if (Input.GetMouseButtonDown(1)) {
 
@@ -255,6 +240,49 @@ public class GeometryEditMode : EditMode {
 
 
         }
+
+    }
+
+    void SelectRangeOfTiles(TileColumn oldColumn, TileColumn column) {
+
+        var xDif = column.x - oldColumn.x;
+        var yDif = column.y - oldColumn.y;
+
+        var xOrigin = oldColumn.x;
+        var yOrigin = oldColumn.y;
+
+        if (xDif < 0) {
+            xOrigin = column.x;
+        }
+        if (yDif < 0) {
+            yOrigin = column.y;
+        }
+
+        foreach (var y in Enumerable.Range(yOrigin, Math.Abs(yDif) + 1)) {
+
+            foreach (var x in Enumerable.Range(xOrigin, Math.Abs(xDif) + 1)) {
+
+                var itColumn = selectedSection.section.GetTileColumn(x, y);
+
+                foreach (var itTile in itColumn.tiles) {
+
+                    if (selectedTiles[0].verticies.Count == itTile.verticies.Count) {
+
+                        SelectTile(itTile, false);
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+    void SelectRangeOfHeightChannels() {
+
+
 
     }
 
@@ -316,19 +344,35 @@ public class GeometryEditMode : EditMode {
 
     }
 
-    void AddHeightObjects(int corner) {
+    void AddHeightObjects(VertexPosition corner) {
 
-        var worldX = selectedSection.x + selectedColumn.x;
-        var worldY = -(selectedSection.y + selectedColumn.y);
+        AddSingleHeightChannelObject(corner, 1, selectedColumn);
+        AddSingleHeightChannelObject(corner, 2, selectedColumn);
+        AddSingleHeightChannelObject(corner, 3, selectedColumn);
+
+    }
+
+    void AddSingleHeightChannelObject(VertexPosition corner, int channel, TileColumn column) {
+
+        var existingHeightChannel = heightPointObjects.Find(obj => { 
+            return obj.heightPoints == column.heights[(int)corner - 1];
+        });
+
+        if (existingHeightChannel != null) {
+            return;
+        }
+
+        var worldX = selectedSection.x + column.x;
+        var worldY = -(selectedSection.y + column.y);
 
         switch (corner) {
-            case 1:
+            case VertexPosition.TopRight:
                 worldX += 1;
                 break;
-            case 2:
+            case VertexPosition.BottomLeft:
                 worldY -= 1;
                 break;
-            case 3:
+            case VertexPosition.BottomRight:
                 worldX += 1;
                 worldY -= 1;
                 break;
@@ -336,35 +380,15 @@ public class GeometryEditMode : EditMode {
                 break;
         }
 
-        var point = Object.Instantiate(main.heightMapChannelPoint, new Vector3(worldX, selectedColumn.heights[corner].height1, worldY), Quaternion.identity);
+        var pos = new Vector3(worldX, column.heights[(int)corner - 1].GetPoint(channel), worldY);
+
+        var point = Object.Instantiate(main.heightMapChannelPoint, pos, Quaternion.identity);
         var script = point.GetComponent<HeightMapChannelPoint>();
-        script.heightPoint = selectedColumn.heights[corner];
+        script.heightPoints = column.heights[(int)corner - 1];
         script.controller = this;
-        script.channel = 1;
-        script.cornerWhenSelected = corner + 1;
-        script.tileColumn = selectedColumn;
-        script.section = selectedSection;
-
-        heightPointObjects.Add(script);
-
-        point = Object.Instantiate(main.heightMapChannelPoint, new Vector3(worldX, selectedColumn.heights[corner].height2, worldY), Quaternion.identity);
-        script = point.GetComponent<HeightMapChannelPoint>();
-        script.heightPoint = selectedColumn.heights[corner];
-        script.controller = this;
-        script.channel = 2;
-        script.cornerWhenSelected = corner + 1;
-        script.tileColumn = selectedColumn;
-        script.section = selectedSection;
-
-        heightPointObjects.Add(script);
-
-        point = Object.Instantiate(main.heightMapChannelPoint, new Vector3(worldX, selectedColumn.heights[corner].height3, worldY), Quaternion.identity);
-        script = point.GetComponent<HeightMapChannelPoint>();
-        script.heightPoint = selectedColumn.heights[corner];
-        script.controller = this;
-        script.channel = 3;
-        script.cornerWhenSelected = corner + 1;
-        script.tileColumn = selectedColumn;
+        script.channel = channel;
+        script.corner = corner;
+        script.tileColumn = column;
         script.section = selectedSection;
 
         heightPointObjects.Add(script);
@@ -416,6 +440,18 @@ public class GeometryEditMode : EditMode {
 
     #region Public and Callback Methods
 
+    public void MoveAllHeights(float distance) {
+
+        foreach (var heightObj in heightPointObjects) {
+
+            if (heightObj.isSelected) {
+                heightObj.MoveHeight(distance);
+            }
+
+        }
+
+    }
+
     public void UnselectAndRefreshHeightPoints() {
 
         foreach (var obj in heightPointObjects) {
@@ -426,10 +462,10 @@ public class GeometryEditMode : EditMode {
 
         heightPointObjects.Clear();
 
-        AddHeightObjects(0);
-        AddHeightObjects(1);
-        AddHeightObjects(2);
-        AddHeightObjects(3);
+        AddHeightObjects(VertexPosition.TopLeft);
+        AddHeightObjects(VertexPosition.TopRight);
+        AddHeightObjects(VertexPosition.BottomLeft);
+        AddHeightObjects(VertexPosition.BottomRight);
 
     }
 

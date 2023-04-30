@@ -227,7 +227,7 @@ namespace FCopParser {
 
         public const int tileColumnsWidth = 16;
 
-        public List<HeightPoint> heightMap = new List<HeightPoint>();
+        public List<HeightPoints> heightMap = new List<HeightPoints>();
 
         public List<TileColumn> tileColumns = new List<TileColumn>();
 
@@ -249,7 +249,7 @@ namespace FCopParser {
             this.tileGraphics = parser.tileGraphics;
 
             foreach (var parsePoint in parser.heightPoints) {
-                heightMap.Add(new HeightPoint(parsePoint));
+                heightMap.Add(new HeightPoints(parsePoint));
             }
 
             var count = 0;
@@ -264,7 +264,7 @@ namespace FCopParser {
                 var tiles = new List<Tile>();
 
                 // Grabs the heights. The heights have already been added so it uses the local height array.
-                var heights = new List<HeightPoint>();
+                var heights = new List<HeightPoints>();
 
                 heights.Add(GetHeightPoint(x, y));
                 heights.Add(GetHeightPoint(x + 1, y));
@@ -293,7 +293,7 @@ namespace FCopParser {
 
         }
 
-        public HeightPoint GetHeightPoint(int x, int y) {
+        public HeightPoints GetHeightPoint(int x, int y) {
             return heightMap[(y * heightMapWdith) + x];
         }
 
@@ -458,7 +458,7 @@ namespace FCopParser {
 
         public void MirrorDiagonally() {
 
-            var newHeightOrder = new List<HeightPoint>();
+            var newHeightOrder = new List<HeightPoints>();
 
             foreach (var hy in Enumerable.Range(0, 17)) {
 
@@ -477,7 +477,7 @@ namespace FCopParser {
                 foreach (var tx in Enumerable.Range(0, 16)) {
                     var column = tileColumns[((15 - ty) * 16) + (15 - tx)];
 
-                    var heights = new List<HeightPoint>();
+                    var heights = new List<HeightPoints>();
 
                     heights.Add(GetHeightPoint(tx, ty));
                     heights.Add(GetHeightPoint(tx + 1, ty));
@@ -579,7 +579,7 @@ namespace FCopParser {
 
         public void MirrorVertically() {
 
-            var newHeightOrder = new List<HeightPoint>();
+            var newHeightOrder = new List<HeightPoints>();
 
             foreach (var hy in Enumerable.Range(0, 17)) {
 
@@ -598,7 +598,7 @@ namespace FCopParser {
                 foreach (var tx in Enumerable.Range(0, 16)) {
                     var column = tileColumns[(ty * 16) + (15 - tx)];
 
-                    var heights = new List<HeightPoint>();
+                    var heights = new List<HeightPoints>();
 
                     heights.Add(GetHeightPoint(tx, ty));
                     heights.Add(GetHeightPoint(tx + 1, ty));
@@ -688,7 +688,7 @@ namespace FCopParser {
 
         public void MirrorHorizontally() {
 
-            var newHeightOrder = new List<HeightPoint>();
+            var newHeightOrder = new List<HeightPoints>();
 
             foreach (var hy in Enumerable.Range(0, 17)) {
 
@@ -707,7 +707,7 @@ namespace FCopParser {
                 foreach (var tx in Enumerable.Range(0, 16)) {
                     var column = tileColumns[((15 - ty) * 16) + tx];
 
-                    var heights = new List<HeightPoint>();
+                    var heights = new List<HeightPoints>();
 
                     heights.Add(GetHeightPoint(tx, ty));
                     heights.Add(GetHeightPoint(tx + 1, ty));
@@ -800,7 +800,7 @@ namespace FCopParser {
 
             heightMap.Clear();
             foreach (var newHeight in section.heightMap) {
-                heightMap.Add(new HeightPoint(newHeight.height1, newHeight.height2, newHeight.height3));
+                heightMap.Add(new HeightPoints(newHeight.height1, newHeight.height2, newHeight.height3));
             }
 
             tileColumns.Clear();
@@ -810,7 +810,7 @@ namespace FCopParser {
 
                 var newTiles = new List<Tile>();
 
-                var heights = new List<HeightPoint>();
+                var heights = new List<HeightPoints>();
 
                 heights.Add(GetHeightPoint(x, y));
                 heights.Add(GetHeightPoint(x + 1, y));
@@ -849,7 +849,7 @@ namespace FCopParser {
 
     }
 
-    public class HeightPoint {
+    public class HeightPoints {
 
         public const float multiplyer = 30f;
         public const float maxValue = SByte.MaxValue / multiplyer;
@@ -859,21 +859,21 @@ namespace FCopParser {
         public float height2;
         public float height3;
 
-        public HeightPoint(float height1, float height2, float height3) {
+        public HeightPoints(float height1, float height2, float height3) {
             this.height1 = height1;
             this.height2 = height2;
             this.height3 = height3;
         }
 
-        public HeightPoint(HeightPoint3 parsedHeightPoint3) {
+        public HeightPoints(HeightPoint3 parsedHeightPoint3) {
             this.height1 = parsedHeightPoint3.height1 / multiplyer;
             this.height2 = parsedHeightPoint3.height2 / multiplyer;
             this.height3 = parsedHeightPoint3.height3 / multiplyer;
         }
 
-        public float GetPoint(int index) {
+        public float GetPoint(int channel) {
 
-            switch(index) {
+            switch(channel) {
                 case 1: return height1;
                 case 2: return height2;
                 case 3: return height3;
@@ -997,9 +997,9 @@ namespace FCopParser {
 
         public List<Tile> tiles;
 
-        public List<HeightPoint> heights;
+        public List<HeightPoints> heights;
 
-        public TileColumn(int x, int y, List<Tile> tiles, List<HeightPoint> heights) {
+        public TileColumn(int x, int y, List<Tile> tiles, List<HeightPoints> heights) {
             this.x = x;
             this.y = y;
             this.tiles = tiles;

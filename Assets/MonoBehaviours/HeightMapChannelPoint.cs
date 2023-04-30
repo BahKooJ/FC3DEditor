@@ -2,6 +2,7 @@ using FCopParser;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static System.Collections.Specialized.BitVector32;
@@ -11,9 +12,9 @@ public class HeightMapChannelPoint : MonoBehaviour {
     public GameObject setHeightTextField;
 
     public GeometryEditMode controller;
-    public HeightPoint heightPoint;
+    public HeightPoints heightPoints;
     public int channel;
-    public int cornerWhenSelected;
+    public VertexPosition corner;
     public LevelMesh section;
     public TileColumn tileColumn;
 
@@ -56,13 +57,23 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
             var distance = (Input.mousePosition.y - previousMousePosition.y) / 40f;
 
-            transform.position = new Vector3(transform.position.x, heightPoint.GetPoint(channel), transform.position.z);
-
-            heightPoint.AddToPoint(distance, channel);
+            if (isSelected) {
+                controller.MoveAllHeights(distance);
+            } else {
+                MoveHeight(distance);
+            }
 
             previousMousePosition = Input.mousePosition;
 
         }
+
+    }
+
+    public void MoveHeight(float distance) {
+
+        heightPoints.AddToPoint(distance, channel);
+
+        transform.position = new Vector3(transform.position.x, heightPoints.GetPoint(channel), transform.position.z);
 
     }
 
@@ -80,13 +91,38 @@ public class HeightMapChannelPoint : MonoBehaviour {
         }
     }
 
+    public void SelectOrDeSelect() {
+
+        if (isSelected) {
+            DeSelect();
+        } else {
+            Select();
+        }
+
+    }
+
     public void Select() {
+
         isSelected = true;
+
         if (material == null) {
             preInitSelect = true;
         } else {
             material.color = Color.white;
         }
+
+    }
+
+    public void DeSelect() {
+
+        isSelected = false;
+
+        if (material == null) {
+            preInitSelect = false;
+        } else {
+            ResetColors();
+        }
+
     }
 
     public void MoveTileChannelUpOrDown() {
@@ -98,7 +134,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
                 var tile = controller.selectedTiles[0];
 
-                var vertexIndex = tile.verticies.IndexOf(new TileVertex(channel, (VertexPosition)cornerWhenSelected));
+                var vertexIndex = tile.verticies.IndexOf(new TileVertex(channel, corner));
 
                 if (vertexIndex != -1) {
 
@@ -170,6 +206,8 @@ public class HeightMapChannelPoint : MonoBehaviour {
         var script = obj.GetComponent<SetHeightValueTextField>();
 
         script.controller = controller;
+
+        script.selelctedHeightObject = this;
 
     }
 

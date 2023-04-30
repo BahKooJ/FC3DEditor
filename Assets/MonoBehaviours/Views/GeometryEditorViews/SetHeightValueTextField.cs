@@ -10,7 +10,7 @@ using UnityEngine;
 class SetHeightValueTextField: MonoBehaviour {
 
     public GeometryEditMode controller;
-
+    public HeightMapChannelPoint selelctedHeightObject;
     public TMP_InputField field;
 
     void Start() {
@@ -18,33 +18,8 @@ class SetHeightValueTextField: MonoBehaviour {
         field = GetComponent<TMP_InputField>();
 
         field.Select();
-
-        var height = -200;
-        var samePoints = true;
-
-        HeightMapChannelPoint firstSelectedHeight = null;
-
-        foreach (var point in controller.heightPointObjects) {
-
-            if (point.isSelected) {
-
-                if (height == -200) {
-
-                    height = point.heightPoint.GetTruePoint(point.channel);
-
-                    firstSelectedHeight = point;
-
-                } else if (height != point.heightPoint.GetTruePoint(point.channel)) {
-                    samePoints = false;
-                }
-
-            }
-
-        }
-
-        if (samePoints) {
-            field.text = firstSelectedHeight.heightPoint.GetTruePoint(firstSelectedHeight.channel).ToString();
-        }
+        
+        field.text = selelctedHeightObject.heightPoints.GetTruePoint(selelctedHeightObject.channel).ToString();
 
         ((RectTransform)transform).anchoredPosition = Input.mousePosition;
 
@@ -63,7 +38,7 @@ class SetHeightValueTextField: MonoBehaviour {
                 if (point.isSelected) {
 
                     try {
-                        point.heightPoint.SetPoint(Int32.Parse(field.text), point.channel);
+                        point.heightPoints.SetPoint(Int32.Parse(field.text), point.channel);
                     } catch (FormatException) {
 
                         controller.UnselectAndRefreshHeightPoints();
@@ -76,7 +51,7 @@ class SetHeightValueTextField: MonoBehaviour {
                         return;
                     }
 
-                    point.transform.position = new Vector3(point.transform.position.x, point.heightPoint.GetPoint(point.channel), point.transform.position.z);
+                    point.transform.position = new Vector3(point.transform.position.x, point.heightPoints.GetPoint(point.channel), point.transform.position.z);
 
                 }
 
@@ -84,7 +59,7 @@ class SetHeightValueTextField: MonoBehaviour {
 
         }
 
-        controller.UnselectAndRefreshHeightPoints();
+        //controller.UnselectAndRefreshHeightPoints();
         controller.selectedSection.RefreshMesh();
 
         controller.RefreshSelectedOverlays();
