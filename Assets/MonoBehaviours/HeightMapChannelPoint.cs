@@ -111,6 +111,8 @@ public class HeightMapChannelPoint : MonoBehaviour {
             material.color = Color.white;
         }
 
+        controller.lastSelectedHeightChannel = this;
+
     }
 
     public void DeSelect() {

@@ -64,9 +64,15 @@ public class Main : MonoBehaviour {
 
     }
 
-    public void TestRayOnLevelMesh() {
+    public void TestRayOnLevelMesh(bool useCursor = false) {
 
-        var ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+        Ray ray;
+
+        if (useCursor) {
+            ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        } else {
+            ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+        }
 
         RaycastHit hit;
 

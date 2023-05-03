@@ -7,6 +7,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using static System.Collections.Specialized.BitVector32;
+using static UnityEngine.UI.GridLayoutGroup;
 using Object = UnityEngine.Object;
 
 public class GeometryEditMode : EditMode {
@@ -33,6 +34,7 @@ public class GeometryEditMode : EditMode {
     }
 
     FCopLevelSection copySection = null;
+    public HeightMapChannelPoint lastSelectedHeightChannel = null;
 
     public void Update() {
         
@@ -218,7 +220,12 @@ public class GeometryEditMode : EditMode {
 
                     if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift)) {
 
-                        channel.SelectOrDeSelect();
+                        if (Input.GetKey(KeyCode.LeftAlt)) {
+                            SelectAllHeightChannelsInSection(channel.channel);
+                            return;
+                        } else {
+                            channel.SelectOrDeSelect();
+                        }
 
                     } else if (Input.GetMouseButtonDown(0)) {
 
@@ -280,9 +287,61 @@ public class GeometryEditMode : EditMode {
 
     }
 
-    void SelectRangeOfHeightChannels() {
+    // Maybe not needed
+    void SelectRangeOfHeightChannels(HeightMapChannelPoint heightPoint) {
+
+        if (lastSelectedHeightChannel == null) {
+            return;
+        }
+
+        var xDif = heightPoint.tileColumn.x - lastSelectedHeightChannel.tileColumn.x;
+        var yDif = heightPoint.tileColumn.y - lastSelectedHeightChannel.tileColumn.y;
+
+        var xOrigin = lastSelectedHeightChannel.tileColumn.x;
+        var yOrigin = lastSelectedHeightChannel.tileColumn.y;
+
+        if (xDif < 0) {
+            xOrigin = heightPoint.tileColumn.x;
+        }
+        if (yDif < 0) {
+            yOrigin = heightPoint.tileColumn.y;
+        }
+
+        foreach (var y in Enumerable.Range(yOrigin, Math.Abs(yDif) + 1)) {
+
+            foreach (var x in Enumerable.Range(xOrigin, Math.Abs(xDif) + 1)) {
+
+                var itColumn = selectedSection.section.GetTileColumn(x, y);
 
 
+
+            }
+
+        }
+
+    }
+
+    void SelectAllHeightChannelsInSection(int channel) {
+
+        foreach (var y in Enumerable.Range(0, 16)) {
+
+            foreach (var x in Enumerable.Range(0, 16)) {
+
+                var itColumn = selectedSection.section.GetTileColumn(x, y);
+
+                AddSingleHeightChannelObject(VertexPosition.TopLeft, channel, itColumn);
+                AddSingleHeightChannelObject(VertexPosition.TopRight, channel, itColumn);
+                AddSingleHeightChannelObject(VertexPosition.BottomLeft, channel, itColumn);
+                AddSingleHeightChannelObject(VertexPosition.BottomRight, channel, itColumn);
+
+
+            }
+
+        }
+
+        foreach (var heightObj in heightPointObjects) {
+            heightObj.Select();
+        }
 
     }
 
@@ -355,7 +414,7 @@ public class GeometryEditMode : EditMode {
     void AddSingleHeightChannelObject(VertexPosition corner, int channel, TileColumn column) {
 
         var existingHeightChannel = heightPointObjects.Find(obj => { 
-            return obj.heightPoints == column.heights[(int)corner - 1];
+            return obj.heightPoints == column.heights[(int)corner - 1] && obj.channel == channel;
         });
 
         if (existingHeightChannel != null) {
