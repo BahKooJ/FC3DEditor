@@ -340,7 +340,11 @@ public class GeometryEditMode : EditMode {
         }
 
         foreach (var heightObj in heightPointObjects) {
-            heightObj.Select();
+
+            if (heightObj.channel == channel) {
+                heightObj.Select();
+            }
+
         }
 
     }
