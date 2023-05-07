@@ -114,7 +114,36 @@ namespace FCopParser {
 
             }).ToList();
 
-            sections.Add(new FCopLevelSectionParser(rawCtilFiles[0]).Parse(this));
+
+            //TODO: Clean this up
+            var oobSection = new FCopLevelSectionParser(rawCtilFiles[0]).Parse(this);
+
+            oobSection.parser.rawFile = oobSection.parser.rawFile.Clone(1);
+
+            foreach (var h in oobSection.heightMap) {
+                h.SetPoint(19, 1);
+                h.SetPoint(-128, 2);
+                h.SetPoint(-128, 3);
+            }
+
+            foreach (var tColumn in oobSection.tileColumns) {
+
+                tColumn.tiles.Clear();
+
+                tColumn.tiles.Add(new Tile(new TileBitfield(1, 0, 0, 0, 68, 0), tColumn));
+
+            }
+
+            oobSection.tileGraphics.Clear();
+            oobSection.tileGraphics.Add(new TileGraphics(116, 6, 0, 1, 0));
+
+            oobSection.textureCoordinates.Clear();
+            oobSection.textureCoordinates.Add(57200);
+            oobSection.textureCoordinates.Add(57228);
+            oobSection.textureCoordinates.Add(50060);
+            oobSection.textureCoordinates.Add(50032);
+
+            sections.Add(oobSection);
 
             foreach (var row in layout) {
 
@@ -133,6 +162,24 @@ namespace FCopParser {
                         h.SetPoint(-100, 2);
                         h.SetPoint(-80, 3);
                     }
+
+                    foreach (var tColumn in newSection.tileColumns) {
+
+                        tColumn.tiles.Clear();
+
+                        tColumn.tiles.Add(new Tile(new TileBitfield(1, 0, 0, 0, 68, 0), tColumn));
+
+                    }
+
+                    newSection.tileGraphics.Clear();
+                    newSection.tileGraphics.Add(new TileGraphics(116, 6, 0, 1, 0));
+
+                    newSection.textureCoordinates.Clear();
+                    newSection.textureCoordinates.Add(57200);
+                    newSection.textureCoordinates.Add(57228);
+                    newSection.textureCoordinates.Add(50060);
+                    newSection.textureCoordinates.Add(50032);
+
 
                     sections.Add(newSection);
 
@@ -237,7 +284,7 @@ namespace FCopParser {
 
         public List<TileGraphics> tileGraphics = new List<TileGraphics>();
 
-        // Until the file can be fully parsed, we need to have the parser on hand
+        // Until the file can be fully parsed, we need to have the parser
         public FCopLevelSectionParser parser;
 
         public FCopLevelSection(FCopLevelSectionParser parser, FCopLevel parent) {
@@ -1008,6 +1055,7 @@ namespace FCopParser {
 
     }
 
+    // TODO: Naming is wrong
     // Tiles are sorted into 4x4 chunks
     public class Tile {
 

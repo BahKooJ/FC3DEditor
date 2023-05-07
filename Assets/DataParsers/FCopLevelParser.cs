@@ -448,8 +448,10 @@ namespace FCopParser {
     public struct TileGraphics {
 
         public int number1;
+        // BMP ID
         public int number2;
         public int number3;
+        // Rect tile
         public int number4;
         public int number5;
 

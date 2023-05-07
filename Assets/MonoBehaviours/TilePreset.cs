@@ -21,7 +21,7 @@ public struct TilePreset {
 
     public Tile Create(bool isStart, TileColumn column) {
 
-        return new Tile(new TileBitfield(isStart ? 1 : 0, textureIndex, culling, 0, meshID,graphicsIndex), column);
+        return new Tile(new TileBitfield(isStart ? 1 : 0, textureIndex, culling, 0, meshID, graphicsIndex), column);
 
     }
 
