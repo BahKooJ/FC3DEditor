@@ -89,6 +89,16 @@ public class GeometryEditorUI: MonoBehaviour {
         controller.MirrorSectionDiagonally();
     }
 
+    public void OnClicCleanUnusedSectionHeightsButton_127()
+    {
+        controller.CleanUnusedSectionHeights(-127, -127, -127);
+    }
+
+    public void OnClicCleanUnusedSectionHeightsButton()
+    {
+        controller.CleanUnusedSectionHeights(-120, -100, -80);
+    }
+
 
 
 }

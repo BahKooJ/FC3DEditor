@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace FCopParser {
 
@@ -842,6 +843,102 @@ namespace FCopParser {
 
         }
 
+        internal void CleanUnusedHeights(int height1Fallback, int height2Fallback, int height3Fallback)
+        {
+            var newHeightOrder = new List<HeightPoints>();
+
+            foreach (var hy in Enumerable.Range(0, 17))
+            {
+                foreach (var hx in Enumerable.Range(0, 17))
+                {
+                    //HeightPoints currentHeightPoints = GetHeightPoint(hx, hy);
+                    HeightPoints workingHeightPoints = new HeightPoints(0, 0, 0);
+                    workingHeightPoints.SetPoint(height1Fallback, 1);
+                    workingHeightPoints.SetPoint(height2Fallback, 2);
+                    workingHeightPoints.SetPoint(height3Fallback, 3);
+                    newHeightOrder.Add(workingHeightPoints);
+                }
+
+            }
+            foreach (var ty in Enumerable.Range(0, 16))
+            {
+
+                foreach (var tx in Enumerable.Range(0, 16))
+                {
+                    TileColumn column = tileColumns[(ty * 16) + tx];
+                    foreach (var tIndex in Enumerable.Range(0, column.tiles.Count))
+                    {
+                        foreach (var vIndex in Enumerable.Range(0, column.tiles[tIndex].verticies.Count()))
+                        {
+                            TileVertex currentTileVertex = column.tiles[tIndex].verticies[vIndex];
+                            int currentHeightChanel = currentTileVertex.heightChannel;
+                            switch (((int)currentTileVertex.vertexPosition)) {
+                                case 1:
+                                    {
+                                        int x = tx;
+                                        int y = ty;
+                                        int position = (y * 17) + x;
+                                        HeightPoints heightPoints = GetHeightPoint(x, y);
+                                        int oldHeight = (int)heightPoints.GetTruePoint(currentHeightChanel);
+                                        int refheight = newHeightOrder[position].GetTruePoint(currentHeightChanel);
+                                        newHeightOrder[position].SetPoint(oldHeight, currentHeightChanel);
+                                        Debug.Log("[" + oldHeight + "|" + refheight + " " + newHeightOrder[position].GetTruePoint(currentHeightChanel) + "|" + currentHeightChanel + "] [" + GetHeightPoint(x, y).GetTruePoint(1) + " " + GetHeightPoint(x, y).GetTruePoint(2) + " " + GetHeightPoint(x, y).GetTruePoint(3) + "]");
+
+                                    }
+                                    break;
+                                case 2:
+                                    {
+                                        int x = tx +1;
+                                        int y = ty;
+                                        int position = (y * 17) + x;
+                                        HeightPoints heightPoints = GetHeightPoint(x, y);
+                                        int oldHeight = (int)heightPoints.GetTruePoint(currentHeightChanel);
+                                        int refheight = newHeightOrder[position].GetTruePoint(currentHeightChanel);
+                                        newHeightOrder[position].SetPoint(oldHeight, currentHeightChanel);
+                                        Debug.Log("[" + oldHeight + "|" + refheight + " " + newHeightOrder[position].GetTruePoint(currentHeightChanel) + "|" + currentHeightChanel + "] [" + GetHeightPoint(x, y).GetTruePoint(1) + " " + GetHeightPoint(x, y).GetTruePoint(2) + " " + GetHeightPoint(x, y).GetTruePoint(3) + "]");
+                                        
+                                    }
+                                    break;
+                                case 3:
+                                    {
+                                        int x = tx;
+                                        int y = ty + 1;
+                                        int position = (y * 17) + x;
+                                        HeightPoints heightPoints = GetHeightPoint(x, y);
+                                        int oldHeight = (int)heightPoints.GetTruePoint(currentHeightChanel);
+                                        int refheight = newHeightOrder[position].GetTruePoint(currentHeightChanel);
+                                        newHeightOrder[position].SetPoint(oldHeight, currentHeightChanel);
+                                        Debug.Log("[" + oldHeight + "|" + refheight + " " + newHeightOrder[position].GetTruePoint(currentHeightChanel) + "|" + currentHeightChanel + "] [" + GetHeightPoint(x, y).GetTruePoint(1) + " " + GetHeightPoint(x, y).GetTruePoint(2) + " " + GetHeightPoint(x, y).GetTruePoint(3) + "]");
+                                        
+                                    }
+                                    break;
+                                case 4:
+                                    {
+                                        int x = tx + 1;
+                                        int y = ty + 1;
+                                        int position = (y * 17) + x;
+                                        HeightPoints heightPoints = GetHeightPoint(x, y);
+                                        int oldHeight = (int)heightPoints.GetTruePoint(currentHeightChanel);
+                                        int refheight = newHeightOrder[position].GetTruePoint(currentHeightChanel);
+                                        newHeightOrder[position].SetPoint(oldHeight, currentHeightChanel);
+                                        Debug.Log("[" + oldHeight + "|" + refheight + " " + newHeightOrder[position].GetTruePoint(currentHeightChanel) + "|" + currentHeightChanel + "] [" + GetHeightPoint(x, y).GetTruePoint(1) + " " + GetHeightPoint(x, y).GetTruePoint(2) + " " + GetHeightPoint(x, y).GetTruePoint(3) + "]");
+                                        
+                                    }
+                                    break;
+                            }
+                        }
+                        
+                    }
+                }
+            }
+            for (int i = 0; i < heightMap.Count; i++)
+            {
+                heightMap[i].SetPoint(newHeightOrder[i].GetTruePoint(1), 1);
+                heightMap[i].SetPoint(newHeightOrder[i].GetTruePoint(2), 2);
+                heightMap[i].SetPoint(newHeightOrder[i].GetTruePoint(3), 3);
+
+            }
+        }
 
         public void Overwrite(FCopLevelSection section) {
 

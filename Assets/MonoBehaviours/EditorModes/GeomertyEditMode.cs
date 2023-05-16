@@ -8,6 +8,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
+[System.Serializable]
 public class GeometryEditMode : EditMode {
 
     public Main main { get; set; }
@@ -744,6 +745,26 @@ public class GeometryEditMode : EditMode {
 
     }
 
+
+
+    public void CleanUnusedSectionHeights(int height1Fallback, int height2Fallback, int height3Fallback)
+    {
+
+        DialogWindowUtil.Dialog("Warning",
+            "All height values are changes. This will overwrite all current map data, are you sure you want to continue?",
+            () => {
+
+                if (selectedSection != null)
+                {
+                    selectedSection.section.CleanUnusedHeights(height1Fallback, height2Fallback, height3Fallback);
+                    selectedSection.RefreshMesh();
+                }
+
+                return true;
+
+            });
+
+    }
     #endregion
 
 }
