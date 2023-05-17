@@ -747,7 +747,7 @@ public class GeometryEditMode : EditMode {
 
 
 
-    public void CleanUnusedSectionHeights(int height1Fallback, int height2Fallback, int height3Fallback)
+    public void CleanUnusedSectionHeights(int targetHeight, bool setLayer1, bool setLayer2, bool setLayer3)
     {
 
         DialogWindowUtil.Dialog("Warning",
@@ -756,7 +756,7 @@ public class GeometryEditMode : EditMode {
 
                 if (selectedSection != null)
                 {
-                    selectedSection.section.CleanUnusedHeights(height1Fallback, height2Fallback, height3Fallback);
+                    selectedSection.section.CleanUnusedHeights(targetHeight, setLayer1, setLayer2, setLayer3);
                     selectedSection.RefreshMesh();
                 }
 

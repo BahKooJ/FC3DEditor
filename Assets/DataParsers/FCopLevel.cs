@@ -843,7 +843,7 @@ namespace FCopParser {
 
         }
 
-        internal void CleanUnusedHeights(int height1Fallback, int height2Fallback, int height3Fallback)
+        internal void CleanUnusedHeights(int targetHeight, bool setLayer1, bool setLayer2, bool setLayer3)
         {
             var newHeightOrder = new List<HeightPoints>();
 
@@ -851,11 +851,31 @@ namespace FCopParser {
             {
                 foreach (var hx in Enumerable.Range(0, 17))
                 {
-                    //HeightPoints currentHeightPoints = GetHeightPoint(hx, hy);
+                    HeightPoints currentHeightPoints = GetHeightPoint(hx, hy);
                     HeightPoints workingHeightPoints = new HeightPoints(0, 0, 0);
-                    workingHeightPoints.SetPoint(height1Fallback, 1);
-                    workingHeightPoints.SetPoint(height2Fallback, 2);
-                    workingHeightPoints.SetPoint(height3Fallback, 3);
+                    if (setLayer1) {
+                        workingHeightPoints.SetPoint(targetHeight, 1);
+                    } else
+                    {
+                        workingHeightPoints.SetPoint(currentHeightPoints.GetTruePoint(1), 1);
+                    }
+
+                    if (setLayer2)
+                    {
+                        workingHeightPoints.SetPoint(targetHeight, 2);
+                    }
+                    else
+                    {
+                        workingHeightPoints.SetPoint(currentHeightPoints.GetTruePoint(2), 2);
+                    }
+                    if (setLayer3)
+                    {
+                        workingHeightPoints.SetPoint(targetHeight, 3);
+                    }
+                    else
+                    {
+                        workingHeightPoints.SetPoint(currentHeightPoints.GetTruePoint(3),3);
+                    }
                     newHeightOrder.Add(workingHeightPoints);
                 }
 
@@ -879,7 +899,7 @@ namespace FCopParser {
                                         int y = ty;
                                         int position = (y * 17) + x;
                                         HeightPoints heightPoints = GetHeightPoint(x, y);
-                                        int oldHeight = (int)heightPoints.GetTruePoint(currentHeightChanel);
+                                        int oldHeight = heightPoints.GetTruePoint(currentHeightChanel);
                                         int refheight = newHeightOrder[position].GetTruePoint(currentHeightChanel);
                                         newHeightOrder[position].SetPoint(oldHeight, currentHeightChanel);
                                         Debug.Log("[" + oldHeight + "|" + refheight + " " + newHeightOrder[position].GetTruePoint(currentHeightChanel) + "|" + currentHeightChanel + "] [" + GetHeightPoint(x, y).GetTruePoint(1) + " " + GetHeightPoint(x, y).GetTruePoint(2) + " " + GetHeightPoint(x, y).GetTruePoint(3) + "]");
