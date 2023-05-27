@@ -33,7 +33,7 @@ public class NavMeshEditMode : EditMode {
 
         if (navNodeToAdd != null) {
 
-            if (Input.GetMouseButtonDown(0)) {
+            if (Input.GetButtonDown("Select")) {
 
                 var node = new NavNode(navNodes.Count,
                     Mathf.RoundToInt(navNodeToAdd.transform.position.x * 32f),
@@ -81,7 +81,7 @@ public class NavMeshEditMode : EditMode {
 
                         pathToAdd.Value.Item2.SetPosition(1, node.transform.position);
 
-                        if (Input.GetMouseButtonDown(0)) {
+                        if (Input.GetButtonDown("Select")) {
 
                             var index = Array.IndexOf(pathToAdd.Value.Item1.node.nextNode, NavNode.invalid);
 
@@ -122,7 +122,7 @@ public class NavMeshEditMode : EditMode {
 
         if (selectedNavNode != null) {
 
-            if (Input.GetKey(KeyCode.LeftShift)) {
+            if (Input.GetButton("ModifierMoveToCursor")) {
 
                 var hitPos = main.CursorOnLevelMesh();
 
@@ -134,13 +134,13 @@ public class NavMeshEditMode : EditMode {
 
                 }
 
-            } else if (Input.GetKey(KeyCode.Delete)) {
+            } else if (Input.GetButton("Delete")) {
                 DeleteNode();
             }
 
         }
 
-        if (Input.GetMouseButtonDown(0)) {
+        if (Input.GetButtonDown("Select")) {
 
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -180,7 +180,7 @@ public class NavMeshEditMode : EditMode {
 
         }
 
-        if (Input.GetMouseButtonDown(1)) {
+        if (Input.GetButtonDown("Interact")) {
 
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 

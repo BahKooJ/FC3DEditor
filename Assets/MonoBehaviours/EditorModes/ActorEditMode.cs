@@ -1,7 +1,5 @@
 ﻿
-
 using FCopParser;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -57,7 +55,8 @@ public class ActorEditMode : EditMode {
 
         if (selectedActor != null) {
 
-            if (Input.GetKey(KeyCode.LeftShift)) {
+            // Moves object to cursor
+            if (Input.GetButton("ModifierMoveToCursor")) {
 
                 var hitPos = main.CursorOnLevelMesh();
 
@@ -70,13 +69,10 @@ public class ActorEditMode : EditMode {
                 }
 
             } 
-            //else if (Input.GetKey(KeyCode.Delete)) {
-            //    DeleteNode();
-            //}
 
         }
 
-        if (Input.GetMouseButtonDown(0)) {
+        if (Input.GetButtonDown("Select")) {
 
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -155,7 +151,7 @@ public class ActorEditMode : EditMode {
 
         }
 
-        if (Input.GetKeyDown(KeyCode.Delete)) {
+        if (Input.GetButtonDown("Delete")) {
             deleteActor();
         }
 

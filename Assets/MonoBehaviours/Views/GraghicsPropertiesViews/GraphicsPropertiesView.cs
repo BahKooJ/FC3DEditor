@@ -1,5 +1,4 @@
 ﻿
-
 using System.Linq;
 using System.IO;
 using TMPro;
@@ -101,7 +100,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
         }
 
-        if (Input.GetMouseButton(1)) {
+        if (Input.GetButton("DragPalette")) {
 
             if (IsCursorInTexturePallete()) {
 

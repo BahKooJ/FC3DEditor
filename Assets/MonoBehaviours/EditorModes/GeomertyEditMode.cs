@@ -6,8 +6,6 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using static System.Collections.Specialized.BitVector32;
-using static UnityEngine.UI.GridLayoutGroup;
 using Object = UnityEngine.Object;
 
 public class GeometryEditMode : EditMode {
@@ -44,7 +42,7 @@ public class GeometryEditMode : EditMode {
 
         TestHeightMapChannelSelection();
 
-        if (Input.GetKeyDown(KeyCode.C)) {
+        if (Input.GetButtonDown("Unselect")) {
 
             var wasSelectedHeights = false;
 
@@ -61,7 +59,7 @@ public class GeometryEditMode : EditMode {
                 ClearAllSelectedItems();
             }
 
-        } else if (Input.GetKeyDown(KeyCode.Delete)) {
+        } else if (Input.GetButtonDown("Delete")) {
             RemoveSelectedTiles();
         }
 
@@ -89,7 +87,7 @@ public class GeometryEditMode : EditMode {
         var oldColumn = selectedColumn;
 
         // If shift is held then multiple tiles can be selected
-        if (Input.GetKey(KeyCode.LeftShift)) {
+        if (Input.GetButton("ModifierMultiSelect")) {
 
             // Checks if the new selected tile is inside the selected Section, if it is not this method cannot continue.
             if (selectedSection != null) {
@@ -110,7 +108,7 @@ public class GeometryEditMode : EditMode {
         selectedSection = section;
 
         // Selects a range of tiles if the mutli-select modifier is held.
-        if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKey(KeyCode.LeftShift)) {
+        if (Input.GetButton("ModifierAltSelect") && Input.GetButton("ModifierMultiSelect")) {
 
             SelectRangeOfTiles(oldColumn, column);
 
@@ -159,7 +157,7 @@ public class GeometryEditMode : EditMode {
 
 
         // If the number of the height channel is held down, all HeightMapChannelPoints will be selected in the column.
-        if (Input.GetKey(KeyCode.Alpha1)) {
+        if (Input.GetButton("ModifierChannelSelect1")) {
 
             foreach (var obj in heightPointObjects) {
 
@@ -170,7 +168,7 @@ public class GeometryEditMode : EditMode {
             }
 
         } 
-        else if (Input.GetKey(KeyCode.Alpha2)) {
+        else if (Input.GetButton("ModifierChannelSelect2")) {
 
             foreach (var obj in heightPointObjects) {
 
@@ -181,7 +179,7 @@ public class GeometryEditMode : EditMode {
             }
 
         } 
-        else if (Input.GetKey(KeyCode.Alpha3)) {
+        else if (Input.GetButton("ModifierChannelSelect3")) {
 
             foreach (var obj in heightPointObjects) {
 
@@ -205,7 +203,7 @@ public class GeometryEditMode : EditMode {
             return;
         }
 
-        if (!Input.GetMouseButtonDown(0) && !Input.GetMouseButtonDown(1) && Input.GetAxis("Mouse ScrollWheel") == 0) {
+        if (!Input.GetButtonDown("Select") && !Input.GetButtonDown("Interact") && Input.GetAxis("Mouse ScrollWheel") == 0) {
             return;
         }
 
@@ -218,16 +216,16 @@ public class GeometryEditMode : EditMode {
 
                 if (hit.colliderInstanceID == channel.boxCollider.GetInstanceID()) {
 
-                    if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift)) {
+                    if (Input.GetButtonDown("Select") && Input.GetButton("ModifierMultiSelect")) {
 
-                        if (Input.GetKey(KeyCode.LeftAlt)) {
+                        if (Input.GetButton("ModifierAltSelect")) {
                             SelectAllHeightChannelsInSection(channel.channel);
                             return;
                         } else {
                             channel.SelectOrDeSelect();
                         }
 
-                    } else if (Input.GetMouseButtonDown(0)) {
+                    } else if (Input.GetButtonDown("Select")) {
 
                         channel.Click();
 
@@ -235,7 +233,7 @@ public class GeometryEditMode : EditMode {
 
                     channel.MoveTileChannelUpOrDown();
 
-                    if (Input.GetMouseButtonDown(1)) {
+                    if (Input.GetButtonDown("Interact")) {
 
                         channel.ChangeExactHeight();
 

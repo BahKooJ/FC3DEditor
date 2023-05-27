@@ -1,6 +1,4 @@
-﻿
-
-using System;
+﻿using System;
 using UnityEngine;
 
 public class AxisControl: MonoBehaviour {
@@ -34,10 +32,10 @@ public class AxisControl: MonoBehaviour {
 
     void Update() {
 
-        if (Input.GetKeyDown(KeyCode.R)) {
+        if (Input.GetButtonDown("Rotate")) {
             rotate = true;
         }
-        if (Input.GetKeyUp(KeyCode.R)) {
+        if (Input.GetButtonDown("Rotate")) {
             rotate = false;
         }
 
@@ -49,7 +47,7 @@ public class AxisControl: MonoBehaviour {
 
         }
 
-        if (Input.GetMouseButton(0)) {
+        if (Input.GetButton("Select")) {
 
             if (click == Axis.None) {
 

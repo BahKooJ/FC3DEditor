@@ -1,10 +1,7 @@
-﻿
-
-using FCopParser;
+﻿using FCopParser;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static System.Collections.Specialized.BitVector32;
 
 public class TileTexturePreview : MonoBehaviour {
 

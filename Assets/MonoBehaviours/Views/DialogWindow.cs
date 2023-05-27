@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -13,12 +11,6 @@ public class DialogWindow : MonoBehaviour {
 
     public Func<bool> confirmAction;
 
-    void Start() { 
-
-        
-
-    }
-
     public void OnClickOK() {
 
         if (confirmAction != null) {
@@ -27,13 +19,13 @@ public class DialogWindow : MonoBehaviour {
 
         }
 
-        Destroy(this.gameObject);
+        Destroy(gameObject);
 
     }
 
     public void OnClickCancel() {
 
-        Destroy(this.gameObject);
+        Destroy(gameObject);
 
     }
 

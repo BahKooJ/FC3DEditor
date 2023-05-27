@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 /// <summary>
@@ -52,35 +48,35 @@ public class FreeMove : MonoBehaviour {
         var fastMode = false;
         var movementSpeed = fastMode ? this.fastMovementSpeed : this.movementSpeed;
 
-        if (Input.GetKey(KeyCode.A)) {
+        if (Input.GetButton("CameraLeft")) {
             transform.position = transform.position + (-transform.right * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKey(KeyCode.D)) {
+        if (Input.GetButton("CameraRight")) {
             transform.position = transform.position + (transform.right * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKey(KeyCode.W)) {
+        if (Input.GetButton("CameraForward")) {
             transform.position = transform.position + (transform.forward * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKey(KeyCode.S)) {
+        if (Input.GetButton("CameraBack")) {
             transform.position = transform.position + (-transform.forward * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKey(KeyCode.Q)) {
+        if (Input.GetButton("CameraUp")) {
             transform.position = transform.position + (transform.up * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKey(KeyCode.E)) {
+        if (Input.GetButton("CameraDown")) {
             transform.position = transform.position + (-transform.up * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKey(KeyCode.Space)) {
+        if (Input.GetButton("CameraWorldUp")) {
             transform.position = transform.position + (Vector3.up * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKey(KeyCode.LeftControl)) {
+        if (Input.GetButton("CameraWorldDown")) {
             transform.position = transform.position + (-Vector3.up * movementSpeed * Time.deltaTime);
         }
 
@@ -104,7 +100,7 @@ public class FreeMove : MonoBehaviour {
         //    transform.position = transform.position + transform.forward * axis * zoomSensitivity;
         //}
 
-        if (Input.GetMouseButtonUp(2) || Input.GetKeyDown(KeyCode.M)) {
+        if (Input.GetButtonDown("CameraEnable")) {
 
             if (looking) {
                 StopLooking();

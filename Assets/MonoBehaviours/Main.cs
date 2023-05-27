@@ -58,7 +58,7 @@ public class Main : MonoBehaviour {
 
         editMode.Update();
 
-        if (Input.GetKeyDown(KeyCode.F5)) {
+        if (Input.GetButtonDown("Save")) {
             Compile();
         }
 
@@ -89,7 +89,7 @@ public class Main : MonoBehaviour {
                         return tileColumn.x == clickX && tileColumn.y == clickY;
                     });
 
-                    if (Input.GetMouseButtonDown(0)) {
+                    if (Input.GetButtonDown("Select")) {
 
                         SelectTile(section.sortedTilesByTriangle[hit.triangleIndex], column, section);
 

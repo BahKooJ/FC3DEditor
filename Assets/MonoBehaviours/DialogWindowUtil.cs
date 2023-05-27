@@ -1,8 +1,4 @@
-﻿
-
-using System;
-using System.Linq;
-using UnityEditor;
+﻿using System;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

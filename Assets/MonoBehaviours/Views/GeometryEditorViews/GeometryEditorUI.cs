@@ -1,7 +1,4 @@
 ﻿
-using FCopParser;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class GeometryEditorUI: MonoBehaviour {

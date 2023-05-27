@@ -1,11 +1,5 @@
 using FCopParser;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using static System.Collections.Specialized.BitVector32;
 
 public class HeightMapChannelPoint : MonoBehaviour {
 
@@ -47,7 +41,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
         
         if (click) {
 
-            if (Input.GetMouseButtonUp(0)) {
+            if (Input.GetButtonUp("Select")) {
 
                 click = false;
                 section.RefreshMesh();
@@ -129,6 +123,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
     public void MoveTileChannelUpOrDown() {
 
+        //TODO: Change how single vertex change is made
         float axis = Input.GetAxis("Mouse ScrollWheel");
         if (axis != 0) {
 

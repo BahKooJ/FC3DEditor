@@ -1,5 +1,4 @@
 ﻿
-
 using FCopParser;
 using System;
 using System.Drawing;
