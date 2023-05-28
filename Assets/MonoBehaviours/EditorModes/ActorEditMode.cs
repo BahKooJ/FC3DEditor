@@ -56,7 +56,7 @@ public class ActorEditMode : EditMode {
         if (selectedActor != null) {
 
             // Moves object to cursor
-            if (Input.GetButton("ModifierMoveToCursor")) {
+            if (Controls.IsDown("ModifierMoveToCursor")) {
 
                 var hitPos = main.CursorOnLevelMesh();
 
@@ -72,7 +72,7 @@ public class ActorEditMode : EditMode {
 
         }
 
-        if (Input.GetButtonDown("Select")) {
+        if (Controls.OnDown("Select")) {
 
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 

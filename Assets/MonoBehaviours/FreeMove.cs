@@ -48,35 +48,35 @@ public class FreeMove : MonoBehaviour {
         var fastMode = false;
         var movementSpeed = fastMode ? this.fastMovementSpeed : this.movementSpeed;
 
-        if (Input.GetButton("CameraLeft")) {
+        if (Controls.IsDown("CameraLeft")) {
             transform.position = transform.position + (-transform.right * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetButton("CameraRight")) {
+        if (Controls.IsDown("CameraRight")) {
             transform.position = transform.position + (transform.right * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetButton("CameraForward")) {
+        if (Controls.IsDown("CameraForward")) {
             transform.position = transform.position + (transform.forward * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetButton("CameraBack")) {
+        if (Controls.IsDown("CameraBack")) {
             transform.position = transform.position + (-transform.forward * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetButton("CameraUp")) {
+        if (Controls.IsDown("CameraUp")) {
             transform.position = transform.position + (transform.up * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetButton("CameraDown")) {
+        if (Controls.IsDown("CameraDown")) {
             transform.position = transform.position + (-transform.up * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetButton("CameraWorldUp")) {
+        if (Controls.IsDown("CameraWorldUp")) {
             transform.position = transform.position + (Vector3.up * movementSpeed * Time.deltaTime);
         }
 
-        if (Input.GetButton("CameraWorldDown")) {
+        if (Controls.IsDown("CameraWorldDown")) {
             transform.position = transform.position + (-Vector3.up * movementSpeed * Time.deltaTime);
         }
 
@@ -100,7 +100,7 @@ public class FreeMove : MonoBehaviour {
         //    transform.position = transform.position + transform.forward * axis * zoomSensitivity;
         //}
 
-        if (Input.GetButtonDown("CameraEnable")) {
+        if (Controls.OnDown("CameraEnable")) {
 
             if (looking) {
                 StopLooking();

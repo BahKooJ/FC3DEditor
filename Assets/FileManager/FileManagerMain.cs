@@ -22,6 +22,7 @@ public class FileManagerMain : MonoBehaviour {
         DialogWindowUtil.prefab = DialogWindow;
         DialogWindowUtil.canvas = canvas.gameObject;
 
+        SettingsManager.ParseSettings();
 
     }
 

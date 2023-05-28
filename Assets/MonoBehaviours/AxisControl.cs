@@ -32,10 +32,10 @@ public class AxisControl: MonoBehaviour {
 
     void Update() {
 
-        if (Input.GetButtonDown("Rotate")) {
+        if (Controls.OnDown("Rotate")) {
             rotate = true;
         }
-        if (Input.GetButtonDown("Rotate")) {
+        if (Controls.OnUp("Rotate")) {
             rotate = false;
         }
 
@@ -47,7 +47,7 @@ public class AxisControl: MonoBehaviour {
 
         }
 
-        if (Input.GetButton("Select")) {
+        if (Controls.IsDown("Select")) {
 
             if (click == Axis.None) {
 

@@ -47,7 +47,7 @@ public class TextureCoordinatesLines : MonoBehaviour {
 
             var point = Instantiate(view.textureCoordinatePoint);
 
-            point.transform.SetParent(view.texturePalleteImage.transform, false);
+            point.transform.SetParent(view.texturePaletteImage.transform, false);
 
             point.transform.localPosition = new Vector2(TextureCoordinate.GetXPixel(coord), TextureCoordinate.GetYPixel(coord));
 
@@ -57,7 +57,7 @@ public class TextureCoordinatesLines : MonoBehaviour {
             script.controller = view.controller;
             script.view = view;
             script.isGlobalPoint = view.globalTextureCoordIndex == null ? false : true;
-            script.imageTransform = (RectTransform)view.texturePalleteImage.transform;
+            script.imageTransform = (RectTransform)view.texturePaletteImage.transform;
             script.lines = this;
 
             var image = point.GetComponent<Image>();

@@ -41,7 +41,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
         
         if (click) {
 
-            if (Input.GetButtonUp("Select")) {
+            if (Controls.OnUp("Select")) {
 
                 click = false;
                 section.RefreshMesh();

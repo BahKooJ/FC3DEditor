@@ -23,10 +23,10 @@ public class GraphicsPropertiesView : MonoBehaviour {
     public GameObject textureCoordinatePoint;
 
     // --View References--
-    public GameObject texturePalletteDropdown;
+    public GameObject texturePaletteDropdown;
     public Toggle rectangleTileToggle;
-    public GameObject texturePallete;
-    public GameObject texturePalleteImage;
+    public GameObject texturePalette;
+    public GameObject texturePaletteImage;
     public GameObject textureOffsets;
     public ScrollRect textureScrollView;
     public GameObject graphicsPreset;
@@ -70,19 +70,19 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
             if (IsCursorInTexturePallete()) {
 
-                var scale = texturePalleteImage.transform.localScale;
+                var scale = texturePaletteImage.transform.localScale;
 
                 scale.x += axis * 4;
                 scale.y += axis * 4;
 
-                texturePalleteImage.transform.localScale = scale;
+                texturePaletteImage.transform.localScale = scale;
 
-                var position = texturePalleteImage.transform.localPosition;
+                var position = texturePaletteImage.transform.localPosition;
 
                 position.x -= 265 * (axis * 2);
                 position.y -= 265 * (axis * 2);
 
-                texturePalleteImage.transform.localPosition = position;
+                texturePaletteImage.transform.localPosition = position;
 
             }
             else if (IsCursorInTilePreview()) {
@@ -100,16 +100,16 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
         }
 
-        if (Input.GetButton("DragPalette")) {
+        if (Controls.IsDown("DragPalette")) {
 
             if (IsCursorInTexturePallete()) {
 
-                var position = texturePalleteImage.transform.localPosition;
+                var position = texturePaletteImage.transform.localPosition;
 
                 position.x += Input.GetAxis("Mouse X") * 18;
                 position.y += Input.GetAxis("Mouse Y") * 18;
 
-                texturePalleteImage.transform.localPosition = position;
+                texturePaletteImage.transform.localPosition = position;
 
             }
             else if (IsCursorInTilePreview()) {
@@ -136,9 +136,9 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
         Vector2 pointOnPallete = Vector2.zero;
 
-        RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)texturePallete.transform, Input.mousePosition, Camera.main, out pointOnPallete);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)texturePalette.transform, Input.mousePosition, Camera.main, out pointOnPallete);
 
-        var palleteRect = (RectTransform)texturePallete.transform;
+        var palleteRect = (RectTransform)texturePalette.transform;
 
         return pointOnPallete.x < palleteRect.rect.width && pointOnPallete.y < palleteRect.rect.height;
 
@@ -175,9 +175,9 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
             var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
 
-            texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
+            texturePaletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
 
-            texturePalleteImage.GetComponent<Image>().sprite = controller.main.bmpTextures[graphics.number2];
+            texturePaletteImage.GetComponent<Image>().sprite = controller.main.bmpTextures[graphics.number2];
 
         }
 
@@ -363,7 +363,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
         var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
 
-        texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
+        texturePaletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
 
         rectangleTileToggle.GetComponent<Toggle>().isOn = graphics.number4 == 1;
 
@@ -378,11 +378,11 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
     public void OnChangeTexturePalleteValue() {
 
-        controller.ChangeTexturePallette(texturePalletteDropdown.GetComponent<TMP_Dropdown>().value);
+        controller.ChangeTexturePallette(texturePaletteDropdown.GetComponent<TMP_Dropdown>().value);
 
         var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
 
-        texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
+        texturePaletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
 
         InitTexturePallette();
 
