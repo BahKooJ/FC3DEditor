@@ -902,7 +902,7 @@ namespace FCopParser {
                                         int oldHeight = heightPoints.GetTruePoint(currentHeightChanel);
                                         int refheight = newHeightOrder[position].GetTruePoint(currentHeightChanel);
                                         newHeightOrder[position].SetPoint(oldHeight, currentHeightChanel);
-                                        Debug.Log("[" + oldHeight + "|" + refheight + " " + newHeightOrder[position].GetTruePoint(currentHeightChanel) + "|" + currentHeightChanel + "] [" + GetHeightPoint(x, y).GetTruePoint(1) + " " + GetHeightPoint(x, y).GetTruePoint(2) + " " + GetHeightPoint(x, y).GetTruePoint(3) + "]");
+                                        //Debug.Log("[" + oldHeight + "|" + refheight + " " + newHeightOrder[position].GetTruePoint(currentHeightChanel) + "|" + currentHeightChanel + "] [" + GetHeightPoint(x, y).GetTruePoint(1) + " " + GetHeightPoint(x, y).GetTruePoint(2) + " " + GetHeightPoint(x, y).GetTruePoint(3) + "]");
 
                                     }
                                     break;
@@ -915,7 +915,7 @@ namespace FCopParser {
                                         int oldHeight = (int)heightPoints.GetTruePoint(currentHeightChanel);
                                         int refheight = newHeightOrder[position].GetTruePoint(currentHeightChanel);
                                         newHeightOrder[position].SetPoint(oldHeight, currentHeightChanel);
-                                        Debug.Log("[" + oldHeight + "|" + refheight + " " + newHeightOrder[position].GetTruePoint(currentHeightChanel) + "|" + currentHeightChanel + "] [" + GetHeightPoint(x, y).GetTruePoint(1) + " " + GetHeightPoint(x, y).GetTruePoint(2) + " " + GetHeightPoint(x, y).GetTruePoint(3) + "]");
+                                        //Debug.Log("[" + oldHeight + "|" + refheight + " " + newHeightOrder[position].GetTruePoint(currentHeightChanel) + "|" + currentHeightChanel + "] [" + GetHeightPoint(x, y).GetTruePoint(1) + " " + GetHeightPoint(x, y).GetTruePoint(2) + " " + GetHeightPoint(x, y).GetTruePoint(3) + "]");
                                         
                                     }
                                     break;
@@ -928,7 +928,7 @@ namespace FCopParser {
                                         int oldHeight = (int)heightPoints.GetTruePoint(currentHeightChanel);
                                         int refheight = newHeightOrder[position].GetTruePoint(currentHeightChanel);
                                         newHeightOrder[position].SetPoint(oldHeight, currentHeightChanel);
-                                        Debug.Log("[" + oldHeight + "|" + refheight + " " + newHeightOrder[position].GetTruePoint(currentHeightChanel) + "|" + currentHeightChanel + "] [" + GetHeightPoint(x, y).GetTruePoint(1) + " " + GetHeightPoint(x, y).GetTruePoint(2) + " " + GetHeightPoint(x, y).GetTruePoint(3) + "]");
+                                        //Debug.Log("[" + oldHeight + "|" + refheight + " " + newHeightOrder[position].GetTruePoint(currentHeightChanel) + "|" + currentHeightChanel + "] [" + GetHeightPoint(x, y).GetTruePoint(1) + " " + GetHeightPoint(x, y).GetTruePoint(2) + " " + GetHeightPoint(x, y).GetTruePoint(3) + "]");
                                         
                                     }
                                     break;
@@ -941,7 +941,7 @@ namespace FCopParser {
                                         int oldHeight = (int)heightPoints.GetTruePoint(currentHeightChanel);
                                         int refheight = newHeightOrder[position].GetTruePoint(currentHeightChanel);
                                         newHeightOrder[position].SetPoint(oldHeight, currentHeightChanel);
-                                        Debug.Log("[" + oldHeight + "|" + refheight + " " + newHeightOrder[position].GetTruePoint(currentHeightChanel) + "|" + currentHeightChanel + "] [" + GetHeightPoint(x, y).GetTruePoint(1) + " " + GetHeightPoint(x, y).GetTruePoint(2) + " " + GetHeightPoint(x, y).GetTruePoint(3) + "]");
+                                        //Debug.Log("[" + oldHeight + "|" + refheight + " " + newHeightOrder[position].GetTruePoint(currentHeightChanel) + "|" + currentHeightChanel + "] [" + GetHeightPoint(x, y).GetTruePoint(1) + " " + GetHeightPoint(x, y).GetTruePoint(2) + " " + GetHeightPoint(x, y).GetTruePoint(3) + "]");
                                         
                                     }
                                     break;
