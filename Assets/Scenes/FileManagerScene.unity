@@ -123,11 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!224 &393666162 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 7018064738338162474, guid: c61b2c95d735c614699d244937113bb6, type: 3}
-  m_PrefabInstance: {fileID: 973709993}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &421108728
 GameObject:
   m_ObjectHideFlags: 0
@@ -158,8 +153,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvas: {fileID: 1453606477}
+  HomeScreenView: {fileID: 7018064738338162475, guid: c61b2c95d735c614699d244937113bb6, type: 3}
   MapOpenerView: {fileID: 8099739459360943739, guid: c9373b0038e7c5a4fafed8aebf7ea4e1, type: 3}
   DialogWindow: {fileID: 9023378669157016393, guid: fc02d57a8830ac84683706ca24c1a091, type: 3}
+  SettingsView: {fileID: 9103961765646916841, guid: 31df37c7d02efd54db0f6c0e76a06ee8, type: 3}
 --- !u!4 &421108730
 Transform:
   m_ObjectHideFlags: 0
@@ -175,7 +172,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &973709993
+--- !u!1001 &1121390688
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -304,6 +301,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c61b2c95d735c614699d244937113bb6, type: 3}
+--- !u!224 &1208303788 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 7018064738338162474, guid: c61b2c95d735c614699d244937113bb6, type: 3}
+  m_PrefabInstance: {fileID: 1121390688}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1351828149
 GameObject:
   m_ObjectHideFlags: 0
@@ -464,7 +466,7 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 393666162}
+  - {fileID: 1208303788}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

@@ -9,8 +9,10 @@ public class FileManagerMain : MonoBehaviour {
 
     public RectTransform canvas;
 
+    public GameObject HomeScreenView;
     public GameObject MapOpenerView;
     public GameObject DialogWindow;
+    public GameObject SettingsView;
 
 
     public static IFFParser iffFile;
@@ -19,10 +21,12 @@ public class FileManagerMain : MonoBehaviour {
 
     void Start() {
 
+        if (SettingsManager.keyBinds.Count == 0) {
+            SettingsManager.ParseSettings();
+        }
+
         DialogWindowUtil.prefab = DialogWindow;
         DialogWindowUtil.canvas = canvas.gameObject;
-
-        SettingsManager.ParseSettings();
 
     }
 
@@ -42,6 +46,30 @@ public class FileManagerMain : MonoBehaviour {
 
         var view = Instantiate(MapOpenerView);
         view.GetComponent<MapOpenerView>().main = this;
+        view.transform.SetParent(canvas, false);
+
+    }
+
+    public void OpenSettings() {
+
+        foreach (Transform child in canvas) {
+            Destroy(child.gameObject);
+        }
+
+        var view = Instantiate(SettingsView);
+        view.GetComponent<SettingsView>().main = this;
+        view.transform.SetParent(canvas, false);
+
+    }
+
+    public void OpenHome() {
+
+        foreach (Transform child in canvas) {
+            Destroy(child.gameObject);
+        }
+
+        var view = Instantiate(HomeScreenView);
+        view.GetComponent<HomeScreenView>().main = this;
         view.transform.SetParent(canvas, false);
 
     }

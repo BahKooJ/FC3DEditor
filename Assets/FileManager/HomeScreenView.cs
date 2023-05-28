@@ -30,4 +30,10 @@ public class HomeScreenView : MonoBehaviour {
 
     }
 
+    public void OnClickSettings() {
+
+        main.OpenSettings();
+
+    }
+
 }

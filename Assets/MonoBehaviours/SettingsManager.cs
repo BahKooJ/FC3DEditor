@@ -95,6 +95,22 @@ public abstract class SettingsManager {
 
     }
 
+    static public void SaveToFile() {
+
+        var total = "";
+
+        total += "Inputs = { \n";
+
+        foreach (var binds in keyBinds) {
+            total += "\"" + binds.Key + "\":\"" + binds.Value + "\"\n";
+        }
+
+        total += "}";
+
+        File.WriteAllText("Settings.txt", total);
+
+    }
+
 }
 
 public abstract class Controls {
