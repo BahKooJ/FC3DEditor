@@ -4,6 +4,7 @@ class ToolbarView: MonoBehaviour {
 
     public GameObject geometryEditorPanel;
     public GameObject addGeometryPanel;
+    public GameObject sectionEditPanel;
     public GameObject navMeshEditPanel;
     public GameObject actorEditPanel;
 
@@ -14,6 +15,26 @@ class ToolbarView: MonoBehaviour {
     void Start() {
 
         SelectGeometryEditorTool();
+
+    }
+
+    void Update() {
+
+        if (Controls.OnDown("GeometryEditingMode")) {
+            SelectGeometryEditorTool();
+        }
+        if (Controls.OnDown("TileBuildingMode")) {
+            AddGeometryPanel();
+        }
+        if (Controls.OnDown("SectionEditingMode")) {
+            SelectSectionEditMode();
+        }
+        if (Controls.OnDown("NavMeshEditingMode")) {
+            SelectNavMeshEdit();
+        }
+        if (Controls.OnDown("ActorEditingMode")) {
+            SelectActorEditMode();
+        }
 
     }
 
@@ -86,6 +107,26 @@ class ToolbarView: MonoBehaviour {
         var obj = Instantiate(actorEditPanel);
 
         var script = obj.GetComponent<ActorEditPanelView>();
+
+        script.controller = editMode;
+
+        obj.transform.SetParent(this.transform.parent, false);
+
+        activePanel = obj;
+
+        controller.ChangeEditMode(editMode);
+
+    }
+
+    public void SelectSectionEditMode() {
+
+        var editMode = new SectionEditMode(controller);
+
+        Destroy(activePanel);
+
+        var obj = Instantiate(sectionEditPanel);
+
+        var script = obj.GetComponent<SectionEditView>();
 
         script.controller = editMode;
 
