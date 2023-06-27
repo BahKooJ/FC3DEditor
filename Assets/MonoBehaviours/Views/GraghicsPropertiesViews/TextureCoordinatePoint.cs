@@ -47,7 +47,7 @@ class TextureCoordinatePoint : MonoBehaviour {
             controller.selectedSection.section.textureCoordinates[index] = TextureCoordinate.SetPixel(x, y);
             view.tilePreview.Refresh();
         }
-
+        view.UpdateDynamicTextureOffsets();
     }
 
     void Update() {

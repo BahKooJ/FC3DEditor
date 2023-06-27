@@ -630,6 +630,7 @@ public class GeometryEditMode : EditMode {
 
     }
 
+    // Input value must allways be zero. If another value is selected the editor crashes!!
     public void ExportTexture(int id) {
 
         if (id == -1) { return; }
@@ -641,11 +642,12 @@ public class GeometryEditMode : EditMode {
     }
 
     // TODO: Allow importing textures even when multiple tiles are selected
+    // Input value must allways be "0". If another value is selected the editor crashes!!
     public void ImportTexture(int id) {
 
         if (id == -1) { return; }
 
-        var graphics = selectedSection.section.tileGraphics[selectedTiles[0].graphicsIndex];
+        var graphics = selectedSection.section.tileGraphics[selectedTiles[id].graphicsIndex];
 
         main.level.textures[graphics.number2].ImportBMP(File.ReadAllBytes("bmp" + graphics.number2.ToString() + ".bmp"));
 
@@ -751,7 +753,7 @@ public class GeometryEditMode : EditMode {
     {
 
         DialogWindowUtil.Dialog("Warning",
-            "All height values are changes. This will overwrite all current map data, are you sure you want to continue?",
+            "All height values are changes.This will overwrite current section data, are you sure you want to continue?",
             () => {
 
                 if (selectedSection != null)
@@ -764,6 +766,23 @@ public class GeometryEditMode : EditMode {
 
             });
 
+    }
+
+    internal void CleanBrockenTiles()
+    {
+        DialogWindowUtil.Dialog("Warning",
+            "All tiles are checked. This will overwrite current section data, are you sure you want to continue?",
+            () => {
+
+                if (selectedSection != null)
+                {
+                    selectedSection.section.CleanBrockenTiles();
+                    selectedSection.RefreshMesh();
+                }
+
+                return true;
+
+            });
     }
     #endregion
 

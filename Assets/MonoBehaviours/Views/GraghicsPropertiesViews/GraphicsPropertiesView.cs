@@ -19,6 +19,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
     // --Prefabs--
     public GameObject textureOffsetItem;
+    public GameObject dynamicTextureOffsetItem;
     public GameObject graphicsPresetItem;
     public GameObject textureCoordinatePoint;
 
@@ -28,6 +29,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
     public GameObject texturePallete;
     public GameObject texturePalleteImage;
     public GameObject textureOffsets;
+    public GameObject dynamicTextureOffsets;
     public ScrollRect textureScrollView;
     public GameObject graphicsPreset;
     public TextureCoordinatesLines textureLines;
@@ -64,8 +66,8 @@ public class GraphicsPropertiesView : MonoBehaviour {
     }
 
     void Update() {
-
-        float axis = Input.GetAxis("Mouse ScrollWheel");
+        
+        /*float axis = Input.GetAxis("Mouse ScrollWheel");
         if (axis != 0) {
 
             if (IsCursorInTexturePallete()) {
@@ -128,7 +130,7 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
             }
 
-        }
+        }*/
 
     }
 
@@ -263,6 +265,56 @@ public class GraphicsPropertiesView : MonoBehaviour {
         //textureScrollView.verticalNormalizedPosition = 1 - scrollDistance;
 
     }
+    public void UpdateDynamicTextureOffsets()
+    {
+        foreach (var index in Enumerable.Range(0, dynamicTextureOffsets.transform.childCount))
+        {
+            Transform t = dynamicTextureOffsets.transform.GetChild(index);
+            Destroy(t.gameObject);
+        }
+
+        foreach (var index in Enumerable.Range(0, controller.selectedSection.section.textureCoordinates.Count))
+        {
+
+            var item = Instantiate(dynamicTextureOffsetItem);
+
+            var script = item.GetComponent<TextureOffsetItemV2>();
+
+            script.controller = controller;
+
+            script.view = this;
+
+            script.index = index;
+
+            item.transform.SetParent(dynamicTextureOffsets.transform);
+
+        }
+
+        foreach (var index in Enumerable.Range(0, textureCoordsClipboard.Count))
+        {
+
+            var item = Instantiate(dynamicTextureOffsetItem);
+
+            var script = item.GetComponent<TextureOffsetItemV2>();
+
+            script.controller = controller;
+
+            script.view = this;
+
+            script.index = index;
+
+            script.isGlobal = true;
+
+            item.transform.SetParent(dynamicTextureOffsets.transform);
+
+        }
+
+        //var itemCount = textureOffsets.transform.childCount;
+        //var scrollDistance = (controller.selectedTiles[0].textureIndex) / (itemCount);
+
+        //textureScrollView.verticalNormalizedPosition = 1 - scrollDistance;
+
+    }
 
     public void InitGraphicsPreset() {
 
@@ -353,15 +405,48 @@ public class GraphicsPropertiesView : MonoBehaviour {
 
     public void OnClickExportTexture() {
 
-        controller.ExportTexture(this.bmpID);
+        //The int value used to breack the exporting
+        OnClickExportTexture(this.bmpID);
+
+    }
+    public void OnClickExportTexture(int index)
+    {
+
+        var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
+        int currentValue = graphics.number2;
+        controller.ChangeTexturePallette(index);
+
+        InitTexturePallette();
+        controller.ExportTexture(0);
+
+        texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = currentValue;
+
+        InitTexturePallette();
+
+    }
+    public void OnClickImportTexture()
+    {
+
+        OnClickImportTexture(this.bmpID);
 
     }
 
-    public void OnClickImportTexture() {
+    public void OnClickImportTexture(int index) {
 
-        controller.ImportTexture(bmpID);
-
+        //A work around for errors in other parts of the code 
         var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
+        int currentValue = graphics.number2;
+        //Updating to new index
+        controller.ChangeTexturePallette(index);
+
+        InitTexturePallette();
+
+        //Input value must allways be zero. If another value is selected the editor crashes!!
+        controller.ImportTexture(0);
+        //Updating values for display
+        texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = currentValue;
+
+        graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
 
         texturePalletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
 

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
 namespace FCopParser {
@@ -1011,6 +1012,52 @@ namespace FCopParser {
 
         }
 
+        internal void CleanBrockenTiles()
+        {
+           var newHeightOrder = new List<HeightPoints>();
+
+            
+            foreach (var ty in Enumerable.Range(0, 16))
+            {
+
+                foreach (var tx in Enumerable.Range(0, 16))
+                {
+                    TileColumn column = tileColumns[(ty * 16) + tx];
+                    StringBuilder logMessage = new StringBuilder("Column Nr: " + (ty * 16) + tx + "\n x=" + tx + " y=" + ty+"\n");
+                    bool valueDuplicate = false;
+                    int verticiesCount = 4;
+                    foreach (var tIndex in Enumerable.Range(0, column.tiles.Count))
+                    {
+                        logMessage.AppendLine("Index: " + tIndex);
+                        logMessage.AppendLine("Verticies: " + column.tiles[tIndex].verticies.Count());
+                        verticiesCount = column.tiles[tIndex].verticies.Count();
+                        List<TileVertex> oldVertices = new List<TileVertex>();
+                        foreach (var vIndex in Enumerable.Range(0, column.tiles[tIndex].verticies.Count()))
+                        {
+                            TileVertex currentTileVertex = column.tiles[tIndex].verticies[vIndex];
+
+                            logMessage.Append("Vertex " + vIndex +": Position = " + currentTileVertex.vertexPosition + " Channel = " + currentTileVertex.heightChannel + " ");
+
+
+                            foreach (var oldVertex in oldVertices)
+                            {
+                                if (currentTileVertex.vertexPosition == oldVertex.vertexPosition && currentTileVertex.heightChannel == oldVertex.heightChannel)
+                                {
+                                    valueDuplicate = true;
+                                }
+                            }
+
+                                logMessage.AppendLine();
+                        }
+                        
+                    }
+                    if (valueDuplicate || verticiesCount < 3 || verticiesCount > 4)
+                    {
+                        Debug.Log(logMessage);
+                    }
+                }
+            }
+        }
     }
 
     public class HeightPoints {
