@@ -44,7 +44,10 @@ public class TextureEditMode : EditMode {
         if (FreeMove.looking) {
             main.TestRayOnLevelMesh();
         }
-
+        if (Controls.OnDown("Unselect")) {
+            ClearAllSelectedItems();
+        }
+    
     }
 
     public void LookTile(Tile tile, TileColumn column, LevelMesh section) {
@@ -214,44 +217,14 @@ public class TextureEditMode : EditMode {
 
     }
 
-    public void ExportTexture(int id) {
-
-        if (id == -1) { return; }
-
-        var graphics = selectedSection.section.tileGraphics[id];
-
-        File.WriteAllBytes("bmp" + graphics.number2.ToString() + ".bmp", main.level.textures[graphics.number2].BitmapWithHeader());
-
-    }
-
-    // TODO: Allow importing textures even when multiple tiles are selected
-    public void ImportTexture(int id) {
-
-        if (id == -1) { return; }
-
-        var graphics = selectedSection.section.tileGraphics[selectedTiles[0].graphicsIndex];
-
-        main.level.textures[graphics.number2].ImportBMP(File.ReadAllBytes("bmp" + graphics.number2.ToString() + ".bmp"));
-
-    }
+    // TODO: Importing and exporting textures, remember that FCopTexture.ImportBMP exists
 
     public void ChangeTexturePallette(int palletteOffset) {
 
         foreach (var tile in selectedTiles) {
-            var graphics = selectedSection.section.tileGraphics[tile.graphicsIndex];
 
-            graphics.number2 = palletteOffset;
+            tile.texturePalette = palletteOffset;
 
-            selectedSection.section.tileGraphics[tile.graphicsIndex] = graphics;
-
-        }
-
-    }
-
-    public void SetTextureIndex(int index) {
-
-        foreach (var tile in selectedTiles) {
-            tile.textureIndex = index;
         }
 
     }

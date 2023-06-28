@@ -102,10 +102,11 @@ public class TextureUVMapper : MonoBehaviour {
 
         var sameTexture = true;
 
-        bmpID = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex].number2; ;
+        // If multiple tiles are select this checks to see if they're all the same texture
+        bmpID = controller.selectedTiles[0].texturePalette;
         foreach (var tile in controller.selectedTiles) {
 
-            if (bmpID != controller.selectedSection.section.tileGraphics[tile.graphicsIndex].number2) {
+            if (bmpID != tile.texturePalette) {
                 sameTexture = false;
                 bmpID = -1;
                 break;
@@ -115,11 +116,11 @@ public class TextureUVMapper : MonoBehaviour {
 
         if (sameTexture) {
 
-            var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
+            var bmpID = controller.selectedTiles[0].texturePalette;
 
-            texturePaletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
+            texturePaletteDropdown.GetComponent<TMP_Dropdown>().value = bmpID;
 
-            texturePaletteImage.GetComponent<Image>().sprite = controller.main.bmpTextures[graphics.number2];
+            texturePaletteImage.GetComponent<Image>().sprite = controller.main.bmpTextures[bmpID];
 
         }
 
@@ -148,9 +149,7 @@ public class TextureUVMapper : MonoBehaviour {
 
         controller.ChangeTexturePallette(texturePaletteDropdown.GetComponent<TMP_Dropdown>().value);
 
-        var graphics = controller.selectedSection.section.tileGraphics[controller.selectedTiles[0].graphicsIndex];
-
-        texturePaletteDropdown.GetComponent<TMP_Dropdown>().value = graphics.number2;
+        texturePaletteDropdown.GetComponent<TMP_Dropdown>().value = controller.selectedTiles[0].texturePalette;
 
         InitTexturePallette();
 

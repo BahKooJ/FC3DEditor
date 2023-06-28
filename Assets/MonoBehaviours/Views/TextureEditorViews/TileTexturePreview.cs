@@ -128,25 +128,19 @@ public class TileTexturePreview : MonoBehaviour {
 
         }
         
-        //TODO: If texture index that is more than avaliable will cause crash
+        
         void GenerateTriangle(Tile tile) {
 
-            var textureOffset = tile.textureIndex;
-            var grpahics = section.tileGraphics[tile.graphicsIndex];
-            textureCords.Add(new Vector2(
-                TextureCoordinate.GetX(section.textureCoordinates[textureOffset] + grpahics.number2 * 65536),
-                TextureCoordinate.GetY(section.textureCoordinates[textureOffset] + grpahics.number2 * 65536)
-            ));
-            textureCords.Add(new Vector2(
-                TextureCoordinate.GetX(section.textureCoordinates[textureOffset + 2] + grpahics.number2 * 65536),
-                TextureCoordinate.GetY(section.textureCoordinates[textureOffset + 2] + grpahics.number2 * 65536)
-            ));
-            textureCords.Add(new Vector2(
-                TextureCoordinate.GetX(section.textureCoordinates[textureOffset + 1] + grpahics.number2 * 65536),
-                TextureCoordinate.GetY(section.textureCoordinates[textureOffset + 1] + grpahics.number2 * 65536)
-            ));
-
             AddVerticies(tile);
+
+            foreach (var uv in tile.uvs) {
+
+                textureCords.Add(new Vector2(
+                    TextureCoordinate.GetX(uv + tile.texturePalette * 65536),
+                    TextureCoordinate.GetY(uv + tile.texturePalette * 65536)
+                ));
+
+            }
 
             triangles.Add(vertexIndex);
             triangles.Add(vertexIndex + 1);
@@ -160,24 +154,14 @@ public class TileTexturePreview : MonoBehaviour {
 
             AddVerticies(tile);
 
-            var textureOffset = tile.textureIndex;
-            var grpahics = section.tileGraphics[tile.graphicsIndex];
-            textureCords.Add(new Vector2(
-                TextureCoordinate.GetX(section.textureCoordinates[textureOffset] + grpahics.number2 * 65536),
-                TextureCoordinate.GetY(section.textureCoordinates[textureOffset] + grpahics.number2 * 65536)
-            ));
-            textureCords.Add(new Vector2(
-                TextureCoordinate.GetX(section.textureCoordinates[textureOffset + 1] + grpahics.number2 * 65536),
-                TextureCoordinate.GetY(section.textureCoordinates[textureOffset + 1] + grpahics.number2 * 65536)
-            ));
-            textureCords.Add(new Vector2(
-                TextureCoordinate.GetX(section.textureCoordinates[textureOffset + 3] + grpahics.number2 * 65536),
-                TextureCoordinate.GetY(section.textureCoordinates[textureOffset + 3] + grpahics.number2 * 65536)
-            ));
-            textureCords.Add(new Vector2(
-                TextureCoordinate.GetX(section.textureCoordinates[textureOffset + 2] + grpahics.number2 * 65536),
-                TextureCoordinate.GetY(section.textureCoordinates[textureOffset + 2] + grpahics.number2 * 65536)
-            ));
+            foreach (var uv in tile.uvs) {
+
+                textureCords.Add(new Vector2(
+                    TextureCoordinate.GetX(uv + tile.texturePalette * 65536),
+                    TextureCoordinate.GetY(uv + tile.texturePalette * 65536)
+                ));
+
+            }
 
             triangles.Add(vertexIndex);
             triangles.Add(vertexIndex + 2);

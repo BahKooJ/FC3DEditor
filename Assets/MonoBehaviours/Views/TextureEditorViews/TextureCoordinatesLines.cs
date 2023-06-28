@@ -13,7 +13,6 @@ public class TextureCoordinatesLines : MonoBehaviour {
 
     public List<GameObject> points = new();
 
-    int index = 0;
     List<int> textureCoords = new();
 
     void Start() {
@@ -52,11 +51,10 @@ public class TextureCoordinatesLines : MonoBehaviour {
             point.transform.localPosition = new Vector2(TextureCoordinate.GetXPixel(coord), TextureCoordinate.GetYPixel(coord));
 
             var script = point.GetComponent<TextureCoordinatePoint>();
-            script.index = index + it;
+            script.uvOffset = it;
             script.textureOffset = coord;
             script.controller = view.controller;
             script.view = view;
-            script.isGlobalPoint = view.globalTextureCoordIndex == null ? false : true;
             script.imageTransform = (RectTransform)view.texturePaletteImage.transform;
             script.lines = this;
 
@@ -120,37 +118,23 @@ public class TextureCoordinatesLines : MonoBehaviour {
 
         textureCoords.Clear();
 
-        List<int> coords;
-
+        var uvs = view.controller.selectedTiles[0].uvs;
         if (view.controller.selectedTiles.Count > 1) {
 
-            var textureIndex = view.controller.selectedTiles[0].textureIndex;
             foreach (var tile in view.controller.selectedTiles) {
 
-                if (textureIndex != tile.textureIndex) {
-                    return;
+                if (!uvs.Equals(tile.uvs)) {
+
+                    //TODO: This isn't the best way of doing things because it overwrites immediately. 
+                    tile.uvs = new List<int>(uvs);
+
                 }
 
             }
 
         }
 
-        coords = view.controller.selectedSection.section.textureCoordinates;
-
-        index = view.controller.selectedTiles[0].textureIndex;
-
-        var vertexCount = view.controller.selectedTiles[0].verticies.Count;
-
-        if (coords.Count - index < vertexCount) {
-            return;
-        }
-
-        foreach (var i in Enumerable.Range(0, vertexCount)) {
-
-            var coord = coords[index + i];
-
-            textureCoords.Add(coord);
-        }
+        textureCoords = new List<int>(uvs);
 
     }
 

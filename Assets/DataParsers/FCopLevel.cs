@@ -120,6 +120,15 @@ namespace FCopParser {
 
             oobSection.parser.rawFile = oobSection.parser.rawFile.Clone(1);
 
+            oobSection.tileGraphics.Clear();
+            oobSection.tileGraphics.Add(new TileGraphics(116, 6, 0, 1, 0));
+
+            oobSection.textureCoordinates.Clear();
+            oobSection.textureCoordinates.Add(57200);
+            oobSection.textureCoordinates.Add(57228);
+            oobSection.textureCoordinates.Add(50060);
+            oobSection.textureCoordinates.Add(50032);
+
             foreach (var h in oobSection.heightMap) {
                 h.SetPoint(19, 1);
                 h.SetPoint(-128, 2);
@@ -130,18 +139,9 @@ namespace FCopParser {
 
                 tColumn.tiles.Clear();
 
-                tColumn.tiles.Add(new Tile(new TileBitfield(1, 0, 0, 0, 68, 0), tColumn));
+                tColumn.tiles.Add(new Tile(new TileBitfield(1, 0, 0, 0, 68, 0), tColumn, oobSection));
 
             }
-
-            oobSection.tileGraphics.Clear();
-            oobSection.tileGraphics.Add(new TileGraphics(116, 6, 0, 1, 0));
-
-            oobSection.textureCoordinates.Clear();
-            oobSection.textureCoordinates.Add(57200);
-            oobSection.textureCoordinates.Add(57228);
-            oobSection.textureCoordinates.Add(50060);
-            oobSection.textureCoordinates.Add(50032);
 
             sections.Add(oobSection);
 
@@ -167,7 +167,7 @@ namespace FCopParser {
 
                         tColumn.tiles.Clear();
 
-                        tColumn.tiles.Add(new Tile(new TileBitfield(1, 0, 0, 0, 68, 0), tColumn));
+                        tColumn.tiles.Add(new Tile(new TileBitfield(1, 0, 0, 0, 68, 0), tColumn, oobSection));
 
                     }
 
@@ -321,7 +321,7 @@ namespace FCopParser {
                 var column = new TileColumn(x, y, tiles, heights);
 
                 foreach (var parsedTile in parsedTiles) {
-                    tiles.Add(new Tile(parsedTile, column));
+                    tiles.Add(new Tile(parsedTile, column, this));
                 }
 
                 tileColumns.Add(column);
@@ -845,6 +845,9 @@ namespace FCopParser {
 
         public void Overwrite(FCopLevelSection section) {
 
+            textureCoordinates = new List<int>(section.textureCoordinates);
+            tileGraphics = new List<TileGraphics>(section.tileGraphics);
+
             heightMap.Clear();
             foreach (var newHeight in section.heightMap) {
                 heightMap.Add(new HeightPoints(newHeight.height1, newHeight.height2, newHeight.height3));
@@ -867,7 +870,7 @@ namespace FCopParser {
                 var column = new TileColumn(x, y, newTiles, heights);
 
                 foreach (var newTile in newColumn.tiles) {
-                    newTiles.Add(new Tile(newTile.Compile(), column));
+                    newTiles.Add(new Tile(newTile.Compile(), column, section));
                 }
 
                 tileColumns.Add(column);
@@ -880,8 +883,6 @@ namespace FCopParser {
 
             }
 
-            textureCoordinates = new List<int>(section.textureCoordinates);
-
             colors.Clear();
 
             foreach (var newColor in section.colors) {
@@ -889,8 +890,6 @@ namespace FCopParser {
                 colors.Add(new XRGB555(newColor.x, newColor.r, newColor.g, newColor.b));
 
             }
-
-            tileGraphics = new List<TileGraphics>(section.tileGraphics);
 
         }
 
@@ -1064,36 +1063,40 @@ namespace FCopParser {
         public bool isStartInColumnArray;
         public List<TileVertex> verticies;
 
-        public List<int> uvs;
+        public List<int> uvs = new();
         public int texturePalette;
 
-        //TODO: Remove these
-        public int textureIndex;
-        public int graphicsIndex;
+        public TileGraphics graphics;
 
-        public int unknownButVeryImportantNumber;
+        public int culling;
 
         public TileBitfield parsedTile;
 
-        public Tile(TileBitfield parsedTile, TileColumn column) {
+        public Tile(TileBitfield parsedTile, TileColumn column, FCopLevelSection section) {
 
             this.column = column;
 
             isStartInColumnArray = parsedTile.number1 == 1;
 
             verticies = MeshType.VerticiesFromID(parsedTile.number5);
-            textureIndex = parsedTile.number2;
 
-            unknownButVeryImportantNumber = parsedTile.number3;
+            culling = parsedTile.number3;
 
-            graphicsIndex = parsedTile.number6;
+            var textureIndex = parsedTile.number2;
+            var graphicsIndex = parsedTile.number6;
+            graphics = section.tileGraphics[graphicsIndex];
+
+
+            foreach (var i in Enumerable.Range(textureIndex, verticies.Count)) {
+                uvs.Add(section.textureCoordinates[i]);
+            }
+
+            texturePalette = graphics.number2;
 
             this.parsedTile = parsedTile;
         }
 
         public TileBitfield Compile() {
-
-            //This is still broken
 
             var id = MeshType.IDFromVerticies(verticies);
 
@@ -1101,11 +1104,14 @@ namespace FCopParser {
                 throw new MeshIDException();
             }
 
+
+
+            // FIX ME
             parsedTile.number1 = isStartInColumnArray ? 1 : 0;
             parsedTile.number5 = (int)id;
-            parsedTile.number2 = textureIndex;
-            parsedTile.number3 = unknownButVeryImportantNumber;
-            parsedTile.number6 = graphicsIndex;
+            //parsedTile.number2 = textureIndex;
+            parsedTile.number3 = culling;
+            //parsedTile.number6 = graphicsIndex;
 
             return parsedTile;
 
