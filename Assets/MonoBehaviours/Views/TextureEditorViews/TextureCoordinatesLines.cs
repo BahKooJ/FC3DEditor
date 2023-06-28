@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class TextureCoordinatesLines : MonoBehaviour {
     
-    public GraphicsPropertiesView view;
+    public TextureUVMapper view;
 
     LineRenderer lineRenderer;
 
@@ -122,57 +122,34 @@ public class TextureCoordinatesLines : MonoBehaviour {
 
         List<int> coords;
 
-        if (view.globalTextureCoordIndex != null) {
+        if (view.controller.selectedTiles.Count > 1) {
 
-            coords = GraphicsPropertiesView.textureCoordsClipboard;
+            var textureIndex = view.controller.selectedTiles[0].textureIndex;
+            foreach (var tile in view.controller.selectedTiles) {
 
-            index = (int)view.globalTextureCoordIndex;
-
-            var vertexCount = view.controller.selectedTiles[0].verticies.Count;
-
-            if (coords.Count - index < vertexCount) {
-                return;
-            }
-
-            foreach (var i in Enumerable.Range(0, vertexCount)) {
-
-                var coord = coords[index + i];
-
-                textureCoords.Add(coord);
-            }
-
-        } else {
-
-            if (view.controller.selectedTiles.Count > 1) {
-
-                var textureIndex = view.controller.selectedTiles[0].textureIndex;
-                foreach (var tile in view.controller.selectedTiles) {
-
-                    if (textureIndex != tile.textureIndex) {
-                        return;
-                    }
-
+                if (textureIndex != tile.textureIndex) {
+                    return;
                 }
 
             }
 
-            coords = view.controller.selectedSection.section.textureCoordinates;
+        }
 
-            index = view.controller.selectedTiles[0].textureIndex;
+        coords = view.controller.selectedSection.section.textureCoordinates;
 
-            var vertexCount = view.controller.selectedTiles[0].verticies.Count;
+        index = view.controller.selectedTiles[0].textureIndex;
 
-            if (coords.Count - index < vertexCount) {
-                return;
-            }
+        var vertexCount = view.controller.selectedTiles[0].verticies.Count;
 
-            foreach (var i in Enumerable.Range(0, vertexCount)) {
+        if (coords.Count - index < vertexCount) {
+            return;
+        }
 
-                var coord = coords[index + i];
+        foreach (var i in Enumerable.Range(0, vertexCount)) {
 
-                textureCoords.Add(coord);
-            }
+            var coord = coords[index + i];
 
+            textureCoords.Add(coord);
         }
 
     }

@@ -66,7 +66,6 @@ public class TileTexturePreview : MonoBehaviour {
 
     }
 
-
     void Generate() {
 
         var vertexIndex = 0;

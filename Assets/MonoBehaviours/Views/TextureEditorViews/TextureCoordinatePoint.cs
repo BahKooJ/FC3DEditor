@@ -8,8 +8,8 @@ class TextureCoordinatePoint : MonoBehaviour {
     public int index;
     public int textureOffset;
     public bool isGlobalPoint;
-    public GeometryEditMode controller;
-    public GraphicsPropertiesView view;
+    public TextureEditMode controller;
+    public TextureUVMapper view;
     public RectTransform imageTransform;
     public TextureCoordinatesLines lines;
 
@@ -25,28 +25,18 @@ class TextureCoordinatePoint : MonoBehaviour {
         pos.y += y;
 
         transform.localPosition = pos;
-
-        // Tests if the index is for the section or for a global texture/clipboard.
-        if (isGlobalPoint) {
-            GraphicsPropertiesView.textureCoordsClipboard[index] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
-        } else {
-            controller.selectedSection.section.textureCoordinates[index] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
-            view.tilePreview.Refresh();
-        }
+        
+        controller.selectedSection.section.textureCoordinates[index] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
+        
 
     }
 
     public void ChangePosition(int x, int y) {
 
         transform.localPosition = new Vector2(x, y);
-
-        // Tests if the index is for the section or for a global texture/clipboard.
-        if (isGlobalPoint) {
-            GraphicsPropertiesView.textureCoordsClipboard[index] = TextureCoordinate.SetPixel(x, y);
-        } else {
-            controller.selectedSection.section.textureCoordinates[index] = TextureCoordinate.SetPixel(x, y);
-            view.tilePreview.Refresh();
-        }
+        
+        controller.selectedSection.section.textureCoordinates[index] = TextureCoordinate.SetPixel(x, y);
+        
 
     }
 

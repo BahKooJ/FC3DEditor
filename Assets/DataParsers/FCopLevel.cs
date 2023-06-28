@@ -1063,8 +1063,14 @@ namespace FCopParser {
 
         public bool isStartInColumnArray;
         public List<TileVertex> verticies;
+
+        public List<int> uvs;
+        public int texturePalette;
+
+        //TODO: Remove these
         public int textureIndex;
         public int graphicsIndex;
+
         public int unknownButVeryImportantNumber;
 
         public TileBitfield parsedTile;
