@@ -383,6 +383,9 @@ namespace FCopParser {
             List<ThirdSectionBitfield> thirdSectionBitfields = new List<ThirdSectionBitfield>();
             List<TileBitfield> tiles = new List<TileBitfield>();
 
+            textureCoordinates.Clear();
+            tileGraphics.Clear();
+
             List<Chunk> chunks = new List<Chunk>() { new Chunk(0,0) };
 
             foreach (var point in heightMap) {
@@ -437,15 +440,73 @@ namespace FCopParser {
 
                 foreach (var column in chunk.tileColumns) {
 
-                    // Tiles are sorted within a tile column, the order is not completely know but what is know is walls cannot be first
                     var sortedTiles = new List<TileBitfield>();
 
                     // Now that the tile columns are sorted to fit the 4x4 chunk pattern in the tile array, we can simple add the tiles after they're sorted.
                     foreach (var tile in column.tiles) {
 
-                        var compiledTile = tile.Compile();
+                        // Compresses both the uv mapping and tile graphics
+                        int textureIndex = -1;
+                        int graphicsIndex = -1;
 
-                        if (compiledTile.number5 < 71) {
+                        // First the uvs...
+                        if (textureCoordinates.Count != 0) {
+
+                            foreach (var i in Enumerable.Range(0, textureCoordinates.Count - tile.uvs.Count)) {
+
+                                if (textureCoordinates.GetRange(i, tile.uvs.Count).SequenceEqual(tile.uvs)) {
+                                    textureIndex = i;
+                                    break;
+                                }
+
+                            }
+
+                        }
+
+                        if (textureIndex == -1) {
+
+                            textureIndex = textureCoordinates.Count;
+
+                            textureCoordinates.AddRange(tile.uvs);
+
+                            if (textureCoordinates.Count > 1023) {
+                                throw new TextureArrayMaxExceeded();
+                            }
+
+                        }
+
+                        // Second the graphics
+                        var compiledGraphics = tile.CompileGraphics();
+
+                        if (tileGraphics.Count != 0) {
+
+                            foreach (var i in Enumerable.Range(0, tileGraphics.Count)) {
+
+                                if (compiledGraphics == tileGraphics[i]) {
+                                    graphicsIndex = i;
+                                    break;
+                                }
+
+                            }
+
+                        }
+
+                        if (graphicsIndex == -1) {
+
+                            graphicsIndex = tileGraphics.Count;
+
+                            tileGraphics.Add(compiledGraphics);
+
+                            if (textureCoordinates.Count > 1023) {
+                                throw new GraphicsArrayMaxExceeded();
+                            }
+
+                        }
+
+                        var compiledTile = tile.Compile(textureIndex, graphicsIndex);
+
+                        // Tiles are sorted within a tile column, the order is not completely known but what is know is walls cannot be first
+                        if (compiledTile.meshID < 71) {
                             sortedTiles.Insert(0, compiledTile);
                         } else {
                             sortedTiles.Add(compiledTile);
@@ -453,14 +514,19 @@ namespace FCopParser {
 
                     }
 
-                    tiles.AddRange(sortedTiles);
-
                     // Makes sure the last tile value is correct
-                    foreach (var tile in column.tiles) {
-                        tile.isStartInColumnArray = false;
+
+                    foreach (var i in Enumerable.Range(0, sortedTiles.Count)) {
+                        var cTile = sortedTiles[i];
+                        cTile.isEndInColumnArray = 0;
+                        sortedTiles[i] = cTile;
                     }
 
-                    column.tiles.Last().isStartInColumnArray = true;
+                    var lastCTile = sortedTiles.Last();
+                    lastCTile.isEndInColumnArray = 1;
+                    sortedTiles[sortedTiles.Count - 1] = lastCTile;
+
+                    tiles.AddRange(sortedTiles);
 
                 }
 
@@ -881,7 +947,7 @@ namespace FCopParser {
                 var column = new TileColumn(x, y, newTiles, heights);
 
                 foreach (var newTile in newColumn.tiles) {
-                    newTiles.Add(new Tile(newTile.Compile(), column, section));
+                    newTiles.Add(new Tile(newTile, column, section));
                 }
 
                 tileColumns.Add(column);
@@ -1065,13 +1131,12 @@ namespace FCopParser {
 
     }
 
-    // TODO: Naming is wrong
     // Tiles are sorted into 4x4 chunks
     public class Tile {
 
         public TileColumn column;
 
-        public bool isStartInColumnArray;
+        public bool isEndInColumnArray;
         public List<TileVertex> verticies;
 
         public List<int> uvs = new();
@@ -1087,14 +1152,14 @@ namespace FCopParser {
 
             this.column = column;
 
-            isStartInColumnArray = parsedTile.number1 == 1;
+            isEndInColumnArray = parsedTile.isEndInColumnArray == 1;
 
-            verticies = MeshType.VerticiesFromID(parsedTile.number5);
+            verticies = MeshType.VerticiesFromID(parsedTile.meshID);
 
-            culling = parsedTile.number3;
+            culling = parsedTile.culling;
 
-            var textureIndex = parsedTile.number2;
-            var graphicsIndex = parsedTile.number6;
+            var textureIndex = parsedTile.textureIndex;
+            var graphicsIndex = parsedTile.graphicIndex;
             graphics = section.tileGraphics[graphicsIndex];
 
 
@@ -1107,7 +1172,25 @@ namespace FCopParser {
             this.parsedTile = parsedTile;
         }
 
-        public TileBitfield Compile() {
+        public Tile(Tile tile, TileColumn column, FCopLevelSection section) {
+
+            this.column = column;
+
+            isEndInColumnArray = tile.isEndInColumnArray;
+
+            verticies = new List<TileVertex>(tile.verticies);
+
+            culling = tile.culling;
+
+            tile.uvs = new List<int>(tile.uvs);
+
+            texturePalette = tile.texturePalette;
+
+            this.parsedTile = tile.parsedTile;
+
+        }
+
+        public TileBitfield Compile(int textureIndex, int graphicsIndex) {
 
             var id = MeshType.IDFromVerticies(verticies);
 
@@ -1118,13 +1201,21 @@ namespace FCopParser {
 
 
             // FIX ME
-            parsedTile.number1 = isStartInColumnArray ? 1 : 0;
-            parsedTile.number5 = (int)id;
-            //parsedTile.number2 = textureIndex;
-            parsedTile.number3 = culling;
-            //parsedTile.number6 = graphicsIndex;
+            parsedTile.isEndInColumnArray = isEndInColumnArray ? 1 : 0;
+            parsedTile.meshID = (int)id;
+            parsedTile.textureIndex = textureIndex;
+            parsedTile.culling = culling;
+            parsedTile.graphicIndex = graphicsIndex;
 
             return parsedTile;
+
+        }
+
+        public TileGraphics CompileGraphics() {
+
+            var isRect = verticies.Count == 4;
+
+            return new TileGraphics(116, texturePalette, 0, isRect ? 1 : 0, 0);
 
         }
 

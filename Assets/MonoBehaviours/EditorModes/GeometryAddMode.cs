@@ -107,7 +107,7 @@ public class GeometryAddMode : EditMode {
         if (selectedColumn != null) {
 
             foreach (var t in selectedColumn.tiles) {
-                t.isStartInColumnArray = false;
+                t.isEndInColumnArray = false;
             }
 
             var tile = preset.Create(true, selectedColumn, selectedSection.section);
