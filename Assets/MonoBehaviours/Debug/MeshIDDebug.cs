@@ -2,6 +2,8 @@
 
 using FCopParser;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -13,7 +15,8 @@ public class MeshIDDebug: MonoBehaviour {
     public TextMeshProUGUI meshIDtext;
     public SelectedTileOverlay tilePreview;
 
-
+    IFFParser iffFile = new IFFParser(File.ReadAllBytes("MissionFiles/Mp"));
+    FCopLevel level;
     TileColumn exampleColumn;
     Tile exampleTile;
 
@@ -21,12 +24,13 @@ public class MeshIDDebug: MonoBehaviour {
 
     void Start () {
 
+        level = new FCopLevel(iffFile.parsedData);
+
         exampleColumn = new TileColumn(0, 0, new(), new() {
             new HeightPoints(0,1,2), new HeightPoints(0,1,2), new HeightPoints(0,1,2), new HeightPoints(0,1,2)
         });
 
-        // FIX ME: Because of refactor this needs a section.
-        //exampleTile = new Tile(new TileBitfield(0, 0, 0, 0, meshID, 0), exampleColumn);
+        exampleTile = new Tile(new TileBitfield(0, 0, 0, 0, meshID, 0), exampleColumn, level.sections[0]);
 
         var overlay = Instantiate(tilePreviewPrefab);
         var script = overlay.GetComponent<SelectedTileOverlay>();
@@ -46,7 +50,7 @@ public class MeshIDDebug: MonoBehaviour {
 
             meshID++;
 
-            //exampleTile = new Tile(new TileBitfield(0, 0, 0, 0, meshID, 0), exampleColumn);
+            exampleTile = new Tile(new TileBitfield(0, 0, 0, 0, meshID, 0), exampleColumn, level.sections[0]);
 
             meshIDtext.text = meshID.ToString();
 
@@ -89,7 +93,7 @@ public class MeshIDDebug: MonoBehaviour {
 
             meshID--;
 
-            //exampleTile = new Tile(new TileBitfield(0, 0, 0, 0, meshID, 0), exampleColumn);
+            exampleTile = new Tile(new TileBitfield(0, 0, 0, 0, meshID, 0), exampleColumn, level.sections[0]);
 
             meshIDtext.text = meshID.ToString();
 

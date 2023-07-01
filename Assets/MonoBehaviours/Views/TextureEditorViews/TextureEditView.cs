@@ -8,14 +8,20 @@ public class TextureEditView: MonoBehaviour {
 
     public GameObject graphicsPropertiesView;
 
-    public GameObject activeGraphicsPropertiesView = null;
+    public GameObject activeTextureUVMapper = null;
+
+    void Start() {
+
+        controller.view = this;
+
+    }
 
     void Update() {
 
         if (Input.GetKeyDown(KeyCode.Escape)) {
 
-            if (activeGraphicsPropertiesView != null) {
-                CloseGraphicsPropertyView();
+            if (activeTextureUVMapper != null) {
+                CloseTextureUVMapper();
             }
 
         }
@@ -26,23 +32,23 @@ public class TextureEditView: MonoBehaviour {
 
         if (controller.selectedTiles.Count == 0) { return; }
 
-        if (activeGraphicsPropertiesView != null) {
-            CloseGraphicsPropertyView();
+        if (activeTextureUVMapper != null) {
+            CloseTextureUVMapper();
         }
         else {
 
-            activeGraphicsPropertiesView = Instantiate(graphicsPropertiesView);
+            activeTextureUVMapper = Instantiate(graphicsPropertiesView);
 
-            activeGraphicsPropertiesView.GetComponent<TextureUVMapper>().controller = controller;
+            activeTextureUVMapper.GetComponent<TextureUVMapper>().controller = controller;
 
-            activeGraphicsPropertiesView.transform.SetParent(transform.parent, false);
+            activeTextureUVMapper.transform.SetParent(transform.parent, false);
 
         }
 
     }
 
-    void CloseGraphicsPropertyView() {
-        Destroy(activeGraphicsPropertiesView);
+    public void CloseTextureUVMapper() {
+        Destroy(activeTextureUVMapper);
         controller.selectedSection.RefreshMesh();
     }
 

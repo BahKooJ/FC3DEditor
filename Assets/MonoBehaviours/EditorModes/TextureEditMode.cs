@@ -17,16 +17,6 @@ public class TextureEditMode : EditMode {
 
     public TextureEditView view;
 
-    public bool IsGraphicsViewOpen() {
-
-        if (view != null) {
-            return view.activeGraphicsPropertiesView != null;
-        }
-
-        return false;
-
-    }
-
     public TextureEditMode(Main main) {
         this.main = main;
     }
@@ -45,6 +35,11 @@ public class TextureEditMode : EditMode {
             main.TestRayOnLevelMesh();
         }
         if (Controls.OnDown("Unselect")) {
+            
+            if (view.activeTextureUVMapper != null) {
+                view.CloseTextureUVMapper();
+            }
+
             ClearAllSelectedItems();
         }
     

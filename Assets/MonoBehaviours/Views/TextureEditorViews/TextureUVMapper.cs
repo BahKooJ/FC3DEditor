@@ -19,7 +19,6 @@ public class TextureUVMapper : MonoBehaviour {
     public TextureCoordinatesLines textureLines;
 
     public int bmpID;
-    public int? globalTextureCoordIndex = null;
 
     void ScaleToScreen() {
 

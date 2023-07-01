@@ -437,19 +437,30 @@ namespace FCopParser {
 
                 foreach (var column in chunk.tileColumns) {
 
+                    // Tiles are sorted within a tile column, the order is not completely know but what is know is walls cannot be first
+                    var sortedTiles = new List<TileBitfield>();
+
+                    // Now that the tile columns are sorted to fit the 4x4 chunk pattern in the tile array, we can simple add the tiles after they're sorted.
+                    foreach (var tile in column.tiles) {
+
+                        var compiledTile = tile.Compile();
+
+                        if (compiledTile.number5 < 71) {
+                            sortedTiles.Insert(0, compiledTile);
+                        } else {
+                            sortedTiles.Add(compiledTile);
+                        }
+
+                    }
+
+                    tiles.AddRange(sortedTiles);
+
                     // Makes sure the last tile value is correct
                     foreach (var tile in column.tiles) {
                         tile.isStartInColumnArray = false;
                     }
 
                     column.tiles.Last().isStartInColumnArray = true;
-
-                    // Now that the tile columns are sorted to fit the 4x4 chunk pattern in the tile array, we can simple add the tiles.
-                    foreach (var tile in column.tiles) {
-                        tiles.Add(tile.Compile());
-                    }
-
-
 
                 }
 
