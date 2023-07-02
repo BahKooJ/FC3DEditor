@@ -8,6 +8,8 @@ using Object = UnityEngine.Object;
 
 public class TextureEditMode : EditMode {
 
+    public static bool openUVMapperByDefault = true;
+
     public Main main { get; set; }
     public List<Tile> selectedTiles = new();
     public TileColumn selectedColumn = null;
@@ -92,7 +94,11 @@ public class TextureEditMode : EditMode {
             if (view.activeTextureUVMapper != null) {
                 view.activeTextureUVMapper.GetComponent<TextureUVMapper>().RefreshView();
             } else {
-                view.OpenUVMapper();
+
+                if (openUVMapperByDefault) {
+                    view.OpenUVMapper();
+                }
+
             }
 
         }

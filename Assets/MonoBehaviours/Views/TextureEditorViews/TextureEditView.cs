@@ -1,14 +1,17 @@
 ﻿
 
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TextureEditView: MonoBehaviour {
 
     public TextureEditMode controller;
 
     public GameObject graphicsPropertiesView;
+    public Toggle openUVMapperToggle;
 
     public GameObject activeTextureUVMapper = null;
+
 
     void Start() {
 
@@ -58,6 +61,9 @@ public class TextureEditView: MonoBehaviour {
 
     }
 
+    public void OnChangeOpenUVMapperOnTileSelect() {
+        TextureEditMode.openUVMapperByDefault = openUVMapperToggle.isOn;
+    }
 
 
 }
