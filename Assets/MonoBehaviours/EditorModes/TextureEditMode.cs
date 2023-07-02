@@ -26,6 +26,7 @@ public class TextureEditMode : EditMode {
     }
 
     public void OnDestroy() {
+        view.CloseTextureUVMapper();
         ClearAllSelectedItems();
     }
 
@@ -90,6 +91,8 @@ public class TextureEditMode : EditMode {
 
             if (view.activeTextureUVMapper != null) {
                 view.activeTextureUVMapper.GetComponent<TextureUVMapper>().RefreshView();
+            } else {
+                view.OpenUVMapper();
             }
 
         }
@@ -119,6 +122,17 @@ public class TextureEditMode : EditMode {
             if (deSelectDuplicate) {
                 selectedTiles.Remove(tile);
                 RefeshTileOverlay();
+
+                if (selectedTiles.Count == 0) {
+
+                    if (view.activeTextureUVMapper != null) {
+                        view.CloseTextureUVMapper();
+                    }
+
+                    ClearAllSelectedItems();
+
+                }
+
             }
 
         }
@@ -224,6 +238,14 @@ public class TextureEditMode : EditMode {
 
     }
 
+    void RefreshUVMapper() {
+
+        if (view.activeTextureUVMapper != null) {
+            view.activeTextureUVMapper.GetComponent<TextureUVMapper>().RefreshView();
+        }
+
+    }
+
     // TODO: Importing and exporting textures, remember that FCopTexture.ImportBMP exists
 
     public void ChangeTexturePallette(int palletteOffset) {
@@ -233,6 +255,26 @@ public class TextureEditMode : EditMode {
             tile.texturePalette = palletteOffset;
 
         }
+
+    }
+
+    public void DuplicateTileGraphics() {
+
+        if (selectedTiles.Count < 2) return;
+
+        var firstTile = selectedTiles[0];
+
+        foreach (var tile in selectedTiles.Skip(1)) {
+
+            tile.uvs = new List<int>(firstTile.uvs);
+            tile.texturePalette = firstTile.texturePalette;
+
+        }
+
+        selectedSection.RefreshMesh();
+
+        RefreshUVMapper();
+        RefreshTileOverlayTexture();
 
     }
 

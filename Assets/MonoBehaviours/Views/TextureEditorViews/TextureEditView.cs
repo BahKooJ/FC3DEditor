@@ -28,7 +28,7 @@ public class TextureEditView: MonoBehaviour {
 
     }
 
-    public void OnClickGraphicsProperitesButton() {
+    public void OpenUVMapper() {
 
         if (controller.selectedTiles.Count == 0) { return; }
 
@@ -50,6 +50,12 @@ public class TextureEditView: MonoBehaviour {
     public void CloseTextureUVMapper() {
         Destroy(activeTextureUVMapper);
         controller.selectedSection.RefreshMesh();
+    }
+
+    public void OnClickDuplicateTileTextures() {
+
+        controller.DuplicateTileGraphics();
+
     }
 
 
