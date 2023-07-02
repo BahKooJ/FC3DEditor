@@ -12,7 +12,7 @@ public class TextureEditMode : EditMode {
     public List<Tile> selectedTiles = new();
     public TileColumn selectedColumn = null;
     public LevelMesh selectedSection = null;
-    public List<SelectedTileOverlay> selectedTileOverlays = new();
+    public List<TileTexturePreview> selectedTileOverlays = new();
     public GameObject selectedSectionOverlay = null;
 
     public TextureEditView view;
@@ -87,6 +87,10 @@ public class TextureEditMode : EditMode {
         else if (selectedTiles.Count == 0) {
 
             SelectTile(tile);
+
+            if (view.activeTextureUVMapper != null) {
+                view.activeTextureUVMapper.GetComponent<TextureUVMapper>().RefreshView();
+            }
 
         }
         else if (selectedTiles[0].verticies.Count == tile.verticies.Count) {
@@ -192,13 +196,21 @@ public class TextureEditMode : EditMode {
 
     void InitTileOverlay(Tile tile) {
 
-        var overlay = Object.Instantiate(main.SelectedTileOverlay);
-        var script = overlay.GetComponent<SelectedTileOverlay>();
+        var overlay = Object.Instantiate(main.TileTexturePreview);
+        var script = overlay.GetComponent<TileTexturePreview>();
         script.controller = main;
         script.tile = tile;
         selectedTileOverlays.Add(script);
         overlay.transform.SetParent(selectedSection.transform);
         overlay.transform.localPosition = Vector3.zero;
+
+    }
+
+    public void RefreshTileOverlayTexture() {
+
+        foreach (var overly in selectedTileOverlays) {
+            overly.Refresh();
+        }
 
     }
 

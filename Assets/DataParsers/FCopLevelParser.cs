@@ -396,6 +396,7 @@ namespace FCopParser {
         public int isEndInColumnArray;
         public int textureIndex;
         public int culling;
+        // Special tiles of some sort (water, damage)
         public int number4;
         public int meshID;
         public int graphicIndex;

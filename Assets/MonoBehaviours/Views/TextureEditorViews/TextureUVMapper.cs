@@ -135,6 +135,8 @@ public class TextureUVMapper : MonoBehaviour {
 
         InitTexturePallette();
 
+        textureLines.ReInit();
+
     }
 
     // --Event Handlers--

@@ -28,7 +28,9 @@ class TextureCoordinatePoint : MonoBehaviour {
         foreach (var tile in view.controller.selectedTiles) {
             tile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
         }
-        
+
+        controller.RefreshTileOverlayTexture();
+
     }
 
     public void ChangePosition(int x, int y) {
@@ -39,6 +41,7 @@ class TextureCoordinatePoint : MonoBehaviour {
             tile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
         }
 
+        controller.RefreshTileOverlayTexture();
 
     }
 

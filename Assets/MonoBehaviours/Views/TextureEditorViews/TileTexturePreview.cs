@@ -29,19 +29,6 @@ public class TileTexturePreview : MonoBehaviour {
 
         Refresh();
 
-        // Grabs the cameras rotation to rotate the tile the same as it was seen
-        var startAngle = Camera.main.transform.localEulerAngles.y;
-
-        // Not sure why this needs to be done, but the camera angle needs 180 removed to get the angle to line up
-        if (startAngle > 0) {
-            startAngle = 180 - startAngle;
-        } else {
-            startAngle = -180 + startAngle;
-        }
-
-        transform.localEulerAngles = new Vector3(0, startAngle, 0);
-
-
     }
 
     public void Refresh() {
@@ -70,36 +57,6 @@ public class TileTexturePreview : MonoBehaviour {
 
         var vertexIndex = 0;
 
-        var heights = new List<float>();
-
-        // The lowest high needs to be found to bring the base to 0 while still keeping the right geometry.
-        // This is so the tile stays inside the UI container
-        foreach (var point in tile.verticies) {
-
-            switch (point.vertexPosition) {
-
-                case VertexPosition.TopLeft:
-                    heights.Add(column.heights[0].GetPoint(point.heightChannel));
-
-                    break;
-                case VertexPosition.TopRight:
-                    heights.Add(column.heights[1].GetPoint(point.heightChannel));
-
-                    break;
-                case VertexPosition.BottomLeft:
-                    heights.Add(column.heights[2].GetPoint(point.heightChannel));
-
-                    break;
-                case VertexPosition.BottomRight:
-                    heights.Add(column.heights[3].GetPoint(point.heightChannel));
-
-                    break;
-            }
-
-        }
-
-        var lowestHeight = heights.Min();
-
         void AddVerticies(Tile tile) {
 
             foreach (var point in tile.verticies) {
@@ -107,19 +64,19 @@ public class TileTexturePreview : MonoBehaviour {
                 switch (point.vertexPosition) {
 
                     case VertexPosition.TopLeft:
-                        vertices.Add(new Vector3(x: -0.5f, y: column.heights[0].GetPoint(point.heightChannel) - lowestHeight, z: -0.5f));
+                        vertices.Add(new Vector3(x: tile.column.x, y: tile.column.heights[0].GetPoint(point.heightChannel), z: tile.column.y));
 
                         break;
                     case VertexPosition.TopRight:
-                        vertices.Add(new Vector3(x: 0.5f, y: column.heights[1].GetPoint(point.heightChannel) - lowestHeight, z: -0.5f));
+                        vertices.Add(new Vector3(x: tile.column.x + 1, y: tile.column.heights[1].GetPoint(point.heightChannel), z: tile.column.y));
 
                         break;
                     case VertexPosition.BottomLeft:
-                        vertices.Add(new Vector3(x: -0.5f, y: column.heights[2].GetPoint(point.heightChannel) - lowestHeight, z: 0.5f));
+                        vertices.Add(new Vector3(x: tile.column.x, y: tile.column.heights[2].GetPoint(point.heightChannel), z: tile.column.y + 1));
 
                         break;
                     case VertexPosition.BottomRight:
-                        vertices.Add(new Vector3(x: 0.5f, y: column.heights[3].GetPoint(point.heightChannel) - lowestHeight, z: 0.5f));
+                        vertices.Add(new Vector3(x: tile.column.x + 1, y: tile.column.heights[3].GetPoint(point.heightChannel), z: tile.column.y + 1));
 
                         break;
                 }
@@ -127,20 +84,26 @@ public class TileTexturePreview : MonoBehaviour {
             }
 
         }
-        
-        
+
+
         void GenerateTriangle(Tile tile) {
 
             AddVerticies(tile);
 
-            foreach (var uv in tile.uvs) {
+            textureCords.Add(new Vector2(
+                TextureCoordinate.GetX(tile.uvs[0] + tile.texturePalette * 65536),
+                TextureCoordinate.GetY(tile.uvs[0] + tile.texturePalette * 65536)
+            ));
 
-                textureCords.Add(new Vector2(
-                    TextureCoordinate.GetX(uv + tile.texturePalette * 65536),
-                    TextureCoordinate.GetY(uv + tile.texturePalette * 65536)
-                ));
+            textureCords.Add(new Vector2(
+                TextureCoordinate.GetX(tile.uvs[2] + tile.texturePalette * 65536),
+                TextureCoordinate.GetY(tile.uvs[2] + tile.texturePalette * 65536)
+            ));
 
-            }
+            textureCords.Add(new Vector2(
+                TextureCoordinate.GetX(tile.uvs[1] + tile.texturePalette * 65536),
+                TextureCoordinate.GetY(tile.uvs[1] + tile.texturePalette * 65536)
+            ));
 
             triangles.Add(vertexIndex);
             triangles.Add(vertexIndex + 1);
@@ -154,14 +117,27 @@ public class TileTexturePreview : MonoBehaviour {
 
             AddVerticies(tile);
 
-            foreach (var uv in tile.uvs) {
+            textureCords.Add(new Vector2(
+                TextureCoordinate.GetX(tile.uvs[0] + tile.texturePalette * 65536),
+                TextureCoordinate.GetY(tile.uvs[0] + tile.texturePalette * 65536)
+            ));
 
-                textureCords.Add(new Vector2(
-                    TextureCoordinate.GetX(uv + tile.texturePalette * 65536),
-                    TextureCoordinate.GetY(uv + tile.texturePalette * 65536)
-                ));
+            textureCords.Add(new Vector2(
+                TextureCoordinate.GetX(tile.uvs[1] + tile.texturePalette * 65536),
+                TextureCoordinate.GetY(tile.uvs[1] + tile.texturePalette * 65536)
+            ));
 
-            }
+            textureCords.Add(new Vector2(
+                TextureCoordinate.GetX(tile.uvs[3] + tile.texturePalette * 65536),
+                TextureCoordinate.GetY(tile.uvs[3] + tile.texturePalette * 65536)
+            ));
+
+            textureCords.Add(new Vector2(
+                TextureCoordinate.GetX(tile.uvs[2] + tile.texturePalette * 65536),
+                TextureCoordinate.GetY(tile.uvs[2] + tile.texturePalette * 65536)
+            ));
+
+
 
             triangles.Add(vertexIndex);
             triangles.Add(vertexIndex + 2);

@@ -1200,11 +1200,11 @@ namespace FCopParser {
 
 
 
-            // FIX ME
             parsedTile.isEndInColumnArray = isEndInColumnArray ? 1 : 0;
             parsedTile.meshID = (int)id;
             parsedTile.textureIndex = textureIndex;
             parsedTile.culling = culling;
+            //parsedTile.number4 = 0;
             parsedTile.graphicIndex = graphicsIndex;
 
             return parsedTile;
