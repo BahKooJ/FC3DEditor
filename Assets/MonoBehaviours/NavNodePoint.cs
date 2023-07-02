@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class NavNodePoint : MonoBehaviour {
 
-    static float yPadding = 0.3f;
+    static float yPadding = 0.01f;
 
     public SphereCollider sphereCollider;
 

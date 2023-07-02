@@ -73,3 +73,7 @@ crashlytics-build.properties
 
 # File Directories
 MissionFiles/
+Output/
+
+#No need to commit temporary files
+/*.bmp
