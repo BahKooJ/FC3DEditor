@@ -144,7 +144,6 @@ public class Main : MonoBehaviour {
 
     public void Compile() {
 
-        // TODO: Descriptions for catches
         try {
             level.Compile();
         } catch (MeshIDException) {

@@ -20,6 +20,8 @@ public class TextureEditView: MonoBehaviour {
 
         var obj = Instantiate(texturePresetPanel);
 
+        obj.GetComponent<TexturePresetsView>().controller = controller;
+
         obj.transform.SetParent(transform.parent, false);
 
     }

@@ -127,6 +127,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e17482e61d23f349893f08268569b8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  uvPresetItem: {fileID: 367493372903785777, guid: 6c19900f62c451a46a09a509ed680f9c, type: 3}
+  presetListContent: {fileID: 1369666687501709775}
 --- !u!1 &1369666686433322881
 GameObject:
   m_ObjectHideFlags: 0
@@ -483,7 +485,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.13333334, g: 0.13333334, b: 0.13333334, a: 1}
+  m_Color: {r: 0.06666667, g: 0.06666667, b: 0.06666667, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
