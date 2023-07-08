@@ -93,6 +93,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graphicsPropertiesView: {fileID: 8489185098824900896, guid: aff572503a908144c88230cd3f41a764, type: 3}
+  texturePresetPanel: {fileID: 1369666686304929049, guid: ba81a2dcd0e9f0f43acb6159aa2fac9a, type: 3}
   openUVMapperToggle: {fileID: 6195660390410790446}
   activeTextureUVMapper: {fileID: 0}
 --- !u!1 &4378475921780658026

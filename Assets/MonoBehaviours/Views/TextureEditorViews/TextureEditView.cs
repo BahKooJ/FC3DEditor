@@ -8,6 +8,7 @@ public class TextureEditView: MonoBehaviour {
     public TextureEditMode controller;
 
     public GameObject graphicsPropertiesView;
+    public GameObject texturePresetPanel;
     public Toggle openUVMapperToggle;
 
     public GameObject activeTextureUVMapper = null;
@@ -16,6 +17,10 @@ public class TextureEditView: MonoBehaviour {
     void Start() {
 
         controller.view = this;
+
+        var obj = Instantiate(texturePresetPanel);
+
+        obj.transform.SetParent(transform.parent, false);
 
     }
 
