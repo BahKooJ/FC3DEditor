@@ -17,6 +17,7 @@ public class UVPresentViewItem : MonoBehaviour {
 
     public UVPreset preset;
     public TextureEditMode controller;
+    public bool forceNameChange;
 
     //TODO: Mesh is not masked is scrollview
     Mesh mesh;
@@ -30,19 +31,25 @@ public class UVPresentViewItem : MonoBehaviour {
 
         nameText.text = preset.name;
 
-        var vertices = new List<Vector3>() { new Vector3(0,0), new Vector3(50, 0), new Vector3(0, 50), new Vector3(50, 50) };
+        if (preset.uvs.Count == 4) {
+            GenerateQuad();
+        } else {
+            GenerateTriangle();
+        }
+
+        if (forceNameChange) {
+            nameTextField.Select();
+        } else {
+            nameTextField.gameObject.SetActive(false);
+        }
+
+    }
+
+    void GenerateQuad() {
+
+        var vertices = new List<Vector3>() { new Vector3(0, 0), new Vector3(50, 0), new Vector3(0, 50), new Vector3(50, 50) };
 
         var uvs = new List<Vector2> {
-            new Vector2(
-            TextureCoordinate.GetX(preset.uvs[0] + preset.texturePalette * 65536),
-            TextureCoordinate.GetY(preset.uvs[0] + preset.texturePalette * 65536)
-        ),
-
-            new Vector2(
-            TextureCoordinate.GetX(preset.uvs[1] + preset.texturePalette * 65536),
-            TextureCoordinate.GetY(preset.uvs[1] + preset.texturePalette * 65536)
-        ),
-
             new Vector2(
             TextureCoordinate.GetX(preset.uvs[3] + preset.texturePalette * 65536),
             TextureCoordinate.GetY(preset.uvs[3] + preset.texturePalette * 65536)
@@ -51,6 +58,16 @@ public class UVPresentViewItem : MonoBehaviour {
             new Vector2(
             TextureCoordinate.GetX(preset.uvs[2] + preset.texturePalette * 65536),
             TextureCoordinate.GetY(preset.uvs[2] + preset.texturePalette * 65536)
+        ),
+
+            new Vector2(
+            TextureCoordinate.GetX(preset.uvs[0] + preset.texturePalette * 65536),
+            TextureCoordinate.GetY(preset.uvs[0] + preset.texturePalette * 65536)
+        ),
+
+            new Vector2(
+            TextureCoordinate.GetX(preset.uvs[1] + preset.texturePalette * 65536),
+            TextureCoordinate.GetY(preset.uvs[1] + preset.texturePalette * 65536)
         )
         };
 
@@ -73,6 +90,41 @@ public class UVPresentViewItem : MonoBehaviour {
 
     }
 
+    void GenerateTriangle() {
+
+        var vertices = new List<Vector3>() { new Vector3(0, 0), new Vector3(0, 50), new Vector3(50, 50) };
+
+        var uvs = new List<Vector2> {
+            new Vector2(
+            TextureCoordinate.GetX(preset.uvs[1] + preset.texturePalette * 65536),
+            TextureCoordinate.GetY(preset.uvs[1] + preset.texturePalette * 65536)
+        ),
+
+            new Vector2(
+            TextureCoordinate.GetX(preset.uvs[0] + preset.texturePalette * 65536),
+            TextureCoordinate.GetY(preset.uvs[0] + preset.texturePalette * 65536)
+        ),
+
+            new Vector2(
+            TextureCoordinate.GetX(preset.uvs[2] + preset.texturePalette * 65536),
+            TextureCoordinate.GetY(preset.uvs[2] + preset.texturePalette * 65536)
+        )};
+
+        var triangles = new List<int> {
+            0,
+            1,
+            2
+        };
+
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+
+        mesh.uv = uvs.ToArray();
+
+        mesh.RecalculateNormals();
+
+    }
+
     public void OnStartNameType() {
 
         Main.ignoreAllInputs = true;
@@ -83,7 +135,11 @@ public class UVPresentViewItem : MonoBehaviour {
         
         Main.ignoreAllInputs = false;
 
-        preset.name = nameTextField.text;
+        if (nameTextField.text == "") {
+            preset.name = "Texture Preset";
+        } else {
+            preset.name = nameTextField.text;
+        }
 
         nameText.text = preset.name;
 

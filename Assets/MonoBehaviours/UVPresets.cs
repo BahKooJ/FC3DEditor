@@ -6,13 +6,14 @@ public class UVPresets {
 
     public string directoryName;
     
-    public UVPreset parent = null;
+    public UVPresets parent = null;
     public List<UVPresets> subFolders = new List<UVPresets>();
 
     public List<UVPreset> presets = new List<UVPreset>();
 
-    public UVPresets(string name) {
+    public UVPresets(string name, UVPresets parent) {
         directoryName = name;
+        this.parent = parent;
     }
 
     public void SaveToFile() {
@@ -60,19 +61,26 @@ public class UVPresets {
 
             total += "{\"";
 
-            total += directoryName + "\",[";
+            total += presets.directoryName + "\",[";
 
-            SavePreset(presets.presets);
+            total += SavePreset(presets.presets);
 
-            total += ",[";
+            total += "],[";
 
+            var comma = false;
             foreach (var subPresets in presets.subFolders) {
+
+                if (comma) {
+                    total += ",";
+                }
 
                 total += SavePresets(subPresets);
 
+                comma = true;
+
             }
 
-            total += "]";
+            total += "]}";
 
             return total;
 
@@ -80,7 +88,7 @@ public class UVPresets {
 
         var total = SavePresets(this);
 
-        File.WriteAllText("TexturePresets/" + directoryName, total);
+        File.WriteAllText("TexturePresets/" + directoryName + ".txt", total);
 
     }
 

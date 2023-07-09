@@ -9,6 +9,7 @@ using Object = UnityEngine.Object;
 public class TextureEditMode : EditMode {
 
     public static bool openUVMapperByDefault = true;
+    public static UVPresets rootUVPresets = new UVPresets("default", null);
 
     public Main main { get; set; }
     public List<Tile> selectedTiles = new();
@@ -19,14 +20,14 @@ public class TextureEditMode : EditMode {
 
     public TextureEditView view;
 
-    public UVPresets uvPresets = new UVPresets("default");
+    public UVPresets currentUVPresets;
 
     public TextureEditMode(Main main) {
         this.main = main;
     }
 
     public void OnCreateMode() {
-        
+        currentUVPresets = rootUVPresets;
     }
 
     public void OnDestroy() {
@@ -287,6 +288,28 @@ public class TextureEditMode : EditMode {
 
         RefreshUVMapper();
         RefreshTileOverlayTexture();
+
+    }
+
+    // UV Presets
+
+    public bool AddPreset() {
+
+        if (selectedTiles.Count == 0) { return false; }
+
+        var firstTile = selectedTiles[0];
+
+        var uvPreset = new UVPreset(firstTile.uvs, firstTile.texturePalette, "");
+
+        currentUVPresets.presets.Add(uvPreset);
+
+        return true;
+
+    }
+
+    public void AddPresetsDirectory() {
+
+        currentUVPresets.subFolders.Add(new UVPresets("", currentUVPresets));
 
     }
 

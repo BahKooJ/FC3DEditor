@@ -132,6 +132,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uvPresetItem: {fileID: 367493372903785777, guid: 6c19900f62c451a46a09a509ed680f9c, type: 3}
+  uvPresetsDirectoryItem: {fileID: 367493372903785777, guid: f0ba57abaf44766499983aec6dcf6c47, type: 3}
+  backUVPresetsItem: {fileID: 367493372903785777, guid: fd41b339f90a3264e83abcc212cf61b0, type: 3}
   presetListContent: {fileID: 1369666687501709775}
 --- !u!1 &1369666686433322881
 GameObject:
@@ -734,7 +736,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5372754290973053847}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3486743859420914288}
+        m_TargetAssemblyTypeName: TexturePresetsView, Assembly-CSharp
+        m_MethodName: OnClickSavePresetsButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &3618104396977626068
 GameObject:
   m_ObjectHideFlags: 0
@@ -855,7 +869,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5309834740259180498}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3486743859420914288}
+        m_TargetAssemblyTypeName: TexturePresetsView, Assembly-CSharp
+        m_MethodName: OnClickAddPresetButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &4376306429322491923
 GameObject:
   m_ObjectHideFlags: 0
@@ -976,7 +1002,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8869515017764786665}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3486743859420914288}
+        m_TargetAssemblyTypeName: TexturePresetsView, Assembly-CSharp
+        m_MethodName: OnClickAddDirectoryButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &6250277647658848028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1097,4 +1135,16 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2766385966808660504}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3486743859420914288}
+        m_TargetAssemblyTypeName: TexturePresetsView, Assembly-CSharp
+        m_MethodName: OnClickOpenPresetsButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
