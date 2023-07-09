@@ -20,7 +20,7 @@ public class TexturePresetsView : MonoBehaviour {
         var script = item.GetComponent<UVPresentViewItem>();
 
         script.controller = controller;
-        script.preset = new UVPreset(new List<int>() { TextureCoordinate.SetPixel(40,40), TextureCoordinate.SetPixel(60, 40), TextureCoordinate.SetPixel(40, 60), TextureCoordinate.SetPixel(60, 60) }, 3);
+        script.preset = new UVPreset(new List<int>() { TextureCoordinate.SetPixel(40,40), TextureCoordinate.SetPixel(60, 40), TextureCoordinate.SetPixel(40, 60), TextureCoordinate.SetPixel(60, 60) }, 3, "bonk");
 
         item.transform.SetParent(presetListContent, false);
 

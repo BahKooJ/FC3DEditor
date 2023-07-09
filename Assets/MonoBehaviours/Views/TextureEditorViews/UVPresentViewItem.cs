@@ -3,13 +3,17 @@
 
 using FCopParser;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UVPresentViewItem : MonoBehaviour {
 
+    // View refs
     public MeshFilter filter;
     public MeshRenderer meshRenderer;
+    public TMP_Text nameText;
+    public TMP_InputField nameTextField;
 
     public UVPreset preset;
     public TextureEditMode controller;
@@ -23,6 +27,8 @@ public class UVPresentViewItem : MonoBehaviour {
         filter.mesh = mesh;
 
         meshRenderer.material.mainTexture = controller.main.levelTexturePallet;
+
+        nameText.text = preset.name;
 
         var vertices = new List<Vector3>() { new Vector3(0,0), new Vector3(50, 0), new Vector3(0, 50), new Vector3(50, 50) };
 
@@ -64,6 +70,24 @@ public class UVPresentViewItem : MonoBehaviour {
         mesh.uv = uvs.ToArray();
 
         mesh.RecalculateNormals();
+
+    }
+
+    public void OnStartNameType() {
+
+        Main.ignoreAllInputs = true;
+
+    }
+
+    public void OnEndNameType() {
+        
+        Main.ignoreAllInputs = false;
+
+        preset.name = nameTextField.text;
+
+        nameText.text = preset.name;
+
+        nameTextField.gameObject.SetActive(false);
 
     }
 

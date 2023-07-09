@@ -8,6 +8,8 @@ using UnityEngine;
 
 public class Main : MonoBehaviour {
 
+    public static bool ignoreAllInputs = false;
+
     public GameObject meshSection;
     public GameObject heightMapChannelPoint;
     public GameObject SelectedTileOverlay;
@@ -57,6 +59,8 @@ public class Main : MonoBehaviour {
     void Update() {
 
         editMode.Update();
+
+        if (ignoreAllInputs) { return; }
 
         if (Controls.OnDown("Save")) {
             Compile();

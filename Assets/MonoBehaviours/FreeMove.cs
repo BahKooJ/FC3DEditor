@@ -45,6 +45,9 @@ public class FreeMove : MonoBehaviour {
     static public bool looking = false;
 
     void Update() {
+
+        if (Main.ignoreAllInputs) { return; }
+
         var fastMode = false;
         var movementSpeed = fastMode ? this.fastMovementSpeed : this.movementSpeed;
 

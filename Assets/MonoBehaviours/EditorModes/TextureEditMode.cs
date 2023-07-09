@@ -19,6 +19,8 @@ public class TextureEditMode : EditMode {
 
     public TextureEditView view;
 
+    public UVPresets uvPresets = new UVPresets("default");
+
     public TextureEditMode(Main main) {
         this.main = main;
     }
@@ -29,6 +31,7 @@ public class TextureEditMode : EditMode {
 
     public void OnDestroy() {
         view.CloseTextureUVMapper();
+        view.CloseTexturePresetPanel();
         ClearAllSelectedItems();
     }
 
@@ -37,6 +40,9 @@ public class TextureEditMode : EditMode {
         if (FreeMove.looking) {
             main.TestRayOnLevelMesh();
         }
+
+        if (Main.ignoreAllInputs) { return; }
+
         if (Controls.OnDown("Unselect")) {
             
             if (view.activeTextureUVMapper != null) {

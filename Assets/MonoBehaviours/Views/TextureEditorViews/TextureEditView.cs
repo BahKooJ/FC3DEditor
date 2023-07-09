@@ -12,17 +12,18 @@ public class TextureEditView: MonoBehaviour {
     public Toggle openUVMapperToggle;
 
     public GameObject activeTextureUVMapper = null;
+    public GameObject activeTexturePresetPanel = null;
 
 
     void Start() {
 
         controller.view = this;
 
-        var obj = Instantiate(texturePresetPanel);
+        activeTexturePresetPanel = Instantiate(texturePresetPanel);
 
-        obj.GetComponent<TexturePresetsView>().controller = controller;
+        activeTexturePresetPanel.GetComponent<TexturePresetsView>().controller = controller;
 
-        obj.transform.SetParent(transform.parent, false);
+        activeTexturePresetPanel.transform.SetParent(transform.parent, false);
 
     }
 
@@ -59,7 +60,15 @@ public class TextureEditView: MonoBehaviour {
 
     public void CloseTextureUVMapper() {
         Destroy(activeTextureUVMapper);
-        controller.selectedSection.RefreshMesh();
+
+        if (controller.selectedSection != null) {
+            controller.selectedSection.RefreshMesh();
+        }
+
+    }
+
+    public void CloseTexturePresetPanel() {
+        Destroy(activeTexturePresetPanel);
     }
 
     public void OnClickDuplicateTileTextures() {
