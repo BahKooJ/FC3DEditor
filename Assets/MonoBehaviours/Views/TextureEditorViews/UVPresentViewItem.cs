@@ -176,6 +176,20 @@ public class UVPresentViewItem : MonoBehaviour {
 
     public void OnClick() {
 
+        foreach (var tile in controller.selectedTiles) {
+
+            if (tile.uvs.Count == preset.uvs.Count) {
+
+                tile.uvs = preset.uvs;
+                tile.texturePalette = preset.texturePalette;
+
+            }
+
+        }
+
+        controller.RefreshTileOverlayTexture();
+        controller.RefreshUVMapper();
+
     }
 
 }

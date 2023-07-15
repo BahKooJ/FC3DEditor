@@ -251,7 +251,7 @@ public class TextureEditMode : EditMode {
 
     }
 
-    void RefreshUVMapper() {
+    public void RefreshUVMapper() {
 
         if (view.activeTextureUVMapper != null) {
             view.activeTextureUVMapper.GetComponent<TextureUVMapper>().RefreshView();
