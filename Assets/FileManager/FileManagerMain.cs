@@ -13,6 +13,8 @@ public class FileManagerMain : MonoBehaviour {
     public GameObject MapOpenerView;
     public GameObject DialogWindow;
     public GameObject SettingsView;
+    public GameObject ContextMenu;
+    public GameObject ContextMenuItem;
 
 
     public static IFFParser iffFile;
@@ -27,6 +29,10 @@ public class FileManagerMain : MonoBehaviour {
 
         DialogWindowUtil.prefab = DialogWindow;
         DialogWindowUtil.canvas = canvas.gameObject;
+
+        ContextMenuUtil.container = ContextMenu;
+        ContextMenuUtil.contextMenuItem = ContextMenuItem;
+        ContextMenuUtil.canvas = canvas.gameObject;
 
     }
 

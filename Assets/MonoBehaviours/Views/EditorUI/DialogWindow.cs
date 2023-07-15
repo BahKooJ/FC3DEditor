@@ -9,6 +9,7 @@ public class DialogWindow : MonoBehaviour {
 
     public GameObject cancelButton;
 
+    // TODO: Change this to Action
     public Func<bool> confirmAction;
 
     public void OnClickOK() {

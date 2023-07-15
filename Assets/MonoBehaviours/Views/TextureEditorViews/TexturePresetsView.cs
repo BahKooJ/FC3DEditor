@@ -72,6 +72,7 @@ public class TexturePresetsView : MonoBehaviour {
         var script = item.GetComponent<UVPresentViewItem>();
 
         script.controller = controller;
+        script.view = this;
         script.preset = preset;
         script.forceNameChange = forceNameChange;
 

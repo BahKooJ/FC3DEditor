@@ -42,6 +42,7 @@ public class Main : MonoBehaviour {
     void Start() {
 
         DialogWindowUtil.canvas = canvas;
+        ContextMenuUtil.canvas = canvas;
 
         Physics.queriesHitBackfaces = true;
 

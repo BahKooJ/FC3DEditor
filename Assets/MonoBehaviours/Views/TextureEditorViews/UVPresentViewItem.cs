@@ -2,6 +2,7 @@
 
 
 using FCopParser;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -14,9 +15,11 @@ public class UVPresentViewItem : MonoBehaviour {
     public MeshRenderer meshRenderer;
     public TMP_Text nameText;
     public TMP_InputField nameTextField;
+    public ContextMenuHandler contextMenu;
 
     public UVPreset preset;
     public TextureEditMode controller;
+    public TexturePresetsView view;
     public bool forceNameChange;
 
     //TODO: Mesh is not masked is scrollview
@@ -26,6 +29,10 @@ public class UVPresentViewItem : MonoBehaviour {
 
         mesh = new Mesh();
         filter.mesh = mesh;
+
+        contextMenu.items = new() {
+            ("Rename", Rename), ("Delete", Delete)
+        };
 
         meshRenderer.material.mainTexture = controller.main.levelTexturePallet;
 
@@ -125,6 +132,26 @@ public class UVPresentViewItem : MonoBehaviour {
 
     }
 
+    void Rename() {
+
+        nameTextField.gameObject.SetActive(true);
+        nameTextField.text = preset.name;
+        nameTextField.Select();
+
+    }
+
+    void Delete() {
+        DialogWindowUtil.Dialog("Delete Preset", "Are you sure you want to delete preset " + preset.name + "?", ConfirmDelete);
+    }
+
+    bool ConfirmDelete() {
+
+        controller.currentUVPresets.presets.Remove(preset);
+        view.Refresh();
+
+        return true;
+    }
+
     public void OnStartNameType() {
 
         Main.ignoreAllInputs = true;
@@ -144,6 +171,10 @@ public class UVPresentViewItem : MonoBehaviour {
         nameText.text = preset.name;
 
         nameTextField.gameObject.SetActive(false);
+
+    }
+
+    public void OnClick() {
 
     }
 
