@@ -43,6 +43,7 @@ public class Main : MonoBehaviour {
 
         DialogWindowUtil.canvas = canvas;
         ContextMenuUtil.canvas = canvas;
+        OpenFileWindowUtil.canvas = canvas;
 
         Physics.queriesHitBackfaces = true;
 

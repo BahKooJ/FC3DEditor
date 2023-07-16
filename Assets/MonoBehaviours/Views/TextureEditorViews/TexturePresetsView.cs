@@ -118,11 +118,29 @@ public class TexturePresetsView : MonoBehaviour {
 
     public void OnClickSavePresetsButton() {
 
-        TextureEditMode.rootUVPresets.SaveToFile();
+        OpenFileWindowUtil.SaveFile("TexturePresets", TextureEditMode.rootUVPresets.directoryName, path => {
+
+            var fileName = Utils.RemovePathingFromFilePath(path);
+
+            TextureEditMode.rootUVPresets.directoryName = Utils.RemoveExtensionFromFileName(fileName);
+
+            TextureEditMode.rootUVPresets.SaveToFile();
+
+        });
 
     }
 
     public void OnClickOpenPresetsButton() {
+
+        OpenFileWindowUtil.OpenFile("TexturePresets", "", path => {
+
+            TextureEditMode.rootUVPresets = UVPresets.ReadFile(path);
+
+            controller.currentUVPresets = TextureEditMode.rootUVPresets;
+
+            Refresh();
+
+        });
 
     }
 

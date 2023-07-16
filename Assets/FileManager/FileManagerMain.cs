@@ -15,6 +15,7 @@ public class FileManagerMain : MonoBehaviour {
     public GameObject SettingsView;
     public GameObject ContextMenu;
     public GameObject ContextMenuItem;
+    public GameObject OpenFileWindow;
 
 
     public static IFFParser iffFile;
@@ -33,6 +34,9 @@ public class FileManagerMain : MonoBehaviour {
         ContextMenuUtil.container = ContextMenu;
         ContextMenuUtil.contextMenuItem = ContextMenuItem;
         ContextMenuUtil.canvas = canvas.gameObject;
+
+        OpenFileWindowUtil.prefab = OpenFileWindow;
+        OpenFileWindowUtil.canvas = canvas.gameObject;
 
     }
 

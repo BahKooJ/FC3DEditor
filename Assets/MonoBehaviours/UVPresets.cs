@@ -8,7 +8,7 @@ public class UVPresets {
 
     public static UVPresets ReadFile(string fileName) {
 
-        var file = File.ReadAllText("TexturePresets/" + fileName);
+        var file = File.ReadAllText(fileName);
 
         var opened = new List<UVPresets>();
 

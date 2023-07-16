@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 public class TextureEditMode : EditMode {
 
     public static bool openUVMapperByDefault = true;
-    public static UVPresets rootUVPresets = UVPresets.ReadFile("default.txt");
+    public static UVPresets rootUVPresets = new UVPresets("Texture Presets", null);
 
     public Main main { get; set; }
     public List<Tile> selectedTiles = new();
