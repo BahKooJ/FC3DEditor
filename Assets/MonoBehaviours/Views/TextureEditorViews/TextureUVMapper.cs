@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using UnityEditor;
+using System.IO;
+using FCopParser;
 
 public class TextureUVMapper : MonoBehaviour {
 
@@ -154,6 +156,8 @@ public class TextureUVMapper : MonoBehaviour {
 
         InitTexturePallette();
 
+        controller.RefreshTileOverlayTexture();
+
     }
 
     public void OnClickRotateClockwise() {
@@ -279,6 +283,26 @@ public class TextureUVMapper : MonoBehaviour {
             index++;
 
         }
+
+    }
+
+    public void OnClickExportTexture() {
+
+        if (controller.selectedTiles.Count == 0) { return; }
+
+        OpenFileWindowUtil.SaveFile("Textures", "Bitmap Texture", path => {
+
+            var bitmap = controller.main.level.textures[controller.selectedTiles[0].texturePalette].BitmapWithHeader();
+
+            File.WriteAllBytes(Utils.RemoveExtensionFromFileName(path) + ".bmp", bitmap);
+
+        });
+
+    }
+
+    public void OnClickImportTexture() {
+
+
 
     }
 
