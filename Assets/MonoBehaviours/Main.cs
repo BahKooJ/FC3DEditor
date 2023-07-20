@@ -214,6 +214,8 @@ public class Main : MonoBehaviour {
 
     public void RefreshTextures() {
 
+        bmpTextures.Clear();
+
         foreach (var bmp in level.textures) {
 
             var bmpTexture = new Texture2D(256, 256, TextureFormat.RGB565, false);

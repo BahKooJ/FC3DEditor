@@ -302,7 +302,26 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void OnClickImportTexture() {
 
+        if (controller.selectedTiles.Count == 0) { return; }
 
+        OpenFileWindowUtil.OpenFile("Textures", "", path => {
+
+            var texture = controller.main.level.textures[controller.selectedTiles[0].texturePalette];
+
+            texture.ImportBMP(File.ReadAllBytes(path));
+
+            controller.main.RefreshTextures();
+
+            controller.RefreshUVMapper();
+
+            controller.RefreshTileOverlayTexture();
+
+            foreach (var section in controller.main.sectionMeshes) {
+                section.RefreshTexture();
+                section.RefreshMesh();
+            }
+
+        });
 
     }
 
