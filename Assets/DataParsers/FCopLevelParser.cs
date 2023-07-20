@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System;
+using static UnityEngine.Experimental.Rendering.RayTracingAccelerationStructure;
 
 namespace FCopParser {
 
@@ -98,9 +99,9 @@ namespace FCopParser {
             foreach (TileBitfield tile in tiles) {
 
                 var bitFeild = new BitField(32, new List<BitNumber> {
-                    new BitNumber(1,tile.number1), new BitNumber(10,tile.number2),
-                    new BitNumber(2,tile.number3), new BitNumber(2,tile.number4),
-                    new BitNumber(7,tile.number5), new BitNumber(10,tile.number6)
+                    new BitNumber(1,tile.isEndInColumnArray), new BitNumber(10,tile.textureIndex),
+                    new BitNumber(2,tile.culling), new BitNumber(2,tile.number4),
+                    new BitNumber(7,tile.meshID), new BitNumber(10,tile.graphicIndex)
                 });
 
                 compiledFile.AddRange(Utils.BitArrayToByteArray(bitFeild.Compile()));
@@ -392,20 +393,21 @@ namespace FCopParser {
 
     public struct TileBitfield {
 
-        public int number1;
-        public int number2;
-        public int number3;
+        public int isEndInColumnArray;
+        public int textureIndex;
+        public int culling;
+        // Special tiles of some sort (water, damage)
         public int number4;
-        public int number5;
-        public int number6;
+        public int meshID;
+        public int graphicIndex;
 
         public TileBitfield(int number1, int number2, int number3, int number4, int number5, int number6) {
-            this.number1 = number1;
-            this.number2 = number2;
-            this.number3 = number3;
+            this.isEndInColumnArray = number1;
+            this.textureIndex = number2;
+            this.culling = number3;
             this.number4 = number4;
-            this.number5 = number5;
-            this.number6 = number6;
+            this.meshID = number5;
+            this.graphicIndex = number6;
         }
     }
 
@@ -447,12 +449,15 @@ namespace FCopParser {
 
     public struct TileGraphics {
 
+        // Shader info
         public int number1;
         // BMP ID
         public int number2;
+        // Unknown
         public int number3;
         // Rect tile
         public int number4;
+        // Unknown
         public int number5;
 
         public TileGraphics(int number1, int number2, int number3, int number4, int number5) {
@@ -461,6 +466,22 @@ namespace FCopParser {
             this.number3 = number3;
             this.number4 = number4;
             this.number5 = number5;
+        }
+
+        public static bool operator ==(TileGraphics tg1, TileGraphics tg2) {
+            return tg1.number1 == tg2.number1 && 
+                tg1.number2 == tg2.number2 &&
+                tg1.number3 == tg2.number3 &&
+                tg1.number4 == tg2.number4 &&
+                tg1.number5 == tg2.number5;
+        }
+
+        public static bool operator !=(TileGraphics tg1, TileGraphics tg2) {
+            return !(tg1.number1 == tg2.number1 &&
+                tg1.number2 == tg2.number2 &&
+                tg1.number3 == tg2.number3 &&
+                tg1.number4 == tg2.number4 &&
+                tg1.number5 == tg2.number5);
         }
 
     }

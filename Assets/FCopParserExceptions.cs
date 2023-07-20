@@ -17,4 +17,18 @@ namespace FCopParser {
 
     }
 
+    public class TextureArrayMaxExceeded : Exception {
+
+        public TextureArrayMaxExceeded() {
+        }
+
+    }
+
+    public class GraphicsArrayMaxExceeded : Exception {
+
+        public GraphicsArrayMaxExceeded() {
+        }
+
+    }
+
 }

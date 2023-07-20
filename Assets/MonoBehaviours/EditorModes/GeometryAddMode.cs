@@ -48,7 +48,7 @@ public class GeometryAddMode : EditMode {
 
         if (selectedTilePreset != null) {
 
-            InitTileOverlay(((TilePreset)selectedTilePreset).Create(false, selectedColumn));
+            InitTileOverlay(((TilePreset)selectedTilePreset).Create(false, selectedColumn, selectedSection.section));
 
         }
 
@@ -74,7 +74,7 @@ public class GeometryAddMode : EditMode {
 
         if (selectedTilePreset != null) {
 
-            InitTileOverlay(((TilePreset)selectedTilePreset).Create(false, selectedColumn));
+            InitTileOverlay(((TilePreset)selectedTilePreset).Create(false, selectedColumn, selectedSection.section));
 
         }
 
@@ -107,10 +107,10 @@ public class GeometryAddMode : EditMode {
         if (selectedColumn != null) {
 
             foreach (var t in selectedColumn.tiles) {
-                t.isStartInColumnArray = false;
+                t.isEndInColumnArray = false;
             }
 
-            var tile = preset.Create(true, selectedColumn);
+            var tile = preset.Create(true, selectedColumn, selectedSection.section);
 
             selectedColumn.tiles.Add(tile);
 

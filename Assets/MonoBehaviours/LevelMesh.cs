@@ -82,25 +82,22 @@ public class LevelMesh : MonoBehaviour {
 
             void GenerateTriangle(Tile tile) {
 
-                var textureOffset = tile.textureIndex;
-                var grpahics = section.tileGraphics[tile.graphicsIndex];
-
-                textureCords.Add(new Vector2(
-                    TextureCoordinate.GetX(section.textureCoordinates[textureOffset] + grpahics.number2 * 65536),
-                    TextureCoordinate.GetY(section.textureCoordinates[textureOffset] + grpahics.number2 * 65536)
-                ));
-
-                textureCords.Add(new Vector2(
-                    TextureCoordinate.GetX(section.textureCoordinates[textureOffset + 2] + grpahics.number2 * 65536),
-                    TextureCoordinate.GetY(section.textureCoordinates[textureOffset + 2] + grpahics.number2 * 65536)
-                ));
-
-                textureCords.Add(new Vector2(
-                    TextureCoordinate.GetX(section.textureCoordinates[textureOffset + 1] + grpahics.number2 * 65536),
-                    TextureCoordinate.GetY(section.textureCoordinates[textureOffset + 1] + grpahics.number2 * 65536)
-                ));
-
                 AddVerticies(tile);
+
+                textureCords.Add(new Vector2(
+                    TextureCoordinate.GetX(tile.uvs[0] + tile.texturePalette * 65536),
+                    TextureCoordinate.GetY(tile.uvs[0] + tile.texturePalette * 65536)
+                ));
+
+                textureCords.Add(new Vector2(
+                    TextureCoordinate.GetX(tile.uvs[2] + tile.texturePalette * 65536),
+                    TextureCoordinate.GetY(tile.uvs[2] + tile.texturePalette * 65536)
+                ));
+
+                textureCords.Add(new Vector2(
+                    TextureCoordinate.GetX(tile.uvs[1] + tile.texturePalette * 65536),
+                    TextureCoordinate.GetY(tile.uvs[1] + tile.texturePalette * 65536)
+                ));
 
                 triangles.Add(vertexIndex);
                 triangles.Add(vertexIndex + 1);
@@ -114,28 +111,27 @@ public class LevelMesh : MonoBehaviour {
 
                 AddVerticies(tile);
 
-                var textureOffset = tile.textureIndex;
-                var grpahics = section.tileGraphics[tile.graphicsIndex];
-
                 textureCords.Add(new Vector2(
-                    TextureCoordinate.GetX(section.textureCoordinates[textureOffset] + grpahics.number2 * 65536),
-                    TextureCoordinate.GetY(section.textureCoordinates[textureOffset] + grpahics.number2 * 65536)
+                    TextureCoordinate.GetX(tile.uvs[0] + tile.texturePalette * 65536),
+                    TextureCoordinate.GetY(tile.uvs[0] + tile.texturePalette * 65536)
                 ));
 
                 textureCords.Add(new Vector2(
-                    TextureCoordinate.GetX(section.textureCoordinates[textureOffset + 1] + grpahics.number2 * 65536),
-                    TextureCoordinate.GetY(section.textureCoordinates[textureOffset + 1] + grpahics.number2 * 65536)
+                    TextureCoordinate.GetX(tile.uvs[1] + tile.texturePalette * 65536),
+                    TextureCoordinate.GetY(tile.uvs[1] + tile.texturePalette * 65536)
                 ));
 
                 textureCords.Add(new Vector2(
-                    TextureCoordinate.GetX(section.textureCoordinates[textureOffset + 3] + grpahics.number2 * 65536),
-                    TextureCoordinate.GetY(section.textureCoordinates[textureOffset + 3] + grpahics.number2 * 65536)
+                    TextureCoordinate.GetX(tile.uvs[3] + tile.texturePalette * 65536),
+                    TextureCoordinate.GetY(tile.uvs[3] + tile.texturePalette * 65536)
                 ));
 
                 textureCords.Add(new Vector2(
-                    TextureCoordinate.GetX(section.textureCoordinates[textureOffset + 2] + grpahics.number2 * 65536),
-                    TextureCoordinate.GetY(section.textureCoordinates[textureOffset + 2] + grpahics.number2 * 65536)
+                    TextureCoordinate.GetX(tile.uvs[2] + tile.texturePalette * 65536),
+                    TextureCoordinate.GetY(tile.uvs[2] + tile.texturePalette * 65536)
                 ));
+
+
 
                 triangles.Add(vertexIndex);
                 triangles.Add(vertexIndex + 2);
@@ -160,7 +156,7 @@ public class LevelMesh : MonoBehaviour {
 
                     //tall += 0.5f;
 
-                    Debug.Log(tile.parsedTile.number5.ToString() + " " + x.ToString() + " " + y.ToString());
+                    Debug.Log(tile.parsedTile.meshID.ToString() + " " + x.ToString() + " " + y.ToString());
 
                 } else if (tile.verticies.Count == 3) {
                     GenerateTriangle(tile);

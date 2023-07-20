@@ -1,5 +1,6 @@
 ﻿
 
+using FCopParser;
 using TMPro;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ public class FileListButton : MonoBehaviour {
 
     void Start() {
 
-        text.text = file;
+        text.text = Utils.RemovePathingFromFilePath(file);
 
     }
 

@@ -157,6 +157,9 @@ MonoBehaviour:
   MapOpenerView: {fileID: 8099739459360943739, guid: c9373b0038e7c5a4fafed8aebf7ea4e1, type: 3}
   DialogWindow: {fileID: 9023378669157016393, guid: fc02d57a8830ac84683706ca24c1a091, type: 3}
   SettingsView: {fileID: 9103961765646916841, guid: 31df37c7d02efd54db0f6c0e76a06ee8, type: 3}
+  ContextMenu: {fileID: 1202363537915741135, guid: 93748f903e8932d4b9befa7ac46324e1, type: 3}
+  ContextMenuItem: {fileID: 4118889749630939980, guid: 6a6c4871c74e75e49b6a09c0e323f1b4, type: 3}
+  OpenFileWindow: {fileID: 3388687106751044216, guid: b13e7f6bb30b1aa4489b25d16feb2697, type: 3}
 --- !u!4 &421108730
 Transform:
   m_ObjectHideFlags: 0

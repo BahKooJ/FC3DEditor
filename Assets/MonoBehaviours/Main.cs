@@ -8,6 +8,8 @@ using UnityEngine;
 
 public class Main : MonoBehaviour {
 
+    public static bool ignoreAllInputs = false;
+
     public GameObject meshSection;
     public GameObject heightMapChannelPoint;
     public GameObject SelectedTileOverlay;
@@ -40,6 +42,8 @@ public class Main : MonoBehaviour {
     void Start() {
 
         DialogWindowUtil.canvas = canvas;
+        ContextMenuUtil.canvas = canvas;
+        OpenFileWindowUtil.canvas = canvas;
 
         Physics.queriesHitBackfaces = true;
 
@@ -57,6 +61,8 @@ public class Main : MonoBehaviour {
     void Update() {
 
         editMode.Update();
+
+        if (ignoreAllInputs) { return; }
 
         if (Controls.OnDown("Save")) {
             Compile();
@@ -147,9 +153,18 @@ public class Main : MonoBehaviour {
         try {
             level.Compile();
         } catch (MeshIDException) {
-            DialogWindowUtil.Dialog("Invalid Level Geometry", "One or more tiles geomtry is invalid." +
+            DialogWindowUtil.Dialog("Compile Error: Invalid Level Geometry", "One or more tiles geomtry is invalid." +
                 " This error can be cause by manually changing the height channel of a vertex. The selected tile overlay" +
                 " will be red if the geometry is invalid.");
+            return;
+        } catch (TextureArrayMaxExceeded) {
+            DialogWindowUtil.Dialog("Compile Error: Unique Tile Texture Mapping Exceeded", "The max of 1024 UVs have been exceeded in one or more sections. " +
+                "Please report this error");
+            return;
+        }
+        catch (GraphicsArrayMaxExceeded) {
+            DialogWindowUtil.Dialog("Compile Error: Unique Tile Graphics Exceeded", "The max of 1024 Tile Graphics have been exceeded in one or more sections. " +
+                "This should be very rare, please report this error");
             return;
         }
 
@@ -172,7 +187,13 @@ public class Main : MonoBehaviour {
 
         iffFile.Compile();
 
-        File.WriteAllBytes(FileManagerMain.savePath, iffFile.bytes);
+        FreeMove.StopLooking();
+
+        OpenFileWindowUtil.SaveFile("Output", "Mission File", path => {
+
+            File.WriteAllBytes(path, iffFile.bytes);
+
+        });
 
     }
 
@@ -198,6 +219,8 @@ public class Main : MonoBehaviour {
     }
 
     public void RefreshTextures() {
+
+        bmpTextures.Clear();
 
         foreach (var bmp in level.textures) {
 

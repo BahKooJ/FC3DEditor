@@ -7,6 +7,7 @@ class ToolbarView: MonoBehaviour {
     public GameObject sectionEditPanel;
     public GameObject navMeshEditPanel;
     public GameObject actorEditPanel;
+    public GameObject textureEditPanel;
 
     public Main controller;
 
@@ -20,6 +21,8 @@ class ToolbarView: MonoBehaviour {
 
     void Update() {
 
+        if (Main.ignoreAllInputs) { return; }
+
         if (Controls.OnDown("GeometryEditingMode")) {
             SelectGeometryEditorTool();
         }
@@ -28,6 +31,9 @@ class ToolbarView: MonoBehaviour {
         }
         if (Controls.OnDown("SectionEditingMode")) {
             SelectSectionEditMode();
+        }
+        if (Controls.OnDown("TextureEditingMode")) {
+            SelectTextureEditMode();
         }
         if (Controls.OnDown("NavMeshEditingMode")) {
             SelectNavMeshEdit();
@@ -127,6 +133,26 @@ class ToolbarView: MonoBehaviour {
         var obj = Instantiate(sectionEditPanel);
 
         var script = obj.GetComponent<SectionEditView>();
+
+        script.controller = editMode;
+
+        obj.transform.SetParent(this.transform.parent, false);
+
+        activePanel = obj;
+
+        controller.ChangeEditMode(editMode);
+
+    }
+
+    public void SelectTextureEditMode() {
+
+        var editMode = new TextureEditMode(controller);
+
+        Destroy(activePanel);
+
+        var obj = Instantiate(textureEditPanel);
+
+        var script = obj.GetComponent<TextureEditView>();
 
         script.controller = editMode;
 

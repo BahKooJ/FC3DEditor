@@ -57,6 +57,65 @@ namespace FCopParser {
         public static ushort BytesToUShort(byte[] bytes, int offset) {
             return BitConverter.ToUInt16(bytes, offset);
         }
+
+        public static string RemovePathingFromFilePath(string filePath) {
+
+            string Reverse(string s) {
+                char[] charArray = s.ToCharArray();
+                Array.Reverse(charArray);
+                return new string(charArray);
+            }
+
+            var total = "";
+
+            foreach (var i in Enumerable.Range(0, filePath.Length)) {
+
+                var c = filePath[(filePath.Length - 1) - i];
+
+                if (c == '\\' || c == '/') {
+                    return Reverse(total);
+                }
+
+                total += c;
+
+            }
+
+            return Reverse(total);
+
+        }
+
+        public static string RemoveExtensionFromFileName(string fileName) {
+
+            var total = "";
+
+            var periodCount = fileName.Where(c => {
+                return c == '.';
+            }).Count();
+
+            if (periodCount == 0) {
+                return fileName;
+            }
+
+            foreach (var c in fileName) {
+
+                if (c == '.') {
+
+                    if (periodCount == 1) {
+                        return total;
+                    } else {
+                        periodCount--;
+                    }
+
+                }
+
+                total += c;
+
+            }
+
+            return total;
+
+        }
+
     }
 
 }

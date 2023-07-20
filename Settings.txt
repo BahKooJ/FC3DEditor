@@ -11,6 +11,7 @@ Inputs = {
 "GeometryEditingMode":"G"
 "TileBuildingMode":"T"
 "SectionEditingMode":"Y"
+"TextureEditingMode":"H"
 "NavMeshEditingMode":"N"
 "ActorEditingMode":"O"
 "Save":"F5"

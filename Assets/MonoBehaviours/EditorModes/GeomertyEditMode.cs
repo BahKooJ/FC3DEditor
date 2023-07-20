@@ -21,17 +21,6 @@ public class GeometryEditMode : EditMode {
 
     public GeometryEditorUI view;
 
-    public bool IsGraphicsViewOpen() {
-
-        if (view != null) {
-            return view.activeGraphicsPropertiesView != null;
-        }
-
-        return false;
-
-    }
-
-    FCopLevelSection copySection = null;
     public HeightMapChannelPoint lastSelectedHeightChannel = null;
 
     public void Update() {
@@ -59,7 +48,8 @@ public class GeometryEditMode : EditMode {
                 ClearAllSelectedItems();
             }
 
-        } else if (Controls.OnDown("Delete")) {
+        } 
+        else if (Controls.OnDown("Delete")) {
             RemoveSelectedTiles();
         }
 
@@ -199,7 +189,7 @@ public class GeometryEditMode : EditMode {
 
     void TestHeightMapChannelSelection() {
 
-        if (FreeMove.looking || IsGraphicsViewOpen()) {
+        if (FreeMove.looking) {
             return;
         }
 
@@ -607,67 +597,6 @@ public class GeometryEditMode : EditMode {
         selectedSection.RefreshMesh();
 
         RefreshSelectedOverlays();
-
-    }
-
-    public void DuplicateTileGraphics() {
-
-        if (selectedTiles.Count < 2) { return; }
-
-        var firstTile = selectedTiles[0];
-
-        foreach (var tile in selectedTiles) {
-
-            tile.textureIndex = firstTile.textureIndex;
-            tile.graphicsIndex = firstTile.graphicsIndex;
-
-        }
-
-        selectedSection.RefreshMesh();
-
-        ClearAllSelectedItems();
-
-    }
-
-    public void ExportTexture(int id) {
-
-        if (id == -1) { return; }
-
-        var graphics = selectedSection.section.tileGraphics[id];
-
-        File.WriteAllBytes("bmp" + graphics.number2.ToString() + ".bmp", main.level.textures[graphics.number2].BitmapWithHeader());
-
-    }
-
-    // TODO: Allow importing textures even when multiple tiles are selected
-    public void ImportTexture(int id) {
-
-        if (id == -1) { return; }
-
-        var graphics = selectedSection.section.tileGraphics[selectedTiles[0].graphicsIndex];
-
-        main.level.textures[graphics.number2].ImportBMP(File.ReadAllBytes("bmp" + graphics.number2.ToString() + ".bmp"));
-
-    }
-
-    public void ChangeTexturePallette(int palletteOffset) {
-
-        foreach (var tile in selectedTiles) {
-            var graphics = selectedSection.section.tileGraphics[tile.graphicsIndex];
-
-            graphics.number2 = palletteOffset;
-
-            selectedSection.section.tileGraphics[tile.graphicsIndex] = graphics;
-
-        }
-
-    }
-
-    public void SetTextureIndex(int index) {
-
-        foreach (var tile in selectedTiles) {
-            tile.textureIndex = index;
-        }
 
     }
 
