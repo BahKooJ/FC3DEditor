@@ -20,7 +20,6 @@ public class FileManagerMain : MonoBehaviour {
 
     public static IFFParser iffFile;
     public static FCopLevel level;
-    public static string savePath = "Output/";
 
     void Start() {
 

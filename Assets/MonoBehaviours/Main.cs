@@ -187,7 +187,13 @@ public class Main : MonoBehaviour {
 
         iffFile.Compile();
 
-        File.WriteAllBytes(FileManagerMain.savePath, iffFile.bytes);
+        FreeMove.StopLooking();
+
+        OpenFileWindowUtil.SaveFile("Output", "Mission File", path => {
+
+            File.WriteAllBytes(path, iffFile.bytes);
+
+        });
 
     }
 

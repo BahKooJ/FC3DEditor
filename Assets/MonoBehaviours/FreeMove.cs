@@ -122,7 +122,7 @@ public class FreeMove : MonoBehaviour {
     /// <summary>
     /// Enable free looking.
     /// </summary>
-    public void StartLooking() {
+    public static void StartLooking() {
         looking = true;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
@@ -131,7 +131,7 @@ public class FreeMove : MonoBehaviour {
     /// <summary>
     /// Disable free looking.
     /// </summary>
-    public void StopLooking() {
+    public static void StopLooking() {
         looking = false;
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
