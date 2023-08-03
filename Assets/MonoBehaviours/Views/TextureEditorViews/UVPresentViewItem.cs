@@ -6,26 +6,48 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
 
 public class UVPresentViewItem : MonoBehaviour {
 
+    // Prefabs
+    public GameObject texturePreviewMesh;
+    public GameObject texturePreviewCamera;
+    public RenderTexture texturePreviewRender;
+
     // View refs
-    public MeshFilter filter;
-    public MeshRenderer meshRenderer;
     public TMP_Text nameText;
     public TMP_InputField nameTextField;
     public ContextMenuHandler contextMenu;
+    public RawImage texturePreview;
 
     public UVPreset preset;
     public TextureEditMode controller;
     public TexturePresetsView view;
     public bool forceNameChange;
 
-    //TODO: Mesh is not masked is scrollview
+    public MeshFilter filter;
+    public MeshRenderer meshRenderer;
     Mesh mesh;
 
+    // TODO: This works but I really don't like the implementation. It's also really slow.
+    // All this just to get it to mask in the UI?
     void Start() {
+
+        var meshObj = Instantiate(texturePreviewMesh);
+        meshObj.transform.SetParent(transform, false);
+
+        filter = meshObj.GetComponent<MeshFilter>();
+        meshRenderer = meshObj.GetComponent<MeshRenderer>();
+
+        var camera = Instantiate(texturePreviewCamera);
+        camera.transform.SetParent(transform, false);
+        ((RectTransform)camera.transform).anchoredPosition = new Vector2(25,25);
+
+        var clp = camera.transform.localPosition;
+        clp.z = -1;
+        camera.transform.localPosition = clp;
 
         mesh = new Mesh();
         filter.mesh = mesh;
@@ -40,7 +62,8 @@ public class UVPresentViewItem : MonoBehaviour {
 
         if (preset.uvs.Count == 4) {
             GenerateQuad();
-        } else {
+        }
+        else {
             GenerateTriangle();
         }
 
@@ -49,6 +72,18 @@ public class UVPresentViewItem : MonoBehaviour {
         } else {
             nameTextField.gameObject.SetActive(false);
         }
+
+        camera.GetComponent<Camera>().Render();
+
+        var texture = new Texture2D(texturePreviewRender.width, texturePreviewRender.height, texturePreviewRender.graphicsFormat, 0, TextureCreationFlags.None);
+        RenderTexture.active = texturePreviewRender;
+        texture.ReadPixels(new Rect(0, 0, texturePreviewRender.width, texturePreviewRender.height), 0, 0);
+        texture.Apply();
+        RenderTexture.active = null;
+        texturePreview.texture = texture;
+
+        Destroy(meshObj);
+        Destroy(camera);
 
     }
 
