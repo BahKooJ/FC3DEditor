@@ -11,10 +11,8 @@ Currently the features of the editor are:
 What's currently planned for the editor is:
 - Creating/Editing colored vertex
 - Creating/Editing special tiles (animated, liquid, damaging)
-- Viewing models of game objects
 - Creating custom game objects
 - Creating custom models
-- Playstation support (maybe)
 
 And of course, improving and fixing the editor.
 
@@ -22,25 +20,31 @@ Please note that this editor is still very early in development and improvements
 
 # Getting Started
 
-When you first start up the editor the left will have a list view and a settings button at the bottom of the screen (Not yet implemented).
+When you first start up the editor the left will have a list view and a settings button at the bottom of the screen.
 This list view will show files put in the "MissionFiles" folder in the directory of the editor. Copy over mission files from Future Cop and paste them into this folder to open them.
 You can find the mission files in the in "C:\Program Files (x86)\Electronic Arts\Future Cop\missions".
 
-![openfileexample](https://user-images.githubusercontent.com/71286169/227432641-b86bb0c3-4014-4e98-aba0-bb9cd49c2cde.PNG)
+The settings menu contains custom keybindings for changing the controls. These changes are persistant and will save to the "Settings.txt" file.
 
-After opening a mission file, type in the name or save path of the mission file. This will not create a file right away, rather it will be the save path of the file if you do choose to save. The button to save is "F5"
+![settings](https://github.com/BahKooJ/FC3DEditor/assets/71286169/9ebd5e14-0488-4065-81d7-081e0fce99b1)
 
-Checking "Override map data '' will clear all level geometry and make a new layout based on the provided width and height. The width and height represent the width and height of sections the playable area of the level has. This is useful for creating custom maps from scratch. If left uncheck the level will load with the existing level geometry.
+To open up the level, click on a file in the list view. After opening a mission file, there are a few additional settings we can change before opening up the level.
 
-Hitting open will then open the level in a 3D environment, this might take a second to load. Once loaded in, click the middle mouse button or "M" to enable free look. "WASD" is to move around, "E" and "Q" move the camera up and down relative to the camera, and "Space" and "Control" move the camera directly up or down.
+Checking "Override map data" will clear all level geometry and make a new layout based on the provided width and height. The width and height represent the width and height of sections the playable area of the level has. This is useful for creating custom maps from scratch. If left uncheck the level will load with the existing level geometry.
+
+![openFile](https://github.com/BahKooJ/FC3DEditor/assets/71286169/527bb545-82e8-4deb-80e7-86aea320d5e9)
+
+Hitting open will then open the level in a 3D environment, this might take a second to load. Once loaded in, click the middle mouse button to enable free look. "WASD" is to move around, "E" and "Q" move the camera up and down relative to the camera, and "Space" and "Control" move the camera directly up or down.
+
+To save the level, hit F5. A file window will open up allowing to type in the name of the file. The file will save to the "Output" folder.
 
 # Level formatting
 
-Future Cop's levels are split up into 16x16 tile sections. A section consists of 16x16 tile columns and 17x17 heightmap points.
+Future Cop's levels are split up into 16x16 tile sections. A section consists of 16x16 tile columns and 17x3x17 verticies (17x17 Heightmap points).
 
 ![column example](https://user-images.githubusercontent.com/71286169/226208727-063974eb-0952-4f59-89c0-3483cc88ccab.PNG)
 
-A tile column stores tiles within a 1x1 tile area. Meaning that the tiles stored inside a tile column use a different combination of heightmap points.
+A tile column stores tiles within a 1x1 grid area. In each coner of the grid contrains vertices or a heightmap point.
 
 A heightmap point is a group of 3 vertices at the corners of a tile column. These vertices are what the tiles connect to make a face. A heightmap point contains 3 channels, the editor represents this by colors. Blue is 1, green is 2, and red is 3. Tiles use a combination of these heightmap points to make faces and level geometry. However each tile column shares the neighboring height points. There are only 3 heightmap channels, this is a limitation of the file format. A height point can have a max value of 127 and min value of -128.
 
