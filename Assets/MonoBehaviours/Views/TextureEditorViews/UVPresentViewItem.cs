@@ -36,13 +36,13 @@ public class UVPresentViewItem : MonoBehaviour {
     void Start() {
 
         var meshObj = Instantiate(texturePreviewMesh);
-        meshObj.transform.SetParent(transform, false);
+        //meshObj.transform.SetParent(transform, false);
 
         filter = meshObj.GetComponent<MeshFilter>();
         meshRenderer = meshObj.GetComponent<MeshRenderer>();
 
         var camera = Instantiate(texturePreviewCamera);
-        camera.transform.SetParent(transform, false);
+        //camera.transform.SetParent(transform, false);
         ((RectTransform)camera.transform).anchoredPosition = new Vector2(25,25);
 
         var clp = camera.transform.localPosition;
