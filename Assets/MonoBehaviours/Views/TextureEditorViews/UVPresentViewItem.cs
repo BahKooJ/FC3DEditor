@@ -82,8 +82,8 @@ public class UVPresentViewItem : MonoBehaviour {
         RenderTexture.active = null;
         texturePreview.texture = texture;
 
-        Destroy(meshObj);
-        Destroy(camera);
+        DestroyImmediate(meshObj);
+        DestroyImmediate(camera);
 
     }
 
