@@ -1182,9 +1182,11 @@ namespace FCopParser {
 
             culling = tile.culling;
 
-            tile.uvs = new List<int>(tile.uvs);
+            uvs = new List<int>(tile.uvs);
 
             texturePalette = tile.texturePalette;
+
+            graphics = tile.graphics;
 
             this.parsedTile = tile.parsedTile;
 
