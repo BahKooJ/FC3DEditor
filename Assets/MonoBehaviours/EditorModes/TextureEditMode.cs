@@ -196,6 +196,8 @@ public class TextureEditMode : EditMode {
 
     void ClearAllSelectedItems() {
 
+        selectedSection.RefreshMesh();
+
         selectedTiles.Clear();
         ClearTileOverlays();
 
