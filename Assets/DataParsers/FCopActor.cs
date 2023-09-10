@@ -7,14 +7,6 @@ using System.Text;
 
 namespace FCopParser {
 
-    /*
-     * 11 - prop
-     * 14 - interactable
-     * 16 - item
-     * 
-     * 
-     */
-
     public class FCopActor {
 
         public static class FourCC {
@@ -48,13 +40,19 @@ namespace FCopParser {
         public List<ChunkHeader> offsets = new();
 
         public int id;
-        public int objectType;
+        public int actorType;
         public int x;
         public int y;
 
+        public List<int> rpnsReferences = new();
+
+        public List<int> headerCodeData = new();
+
+        public List<byte> headerCode = new();
+
         public List<FCopResource> resourceReferences = new();
 
-        public FCopActorScript script;
+        public FCopActorBehavior behavior;
 
         public IFFDataFile rawFile;
 
@@ -65,33 +63,35 @@ namespace FCopParser {
             FindStartChunkOffset();
 
             id = Utils.BytesToInt(rawFile.data.ToArray(), 8);
-            objectType = Utils.BytesToInt(rawFile.data.ToArray(), 12);
+            actorType = Utils.BytesToInt(rawFile.data.ToArray(), 12);
             y = Utils.BytesToInt(rawFile.data.ToArray(), 16);
             x = Utils.BytesToInt(rawFile.data.ToArray(), 24);
 
             ParseResourceReferences();
 
-            switch(objectType) {
+            ParseRPNSReferences();
+
+            switch (actorType) {
                 case 5:
-                    script = new FCopScript5(this);
+                    behavior = new FCopBehavior5(this);
                     break;
                 case 8:
-                    script = new FCopScript8(this);
+                    behavior = new FCopBehavior8(this);
                     break;
                 case 9:
-                    script = new FCopScript9(this);
+                    behavior = new FCopBehavior9(this);
                     break;
                 case 11:
-                    script = new FCopScript11(this);
+                    behavior = new FCopBehavior11(this);
                     break;
                 case 28:
-                    script = new FCopScript28(this);
+                    behavior = new FCopBehavior28(this);
                     break;
                 case 36:
-                    script = new FCopScript36(this);
+                    behavior = new FCopBehavior36(this);
                     break;
                 case 95:
-                    script = new FCopScript95(this);
+                    behavior = new FCopBehavior95(this);
                     break;
             }
 
@@ -100,13 +100,25 @@ namespace FCopParser {
 
         virtual public void Compile() {
 
+            rawFile.additionalData.Clear();
+
+            foreach (var rpnsRef in rpnsReferences) {
+                rawFile.additionalData.AddRange(BitConverter.GetBytes(rpnsRef));
+            }
+
+            foreach (var i in headerCodeData) {
+                rawFile.additionalData.AddRange(BitConverter.GetBytes(i));
+            }
+
+            rawFile.additionalData.AddRange(headerCode);
+
             rawFile.data.RemoveRange(yOffset, 4);
             rawFile.data.InsertRange(yOffset, BitConverter.GetBytes(y));
             rawFile.data.RemoveRange(xOffset, 4);
             rawFile.data.InsertRange(xOffset, BitConverter.GetBytes(x));
 
-            if (script != null) {
-                script.Compile();
+            if (behavior != null) {
+                behavior.Compile();
             }
 
         }
@@ -133,6 +145,30 @@ namespace FCopParser {
                 offset += 8;
 
             }
+
+        }
+
+        void ParseRPNSReferences() {
+
+            var headerData = rawFile.additionalData;
+
+            var offset = 0;
+
+            foreach (var i in Enumerable.Range(0, 3)) {
+
+                rpnsReferences.Add(Utils.BytesToInt(headerData.ToArray(), offset));
+                offset += 4;
+
+            }
+
+            foreach (var i in Enumerable.Range(0, 2)) {
+
+                headerCodeData.Add(Utils.BytesToInt(headerData.ToArray(), offset));
+                offset += 4;
+
+            }
+
+            headerCode = headerData.GetRange(offset, headerData.Count - offset);
 
         }
 
@@ -171,7 +207,7 @@ namespace FCopParser {
 
         public static IFFDataFile AddNetrualTurretTempMethod(int id, int x, int y) {
 
-            var file = new IFFDataFile(2, new(), "Csac", id, new() );
+            var file = new IFFDataFile(2, new(), "Csac", id, new());
 
             file.additionalData.AddRange(BitConverter.GetBytes(1807));
             file.additionalData.AddRange(BitConverter.GetBytes(1807));
@@ -186,9 +222,9 @@ namespace FCopParser {
             file.data.AddRange(BitConverter.GetBytes(0));
             file.data.AddRange(BitConverter.GetBytes(x));
             file.data.AddRange(new List<byte>() {
-                0x48, 0x01, 0x11, 0x00, 0xF4, 0x01, 0x00, 0x00, 0x00, 0x32, 0x03, 0x00, 0x65, 0x00, 0x00, 0x00, 0x03, 
-                0x00, 0x06, 0x02, 0x03, 0x04, 0x0A, 0x00, 0x00, 0x10, 0x00, 0x10, 0x00, 0x18, 0x20, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 
-                0x02, 0x00, 0x00, 0x99, 0x09, 0x00, 0x18, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x01, 0x02, 0x01, 0x02, 0x3C, 
+                0x48, 0x01, 0x11, 0x00, 0xF4, 0x01, 0x00, 0x00, 0x00, 0x32, 0x03, 0x00, 0x65, 0x00, 0x00, 0x00, 0x03,
+                0x00, 0x06, 0x02, 0x03, 0x04, 0x0A, 0x00, 0x00, 0x10, 0x00, 0x10, 0x00, 0x18, 0x20, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00,
+                0x02, 0x00, 0x00, 0x99, 0x09, 0x00, 0x18, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x01, 0x02, 0x01, 0x02, 0x3C,
                 0x00, 0x00, 0x04, 0x4C, 0x53, 0x52, 0x61, 0x2C, 0x00, 0x00, 0x00
             });
 
@@ -213,27 +249,27 @@ namespace FCopParser {
 
     }
 
-    public interface FCopActorScript {
+    public interface FCopActorBehavior {
 
         public FCopActor actor { get; set; }
+        public List<ActorProperty> properties { get; set; }
 
         public void Compile() {
 
         }
 
-        public void ChangeRotation(float y) {
-
-        }
 
     }
 
-    public class FCopScript5 : FCopActorScript {
+    public class FCopBehavior5 : FCopActorBehavior {
 
         public FCopActor actor { get; set; }
+        public List<ActorProperty> properties { get; set; }
+
 
         public int textureOffset;
 
-        public FCopScript5(FCopActor actor) {
+        public FCopBehavior5(FCopActor actor) {
             this.actor = actor;
 
             var rawFile = actor.rawFile;
@@ -244,9 +280,11 @@ namespace FCopParser {
 
     }
 
-    public class FCopScript8 : FCopActorScript {
+    public class FCopBehavior8 : FCopActorBehavior {
 
         public FCopActor actor { get; set; }
+        public List<ActorProperty> properties { get; set; }
+
 
         public Team teamHostileToThis;
         public Team miniMapColor;
@@ -257,7 +295,7 @@ namespace FCopParser {
 
         public ActorRotation baseRotation;
 
-        public FCopScript8(FCopActor actor) {
+        public FCopBehavior8(FCopActor actor) {
             this.actor = actor;
 
             var rawFile = actor.rawFile;
@@ -287,13 +325,15 @@ namespace FCopParser {
 
     }
 
-    public class FCopScript9 : FCopActorScript {
+    public class FCopBehavior9 : FCopActorBehavior {
 
         public FCopActor actor { get; set; }
+        public List<ActorProperty> properties { get; set; }
+
 
         public int textureOffset;
 
-        public FCopScript9(FCopActor actor) {
+        public FCopBehavior9(FCopActor actor) {
             this.actor = actor;
 
             var rawFile = actor.rawFile;
@@ -304,13 +344,15 @@ namespace FCopParser {
 
     }
 
-    public class FCopScript11 : FCopActorScript {
+    public class FCopBehavior11 : FCopActorBehavior {
 
         public FCopActor actor { get; set; }
+        public List<ActorProperty> properties { get; set; }
+
 
         public ActorRotation rotation;
 
-        public FCopScript11(FCopActor actor) {
+        public FCopBehavior11(FCopActor actor) {
             this.actor = actor;
 
             rotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 46));
@@ -332,13 +374,50 @@ namespace FCopParser {
 
     }
 
-    public class FCopScript28 : FCopActorScript {
+    public class FCopBehavior14 : FCopActorBehavior {
 
         public FCopActor actor { get; set; }
+        public List<ActorProperty> properties { get; set; }
+
+
+        int number1;
+        int number2;
+        int number3;
+        int number4;
+        int number5;
+        int number6;
+        int number7;
+
+
+        public FCopBehavior14(FCopActor actor) {
+            this.actor = actor;
+
+            number1 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 28);
+            number2 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 30);
+            number3 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 32);
+            number4 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 44);
+            number5 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 46);
+            number6 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 48);
+            number7 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 50);
+
+        }
+
+
+        public void Compile() {
+
+        }
+
+    }
+
+    public class FCopBehavior28 : FCopActorBehavior {
+
+        public FCopActor actor { get; set; }
+        public List<ActorProperty> properties { get; set; }
+
 
         public int textureOffset;
 
-        public FCopScript28(FCopActor actor) {
+        public FCopBehavior28(FCopActor actor) {
             this.actor = actor;
 
             var rawFile = actor.rawFile;
@@ -349,18 +428,19 @@ namespace FCopParser {
 
     }
 
-    public class FCopScript36 : FCopActorScript {
+    public class FCopBehavior36 : FCopActorBehavior {
 
-        //
 
         public FCopActor actor { get; set; }
+        public List<ActorProperty> properties { get; set; }
+
 
         public ActorRotation headRotation;
 
         public ActorRotation baseRotation;
 
 
-        public FCopScript36(FCopActor actor) {
+        public FCopBehavior36(FCopActor actor) {
             this.actor = actor;
 
             headRotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 64));
@@ -383,32 +463,103 @@ namespace FCopParser {
 
     }
 
-    public class FCopScript95 : FCopActorScript {
+    public class FCopBehavior95 : FCopActorBehavior {
 
         public FCopActor actor { get; set; }
+        public List<ActorProperty> properties { get; set; }
 
-        public int number1;
-        public int number2;
-        public int number3;
-        public int number4;
-        public int number5;
 
-        public FCopScript95(FCopActor actor) {
+        public ValueActorProperty hitboxWidth;
+        public ValueActorProperty hitboxHeight;
+        public ValueActorProperty number3;
+        public ValueActorProperty triggerType;
+        public IDReferenceActorProperty actorToTest;
 
-            number1 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 28);
-            number2 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 30);
-            number3 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 32);
-            number4 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 34);
-            number5 = Utils.BytesToInt(actor.rawFile.data.ToArray(), 36);
+        public FCopBehavior95(FCopActor actor) {
+            this.actor = actor;
 
+            hitboxWidth = new ("Hit Box Width", Utils.BytesToShort(actor.rawFile.data.ToArray(), 28));
+            hitboxHeight = new("Hit Box Height", Utils.BytesToShort(actor.rawFile.data.ToArray(), 30));
+            number3 = new("Property 3", Utils.BytesToShort(actor.rawFile.data.ToArray(), 32));
+            triggerType = new("Trigger Type", Utils.BytesToShort(actor.rawFile.data.ToArray(), 34));
+            actorToTest = new("Trigger Actor", Utils.BytesToInt(actor.rawFile.data.ToArray(), 36));
+
+            properties = new() { hitboxWidth, hitboxHeight, number3, triggerType, actorToTest };
 
         }
 
     }
 
-    public enum Team {
-        RED = 1,
-        BLUE = 2
+
+    public interface ActorProperty {
+
+        public string name { get; set; }
+
+    }
+
+    public class ValueActorProperty: ActorProperty { 
+        public string name { get; set; }
+
+        public int value;
+
+        public ValueActorProperty(string name, int value) {
+            this.name = name;
+            this.value = value;
+        }
+
+    }
+
+    public class IDReferenceActorProperty: ActorProperty {
+        public string name { get; set; }
+
+        public int value;
+
+        public IDReferenceActorProperty(string name, int value) {
+            this.name = name;
+            this.value = value;
+        }
+
+    }
+
+    public class EnumDataActorProperty<T>: ActorProperty {
+        public string name { get; set; }
+
+        public T caseValue;
+
+        public EnumDataActorProperty(string name, T caseValue) {
+            this.name = name;
+            this.caseValue = caseValue;
+        }
+
+    }
+
+    public class RangeActorProperty: ActorProperty {
+        public string name { get; set; }
+
+        public int value;
+
+        public int max;
+        public int min;
+
+        public RangeActorProperty(string name, int value, int max, int min) {
+            this.name = name;
+            this.value = value;
+            this.max = max;
+            this.min = min;
+        }
+
+    }
+
+    public class RotationActorProperty: ActorProperty {
+        public string name { get; set; }
+
+        public ActorRotation value;
+
+        public RotationActorProperty(string name, ActorRotation value) {
+            this.name = name;
+            this.value = value;
+        }
+
     }
 
     public struct ActorRotation {
@@ -477,5 +628,11 @@ namespace FCopParser {
         }
 
     }
+
+    public enum Team {
+        RED = 1,
+        BLUE = 2
+    }
+
 
 }

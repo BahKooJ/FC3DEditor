@@ -238,3 +238,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0b66af07c730be46863164f42e53555, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actorPropertiesView: {fileID: 5103753405492657139, guid: f4c95871b5585f348a4588b45d0cd1b4, type: 3}
+  activeActorPropertiesView: {fileID: 0}

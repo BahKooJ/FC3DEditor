@@ -8,9 +8,13 @@ public class ActorEditMode : EditMode {
 
     public Main main { get; set; }
 
+    public ActorEditPanelView view;
+
     List<ActorObject> actors = new();
 
-    AxisControl selectedActor = null;
+    AxisControl selectedActorObject = null;
+    public FCopActor selectedActor = null;
+
     ActorObject actorToAdd = null;
 
     public ActorEditMode(Main main) {
@@ -53,7 +57,7 @@ public class ActorEditMode : EditMode {
 
     public void Update() {
 
-        if (selectedActor != null) {
+        if (selectedActorObject != null) {
 
             // Moves object to cursor
             if (Controls.IsDown("ModifierMoveToCursor")) {
@@ -62,9 +66,9 @@ public class ActorEditMode : EditMode {
 
                 if (hitPos != null) {
 
-                    selectedActor.moveCallback((Vector3)hitPos);
+                    selectedActorObject.moveCallback((Vector3)hitPos);
 
-                    selectedActor.transform.position = selectedActor.controlledObject.transform.position;
+                    selectedActorObject.transform.position = selectedActorObject.controlledObject.transform.position;
 
                 }
 
@@ -104,41 +108,9 @@ public class ActorEditMode : EditMode {
 
                     }
 
-
-
                     if (didHit) {
 
-                        if (act.actor.script is FCopScript95) {
-
-                            var script95 = act.actor.script as FCopScript95;
-
-                            Debug.Log(script95.number1 + " " + script95.number2 + " " + script95.number3 + " " + script95.number4 + " " + script95.number5);
-                        }
-
-                        Debug.Log(act.actor.id + " : " + act.actor.objectType);
-
-                        UnselectActor();
-
-                        var axisControl = Object.Instantiate(main.axisControl);
-                        var script = axisControl.GetComponent<AxisControl>();
-
-                        script.controlledObject = act.gameObject;
-
-                        script.moveCallback = (newPos) => {
-
-                            act.ChangePosition(newPos);
-
-                            return true;
-                        };
-
-                        script.rotateCallback = (y) => {
-
-                            act.ChangeRotation(y);
-
-                            return true;
-                        };
-
-                        selectedActor = script;
+                        SelectActor(act);
 
                         break;
 
@@ -157,21 +129,60 @@ public class ActorEditMode : EditMode {
 
     }
 
+    public void SelectActor(ActorObject actorObject) {
+
+        Debug.Log(actorObject.actor.id + " : " + actorObject.actor.actorType);
+
+        UnselectActor();
+
+        var axisControl = Object.Instantiate(main.axisControl);
+        var script = axisControl.GetComponent<AxisControl>();
+
+        script.controlledObject = actorObject.gameObject;
+
+        script.moveCallback = (newPos) => {
+
+            actorObject.ChangePosition(newPos);
+
+            return true;
+        };
+
+        script.rotateCallback = (y) => {
+
+            actorObject.ChangeRotation(y);
+
+            return true;
+        };
+
+        selectedActorObject = script;
+        selectedActor = actorObject.actor;
+
+        if (view.activeActorPropertiesView != null) {
+            view.RefreshActorPropertiesView();
+        } else {
+            view.OpenActorPropertiesView();
+        }
+
+    }
+
     public void UnselectActor() {
 
-        if (selectedActor != null) {
-            Object.Destroy(selectedActor.gameObject);
+        if (selectedActorObject != null) {
+            Object.Destroy(selectedActorObject.gameObject);
         }
+
+        selectedActor = null;
+        selectedActorObject = null;
 
     }
 
     void deleteActor() {
 
-        if (selectedActor == null) {
+        if (selectedActorObject == null) {
             return;
         }
 
-        var actorObject = selectedActor.controlledObject.GetComponent<ActorObject>();
+        var actorObject = selectedActorObject.controlledObject.GetComponent<ActorObject>();
 
         main.level.actors.Remove(actorObject.actor);
 
@@ -186,12 +197,12 @@ public class ActorEditMode : EditMode {
 
     public void PasteNavNodeCoords() {
 
-        if (selectedActor != null) {
+        if (selectedActorObject != null) {
 
             if (NavMeshEditMode.copiedNavNodeCoords != null) {
 
-                selectedActor.transform.position = (Vector3)NavMeshEditMode.copiedNavNodeCoords;
-                selectedActor.moveCallback((Vector3)NavMeshEditMode.copiedNavNodeCoords);
+                selectedActorObject.transform.position = (Vector3)NavMeshEditMode.copiedNavNodeCoords;
+                selectedActorObject.moveCallback((Vector3)NavMeshEditMode.copiedNavNodeCoords);
 
             }
 

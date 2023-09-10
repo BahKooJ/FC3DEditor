@@ -26,11 +26,11 @@ public class ActorObject : MonoBehaviour {
 
     public void ChangeRotation(float y) {
 
-        if (actor.script == null) {
+        if (actor.behavior == null) {
             return;
         }
 
-        actor.script.ChangeRotation(y);
+        //actor.behavior.ChangeRotation(y);
 
         SetRotation();
 
@@ -42,7 +42,7 @@ public class ActorObject : MonoBehaviour {
         SetToCurrentPosition();
 
         // 98 and 99 are the weapon models. They keep breaking the mesh collider in ObjectMesh so for now I'll just skip them.
-        if (actor.objectType == 98 || actor.objectType == 99) {
+        if (actor.actorType == 98 || actor.actorType == 99) {
             return;
         }
 
@@ -77,7 +77,7 @@ public class ActorObject : MonoBehaviour {
 
                 } else {
 
-                    Debug.LogWarning("Object on Actor: " + actor.objectType + " failed to create");
+                    Debug.LogWarning("Object on Actor: " + actor.actorType + " failed to create");
 
                 }
 
@@ -87,7 +87,7 @@ public class ActorObject : MonoBehaviour {
 
         }
 
-        if (actor.script is FCopScript36 || actor.script is FCopScript8) {
+        if (actor.behavior is FCopBehavior36 || actor.behavior is FCopBehavior8) {
 
             if (objects.Count != 2) {
                 Debug.LogWarning("Actor script 36/8 doesn't have 2 models?");
@@ -126,23 +126,23 @@ public class ActorObject : MonoBehaviour {
 
     void SetRotation() {
 
-        switch (actor.script) {
+        switch (actor.behavior) {
 
-            case FCopScript8:
-                var script8 = (FCopScript8)actor.script;
+            case FCopBehavior8:
+                var script8 = (FCopBehavior8)actor.behavior;
 
                 objects[0].transform.localRotation = Quaternion.Euler(0f, script8.headRotation.parsedRotation, 0f);
                 objects[1].transform.localRotation = Quaternion.Euler(0f, script8.baseRotation.parsedRotation, 0f);
 
                 break;
-            case FCopScript11:
-                var script11 = (FCopScript11)actor.script;
+            case FCopBehavior11:
+                var script11 = (FCopBehavior11)actor.behavior;
 
                 objects[0].transform.localRotation = Quaternion.Euler(0f, script11.rotation.parsedRotation, 0f);
 
                 break;
-            case FCopScript36:
-                var script36 = (FCopScript36)actor.script;
+            case FCopBehavior36:
+                var script36 = (FCopBehavior36)actor.behavior;
 
                 objects[0].transform.localRotation = Quaternion.Euler(0f, script36.headRotation.parsedRotation, 0f);
                 objects[1].transform.localRotation = Quaternion.Euler(0f, script36.baseRotation.parsedRotation, 0f);
@@ -156,16 +156,16 @@ public class ActorObject : MonoBehaviour {
 
     int SetTextureOffset() {
 
-        switch (actor.script) {
+        switch (actor.behavior) {
 
-            case FCopScript5:
-                return ((FCopScript5)actor.script).textureOffset;
-            case FCopScript8:
-                return ((FCopScript8)actor.script).textureOffset;
-            case FCopScript9:
-                return ((FCopScript9)actor.script).textureOffset;
-            case FCopScript28:
-                return ((FCopScript28)actor.script).textureOffset;
+            case FCopBehavior5:
+                return ((FCopBehavior5)actor.behavior).textureOffset;
+            case FCopBehavior8:
+                return ((FCopBehavior8)actor.behavior).textureOffset;
+            case FCopBehavior9:
+                return ((FCopBehavior9)actor.behavior).textureOffset;
+            case FCopBehavior28:
+                return ((FCopBehavior28)actor.behavior).textureOffset;
             default:
                 return 0;
         }
