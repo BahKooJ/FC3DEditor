@@ -84,6 +84,9 @@ namespace FCopParser {
                 case 11:
                     behavior = new FCopBehavior11(this);
                     break;
+                case 14:
+                    behavior = new FCopBehavior14(this);
+                    break;
                 case 28:
                     behavior = new FCopBehavior28(this);
                     break;
@@ -286,42 +289,39 @@ namespace FCopParser {
         public List<ActorProperty> properties { get; set; }
 
 
-        public Team teamHostileToThis;
-        public Team miniMapColor;
-        public int textureOffset;
-        public Team hostileTowards;
+        public EnumDataActorProperty team;
+        public EnumDataActorProperty miniMapColor;
+        public ValueActorProperty textureOffset;
+        public EnumDataActorProperty hostileTowards;
 
-        public ActorRotation headRotation;
+        public RotationActorProperty headRotation;
 
-        public ActorRotation baseRotation;
+        public RotationActorProperty baseRotation;
 
         public FCopBehavior8(FCopActor actor) {
             this.actor = actor;
 
             var rawFile = actor.rawFile;
 
-            teamHostileToThis = Utils.BytesToShort(rawFile.data.ToArray(), 36) == 1 ? Team.RED : Team.BLUE;
-            miniMapColor = Utils.BytesToShort(rawFile.data.ToArray(), 38) == 1 ? Team.RED : Team.BLUE;
-            textureOffset = Utils.BytesToShort(rawFile.data.ToArray(), 42);
-            hostileTowards = Utils.BytesToShort(rawFile.data.ToArray(), 50) == 1 ? Team.RED : Team.BLUE;
+            team = new("Team", Utils.BytesToShort(rawFile.data.ToArray(), 36) == 1 ? Team.RED : Team.BLUE);
+            miniMapColor = new("Minimap Color", Utils.BytesToShort(rawFile.data.ToArray(), 38) == 1 ? Team.RED : Team.BLUE);
+            textureOffset = new("UV Offset", Utils.BytesToShort(rawFile.data.ToArray(), 42));
+            hostileTowards = new("Attacks Team", Utils.BytesToShort(rawFile.data.ToArray(), 50) == 1 ? Team.RED : Team.BLUE);
 
-            headRotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 64));
-            baseRotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 78));
+            headRotation = new("Head Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 64)));
+            baseRotation = new("Base Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 78)));
+
+            properties = new() { team, miniMapColor, textureOffset, hostileTowards, headRotation, baseRotation };
 
         }
 
         public void Compile() {
 
-            actor.rawFile.data.RemoveRange(64, 2);
-            actor.rawFile.data.InsertRange(64, BitConverter.GetBytes((short)headRotation.compiledRotation));
+            //actor.rawFile.data.RemoveRange(64, 2);
+            //actor.rawFile.data.InsertRange(64, BitConverter.GetBytes((short)headRotation.compiledRotation));
 
         }
 
-        public void ChangeRotation(float y) {
-
-            headRotation += y;
-
-        }
 
     }
 
@@ -350,25 +350,21 @@ namespace FCopParser {
         public List<ActorProperty> properties { get; set; }
 
 
-        public ActorRotation rotation;
+        public RotationActorProperty rotation;
 
         public FCopBehavior11(FCopActor actor) {
             this.actor = actor;
 
-            rotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 46));
+            rotation = new("Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 46)));
 
+            properties = new() { rotation };
+        
         }
 
         public void Compile() {
 
-            actor.rawFile.data.RemoveRange(46, 2);
-            actor.rawFile.data.InsertRange(46, BitConverter.GetBytes((short)rotation.compiledRotation));
-
-        }
-
-        public void ChangeRotation(float y) {
-
-            rotation += y;
+            //actor.rawFile.data.RemoveRange(46, 2);
+            //actor.rawFile.data.InsertRange(46, BitConverter.GetBytes((short)rotation.compiledRotation));
 
         }
 
@@ -380,26 +376,27 @@ namespace FCopParser {
         public List<ActorProperty> properties { get; set; }
 
 
-        int number1;
-        int number2;
-        int number3;
-        int number4;
-        int number5;
-        int number6;
-        int number7;
+        ValueActorProperty number1;
+        ValueActorProperty number2;
+        ValueActorProperty number3;
+        ValueActorProperty number4;
+        ValueActorProperty number5;
+        ValueActorProperty number6;
+        ValueActorProperty number7;
 
 
         public FCopBehavior14(FCopActor actor) {
             this.actor = actor;
 
-            number1 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 28);
-            number2 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 30);
-            number3 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 32);
-            number4 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 44);
-            number5 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 46);
-            number6 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 48);
-            number7 = Utils.BytesToShort(actor.rawFile.data.ToArray(), 50);
+            number1 = new("Number 1", Utils.BytesToShort(actor.rawFile.data.ToArray(), 28));
+            number2 = new("Number 2", Utils.BytesToShort(actor.rawFile.data.ToArray(), 30));
+            number3 = new("Number 3", Utils.BytesToShort(actor.rawFile.data.ToArray(), 32));
+            number4 = new("Number 4", Utils.BytesToShort(actor.rawFile.data.ToArray(), 44));
+            number5 = new("Number 5", Utils.BytesToShort(actor.rawFile.data.ToArray(), 46));
+            number6 = new("Number 6", Utils.BytesToShort(actor.rawFile.data.ToArray(), 48));
+            number7 = new("Number 7", Utils.BytesToShort(actor.rawFile.data.ToArray(), 50));
 
+            properties = new() { number1, number2, number3, number4, number5, number6, number7 };
         }
 
 
@@ -435,29 +432,24 @@ namespace FCopParser {
         public List<ActorProperty> properties { get; set; }
 
 
-        public ActorRotation headRotation;
+        public RotationActorProperty headRotation;
 
-        public ActorRotation baseRotation;
+        public RotationActorProperty baseRotation;
 
 
         public FCopBehavior36(FCopActor actor) {
             this.actor = actor;
 
-            headRotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 64));
-            baseRotation = new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 78));
+            headRotation = new("Head Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 64)));
+            baseRotation = new("Base Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 78)));
 
+            properties = new() { headRotation, baseRotation };
         }
 
         public void Compile() {
 
-            actor.rawFile.data.RemoveRange(64, 2);
-            actor.rawFile.data.InsertRange(64, BitConverter.GetBytes((short)headRotation.compiledRotation));
-
-        }
-
-        public void ChangeRotation(float y) {
-
-            headRotation += y;
+            //actor.rawFile.data.RemoveRange(64, 2);
+            //actor.rawFile.data.InsertRange(64, BitConverter.GetBytes((short)headRotation.compiledRotation));
 
         }
 
@@ -521,12 +513,12 @@ namespace FCopParser {
 
     }
 
-    public class EnumDataActorProperty<T>: ActorProperty {
+    public class EnumDataActorProperty: ActorProperty {
         public string name { get; set; }
 
-        public T caseValue;
+        public Enum caseValue;
 
-        public EnumDataActorProperty(string name, T caseValue) {
+        public EnumDataActorProperty(string name, Enum caseValue) {
             this.name = name;
             this.caseValue = caseValue;
         }

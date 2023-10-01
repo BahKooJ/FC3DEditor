@@ -12,7 +12,7 @@ public class ActorEditMode : EditMode {
 
     List<ActorObject> actors = new();
 
-    AxisControl selectedActorObject = null;
+    public AxisControl selectedActorObject = null;
     public FCopActor selectedActor = null;
 
     ActorObject actorToAdd = null;
@@ -52,6 +52,8 @@ public class ActorEditMode : EditMode {
         }
 
         actors.Clear();
+
+        view.CloseActorPorpertiesView();
 
     }
 
@@ -131,8 +133,6 @@ public class ActorEditMode : EditMode {
 
     public void SelectActor(ActorObject actorObject) {
 
-        Debug.Log(actorObject.actor.id + " : " + actorObject.actor.actorType);
-
         UnselectActor();
 
         var axisControl = Object.Instantiate(main.axisControl);
@@ -143,13 +143,6 @@ public class ActorEditMode : EditMode {
         script.moveCallback = (newPos) => {
 
             actorObject.ChangePosition(newPos);
-
-            return true;
-        };
-
-        script.rotateCallback = (y) => {
-
-            actorObject.ChangeRotation(y);
 
             return true;
         };

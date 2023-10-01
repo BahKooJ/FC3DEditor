@@ -305,7 +305,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Content: {fileID: 4429559707500750907}
-  m_Horizontal: 1
+  m_Horizontal: 0
   m_Vertical: 1
   m_MovementType: 1
   m_Elasticity: 0.1
@@ -552,6 +552,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   valueActorPropertyItem: {fileID: 5020871495025236756, guid: 156eb5e6c3b12e447a2ff00467b84019, type: 3}
+  rotationActorPropertyItem: {fileID: 5020871495025236756, guid: 84d30b4b6a16dbe4493b0cf700dc686b, type: 3}
+  enumDataActorPropertyItem: {fileID: 5020871495025236756, guid: 4ee95e0a21fa2fa4da6aa1aadf787a5b, type: 3}
   propertiesContent: {fileID: 4429559707500750907}
   idText: {fileID: 3775939840264087208}
   actorTypeText: {fileID: 3304625165926856517}

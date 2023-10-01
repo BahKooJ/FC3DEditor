@@ -24,13 +24,11 @@ public class ActorObject : MonoBehaviour {
 
     }
 
-    public void ChangeRotation(float y) {
+    public void RefreshRotation() {
 
         if (actor.behavior == null) {
             return;
         }
-
-        //actor.behavior.ChangeRotation(y);
 
         SetRotation();
 
@@ -131,21 +129,21 @@ public class ActorObject : MonoBehaviour {
             case FCopBehavior8:
                 var script8 = (FCopBehavior8)actor.behavior;
 
-                objects[0].transform.localRotation = Quaternion.Euler(0f, script8.headRotation.parsedRotation, 0f);
-                objects[1].transform.localRotation = Quaternion.Euler(0f, script8.baseRotation.parsedRotation, 0f);
+                objects[0].transform.localRotation = Quaternion.Euler(0f, script8.headRotation.value.parsedRotation, 0f);
+                objects[1].transform.localRotation = Quaternion.Euler(0f, script8.baseRotation.value.parsedRotation, 0f);
 
                 break;
             case FCopBehavior11:
                 var script11 = (FCopBehavior11)actor.behavior;
 
-                objects[0].transform.localRotation = Quaternion.Euler(0f, script11.rotation.parsedRotation, 0f);
+                objects[0].transform.localRotation = Quaternion.Euler(0f, script11.rotation.value.parsedRotation, 0f);
 
                 break;
             case FCopBehavior36:
                 var script36 = (FCopBehavior36)actor.behavior;
 
-                objects[0].transform.localRotation = Quaternion.Euler(0f, script36.headRotation.parsedRotation, 0f);
-                objects[1].transform.localRotation = Quaternion.Euler(0f, script36.baseRotation.parsedRotation, 0f);
+                objects[0].transform.localRotation = Quaternion.Euler(0f, script36.headRotation.value.parsedRotation, 0f);
+                objects[1].transform.localRotation = Quaternion.Euler(0f, script36.baseRotation.value.parsedRotation, 0f);
 
                 break;
 
@@ -161,7 +159,7 @@ public class ActorObject : MonoBehaviour {
             case FCopBehavior5:
                 return ((FCopBehavior5)actor.behavior).textureOffset;
             case FCopBehavior8:
-                return ((FCopBehavior8)actor.behavior).textureOffset;
+                return ((FCopBehavior8)actor.behavior).textureOffset.value;
             case FCopBehavior9:
                 return ((FCopBehavior9)actor.behavior).textureOffset;
             case FCopBehavior28:
