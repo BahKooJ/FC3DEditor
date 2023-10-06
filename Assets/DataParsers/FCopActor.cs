@@ -264,6 +264,10 @@ namespace FCopParser {
 
     }
 
+    public class FCopBehavior1 {
+
+    }
+
     public class FCopBehavior5 : FCopActorBehavior {
 
         public FCopActor actor { get; set; }

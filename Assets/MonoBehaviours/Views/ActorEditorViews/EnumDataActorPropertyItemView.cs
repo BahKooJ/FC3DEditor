@@ -16,11 +16,15 @@ public class EnumDataActorPropertyItemView: MonoBehaviour {
     public FCopActor actor;
     public ActorEditMode controller;
 
+    string[] cases;
+    Array values;
+
     void Start() {
 
         nameText.text = property.name;
 
-        var cases = Enum.GetNames(property.caseValue.GetType());
+        cases = Enum.GetNames(property.caseValue.GetType());
+        values = Enum.GetValues(property.caseValue.GetType());
 
         caseDropDown.ClearOptions();
 
@@ -37,6 +41,12 @@ public class EnumDataActorPropertyItemView: MonoBehaviour {
         }
 
         caseDropDown.value = value;
+
+    }
+
+    public void OnChange() {
+
+        property.caseValue = (Enum)values.GetValue(caseDropDown.value);
 
     }
 
