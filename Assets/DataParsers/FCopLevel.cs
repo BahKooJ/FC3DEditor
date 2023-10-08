@@ -369,7 +369,8 @@ namespace FCopParser {
 
         }
 
-        // Compiles the class back into a Ctil Future Cop can read. The changes are applied to the parser object.
+        // Takes all the higher parsed data and puts them back into their basic data form found in Ctil.
+        // This method does all the indexing and compression to allow for FCopLevelParser to convert the data back into binary.
         public void Compile() {
 
             List<HeightPoint3> heightPoints = new List<HeightPoint3>();
@@ -378,6 +379,8 @@ namespace FCopParser {
 
             var textureCoordinates = new List<int>();
             var tileGraphics = new List<TileGraphicsItem>();
+            var tileUVAnimationMetaData = new List<TileUVAnimationMetaData>();
+            var animatedTextureCoordinates = new List<int>();
 
             List<Chunk> chunks = new List<Chunk>() { new Chunk(0,0) };
 
@@ -442,25 +445,91 @@ namespace FCopParser {
                         int textureIndex = -1;
                         int graphicsIndex = -1;
 
-                        // First the uvs...
+                        // First the uvs... (Includeding animated UVs)
+                        #region CompileTextures
+
                         if (textureCoordinates.Count != 0) {
 
                             foreach (var i in Enumerable.Range(0, textureCoordinates.Count - tile.uvs.Count + 1)) {
 
                                 if (textureCoordinates.GetRange(i, tile.uvs.Count).SequenceEqual(tile.uvs)) {
-                                    textureIndex = i;
-                                    break;
+
+                                    // If no UV animations exist no need to test for them
+                                    if (tileUVAnimationMetaData.Count == 0) {
+                                        textureIndex = i;
+                                        break;
+                                    }
+
+                                    var isTileAnimated = tile.uvAnimationData != null;
+
+                                    var found = false;
+
+                                    // Tests to see if the index is overwritten by animated UVs
+                                    foreach (var metaData in tileUVAnimationMetaData) {
+
+                                        if (metaData.textureReplaceOffset * 2 == i) {
+
+                                            // If this tile is not animated but this index is overwritten,
+                                            // this index is not valid.
+                                            if (!isTileAnimated) {
+                                                found = true;
+                                                break;
+                                            }
+
+                                            if (metaData == (TileUVAnimationMetaData)tile.uvAnimationData) {
+
+                                                // Tests to see if that animated UVs are the same
+                                                if (animatedTextureCoordinates.GetRange(metaData.animationOffset / 2, metaData.frames * 4).SequenceEqual(tile.animatedUVs)) {
+
+                                                    textureIndex = i;
+                                                    found = true;
+                                                    break;
+
+                                                }
+
+                                            }
+
+                                        }
+
+                                    }
+
+                                    // Index was found, so the loop can stop
+                                    if (found && isTileAnimated) { break; }
+
+                                    // If this index isn't overwritten and the tile isn't animated this is a valid index
+                                    if (!found && !isTileAnimated) {
+                                        textureIndex = i; 
+                                        break;
+                                    }
+
+
                                 }
 
                             }
 
                         }
 
+                        // No index was found, so new data needs to be added
                         if (textureIndex == -1) {
 
                             textureIndex = textureCoordinates.Count;
 
+                            if (tile.uvAnimationData != null) {
+
+                                var nonNullData = (TileUVAnimationMetaData)tile.uvAnimationData;
+
+                                nonNullData.textureReplaceOffset = textureCoordinates.Count * 2;
+                                nonNullData.animationOffset = animatedTextureCoordinates.Count * 2;
+
+                                tile.uvAnimationData = nonNullData;
+
+                                tileUVAnimationMetaData.Add(nonNullData);
+                                animatedTextureCoordinates.AddRange(tile.animatedUVs);
+
+                            }
+
                             textureCoordinates.AddRange(tile.uvs);
+
 
                             if (textureCoordinates.Count > 1024) {
                                 throw new TextureArrayMaxExceeded();
@@ -468,7 +537,10 @@ namespace FCopParser {
 
                         }
 
+                        #endregion
                         // Second the graphics
+                        #region CompileGraphics
+
                         var compiledGraphics = tile.CompileGraphics();
 
                         if (tileGraphics.Count != 0) {
@@ -547,6 +619,8 @@ namespace FCopParser {
 
                         }
 
+                        #endregion
+
                         var compiledTile = tile.Compile(textureIndex, graphicsIndex);
 
                         // Tiles are sorted within a tile column, the order is not completely known but what is know is walls cannot be first
@@ -619,6 +693,9 @@ namespace FCopParser {
             parser.tiles = tiles;
             parser.textureCoordinates = textureCoordinates;
             parser.tileGraphics = tileGraphics;
+
+            parser.tileUVAnimationMetaData = tileUVAnimationMetaData;
+            parser.animatedTextureCoordinates = animatedTextureCoordinates;
 
             parser.Compile();
 
@@ -1187,9 +1264,13 @@ namespace FCopParser {
 
         public int culling;
 
+        public TileUVAnimationMetaData? uvAnimationData = null;
+        public List<int> animatedUVs = new();
+
         public TileBitfield parsedTile;
 
         public Tile(TileBitfield parsedTile, TileColumn column, FCopLevelSectionParser section) {
+
 
             this.column = column;
 
@@ -1225,7 +1306,30 @@ namespace FCopParser {
 
             texturePalette = graphics.cbmpID;
 
+            #region ParseAnimationData
+
+            if (section.tileUVAnimationMetaData.Count == 0) {
+                return;
+            }
+
+            foreach (var metaData in section.tileUVAnimationMetaData) {
+
+                if (metaData.textureReplaceOffset * 2 == textureIndex) {
+                    uvAnimationData = metaData;
+
+                    var frameUVs = section.animatedTextureCoordinates.GetRange(metaData.animationOffset / 2, metaData.frames * 4);
+
+                    animatedUVs.AddRange(frameUVs);
+
+                    break;
+                }
+
+            }
+
+            #endregion
+
             this.parsedTile = parsedTile;
+
         }
 
         public Tile(Tile tile, TileColumn column, FCopLevelSection section) {

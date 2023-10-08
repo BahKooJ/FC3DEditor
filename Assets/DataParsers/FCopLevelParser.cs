@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System;
-using static UnityEngine.Experimental.Rendering.RayTracingAccelerationStructure;
 using System.Text;
 
 namespace FCopParser {
@@ -28,6 +27,8 @@ namespace FCopParser {
         const int tileArrayOffset = 1488;
 
         static List<byte> fourCC = new List<byte>() { 116, 99, 101, 83 };
+        static List<byte> fourCCScTA = new List<byte>() { 65, 84, 99, 83 };
+
 
 
         public IFFDataFile rawFile;
@@ -36,13 +37,17 @@ namespace FCopParser {
         public short tileCount;
         public short colorCount;
 
+        // Sect
+        public List<HeightPoint3> heightPoints = new();
+        public List<ThirdSectionBitfield> thirdSectionBitfields = new();
+        public List<TileBitfield> tiles = new();
+        public List<int> textureCoordinates = new();
+        public List<XRGB555> colors = new();
+        public List<TileGraphicsItem> tileGraphics = new();
 
-        public List<HeightPoint3> heightPoints = new List<HeightPoint3>();
-        public List<ThirdSectionBitfield> thirdSectionBitfields = new List<ThirdSectionBitfield>();
-        public List<TileBitfield> tiles = new List<TileBitfield>();
-        public List<int> textureCoordinates = new List<int>();
-        public List<XRGB555> colors = new List<XRGB555>();
-        public List<TileGraphicsItem> tileGraphics = new List<TileGraphicsItem>();
+        // ScTA
+        public List<TileUVAnimationMetaData> tileUVAnimationMetaData = new();
+        public List<int> animatedTextureCoordinates = new();
 
         List<ChunkHeader> offsets = new List<ChunkHeader>();
 
@@ -66,21 +71,138 @@ namespace FCopParser {
             ParseColors();
             ParseTileGraphics();
 
+            ParseUVAnimations();
+
         }
 
         public void Compile() {
 
             List<byte> compiledFile = new List<byte>();
 
-            foreach (HeightPoint3 heightPoint3 in heightPoints) {
+            void CompileHeights() {
 
-                compiledFile.Add((byte)heightPoint3.height1);
-                compiledFile.Add((byte)heightPoint3.height2);
-                compiledFile.Add((byte)heightPoint3.height3);
+                foreach (HeightPoint3 heightPoint3 in heightPoints) {
+
+                    compiledFile.Add((byte)heightPoint3.height1);
+                    compiledFile.Add((byte)heightPoint3.height2);
+                    compiledFile.Add((byte)heightPoint3.height3);
+
+                }
+
+                compiledFile.Add(0);
 
             }
 
-            compiledFile.Add(0);
+            void CompileThirdSection() {
+
+                foreach (ThirdSectionBitfield thirdSectionItem in thirdSectionBitfields) {
+
+                    var bitFeild = new BitField(16, new List<BitNumber> {
+                        new BitNumber(6,thirdSectionItem.number1), new BitNumber(10,thirdSectionItem.number2)
+                    });
+
+                    compiledFile.AddRange(Utils.BitArrayToByteArray(bitFeild.Compile()));
+
+                }
+
+            }
+
+            void CompileTiles() {
+
+                foreach (TileBitfield tile in tiles) {
+
+                    var bitFeild = new BitField(32, new List<BitNumber> {
+                        new BitNumber(1,tile.isEndInColumnArray), new BitNumber(10,tile.textureIndex),
+                        new BitNumber(2,tile.culling), new BitNumber(2,tile.number4),
+                        new BitNumber(7,tile.meshID), new BitNumber(10,tile.graphicIndex)
+                    });
+
+                    compiledFile.AddRange(Utils.BitArrayToByteArray(bitFeild.Compile()));
+
+                }
+
+            }
+
+            void CompileGraphics() {
+
+                foreach (TileGraphicsItem graphicsItem in tileGraphics) {
+
+                    if (graphicsItem is TileGraphics) {
+
+                        var graphic = (TileGraphics)graphicsItem;
+
+                        var bitFeild = new BitField(16, new List<BitNumber> {
+                            new BitNumber(8,graphic.lightingInfo), new BitNumber(3,graphic.cbmpID),
+                            new BitNumber(1,graphic.isAnimated), new BitNumber(1,graphic.isSemiTransparent),
+                            new BitNumber(1,graphic.isRect), new BitNumber(2,graphic.graphicsType)
+                        });
+
+                        compiledFile.AddRange(Utils.BitArrayToByteArray(bitFeild.Compile()));
+
+                    }
+                    else {
+
+                        var graphics = (TileGraphicsMetaData)graphicsItem;
+
+                        compiledFile.AddRange(graphics.data);
+
+                    }
+
+                }
+
+            }
+
+            void CompileAnimatedUVs() {
+
+                if (tileUVAnimationMetaData.Count == 0) {
+                    return;
+                }
+
+                var sctaCompiledFile = new List<byte>();
+
+                foreach (var metaData in tileUVAnimationMetaData) {
+
+                    sctaCompiledFile.Add((byte)metaData.frames);
+                    sctaCompiledFile.Add(0);
+                    sctaCompiledFile.Add(1);
+                    sctaCompiledFile.Add((byte)metaData.number1);
+                    sctaCompiledFile.AddRange(BitConverter.GetBytes((short)metaData.frameDuration));
+                    sctaCompiledFile.AddRange(BitConverter.GetBytes((short)0));
+                    sctaCompiledFile.AddRange(BitConverter.GetBytes(metaData.animationOffset));
+                    sctaCompiledFile.AddRange(BitConverter.GetBytes(metaData.textureReplaceOffset));
+
+                }
+
+                foreach (int texture in animatedTextureCoordinates) {
+                    sctaCompiledFile.AddRange(BitConverter.GetBytes((ushort)texture));
+                }
+
+                var header = new List<byte>();
+
+                header.AddRange(fourCCScTA);
+                header.AddRange(BitConverter.GetBytes(12 + sctaCompiledFile.Count()));
+                header.AddRange(BitConverter.GetBytes(tileUVAnimationMetaData.Count));
+                header.AddRange(sctaCompiledFile);
+
+                compiledFile.AddRange(header);
+
+            }
+
+            void CompileSLFX() {
+
+                var slfxHeader = offsets.Find(header => {
+                    return header.fourCCDeclaration == "SLFX";
+                });
+
+                if (slfxHeader == null) {
+                    return;
+                }
+
+                compiledFile.AddRange(rawFile.data.GetRange(slfxHeader.index, slfxHeader.chunkSize));
+
+            }
+
+            CompileHeights();
 
             compiledFile.AddRange(
                 rawFile.data.GetRange(renderDistanceOffset, rednerDistanceLength)
@@ -88,29 +210,11 @@ namespace FCopParser {
 
             compiledFile.AddRange(BitConverter.GetBytes((short)tiles.Count));
 
-            foreach (ThirdSectionBitfield thirdSectionItem in thirdSectionBitfields) {
-
-                var bitFeild = new BitField(16, new List<BitNumber> {
-                new BitNumber(6,thirdSectionItem.number1), new BitNumber(10,thirdSectionItem.number2)
-            });
-
-                compiledFile.AddRange(Utils.BitArrayToByteArray(bitFeild.Compile()));
-
-            }
+            CompileThirdSection();
 
             compiledFile.AddRange(rawFile.data.GetRange(1484, 4));
 
-            foreach (TileBitfield tile in tiles) {
-
-                var bitFeild = new BitField(32, new List<BitNumber> {
-                    new BitNumber(1,tile.isEndInColumnArray), new BitNumber(10,tile.textureIndex),
-                    new BitNumber(2,tile.culling), new BitNumber(2,tile.number4),
-                    new BitNumber(7,tile.meshID), new BitNumber(10,tile.graphicIndex)
-                });
-
-                compiledFile.AddRange(Utils.BitArrayToByteArray(bitFeild.Compile()));
-
-            }
+            CompileTiles();
 
             foreach (int texture in textureCoordinates) {
                 compiledFile.AddRange(BitConverter.GetBytes((ushort)texture));
@@ -120,30 +224,7 @@ namespace FCopParser {
                 compiledFile.AddRange(color.Compile());
             }
 
-            foreach (TileGraphicsItem graphicsItem in tileGraphics) {
-
-                if (graphicsItem is TileGraphics) {
-
-                    var graphic = (TileGraphics)graphicsItem;
-
-                    var bitFeild = new BitField(16, new List<BitNumber> {
-                        new BitNumber(8,graphic.lightingInfo), new BitNumber(3,graphic.cbmpID),
-                        new BitNumber(1,graphic.isAnimated), new BitNumber(1,graphic.isSemiTransparent),
-                        new BitNumber(1,graphic.isRect), new BitNumber(2,graphic.graphicsType)
-                    });
-
-                    compiledFile.AddRange(Utils.BitArrayToByteArray(bitFeild.Compile()));
-
-                }
-                else {
-
-                    var graphics = (TileGraphicsMetaData)graphicsItem;
-
-                    compiledFile.AddRange(graphics.data);
-
-                }
-
-            }
+            CompileGraphics();
 
             var header = new List<byte>();
 
@@ -157,14 +238,12 @@ namespace FCopParser {
 
             header.AddRange(compiledFile);
 
+            compiledFile = new(header);
 
-            if (offsets.Count > 1) {
+            CompileAnimatedUVs();
+            CompileSLFX();
 
-                header.AddRange(rawFile.data.GetRange(offsets[0].chunkSize, rawFile.data.Count - offsets[0].chunkSize));
-
-            }
-
-            rawFile.data = header;
+            rawFile.data = compiledFile;
             rawFile.modified = true;
 
         }
@@ -328,6 +407,42 @@ namespace FCopParser {
                     }
 
                 }
+
+            }
+
+        }
+
+        void ParseUVAnimations() {
+
+            var sctaHeader = offsets.Find(header => {
+                return header.fourCCDeclaration == "ScTA";
+            });
+
+            if (sctaHeader == null) {
+                return;
+            }
+
+            var sctaData = rawFile.data.GetRange(sctaHeader.index, sctaHeader.chunkSize);
+
+            var offset = 8;
+            var animationCount = Utils.BytesToInt(sctaData.ToArray(), offset);
+            offset += 4;
+
+            foreach (var i in Enumerable.Range(0, animationCount)) {
+
+                tileUVAnimationMetaData.Add(
+                    new TileUVAnimationMetaData(
+                        sctaData[offset], sctaData[offset + 3], Utils.BytesToShort(sctaData.ToArray(), offset + 4),
+                        Utils.BytesToInt(sctaData.ToArray(), offset + 8), Utils.BytesToInt(sctaData.ToArray(), offset + 12)
+                    ));
+
+                offset += 16;
+
+            }
+
+            foreach (var i in Enumerable.Range(0, (sctaData.Count - offset) / 2)) {
+
+                animatedTextureCoordinates.Add(Utils.BytesToUShort(sctaData.ToArray(), offset + (i * 2)));
 
             }
 
@@ -583,6 +698,36 @@ namespace FCopParser {
 
         public TileGraphicsMetaData(List<byte> data) {
             this.data = data;
+        }
+
+    }
+
+    public struct TileUVAnimationMetaData {
+
+        public int frames;
+        public int number1;
+        public int frameDuration;
+        public int animationOffset;
+        public int textureReplaceOffset;
+
+        public TileUVAnimationMetaData(int frames, int number1, int frameDuration, int animationOffset, int textureReplaceOffset) {
+            this.frames = frames;
+            this.number1 = number1;
+            this.frameDuration = frameDuration;
+            this.animationOffset = animationOffset;
+            this.textureReplaceOffset = textureReplaceOffset;
+        }
+
+        public static bool operator ==(TileUVAnimationMetaData uva1, TileUVAnimationMetaData uva2) {
+            return uva1.frames == uva2.frames &&
+                uva1.number1 == uva2.number1 &&
+                uva1.frameDuration == uva2.frameDuration;
+        }
+
+        public static bool operator !=(TileUVAnimationMetaData uva1, TileUVAnimationMetaData uva2) {
+            return !(uva1.frames == uva2.frames &&
+                uva1.number1 == uva2.number1 &&
+                uva1.frameDuration == uva2.frameDuration);
         }
 
     }
