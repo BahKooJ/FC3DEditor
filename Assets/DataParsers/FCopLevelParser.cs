@@ -4,6 +4,7 @@ using System.Collections;
 using System.Linq;
 using System;
 using static UnityEngine.Experimental.Rendering.RayTracingAccelerationStructure;
+using System.Text;
 
 namespace FCopParser {
 
@@ -41,13 +42,16 @@ namespace FCopParser {
         public List<TileBitfield> tiles = new List<TileBitfield>();
         public List<int> textureCoordinates = new List<int>();
         public List<XRGB555> colors = new List<XRGB555>();
-        public List<TileGraphics> tileGraphics = new List<TileGraphics>();
+        public List<TileGraphicsItem> tileGraphics = new List<TileGraphicsItem>();
 
+        List<ChunkHeader> offsets = new List<ChunkHeader>();
 
         int offset = 0;
 
         public FCopLevelSectionParser(IFFDataFile rawFile) {
             this.rawFile = rawFile;
+
+            FindStartChunkOffset();
 
             colorCount = Utils.BytesToShort(rawFile.data.ToArray(), colorCountOffset);
             textureCordCount = Utils.BytesToShort(rawFile.data.ToArray(), textureCordCountOffset);
@@ -116,14 +120,28 @@ namespace FCopParser {
                 compiledFile.AddRange(color.Compile());
             }
 
-            foreach (TileGraphics graphic in tileGraphics) {
+            foreach (TileGraphicsItem graphicsItem in tileGraphics) {
 
-                var bitFeild = new BitField(16, new List<BitNumber> {
-                    new BitNumber(8,graphic.number1), new BitNumber(3,graphic.number2),
-                    new BitNumber(2,graphic.number3), new BitNumber(1,graphic.number4), new BitNumber(2,graphic.number5)
-                });
+                if (graphicsItem is TileGraphics) {
 
-                compiledFile.AddRange(Utils.BitArrayToByteArray(bitFeild.Compile()));
+                    var graphic = (TileGraphics)graphicsItem;
+
+                    var bitFeild = new BitField(16, new List<BitNumber> {
+                        new BitNumber(8,graphic.lightingInfo), new BitNumber(3,graphic.cbmpID),
+                        new BitNumber(1,graphic.isAnimated), new BitNumber(1,graphic.isSemiTransparent),
+                        new BitNumber(1,graphic.isRect), new BitNumber(2,graphic.graphicsType)
+                    });
+
+                    compiledFile.AddRange(Utils.BitArrayToByteArray(bitFeild.Compile()));
+
+                }
+                else {
+
+                    var graphics = (TileGraphicsMetaData)graphicsItem;
+
+                    compiledFile.AddRange(graphics.data);
+
+                }
 
             }
 
@@ -138,6 +156,13 @@ namespace FCopParser {
             header.AddRange(BitConverter.GetBytes((short)textureCoordinates.Count));
 
             header.AddRange(compiledFile);
+
+
+            if (offsets.Count > 1) {
+
+                header.AddRange(rawFile.data.GetRange(offsets[0].chunkSize, rawFile.data.Count - offsets[0].chunkSize));
+
+            }
 
             rawFile.data = header;
             rawFile.modified = true;
@@ -257,25 +282,90 @@ namespace FCopParser {
 
         void ParseTileGraphics() {
 
-            var length = rawFile.data.Count() - offset;
+            var length = offsets[0].chunkSize - offset;
 
             var bytes = rawFile.data.GetRange(offset, length);
 
+
+            var additionalDataCount = 0;
+
             foreach (int i in Enumerable.Range(0, length / 2)) {
+
+                if (additionalDataCount > 0) {
+
+                    // For whatever reason it counts tile graphics metadata as a whole tile graphics
+                    tileGraphics.Add(new TileGraphicsMetaData(bytes.GetRange(i * 2, 2)));
+
+                    additionalDataCount--;
+
+                    continue;
+
+                }
+
                 var byteFiled = bytes.GetRange(i * 2, 2).ToArray();
 
                 var bitField = new BitArray(byteFiled);
 
-                tileGraphics.Add(new TileGraphics(
+                var graphic = new TileGraphics(
                     Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 0, 8)),
                     Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 8, 11)),
-                    Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 11, 13)),
+                    Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 11, 12)),
+                    Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 12, 13)),
                     Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 13, 14)),
                     Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 14, 16))
-                    ));
+                    );
+
+                tileGraphics.Add(graphic);
+
+                if (graphic.graphicsType == 1) {
+                    additionalDataCount = 1;
+                } else if (graphic.graphicsType == 2) {
+
+                    if (graphic.isRect == 1) {
+                        additionalDataCount = 2;
+                    } else {
+                        additionalDataCount = 1;
+                    }
+
+                }
+
             }
 
         }
+
+        void FindStartChunkOffset() {
+
+            string Reverse(string s) {
+                char[] charArray = s.ToCharArray();
+                Array.Reverse(charArray);
+                return new string(charArray);
+            }
+
+            int BytesToInt(int offset) {
+                return BitConverter.ToInt32(rawFile.data.ToArray(), offset);
+            }
+
+            string BytesToStringReversed(int offset, int length) {
+                return Reverse(Encoding.Default.GetString(rawFile.data.ToArray(), offset, length));
+            }
+
+            offsets.Clear();
+
+            int offset = 0;
+
+            while (offset < rawFile.data.Count) {
+
+                var fourCC = BytesToStringReversed(offset, 4);
+                var size = BytesToInt(offset + 4);
+
+                offsets.Add(new ChunkHeader(offset, fourCC, size));
+
+                offset += size;
+
+            }
+
+        }
+
 
     }
 
@@ -447,41 +537,52 @@ namespace FCopParser {
 
     }
 
-    public struct TileGraphics {
+    public interface TileGraphicsItem { }
 
-        // Shader info
-        public int number1;
-        // BMP ID
-        public int number2;
-        // Unknown
-        public int number3;
-        // Rect tile
-        public int number4;
-        // Unknown
-        public int number5;
+    public struct TileGraphics: TileGraphicsItem {
 
-        public TileGraphics(int number1, int number2, int number3, int number4, int number5) {
-            this.number1 = number1;
-            this.number2 = number2;
-            this.number3 = number3;
-            this.number4 = number4;
-            this.number5 = number5;
+        public int lightingInfo;
+        public int cbmpID;
+        public int isAnimated;
+        public int isSemiTransparent;
+        public int isRect;
+        public int graphicsType;
+
+        public TileGraphics(int lightingInfo, int cbmpID, int isAnimated, int isSemiTransparent, int isRect, int graphicsType) {
+            this.lightingInfo = lightingInfo;
+            this.cbmpID = cbmpID;
+            this.isAnimated = isAnimated;
+            this.isSemiTransparent = isSemiTransparent;
+            this.isRect = isRect;
+            this.graphicsType = graphicsType;
         }
 
         public static bool operator ==(TileGraphics tg1, TileGraphics tg2) {
-            return tg1.number1 == tg2.number1 && 
-                tg1.number2 == tg2.number2 &&
-                tg1.number3 == tg2.number3 &&
-                tg1.number4 == tg2.number4 &&
-                tg1.number5 == tg2.number5;
+            return tg1.lightingInfo == tg2.lightingInfo && 
+                tg1.cbmpID == tg2.cbmpID &&
+                tg1.isAnimated == tg2.isAnimated &&
+                tg1.isSemiTransparent == tg2.isSemiTransparent &&
+                tg1.isRect == tg2.isRect &&
+                tg1.graphicsType == tg2.graphicsType;
         }
 
         public static bool operator !=(TileGraphics tg1, TileGraphics tg2) {
-            return !(tg1.number1 == tg2.number1 &&
-                tg1.number2 == tg2.number2 &&
-                tg1.number3 == tg2.number3 &&
-                tg1.number4 == tg2.number4 &&
-                tg1.number5 == tg2.number5);
+            return !(tg1.lightingInfo == tg2.lightingInfo &&
+                tg1.cbmpID == tg2.cbmpID &&
+                tg1.isAnimated == tg2.isAnimated &&
+                tg1.isSemiTransparent == tg2.isSemiTransparent &&
+                tg1.isRect == tg2.isRect &&
+                tg1.graphicsType == tg2.graphicsType);
+        }
+
+    }
+
+    public struct TileGraphicsMetaData: TileGraphicsItem {
+
+        public List<byte> data;
+
+        public TileGraphicsMetaData(List<byte> data) {
+            this.data = data;
         }
 
     }

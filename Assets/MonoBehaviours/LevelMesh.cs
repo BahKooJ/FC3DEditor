@@ -156,8 +156,6 @@ public class LevelMesh : MonoBehaviour {
 
                     //tall += 0.5f;
 
-                    Debug.Log(tile.parsedTile.meshID.ToString() + " " + x.ToString() + " " + y.ToString());
-
                 } else if (tile.verticies.Count == 3) {
                     GenerateTriangle(tile);
                     sortedTilesByTriangle.Add(tile);

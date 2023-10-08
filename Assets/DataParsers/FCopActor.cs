@@ -72,6 +72,9 @@ namespace FCopParser {
             ParseRPNSReferences();
 
             switch (actorType) {
+                case 1:
+                    behavior = new FCopBehavior1(this);
+                    break;
                 case 5:
                     behavior = new FCopBehavior5(this);
                     break;
@@ -264,7 +267,42 @@ namespace FCopParser {
 
     }
 
-    public class FCopBehavior1 {
+    public class FCopBehavior1 : FCopActorBehavior {
+
+        public FCopActor actor { get; set; }
+        public List<ActorProperty> properties { get; set; }
+
+        public int unknownNumber1;
+        public int unknownNumber2;
+        public ValueActorProperty playerHealth;
+        public int unknownNumber3;
+        public EnumDataActorProperty team;
+        public ValueActorProperty minimapColor;
+        public int unknownNumber4;
+        public ValueActorProperty uvOffset;
+        // FIXME: for some odd reason players facing can be negative. Allow the property to be negative
+        public RotationActorProperty facing;
+        public int unknownNumber5;
+
+        public FCopBehavior1(FCopActor actor) {
+            this.actor = actor;
+
+            var rawFile = actor.rawFile;
+
+            unknownNumber1 = Utils.BytesToShort(rawFile.data.ToArray(), 28);
+            unknownNumber2 = Utils.BytesToShort(rawFile.data.ToArray(), 30);
+            playerHealth = new("Player Health", Utils.BytesToShort(rawFile.data.ToArray(), 32));
+            unknownNumber3 = Utils.BytesToShort(rawFile.data.ToArray(), 34);
+            team = new("Team", (PlayerTeam)Utils.BytesToShort(rawFile.data.ToArray(), 36));
+            minimapColor = new("Minimap Color", Utils.BytesToShort(rawFile.data.ToArray(), 38));
+            unknownNumber4 = Utils.BytesToShort(rawFile.data.ToArray(), 40);
+            uvOffset = new("UV Offset", Utils.BytesToShort(rawFile.data.ToArray(), 42));
+            facing = new("Facing", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 44)));
+            unknownNumber5 = Utils.BytesToShort(rawFile.data.ToArray(), 46);
+
+            properties = new() { playerHealth, team, minimapColor, uvOffset, facing };
+
+        }
 
     }
 
@@ -307,10 +345,10 @@ namespace FCopParser {
 
             var rawFile = actor.rawFile;
 
-            team = new("Team", Utils.BytesToShort(rawFile.data.ToArray(), 36) == 1 ? Team.RED : Team.BLUE);
-            miniMapColor = new("Minimap Color", Utils.BytesToShort(rawFile.data.ToArray(), 38) == 1 ? Team.RED : Team.BLUE);
+            team = new("Team", Utils.BytesToShort(rawFile.data.ToArray(), 36) == 1 ? Team.Red : Team.Blue);
+            miniMapColor = new("Minimap Color", Utils.BytesToShort(rawFile.data.ToArray(), 38) == 1 ? Team.Red : Team.Blue);
             textureOffset = new("UV Offset", Utils.BytesToShort(rawFile.data.ToArray(), 42));
-            hostileTowards = new("Attacks Team", Utils.BytesToShort(rawFile.data.ToArray(), 50) == 1 ? Team.RED : Team.BLUE);
+            hostileTowards = new("Attacks Team", Utils.BytesToShort(rawFile.data.ToArray(), 50) == 1 ? Team.Red : Team.Blue);
 
             headRotation = new("Head Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 64)));
             baseRotation = new("Base Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 78)));
@@ -626,9 +664,15 @@ namespace FCopParser {
     }
 
     public enum Team {
-        RED = 1,
-        BLUE = 2
+        Red = 1,
+        Blue = 2
     }
 
+    public enum PlayerTeam {
+        Red = 1,
+        Blue = 2,
+        Unknown1 = 31,
+        Unknown2 = 543
+    }
 
 }
