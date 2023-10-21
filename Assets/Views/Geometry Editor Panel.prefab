@@ -387,3 +387,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f3618dfcf56d034785d98fa63aa4c34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  debugTilePanel: {fileID: 8481524618504945480, guid: b5a0814779a6e38449daf924748309cc, type: 3}
+  debugTilePanelView: {fileID: 0}

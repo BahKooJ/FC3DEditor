@@ -9,6 +9,7 @@ using UnityEngine;
 public class Main : MonoBehaviour {
 
     public static bool ignoreAllInputs = false;
+    public static bool debug = true;
 
     public GameObject meshSection;
     public GameObject heightMapChannelPoint;
@@ -34,8 +35,6 @@ public class Main : MonoBehaviour {
     public Texture2D levelTexturePallet;
 
     public List<Sprite> bmpTextures = new();
-
-    public bool debug = false;
 
     public EditMode editMode;
 

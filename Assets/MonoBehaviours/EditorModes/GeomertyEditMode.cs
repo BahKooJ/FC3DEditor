@@ -62,6 +62,10 @@ public class GeometryEditMode : EditMode {
 
     public void OnDestroy() {
         ClearAllSelectedItems();
+
+        if (view.debugTilePanelView != null) {
+            Object.Destroy(view.debugTilePanelView);
+        }
     }
 
     public GeometryEditMode(Main main) {
@@ -460,6 +464,10 @@ public class GeometryEditMode : EditMode {
 
     void RefeshTileOverlay() {
 
+        if (Main.debug) {
+            return;
+        }
+
         ClearTileOverlays();
 
         foreach (var tile in selectedTiles) {
@@ -483,6 +491,10 @@ public class GeometryEditMode : EditMode {
 
             selectedTiles.Add(tile);
 
+        }
+
+        if (view.debugTilePanelView != null) {
+            view.debugTilePanelView.GetComponent<DebugTilePanelView>().TileSelected(tile);
         }
 
     }
