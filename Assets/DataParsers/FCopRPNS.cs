@@ -1,28 +1,49 @@
 ﻿
 
 using System.Collections;
+using System.Collections.Generic;
 
 namespace FCopParser {
 
     public class FCopRPNS {
 
+        public List<List<byte>> code = new();
+
+        public List<byte> bytes = new();
+
+        IFFDataFile rawFile;
 
         public FCopRPNS(IFFDataFile rawFile) {
 
-            //foreach (var b in rawFile.data) {
+            this.rawFile = rawFile;
 
-            //    var bits = new BitArray(new byte[] { b });
-                
-            //    Console.Write(Utils.BitsToInt(Utils.CopyBitsOfRange(bits, 6, 8)));
-            //    Console.Write(' ');
-            //    Console.Write(Utils.BitsToInt(Utils.CopyBitsOfRange(bits, 0, 6)));
+            bytes = rawFile.data;
 
-            //    Console.WriteLine();
+            var currentLine = new List<byte>();
 
-            //}
+            foreach (var b in rawFile.data) {
+
+                currentLine.Add(b);
+
+                if (b == 0) {
+
+                    code.Add(new(currentLine));
+
+                    currentLine.Clear();
+
+                }
+
+            }
+
+        }
+
+        public void Compile() {
+
+            rawFile.data = bytes;
 
         }
 
     }
+
 
 }

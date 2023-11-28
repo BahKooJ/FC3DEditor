@@ -9,7 +9,7 @@ using UnityEngine;
 public class Main : MonoBehaviour {
 
     public static bool ignoreAllInputs = false;
-    public static bool debug = true;
+    public static bool debug = false;
 
     public GameObject meshSection;
     public GameObject heightMapChannelPoint;
