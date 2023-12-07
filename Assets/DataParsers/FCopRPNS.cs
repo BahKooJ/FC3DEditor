@@ -7,7 +7,7 @@ namespace FCopParser {
 
     public class FCopRPNS {
 
-        public List<List<byte>> code = new();
+        public List<FCopScript> code = new();
 
         public List<byte> bytes = new();
 
@@ -21,16 +21,21 @@ namespace FCopParser {
 
             var currentLine = new List<byte>();
 
+            var offset = 0;
+            var i = 0;
             foreach (var b in rawFile.data) {
 
                 currentLine.Add(b);
 
+                i++;
+
                 if (b == 0) {
 
-                    code.Add(new(currentLine));
+                    code.Add(new FCopScript(offset, new List<byte>(currentLine)));
 
                     currentLine.Clear();
 
+                    offset = i;
                 }
 
             }

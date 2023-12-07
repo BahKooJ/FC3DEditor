@@ -9,6 +9,8 @@ namespace FCopParser {
     // =WIP=
     public class FCopLevel {
 
+        public FCopRPNS rpns;
+
         public List<List<int>> layout;
 
         public List<FCopLevelSection> sections = new();
@@ -193,6 +195,12 @@ namespace FCopParser {
         }
 
         void InitData() {
+
+            rpns = new FCopRPNS(fileManager.files.First(file => {
+
+                return file.dataFourCC == "RPNS";
+
+            }));
 
             var rawBitmapFiles = fileManager.files.Where(file => {
 

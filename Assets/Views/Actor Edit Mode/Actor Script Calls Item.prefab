@@ -215,6 +215,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 802aebea004863b4f81dcb2fae64113b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scriptingPanel: {fileID: 1977952715223143764, guid: 8b70fe1ab173a2648bb75781992e212f, type: 3}
   rpnsRefText1: {fileID: 8418964635226473172}
   rpnsRefText2: {fileID: 8970771209224178647}
   rpnsRefText3: {fileID: 2235624731209901533}
@@ -1222,7 +1223,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7617860012713035557}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 836502995835538172}
+        m_TargetAssemblyTypeName: ActorScriptCallItemView, Assembly-CSharp
+        m_MethodName: OpenPanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &9214550468504064457
 GameObject:
   m_ObjectHideFlags: 0
