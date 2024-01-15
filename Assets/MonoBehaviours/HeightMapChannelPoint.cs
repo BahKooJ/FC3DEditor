@@ -5,6 +5,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
     public GameObject setHeightTextField;
 
+    public bool isStatic = false;
     public GeometryEditMode controller;
     public HeightPoints heightPoints;
     public int channel;
@@ -38,6 +39,10 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
 
     void Update() {
+
+        if (isStatic) {
+            return;
+        }
         
         if (click) {
 
@@ -69,6 +74,12 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
         transform.position = new Vector3(transform.position.x, heightPoints.GetPoint(channel), transform.position.z);
 
+        if (GeometryEditMode.keepHeightsOnTop) {
+
+            KeepHigherChannelsOnTop();
+
+        }
+
     }
 
     public void ResetColors() {
@@ -83,6 +94,43 @@ public class HeightMapChannelPoint : MonoBehaviour {
                 material.color = Color.red;
                 break;
         }
+    }
+
+    public void RefreshHeight() {
+        transform.position = new Vector3(transform.position.x, heightPoints.GetPoint(channel), transform.position.z);
+    }
+
+    public void KeepHigherChannelsOnTop() {
+
+        var padding = 8;
+
+        if (channel == 3) {
+            return;
+        }
+
+        if (channel == 1) {
+
+            if (heightPoints.GetPoint(channel) > heightPoints.GetPoint(2)) {
+                heightPoints.SetPoint(heightPoints.GetTruePoint(channel) + padding, 2);
+            }
+
+            if (heightPoints.GetPoint(2) > heightPoints.GetPoint(3)) {
+                heightPoints.SetPoint(heightPoints.GetTruePoint(2) + padding, 3);
+            }
+
+        }
+        if (channel == 2) {
+
+            if (heightPoints.GetPoint(channel) > heightPoints.GetPoint(3)) {
+                heightPoints.SetPoint(heightPoints.GetTruePoint(channel) + padding, 3);
+            }
+
+        }
+
+        foreach (var point in controller.heightPointObjects) {
+            point.RefreshHeight();
+        }
+
     }
 
     public void SelectOrDeSelect() {

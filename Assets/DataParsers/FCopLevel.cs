@@ -51,146 +51,127 @@ namespace FCopParser {
 
         public FCopLevel(int width, int height, IFFFileManager fileManager) {
 
-            //this.fileManager = fileManager;
+            this.fileManager = fileManager;
 
-            //layout = new List<List<int>>();
-
-            //foreach (int _ in Enumerable.Range(0, 4)) {
-
-            //    layout.Add(new List<int>());
-
-            //    layout.Last().AddRange(new List<int>() { 1, 1, 1, 1 });
-
-            //    foreach (int __ in Enumerable.Range(0, width)) {
-            //        layout.Last().Add(1);
-            //    }
-
-            //    layout.Last().AddRange(new List<int>() { 1, 1, 1, 1, 0 });
-
-            //}
-
-            //var id = 2;
-
-            //foreach (int _ in Enumerable.Range(0, height)) {
-
-            //    layout.Add(new List<int>());
-
-            //    layout.Last().AddRange(new List<int>() { 1, 1, 1, 1 });
-
-            //    foreach (int i in Enumerable.Range(0, width)) {
-            //        layout.Last().Add(id);
-            //        id++;
-            //    }
-
-            //    layout.Last().AddRange(new List<int>() { 1, 1, 1, 1, 0 });
-
-            //}
-
-            //foreach (int _ in Enumerable.Range(0, 4)) {
-
-            //    layout.Add(new List<int>());
-
-            //    layout.Last().AddRange(new List<int>() { 1, 1, 1, 1 });
-
-            //    foreach (int __ in Enumerable.Range(0, width)) {
-            //        layout.Last().Add(1);
-            //    }
-
-            //    layout.Last().AddRange(new List<int>() { 1, 1, 1, 1, 0 });
-
-            //}
-
-            //layout.Add(new List<int>());
-
-            //layout.Last().AddRange(new List<int>() { 0, 0, 0, 0 });
-
-            //foreach (int __ in Enumerable.Range(0, width)) {
-            //    layout.Last().Add(0);
-            //}
-
-            //layout.Last().AddRange(new List<int>() { 0, 0, 0, 0, 0 });
-
-            //var rawCtilFiles = fileManager.files.Where(file => {
-
-            //    return file.dataFourCC == "Ctil";
-
-            //}).ToList();
+            layout = new List<List<int>>();
 
 
-            ////TODO: Clean this up
-            //var oobSection = new FCopLevelSectionParser(rawCtilFiles[0]).Parse(this);
+            // TODO: This abomination needs to get cleaned up
+            foreach (int _ in Enumerable.Range(0, 4)) {
 
-            //oobSection.parser.rawFile = oobSection.parser.rawFile.Clone(1);
+                layout.Add(new List<int>());
 
-            //oobSection.tileGraphics.Clear();
-            //oobSection.tileGraphics.Add(new TileGraphics(116, 6, 0, 0, 1, 0));
+                layout.Last().AddRange(new List<int>() { 1, 1, 1, 1 });
 
-            //oobSection.textureCoordinates.Clear();
-            //oobSection.textureCoordinates.Add(57200);
-            //oobSection.textureCoordinates.Add(57228);
-            //oobSection.textureCoordinates.Add(50060);
-            //oobSection.textureCoordinates.Add(50032);
+                foreach (int __ in Enumerable.Range(0, width)) {
+                    layout.Last().Add(1);
+                }
 
-            //foreach (var h in oobSection.heightMap) {
-            //    h.SetPoint(19, 1);
-            //    h.SetPoint(-128, 2);
-            //    h.SetPoint(-128, 3);
-            //}
+                layout.Last().AddRange(new List<int>() { 1, 1, 1, 1, 0 });
 
-            //foreach (var tColumn in oobSection.tileColumns) {
+            }
 
-            //    tColumn.tiles.Clear();
+            var id = 2;
 
-            //    tColumn.tiles.Add(new Tile(new TileBitfield(1, 0, 0, 0, 68, 0), tColumn, oobSection));
+            foreach (int _ in Enumerable.Range(0, height)) {
 
-            //}
+                layout.Add(new List<int>());
 
-            //sections.Add(oobSection);
+                layout.Last().AddRange(new List<int>() { 1, 1, 1, 1 });
 
-            //foreach (var row in layout) {
+                foreach (int i in Enumerable.Range(0, width)) {
+                    layout.Last().Add(id);
+                    id++;
+                }
 
-            //    foreach (var column in row) {
+                layout.Last().AddRange(new List<int>() { 1, 1, 1, 1, 0 });
 
-            //        if (column == 0 || column == 1) {
-            //            continue;
-            //        }
+            }
 
-            //        var newSection = new FCopLevelSectionParser(rawCtilFiles[0]).Parse(this);
+            foreach (int _ in Enumerable.Range(0, 4)) {
 
-            //        newSection.parser.rawFile = newSection.parser.rawFile.Clone(column);
+                layout.Add(new List<int>());
 
-            //        foreach (var h in newSection.heightMap) {
-            //            h.SetPoint(-120, 1);
-            //            h.SetPoint(-100, 2);
-            //            h.SetPoint(-80, 3);
-            //        }
+                layout.Last().AddRange(new List<int>() { 1, 1, 1, 1 });
 
-            //        foreach (var tColumn in newSection.tileColumns) {
+                foreach (int __ in Enumerable.Range(0, width)) {
+                    layout.Last().Add(1);
+                }
 
-            //            tColumn.tiles.Clear();
+                layout.Last().AddRange(new List<int>() { 1, 1, 1, 1, 0 });
 
-            //            tColumn.tiles.Add(new Tile(new TileBitfield(1, 0, 0, 0, 68, 0), tColumn, oobSection));
+            }
 
-            //        }
+            layout.Add(new List<int>());
 
-            //        newSection.tileGraphics.Clear();
-            //        newSection.tileGraphics.Add(new TileGraphics(116, 6, 0, 0, 1, 0));
+            layout.Last().AddRange(new List<int>() { 0, 0, 0, 0 });
 
-            //        newSection.textureCoordinates.Clear();
-            //        newSection.textureCoordinates.Add(57200);
-            //        newSection.textureCoordinates.Add(57228);
-            //        newSection.textureCoordinates.Add(50060);
-            //        newSection.textureCoordinates.Add(50032);
+            foreach (int __ in Enumerable.Range(0, width)) {
+                layout.Last().Add(0);
+            }
+
+            layout.Last().AddRange(new List<int>() { 0, 0, 0, 0, 0 });
+
+            var rawCtilFiles = fileManager.files.Where(file => {
+
+                return file.dataFourCC == "Ctil";
+
+            }).ToList();
+
+            var oobSection = new FCopLevelSectionParser(rawCtilFiles[0]).Parse(this);
+
+            oobSection.parser.rawFile = oobSection.parser.rawFile.Clone(1);
+
+            foreach (var h in oobSection.heightMap) {
+                h.SetPoint(19, 1);
+                h.SetPoint(-128, 2);
+                h.SetPoint(-128, 3);
+            }
+
+            foreach (var tColumn in oobSection.tileColumns) {
+
+                tColumn.tiles.Clear();
+
+                tColumn.tiles.Add(new Tile(tColumn, MeshType.VerticiesFromID(68), 0, new() { 57200, 57228, 50060, 50032 }, new TileGraphics(116, 6, 0, 0, 1, 0)));
+
+            }
+
+            sections.Add(oobSection);
+
+            foreach (var row in layout) {
+
+                foreach (var column in row) {
+
+                    if (column == 0 || column == 1) {
+                        continue;
+                    }
+
+                    var newSection = new FCopLevelSectionParser(rawCtilFiles[0]).Parse(this);
+
+                    newSection.parser.rawFile = newSection.parser.rawFile.Clone(column);
+
+                    foreach (var h in newSection.heightMap) {
+                        h.SetPoint(-120, 1);
+                        h.SetPoint(-100, 2);
+                        h.SetPoint(-80, 3);
+                    }
+
+                    foreach (var tColumn in newSection.tileColumns) {
+
+                        tColumn.tiles.Clear();
+
+                        tColumn.tiles.Add(new Tile(tColumn, MeshType.VerticiesFromID(68), 0, new() { 57200, 57228, 50060, 50032 }, new TileGraphics(116, 6, 0, 0, 1, 0)));
+
+                    }
+
+                    sections.Add(newSection);
+
+                }
 
 
-            //        sections.Add(newSection);
+            }
 
-            //    }
-
-
-            //}
-
-            //InitData();
+            InitData();
 
         }
 
@@ -1361,6 +1342,16 @@ namespace FCopParser {
 
         }
 
+        public Tile(TileColumn column, List<TileVertex> vertices, int culling, List<int> uvs, TileGraphics graphics) {
+            this.column = column;
+            isEndInColumnArray = true;
+            this.verticies = vertices;
+            this.culling = culling;
+            this.uvs = uvs;
+            this.texturePalette = graphics.cbmpID;
+            this.graphics = graphics;
+        }
+
         public TileBitfield Compile(int textureIndex, int graphicsIndex) {
 
             var id = MeshType.IDFromVerticies(verticies);
@@ -1368,8 +1359,6 @@ namespace FCopParser {
             if (id == null) {
                 throw new MeshIDException();
             }
-
-
 
             parsedTile.isEndInColumnArray = isEndInColumnArray ? 1 : 0;
             parsedTile.meshID = (int)id;

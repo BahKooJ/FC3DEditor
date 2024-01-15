@@ -10,6 +10,8 @@ using Object = UnityEngine.Object;
 
 public class GeometryEditMode : EditMode {
 
+    public static bool keepHeightsOnTop = false;
+
     public Main main { get; set; }
 
     public List<Tile> selectedTiles = new();

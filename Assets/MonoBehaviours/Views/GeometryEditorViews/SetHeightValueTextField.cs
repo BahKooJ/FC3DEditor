@@ -50,7 +50,11 @@ class SetHeightValueTextField: MonoBehaviour {
                         return;
                     }
 
-                    point.transform.position = new Vector3(point.transform.position.x, point.heightPoints.GetPoint(point.channel), point.transform.position.z);
+                    point.RefreshHeight();
+
+                    if (GeometryEditMode.keepHeightsOnTop) {
+                        point.KeepHigherChannelsOnTop();
+                    }
 
                 }
 

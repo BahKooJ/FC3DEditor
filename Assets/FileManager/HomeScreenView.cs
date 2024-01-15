@@ -13,8 +13,22 @@ public class HomeScreenView : MonoBehaviour {
 
     private void Start() {
 
-        // TODO: Hardcoded directory, refactor to settings file
+        // TODO: Hardcoded directory
         foreach (var file in Directory.GetFiles("MissionFiles")) {
+
+            var item = Instantiate(FileListItem);
+
+            item.transform.SetParent(listView.transform, false);
+
+            var script = item.GetComponent<FileListButton>();
+
+            script.file = file;
+
+            script.main = main;
+
+        }
+
+        foreach (var file in Directory.GetFiles("Output")) {
 
             var item = Instantiate(FileListItem);
 
