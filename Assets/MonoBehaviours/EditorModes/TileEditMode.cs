@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static System.Collections.Specialized.BitVector32;
 using Object = UnityEngine.Object;
 
 public class TileEditMode : EditMode {
@@ -12,14 +13,15 @@ public class TileEditMode : EditMode {
 
     public TilePreset? selectedTilePreset = null;
 
-    public List<Tile> selectedTiles = new();
-    public TileColumn selectedColumn = null;
-    public LevelMesh selectedSection = null;
+    static public List<Tile> selectedTiles = new();
+    static public TileColumn selectedColumn = null;
+    static public LevelMesh selectedSection = null;
     public SelectedTileOverlay buildTileOverlay = null;
     public List<SelectedTileOverlay> selectedTileOverlays = new();
     public GameObject selectedSectionOverlay = null;
 
     public List<TileHeightMapChannelPoint> heightPointObjects = new();
+    public TileHeightMapChannelPoint selectedHeight = null;
 
     bool isBuildMode = false;
 
@@ -33,6 +35,16 @@ public class TileEditMode : EditMode {
             main.TestRayOnLevelMesh();
         }
 
+        if (isBuildMode) {
+            return;
+        }
+
+        if (Controls.OnUp("Select")) {
+            selectedHeight = null;
+        }
+
+        TestTileHeightSelection();
+
         if (Controls.OnDown("Unselect")) {
             
             ClearAllSelectedItems();
@@ -45,11 +57,11 @@ public class TileEditMode : EditMode {
     }
 
     public void OnCreateMode() {
-
+        ReinitExistingSelectedItems();
     }
 
     public void OnDestroy() {
-        ClearAllSelectedItems();
+        ClearAllGameObjects();
     }
 
     public void LookTile(Tile tile, TileColumn column, LevelMesh section) {
@@ -138,6 +150,75 @@ public class TileEditMode : EditMode {
 
     }
 
+    void TestTileHeightSelection() {
+
+        if (FreeMove.looking) {
+            return;
+        }
+
+        if (!Controls.IsDown("Select")) {
+            return;
+        }
+
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, 8)) {
+
+            foreach (var channel in heightPointObjects) {
+
+                if (hit.colliderInstanceID == channel.boxCollider.GetInstanceID()) {
+                    
+                    if (Controls.OnDown("Select")) {
+
+                        if (selectedHeight == null) {
+                            selectedHeight = channel;
+                        }
+
+                    } else if (Controls.IsDown("Select")) {
+
+                        if (channel.heightPoints != selectedHeight.heightPoints) {
+                            return;
+                        }
+
+                        foreach (var tile in selectedTiles) {
+
+                            var index = tile.verticies.FindIndex(vertex => { return vertex.vertexPosition == selectedHeight.corner; });
+                            var vertex = tile.verticies[index];
+                            tile.verticies[index] = new TileVertex(channel.channel, vertex.vertexPosition);
+
+                        }
+
+                        selectedSection.RefreshMesh();
+                        RefeshTileOverlay();
+
+                    }
+
+                }
+
+            }
+
+
+        }
+
+    }
+
+    void ReinitExistingSelectedItems() {
+
+        if (selectedTiles.Count == 0) {
+            return;
+        }
+
+        RefeshTileOverlay();
+
+        selectedSectionOverlay = Object.Instantiate(main.SectionBoarders, new Vector3(selectedSection.x, 0, -selectedSection.y), Quaternion.identity);
+
+        AddHeightObjects(VertexPosition.TopLeft);
+        AddHeightObjects(VertexPosition.TopRight);
+        AddHeightObjects(VertexPosition.BottomLeft);
+        AddHeightObjects(VertexPosition.BottomRight);
+
+    }
     void SelectTile(Tile tile, bool deSelectDuplicate = true) {
 
         if (selectedTiles.Contains(tile)) {
@@ -255,6 +336,22 @@ public class TileEditMode : EditMode {
 
     }
 
+    void ClearAllGameObjects() {
+
+        ClearBuildingOverlay();
+
+        ClearTileOverlays();
+
+        foreach (var point in heightPointObjects) {
+            Object.Destroy(point.gameObject);
+        }
+
+        if (selectedSectionOverlay != null) {
+            Object.Destroy(selectedSectionOverlay);
+        }
+
+    }
+
     void ClearAllSelectedItems() {
 
         ClearBuildingOverlay();
@@ -318,6 +415,7 @@ public class TileEditMode : EditMode {
 
         var point = Object.Instantiate(main.tileHeightMapChannelPoint, pos, Quaternion.identity);
         var script = point.GetComponent<TileHeightMapChannelPoint>();
+        script.corner = corner;
         script.controller = this;
         script.heightPoints = column.heights[(int)corner - 1];
         script.channel = channel;

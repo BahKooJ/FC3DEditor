@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using static System.Collections.Specialized.BitVector32;
 using Object = UnityEngine.Object;
 
 public class HeightMapEditMode : EditMode {
@@ -14,8 +15,8 @@ public class HeightMapEditMode : EditMode {
 
     public Main main { get; set; }
 
-    public TileColumn selectedColumn = null;
-    public LevelMesh selectedSection = null;
+    static public TileColumn selectedColumn = null;
+    static public LevelMesh selectedSection = null;
     public List<HeightMapChannelPoint> heightPointObjects = new();
     public List<SelectedTileOverlay> selectedTileOverlays = new();
     public GameObject selectedSectionOverlay = null;
@@ -46,11 +47,11 @@ public class HeightMapEditMode : EditMode {
     }
 
     public void OnCreateMode() {
-
+        ReinitExistingSelectedItems();
     }
 
     public void OnDestroy() {
-        ClearAllSelectedItems();
+        ClearAllGameObjects();
 
         if (view.debugTilePanelView != null) {
             Object.Destroy(view.debugTilePanelView);
@@ -187,9 +188,18 @@ public class HeightMapEditMode : EditMode {
             }
 
         }
+    }
+    void ReinitExistingSelectedItems() {
+
+        if (selectedColumn == null) {
+            return;
+        }
+
+        AddAllHeights();
+
+        selectedSectionOverlay = Object.Instantiate(main.SectionBoarders, new Vector3(selectedSection.x, 0, -selectedSection.y), Quaternion.identity);
 
     }
-
     void ClearAllSelectedItems() {
 
         foreach (var obj in heightPointObjects) {
@@ -208,6 +218,18 @@ public class HeightMapEditMode : EditMode {
 
         selectedColumn = null;
         selectedSection = null;
+
+    }
+
+    void ClearAllGameObjects() {
+
+        foreach (var obj in heightPointObjects) {
+            Object.Destroy(obj.gameObject);
+        }
+
+        if (selectedSectionOverlay != null) {
+            Object.Destroy(selectedSectionOverlay);
+        }
 
     }
 

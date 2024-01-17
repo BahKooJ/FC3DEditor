@@ -41,7 +41,7 @@ class SetHeightValueTextField: MonoBehaviour {
                     } catch (FormatException) {
 
                         controller.UnselectAndRefreshHeightPoints();
-                        controller.selectedSection.RefreshMesh();
+                        HeightMapEditMode.selectedSection.RefreshMesh();
 
                         controller.RefreshSelectedOverlays();
 
@@ -63,7 +63,7 @@ class SetHeightValueTextField: MonoBehaviour {
         }
 
         //controller.UnselectAndRefreshHeightPoints();
-        controller.selectedSection.RefreshMesh();
+        HeightMapEditMode.selectedSection.RefreshMesh();
 
         controller.RefreshSelectedOverlays();
 
