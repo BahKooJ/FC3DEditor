@@ -48,11 +48,11 @@ class ToolbarView: MonoBehaviour {
 
         Destroy(activePanel);
 
-        var editMode = new GeometryEditMode(controller);
+        var editMode = new HeightMapEditMode(controller);
 
         var obj = Instantiate(geometryEditorPanel);
 
-        var script = obj.GetComponent<GeometryEditorUI>();
+        var script = obj.GetComponent<HeightMapEditPanelView>();
 
         script.controller = editMode;
 

@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GeometryEditorUI: MonoBehaviour {
+public class HeightMapEditPanelView: MonoBehaviour {
 
     // View Refs
     public Image keepOnTopToggleImage;
@@ -10,7 +10,7 @@ public class GeometryEditorUI: MonoBehaviour {
     //Prefabs
     public GameObject debugTilePanel;
 
-    public GeometryEditMode controller;
+    public HeightMapEditMode controller;
 
     public GameObject debugTilePanelView = null;
 
@@ -28,7 +28,7 @@ public class GeometryEditorUI: MonoBehaviour {
 
         }
 
-        ChangeToggleColor(keepOnTopToggleImage, GeometryEditMode.keepHeightsOnTop);
+        ChangeToggleColor(keepOnTopToggleImage, HeightMapEditMode.keepHeightsOnTop);
 
     }
 
@@ -45,23 +45,11 @@ public class GeometryEditorUI: MonoBehaviour {
 
     }
 
-    public void OnClickShiftHeightUpButton() {
-
-        controller.ShiftTilesHeightUp();
-
-    }
-
-    public void OnClickShiftHeightDownButton() {
-
-        controller.ShiftTilesHeightDown();
-
-    }
-
     public void OnClickKeepVerticiesOnTopToggle() {
 
-        GeometryEditMode.keepHeightsOnTop = !GeometryEditMode.keepHeightsOnTop;
+        HeightMapEditMode.keepHeightsOnTop = !HeightMapEditMode.keepHeightsOnTop;
 
-        ChangeToggleColor(keepOnTopToggleImage, GeometryEditMode.keepHeightsOnTop);
+        ChangeToggleColor(keepOnTopToggleImage, HeightMapEditMode.keepHeightsOnTop);
 
     }
 

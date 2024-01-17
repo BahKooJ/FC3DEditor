@@ -178,8 +178,6 @@ public class GeometryAddMode : EditMode {
         script.heightPoints = column.heights[(int)corner - 1];
         script.isStatic = true;
         script.channel = channel;
-        script.corner = corner;
-        script.tileColumn = column;
         script.section = selectedSection;
 
         heightPointObjects.Add(script);

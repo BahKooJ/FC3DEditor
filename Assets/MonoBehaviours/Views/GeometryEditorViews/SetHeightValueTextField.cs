@@ -8,7 +8,7 @@ using UnityEngine;
 
 class SetHeightValueTextField: MonoBehaviour {
 
-    public GeometryEditMode controller;
+    public HeightMapEditMode controller;
     public HeightMapChannelPoint selelctedHeightObject;
     public TMP_InputField field;
 
@@ -52,7 +52,7 @@ class SetHeightValueTextField: MonoBehaviour {
 
                     point.RefreshHeight();
 
-                    if (GeometryEditMode.keepHeightsOnTop) {
+                    if (HeightMapEditMode.keepHeightsOnTop) {
                         point.KeepHigherChannelsOnTop();
                     }
 

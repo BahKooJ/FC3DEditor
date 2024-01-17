@@ -9,7 +9,7 @@ public class DebugTilePanelView : MonoBehaviour {
     //Prefabs
     public GameObject debugUVItemView;
 
-    public GeometryEditMode controller;
+    public HeightMapEditMode controller;
 
     public TMP_Text meshIDText;
     public Transform content;

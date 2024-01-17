@@ -6,12 +6,10 @@ public class HeightMapChannelPoint : MonoBehaviour {
     public GameObject setHeightTextField;
 
     public bool isStatic = false;
-    public GeometryEditMode controller;
+    public HeightMapEditMode controller;
     public HeightPoints heightPoints;
     public int channel;
-    public VertexPosition corner;
     public LevelMesh section;
-    public TileColumn tileColumn;
 
     public bool isSelected = false;
 
@@ -74,7 +72,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
         transform.position = new Vector3(transform.position.x, heightPoints.GetPoint(channel), transform.position.z);
 
-        if (GeometryEditMode.keepHeightsOnTop) {
+        if (HeightMapEditMode.keepHeightsOnTop) {
 
             KeepHigherChannelsOnTop();
 
@@ -103,6 +101,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
     public void KeepHigherChannelsOnTop() {
 
         var padding = 8;
+        var gameCoordsPadding = padding / HeightPoints.multiplyer;
 
         if (channel == 3) {
             return;
@@ -110,18 +109,18 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
         if (channel == 1) {
 
-            if (heightPoints.GetPoint(channel) > heightPoints.GetPoint(2)) {
+            if (heightPoints.GetPoint(channel) + gameCoordsPadding > heightPoints.GetPoint(2)) {
                 heightPoints.SetPoint(heightPoints.GetTruePoint(channel) + padding, 2);
             }
 
-            if (heightPoints.GetPoint(2) > heightPoints.GetPoint(3)) {
+            if (heightPoints.GetPoint(2) + gameCoordsPadding > heightPoints.GetPoint(3)) {
                 heightPoints.SetPoint(heightPoints.GetTruePoint(2) + padding, 3);
             }
 
         }
         if (channel == 2) {
 
-            if (heightPoints.GetPoint(channel) > heightPoints.GetPoint(3)) {
+            if (heightPoints.GetPoint(channel) + gameCoordsPadding > heightPoints.GetPoint(3)) {
                 heightPoints.SetPoint(heightPoints.GetTruePoint(channel) + padding, 3);
             }
 
@@ -172,62 +171,62 @@ public class HeightMapChannelPoint : MonoBehaviour {
     public void MoveTileChannelUpOrDown() {
 
         //TODO: Change how single vertex change is made
-        float axis = Input.GetAxis("Mouse ScrollWheel");
-        if (axis != 0) {
+        //float axis = Input.GetAxis("Mouse ScrollWheel");
+        //if (axis != 0) {
 
-            if (controller.selectedTiles.Count == 1) {
+        //    if (controller.selectedTiles.Count == 1) {
 
-                var tile = controller.selectedTiles[0];
+        //        var tile = controller.selectedTiles[0];
 
-                var vertexIndex = tile.verticies.IndexOf(new TileVertex(channel, corner));
+        //        var vertexIndex = tile.verticies.IndexOf(new TileVertex(channel, corner));
 
-                if (vertexIndex != -1) {
+        //        if (vertexIndex != -1) {
 
-                    if (axis > 0) {
+        //            if (axis > 0) {
 
-                        if (tile.verticies[vertexIndex].heightChannel < 3) {
+        //                if (tile.verticies[vertexIndex].heightChannel < 3) {
 
-                            var vertex = tile.verticies[vertexIndex];
+        //                    var vertex = tile.verticies[vertexIndex];
 
-                            vertex.heightChannel++;
+        //                    vertex.heightChannel++;
 
-                            if (tile.verticies.Contains(vertex)) {
-                                return;
-                            }
+        //                    if (tile.verticies.Contains(vertex)) {
+        //                        return;
+        //                    }
 
-                            tile.verticies[vertexIndex] = vertex;
+        //                    tile.verticies[vertexIndex] = vertex;
 
-                            controller.selectedSection.RefreshMesh();
-                            controller.RefreshSelectedOverlays();
+        //                    controller.selectedSection.RefreshMesh();
+        //                    controller.RefreshSelectedOverlays();
 
-                        }
+        //                }
 
-                    } else {
+        //            } else {
 
-                        if (tile.verticies[vertexIndex].heightChannel > 1) {
+        //                if (tile.verticies[vertexIndex].heightChannel > 1) {
 
-                            var vertex = tile.verticies[vertexIndex];
+        //                    var vertex = tile.verticies[vertexIndex];
 
-                            vertex.heightChannel--;
+        //                    vertex.heightChannel--;
 
-                            if (tile.verticies.Contains(vertex)) {
-                                return;
-                            }
+        //                    if (tile.verticies.Contains(vertex)) {
+        //                        return;
+        //                    }
 
-                            tile.verticies[vertexIndex] = vertex;
+        //                    tile.verticies[vertexIndex] = vertex;
 
-                            controller.selectedSection.RefreshMesh();
-                            controller.RefreshSelectedOverlays();
+        //                    controller.selectedSection.RefreshMesh();
+        //                    controller.RefreshSelectedOverlays();
 
-                        }
+        //                }
 
-                    }
+        //            }
 
-                }
+        //        }
 
-            }
+        //    }
 
-        }
+        //}
 
     }
 
@@ -242,7 +241,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
         Select();
 
-        var mainUI = FindObjectOfType<GeometryEditorUI>();
+        var mainUI = FindObjectOfType<HeightMapEditPanelView>();
 
         var obj = Instantiate(setHeightTextField);
 
