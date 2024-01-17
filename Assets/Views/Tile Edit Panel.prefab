@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8179000494336432638}
   - component: {fileID: 1508618424895006350}
   m_Layer: 6
-  m_Name: Add Geometry Panel
+  m_Name: Tile Edit Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -88,7 +88,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 306264782225130835}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f20ca6bc8fd50514ba965dcf5be88dcf, type: 3}
+  m_Script: {fileID: 11500000, guid: 0f8241c81ef95374a8e9eafbbcd149ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   tilePresetPrefab: {fileID: 8977290598924302764, guid: 466baca0aaaa2d141a3d1feb7119be31, type: 3}

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class AddTileButton : MonoBehaviour {
 
-    public AddGeometryPanel view;
+    public TileEditPanel view;
 
     public TilePreset preset;
 

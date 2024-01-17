@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AddGeometryPanel : MonoBehaviour {
+public class TileEditPanel : MonoBehaviour {
 
     public GameObject tilePresetPrefab;
     public Main controller;
@@ -101,7 +101,7 @@ public class AddGeometryPanel : MonoBehaviour {
     public void Select(TilePreset preset) {
        
         // A try shoud be placed here. It should never not be GeometryAddMode so leaving it here to see if an exeption is thrown.
-        var geometryAddMode = (GeometryAddMode)controller.editMode;
+        var geometryAddMode = (TileEditMode)controller.editMode;
 
         geometryAddMode.selectedTilePreset = preset;
 

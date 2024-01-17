@@ -13,6 +13,7 @@ public class Main : MonoBehaviour {
 
     public GameObject meshSection;
     public GameObject heightMapChannelPoint;
+    public GameObject tileHeightMapChannelPoint;
     public GameObject SelectedTileOverlay;
     public GameObject TileTexturePreview;
     public GameObject SectionBoarders;

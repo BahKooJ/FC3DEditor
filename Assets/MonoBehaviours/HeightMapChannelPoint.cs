@@ -168,68 +168,6 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
     }
 
-    public void MoveTileChannelUpOrDown() {
-
-        //TODO: Change how single vertex change is made
-        //float axis = Input.GetAxis("Mouse ScrollWheel");
-        //if (axis != 0) {
-
-        //    if (controller.selectedTiles.Count == 1) {
-
-        //        var tile = controller.selectedTiles[0];
-
-        //        var vertexIndex = tile.verticies.IndexOf(new TileVertex(channel, corner));
-
-        //        if (vertexIndex != -1) {
-
-        //            if (axis > 0) {
-
-        //                if (tile.verticies[vertexIndex].heightChannel < 3) {
-
-        //                    var vertex = tile.verticies[vertexIndex];
-
-        //                    vertex.heightChannel++;
-
-        //                    if (tile.verticies.Contains(vertex)) {
-        //                        return;
-        //                    }
-
-        //                    tile.verticies[vertexIndex] = vertex;
-
-        //                    controller.selectedSection.RefreshMesh();
-        //                    controller.RefreshSelectedOverlays();
-
-        //                }
-
-        //            } else {
-
-        //                if (tile.verticies[vertexIndex].heightChannel > 1) {
-
-        //                    var vertex = tile.verticies[vertexIndex];
-
-        //                    vertex.heightChannel--;
-
-        //                    if (tile.verticies.Contains(vertex)) {
-        //                        return;
-        //                    }
-
-        //                    tile.verticies[vertexIndex] = vertex;
-
-        //                    controller.selectedSection.RefreshMesh();
-        //                    controller.RefreshSelectedOverlays();
-
-        //                }
-
-        //            }
-
-        //        }
-
-        //    }
-
-        //}
-
-    }
-
     public void Click() {
 
         click = true;

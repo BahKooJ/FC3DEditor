@@ -70,7 +70,7 @@ class ToolbarView: MonoBehaviour {
 
         var obj = Instantiate(addGeometryPanel);
 
-        var script = obj.GetComponent<AddGeometryPanel>();
+        var script = obj.GetComponent<TileEditPanel>();
 
         script.controller = controller;
 
@@ -78,7 +78,7 @@ class ToolbarView: MonoBehaviour {
 
         activePanel = obj;
 
-        controller.ChangeEditMode(new GeometryAddMode(controller));
+        controller.ChangeEditMode(new TileEditMode(controller));
 
     }
 

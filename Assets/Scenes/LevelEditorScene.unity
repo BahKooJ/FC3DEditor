@@ -864,7 +864,7 @@ GameObject:
   - component: {fileID: 1137386961}
   - component: {fileID: 1137386964}
   m_Layer: 6
-  m_Name: Add Geometry Tool
+  m_Name: Tile Edit Tool
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -966,7 +966,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d4215a89fb1d7ca44b16a5c392fe54dd, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5f1d76a5aef9b2b4286f2f9dad578034, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -997,7 +997,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
-  message: Tile Building Mode
+  message: Tile Editing Mode
 --- !u!1 &1170534027
 GameObject:
   m_ObjectHideFlags: 0
@@ -1401,6 +1401,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   meshSection: {fileID: 3982175839306991789, guid: d2f3b92a7ae38644b87000c94b6447b4, type: 3}
   heightMapChannelPoint: {fileID: 1298310605505145416, guid: 804d2b1c507598948a3e68434291bfc0, type: 3}
+  tileHeightMapChannelPoint: {fileID: 1298310605505145416, guid: f51c5e561cc50c441a5a06599292ebdc, type: 3}
   SelectedTileOverlay: {fileID: 3982175839306991789, guid: c11d8fe31bdf1aa4887436153193d9c9, type: 3}
   TileTexturePreview: {fileID: 3982175839306991789, guid: 2759ef5779e33c643944bdeae490ddfa, type: 3}
   SectionBoarders: {fileID: 2168547336867362444, guid: 9ea2ba9bd14a6d84f92bbce323964dbf, type: 3}
