@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class TileEditPanel : MonoBehaviour {
 
     public GameObject tilePresetPrefab;
-    public Main controller;
+    public TileEditMode controller;
 
     public RectTransform presetList;
     public TMP_Dropdown presetCatagory;
@@ -71,6 +71,20 @@ public class TileEditPanel : MonoBehaviour {
         OnCatagoryChange();
     }
 
+    // Editing
+    public void OnClickShiftHeightUpButton() {
+
+        controller.ShiftTilesHeightUp();
+
+    }
+
+    public void OnClickShiftHeightDownButton() {
+
+        controller.ShiftTilesHeightDown();
+
+    }
+
+    // Building
     public void OnCatagoryChange() {
 
         foreach (var obj in FindObjectsOfType<AddTileButton>()) {
@@ -100,13 +114,14 @@ public class TileEditPanel : MonoBehaviour {
 
     public void Select(TilePreset preset) {
        
-        // A try shoud be placed here. It should never not be GeometryAddMode so leaving it here to see if an exeption is thrown.
-        var geometryAddMode = (TileEditMode)controller.editMode;
+        var geometryAddMode = controller;
 
         geometryAddMode.selectedTilePreset = preset;
 
         geometryAddMode.RefreshTilePlacementOverlay();
 
     }
+
+
 
 }

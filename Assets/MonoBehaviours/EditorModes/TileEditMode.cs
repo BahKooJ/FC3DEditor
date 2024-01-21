@@ -35,6 +35,10 @@ public class TileEditMode : EditMode {
             main.TestRayOnLevelMesh();
         }
 
+        if (Input.GetKeyDown(KeyCode.Alpha1)) {
+            SwitchModes();
+        }
+
         if (isBuildMode) {
             return;
         }
@@ -75,7 +79,11 @@ public class TileEditMode : EditMode {
     public void SelectTile(Tile tile, TileColumn column, LevelMesh section) {
 
         if (isBuildMode) {
-            AddTile((TilePreset)selectedTilePreset, column, section);
+
+            if (selectedTilePreset != null) {
+                AddTile((TilePreset)selectedTilePreset, column, section);
+            }
+
             return;
         }
 
@@ -148,6 +156,12 @@ public class TileEditMode : EditMode {
 
         RefeshTileOverlay();
 
+    }
+
+    void SwitchModes() {
+        isBuildMode = !isBuildMode;
+        ClearAllSelectedItems();
+        selectedHeight = null;
     }
 
     void TestTileHeightSelection() {
@@ -523,4 +537,77 @@ public class TileEditMode : EditMode {
 
     #endregion
 
+    #region Callbacks
+
+    public void ShiftTilesHeightUp() {
+
+        if (selectedTiles.Count == 0) { return; }
+
+        foreach (var tile in selectedTiles) {
+
+            var previousVerticies = new List<TileVertex>(tile.verticies);
+            var newVerticies = new HashSet<TileVertex>();
+
+            foreach (var index in Enumerable.Range(0, tile.verticies.Count)) {
+
+                var vertex = tile.verticies[index];
+
+                if (vertex.heightChannel < 3) {
+
+                    vertex.heightChannel += 1;
+
+                    newVerticies.Add(vertex);
+
+                }
+
+                if (newVerticies.Count == previousVerticies.Count) {
+                    tile.verticies = newVerticies.ToList();
+                }
+
+            }
+
+        }
+
+        selectedSection.RefreshMesh();
+
+        RefeshTileOverlay();
+
+    }
+
+    public void ShiftTilesHeightDown() {
+
+        if (selectedTiles.Count == 0) { return; }
+
+        foreach (var tile in selectedTiles) {
+
+            var previousVerticies = new List<TileVertex>(tile.verticies);
+            var newVerticies = new HashSet<TileVertex>();
+
+            foreach (var index in Enumerable.Range(0, tile.verticies.Count)) {
+
+                var vertex = tile.verticies[index];
+
+                if (vertex.heightChannel > 1) {
+
+                    vertex.heightChannel -= 1;
+
+                    newVerticies.Add(vertex);
+
+                }
+
+                if (newVerticies.Count == previousVerticies.Count) {
+                    tile.verticies = newVerticies.ToList();
+                }
+
+            }
+
+        }
+
+        selectedSection.RefreshMesh();
+
+        RefeshTileOverlay();
+
+    }
+
+    #endregion
 }

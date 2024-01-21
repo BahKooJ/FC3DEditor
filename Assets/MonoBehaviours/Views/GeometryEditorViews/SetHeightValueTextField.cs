@@ -4,6 +4,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 using TMPro;
+using UnityEditor.UIElements;
 using UnityEngine;
 
 class SetHeightValueTextField: MonoBehaviour {
@@ -12,19 +13,25 @@ class SetHeightValueTextField: MonoBehaviour {
     public HeightMapChannelPoint selelctedHeightObject;
     public TMP_InputField field;
 
+    public bool preSelect = false;
+
     void Start() {
 
-        field = GetComponent<TMP_InputField>();
+        if (preSelect) {
+            field.Select();
+        }
 
-        field.Select();
-        
         field.text = selelctedHeightObject.heightPoints.GetTruePoint(selelctedHeightObject.channel).ToString();
 
-        ((RectTransform)transform).anchoredPosition = Input.mousePosition;
+        ((RectTransform)transform).anchoredPosition = Camera.main.WorldToScreenPoint(selelctedHeightObject.transform.position);
 
     }
 
     public void OnFinished() {
+
+        if (!preSelect) {
+            return;
+        }
 
         if (field == null) {
             return;

@@ -1,4 +1,5 @@
 using FCopParser;
+using UnityEditor.UIElements;
 using UnityEngine;
 
 public class HeightMapChannelPoint : MonoBehaviour {
@@ -18,6 +19,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
     public bool preInitSelect = false;
 
+    SetHeightValueTextField dragField = null;
     bool click = false;
     Vector3 previousMousePosition;
 
@@ -45,6 +47,11 @@ public class HeightMapChannelPoint : MonoBehaviour {
         if (click) {
 
             if (Controls.OnUp("Select")) {
+
+                if (dragField != null) {
+                    Destroy(dragField.gameObject);
+                    dragField = null;
+                }
 
                 click = false;
                 section.RefreshMesh();
@@ -76,6 +83,11 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
             KeepHigherChannelsOnTop();
 
+        }
+
+        if (dragField != null) {
+            dragField.field.text = heightPoints.GetTruePoint(channel).ToString();
+            ((RectTransform)dragField.transform).anchoredPosition = Camera.main.WorldToScreenPoint(transform.position);
         }
 
     }
@@ -170,6 +182,17 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
     public void Click() {
 
+        var obj = Instantiate(setHeightTextField);
+
+        obj.transform.SetParent(controller.main.canvas.transform, false);
+
+        var script = obj.GetComponent<SetHeightValueTextField>();
+
+        script.controller = controller;
+        script.selelctedHeightObject = this;
+
+        dragField = script;
+
         click = true;
         previousMousePosition = Input.mousePosition;
 
@@ -188,7 +211,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
         var script = obj.GetComponent<SetHeightValueTextField>();
 
         script.controller = controller;
-
+        script.preSelect = true;
         script.selelctedHeightObject = this;
 
     }

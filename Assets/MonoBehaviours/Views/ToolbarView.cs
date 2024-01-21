@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using UnityEditorInternal;
+using UnityEngine;
+using static UnityEngine.UI.ContentSizeFitter;
 
 class ToolbarView: MonoBehaviour {
 
@@ -66,19 +68,20 @@ class ToolbarView: MonoBehaviour {
 
     public void AddGeometryPanel() {
 
+        var editMode = new TileEditMode(controller);
+
         Destroy(activePanel);
 
         var obj = Instantiate(addGeometryPanel);
 
         var script = obj.GetComponent<TileEditPanel>();
 
-        script.controller = controller;
+        script.controller = editMode;
 
         obj.transform.SetParent(this.transform.parent, false);
-
         activePanel = obj;
 
-        controller.ChangeEditMode(new TileEditMode(controller));
+        controller.ChangeEditMode(editMode);
 
     }
 
