@@ -10,6 +10,7 @@ using Object = UnityEngine.Object;
 public class TileEditMode : EditMode {
 
     public Main main { get; set; }
+    public TileEditPanel view;
 
     public TilePreset? selectedTilePreset = null;
 
@@ -23,7 +24,7 @@ public class TileEditMode : EditMode {
     public List<TileHeightMapChannelPoint> heightPointObjects = new();
     public TileHeightMapChannelPoint selectedHeight = null;
 
-    bool isBuildMode = false;
+    public bool isBuildMode = false;
 
     public TileEditMode(Main main) {
         this.main = main;
@@ -162,6 +163,7 @@ public class TileEditMode : EditMode {
         isBuildMode = !isBuildMode;
         ClearAllSelectedItems();
         selectedHeight = null;
+        view.ChangeTools();
     }
 
     void TestTileHeightSelection() {

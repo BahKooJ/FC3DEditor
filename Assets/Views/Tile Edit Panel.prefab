@@ -94,6 +94,8 @@ MonoBehaviour:
   tilePresetPrefab: {fileID: 8977290598924302764, guid: 466baca0aaaa2d141a3d1feb7119be31, type: 3}
   presetList: {fileID: 52517549221597876}
   presetCatagory: {fileID: 6178175534636763459}
+  editTools: {fileID: 7830268857144566512}
+  buildTools: {fileID: 5299598173449623933}
 --- !u!1 &459638283881311918
 GameObject:
   m_ObjectHideFlags: 0
@@ -648,7 +650,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 40}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -980, y: -33}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &4537676781097994574
@@ -1655,7 +1657,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -17, y: 6}
+  m_SizeDelta: {x: 0, y: 6}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &5136434450516169965
 CanvasRenderer:

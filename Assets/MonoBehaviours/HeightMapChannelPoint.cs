@@ -6,6 +6,8 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
     public GameObject setHeightTextField;
 
+    public int x;
+    public int y;
     public bool isStatic = false;
     public HeightMapEditMode controller;
     public HeightPoints heightPoints;

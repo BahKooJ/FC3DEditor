@@ -189,6 +189,7 @@ public class HeightMapEditMode : EditMode {
 
         }
     }
+
     void ReinitExistingSelectedItems() {
 
         if (selectedColumn == null) {
@@ -200,6 +201,7 @@ public class HeightMapEditMode : EditMode {
         selectedSectionOverlay = Object.Instantiate(main.SectionBoarders, new Vector3(selectedSection.x, 0, -selectedSection.y), Quaternion.identity);
 
     }
+
     void ClearAllSelectedItems() {
 
         foreach (var obj in heightPointObjects) {
@@ -241,20 +243,20 @@ public class HeightMapEditMode : EditMode {
 
                 var itColumn = selectedSection.section.GetTileColumn(x, y);
 
-                AddSingleHeightChannelObject(VertexPosition.TopLeft, 1, itColumn);
-                AddSingleHeightChannelObject(VertexPosition.TopRight, 1, itColumn);
-                AddSingleHeightChannelObject(VertexPosition.BottomLeft, 1, itColumn);
-                AddSingleHeightChannelObject(VertexPosition.BottomRight, 1, itColumn);
+                AddSingleHeightChannelObject(VertexPosition.TopLeft, 1, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.TopRight, 1, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.BottomLeft, 1, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.BottomRight, 1, itColumn, x, y);
 
-                AddSingleHeightChannelObject(VertexPosition.TopLeft, 2, itColumn);
-                AddSingleHeightChannelObject(VertexPosition.TopRight, 2, itColumn);
-                AddSingleHeightChannelObject(VertexPosition.BottomLeft, 2, itColumn);
-                AddSingleHeightChannelObject(VertexPosition.BottomRight, 2, itColumn);
+                AddSingleHeightChannelObject(VertexPosition.TopLeft, 2, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.TopRight, 2, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.BottomLeft, 2, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.BottomRight, 2, itColumn, x, y);
 
-                AddSingleHeightChannelObject(VertexPosition.TopLeft, 3, itColumn);
-                AddSingleHeightChannelObject(VertexPosition.TopRight, 3, itColumn);
-                AddSingleHeightChannelObject(VertexPosition.BottomLeft, 3, itColumn);
-                AddSingleHeightChannelObject(VertexPosition.BottomRight, 3, itColumn);
+                AddSingleHeightChannelObject(VertexPosition.TopLeft, 3, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.TopRight, 3, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.BottomLeft, 3, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.BottomRight, 3, itColumn, x, y);
 
 
             }
@@ -263,15 +265,7 @@ public class HeightMapEditMode : EditMode {
 
     }
 
-    void AddHeightObjects(VertexPosition corner) {
-
-        AddSingleHeightChannelObject(corner, 1, selectedColumn);
-        AddSingleHeightChannelObject(corner, 2, selectedColumn);
-        AddSingleHeightChannelObject(corner, 3, selectedColumn);
-
-    }
-
-    void AddSingleHeightChannelObject(VertexPosition corner, int channel, TileColumn column) {
+    void AddSingleHeightChannelObject(VertexPosition corner, int channel, TileColumn column, int x, int y) {
 
         var existingHeightChannel = heightPointObjects.Find(obj => { 
             return obj.heightPoints == column.heights[(int)corner - 1] && obj.channel == channel;
@@ -303,6 +297,8 @@ public class HeightMapEditMode : EditMode {
 
         var point = Object.Instantiate(main.heightMapChannelPoint, pos, Quaternion.identity);
         var script = point.GetComponent<HeightMapChannelPoint>();
+        script.x = x; 
+        script.y = y;
         script.heightPoints = column.heights[(int)corner - 1];
         script.controller = this;
         script.channel = channel;
@@ -328,20 +324,13 @@ public class HeightMapEditMode : EditMode {
 
     }
 
-    public void UnselectAndRefreshHeightPoints() {
+    public void UnselectHeights() {
 
-        foreach (var obj in heightPointObjects) {
+        foreach (var height in heightPointObjects) {
 
-            Object.Destroy(obj.gameObject);
+            height.DeSelect();
 
         }
-
-        heightPointObjects.Clear();
-
-        AddHeightObjects(VertexPosition.TopLeft);
-        AddHeightObjects(VertexPosition.TopRight);
-        AddHeightObjects(VertexPosition.BottomLeft);
-        AddHeightObjects(VertexPosition.BottomRight);
 
     }
 

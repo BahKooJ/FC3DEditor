@@ -47,7 +47,7 @@ class SetHeightValueTextField: MonoBehaviour {
                         point.heightPoints.SetPoint(Int32.Parse(field.text), point.channel);
                     } catch (FormatException) {
 
-                        controller.UnselectAndRefreshHeightPoints();
+                        controller.UnselectHeights();
                         HeightMapEditMode.selectedSection.RefreshMesh();
 
                         controller.RefreshSelectedOverlays();

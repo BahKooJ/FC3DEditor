@@ -11,6 +11,9 @@ public class TileEditPanel : MonoBehaviour {
     public RectTransform presetList;
     public TMP_Dropdown presetCatagory;
 
+    public GameObject editTools;
+    public GameObject buildTools;
+
     public Dictionary<int, List<TilePreset>> defaultPresets = new() {
         { 0, new() {
                 new TilePreset(68, 0, 0, 0, "PresetsIcon/presetFloorH1"),
@@ -68,7 +71,19 @@ public class TileEditPanel : MonoBehaviour {
     };
 
     void Start() {
-        OnCatagoryChange();
+        controller.view = this;
+        
+    }
+
+    public void ChangeTools() {
+        
+        editTools.SetActive(!controller.isBuildMode);
+        buildTools.SetActive(controller.isBuildMode);
+        
+        if (controller.isBuildMode) {
+            OnCatagoryChange();
+        }
+
     }
 
     // Editing

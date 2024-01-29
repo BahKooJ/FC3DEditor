@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 1298310605505145416}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 184.8771, y: 2.0979347, z: -90.344025}
-  m_LocalScale: {x: 0.16, y: 0.16, z: 0.16}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -111,8 +111,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   setHeightTextField: {fileID: 2737967948328983806, guid: 66a9ab7a111c46848ad8bf53c31d2486, type: 3}
+  x: 0
+  y: 0
+  isStatic: 0
   channel: 0
-  cornerWhenSelected: 0
   section: {fileID: 0}
   isSelected: 0
+  boxCollider: {fileID: 0}
   preInitSelect: 0
