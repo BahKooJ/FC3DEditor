@@ -185,13 +185,20 @@ public class TileEditMode : EditMode {
 
                 if (hit.colliderInstanceID == channel.boxCollider.GetInstanceID()) {
                     
-                    if (Controls.OnDown("Select")) {
+                    if (Controls.IsDown("Select")) {
 
                         if (selectedHeight == null) {
-                            selectedHeight = channel;
-                        }
 
-                    } else if (Controls.IsDown("Select")) {
+                            var index = selectedTiles[0].verticies.FindIndex(vertex => {
+                                return vertex.vertexPosition == channel.corner && vertex.heightChannel == channel.channel;
+                            });
+
+                            if (index != -1) {
+                                selectedHeight = channel;
+                            }
+
+                            return;
+                        }
 
                         if (channel.heightPoints != selectedHeight.heightPoints) {
                             return;
@@ -199,11 +206,23 @@ public class TileEditMode : EditMode {
 
                         foreach (var tile in selectedTiles) {
 
-                            var index = tile.verticies.FindIndex(vertex => { return vertex.vertexPosition == selectedHeight.corner; });
+                            var index = tile.verticies.FindIndex(vertex => {
+                                return vertex.vertexPosition == selectedHeight.corner && vertex.heightChannel == selectedHeight.channel;
+                            });
+
+                            var existingVert = tile.verticies.FindIndex(vertex => {
+                                return vertex.vertexPosition == channel.corner && vertex.heightChannel == channel.channel;
+                            });
+
+                            if (index == -1 || existingVert != -1) {
+                                return;
+                            }
+
                             var vertex = tile.verticies[index];
                             tile.verticies[index] = new TileVertex(channel.channel, vertex.vertexPosition);
-
+                            
                         }
+                        selectedHeight = channel;
 
                         selectedSection.RefreshMesh();
                         RefeshTileOverlay();

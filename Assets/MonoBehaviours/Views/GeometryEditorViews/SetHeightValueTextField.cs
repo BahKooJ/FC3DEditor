@@ -27,6 +27,14 @@ class SetHeightValueTextField: MonoBehaviour {
 
     }
 
+    public void Update() {
+
+        if (controller.main.editMode != controller) {
+            Destroy(this.gameObject);
+        }
+
+    }
+
     public void OnFinished() {
 
         if (!preSelect) {
