@@ -215,7 +215,7 @@ public class UVPresentViewItem : MonoBehaviour {
 
             if (tile.uvs.Count == preset.uvs.Count) {
 
-                tile.uvs = preset.uvs;
+                tile.uvs = new List<int>(preset.uvs);
                 tile.texturePalette = preset.texturePalette;
 
             }
