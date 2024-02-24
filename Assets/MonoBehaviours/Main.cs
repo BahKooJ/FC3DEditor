@@ -224,28 +224,28 @@ public class Main : MonoBehaviour {
 
         foreach (var bmp in level.textures) {
 
-            var bmpTexture = new Texture2D(256, 256, TextureFormat.RGB565, false);
+            var bmpTexture = new Texture2D(256, 256, TextureFormat.ARGB32, false);
 
-            bmpTexture.LoadRawTextureData(bmp.ConvertToRGB565());
+            bmpTexture.LoadRawTextureData(bmp.ConvertToARGB32());
             bmpTexture.Apply();
 
             bmpTextures.Add(Sprite.Create(bmpTexture, new Rect(0, 0, 256, 256), Vector2.zero));
 
         }
 
-        var texture = new Texture2D(256, 2560, TextureFormat.RGB565, false);
+        var texture = new Texture2D(256, 2560, TextureFormat.ARGB32, false);
         var texturePallet = new List<byte>();
 
-        texturePallet.AddRange(level.textures[0].ConvertToRGB565());
-        texturePallet.AddRange(level.textures[1].ConvertToRGB565());
-        texturePallet.AddRange(level.textures[2].ConvertToRGB565());
-        texturePallet.AddRange(level.textures[3].ConvertToRGB565());
-        texturePallet.AddRange(level.textures[4].ConvertToRGB565());
-        texturePallet.AddRange(level.textures[5].ConvertToRGB565());
-        texturePallet.AddRange(level.textures[6].ConvertToRGB565());
-        texturePallet.AddRange(level.textures[7].ConvertToRGB565());
-        texturePallet.AddRange(level.textures[8].ConvertToRGB565());
-        texturePallet.AddRange(level.textures[9].ConvertToRGB565());
+        texturePallet.AddRange(level.textures[0].ConvertToARGB32());
+        texturePallet.AddRange(level.textures[1].ConvertToARGB32());
+        texturePallet.AddRange(level.textures[2].ConvertToARGB32());
+        texturePallet.AddRange(level.textures[3].ConvertToARGB32());
+        texturePallet.AddRange(level.textures[4].ConvertToARGB32());
+        texturePallet.AddRange(level.textures[5].ConvertToARGB32());
+        texturePallet.AddRange(level.textures[6].ConvertToARGB32());
+        texturePallet.AddRange(level.textures[7].ConvertToARGB32());
+        texturePallet.AddRange(level.textures[8].ConvertToARGB32());
+        texturePallet.AddRange(level.textures[9].ConvertToARGB32());
 
         texture.LoadRawTextureData(texturePallet.ToArray());
         texture.Apply();
