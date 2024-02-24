@@ -52,10 +52,6 @@ public class HeightMapEditMode : EditMode {
 
     public void OnDestroy() {
         ClearAllGameObjects();
-
-        if (view.debugTilePanelView != null) {
-            Object.Destroy(view.debugTilePanelView);
-        }
     }
 
     public HeightMapEditMode(Main main) {

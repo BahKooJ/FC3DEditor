@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class TileEditPanel : MonoBehaviour {
 
+    public GameObject debugTilePanel;
     public GameObject tilePresetPrefab;
     public TileEditMode controller;
 
@@ -13,6 +14,8 @@ public class TileEditPanel : MonoBehaviour {
 
     public GameObject editTools;
     public GameObject buildTools;
+
+    public GameObject debugTilePanelView = null;
 
     public Dictionary<int, List<TilePreset>> defaultPresets = new() {
         { 0, new() {
@@ -72,7 +75,17 @@ public class TileEditPanel : MonoBehaviour {
 
     void Start() {
         controller.view = this;
-        
+
+        if (Main.debug) {
+
+            debugTilePanelView = Instantiate(debugTilePanel);
+
+            debugTilePanelView.GetComponent<DebugTilePanelView>().controller = controller;
+
+            debugTilePanelView.transform.SetParent(transform.parent, false);
+
+        }
+
     }
 
     public void ChangeTools() {

@@ -1,5 +1,6 @@
 ﻿
 using FCopParser;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -9,10 +10,11 @@ public class DebugTilePanelView : MonoBehaviour {
     //Prefabs
     public GameObject debugUVItemView;
 
-    public HeightMapEditMode controller;
+    public TileEditMode controller;
 
     public TMP_Text meshIDText;
     public Transform content;
+    public TMP_InputField meshField;
 
     public List<DebugUVItemView> debugUVItems;
 
@@ -51,7 +53,7 @@ public class DebugTilePanelView : MonoBehaviour {
                 tile.verticies = verticies;
 
                 Refresh();
-                HeightMapEditMode.selectedSection.RefreshMesh();
+                TileEditMode.selectedSection.RefreshMesh();
 
             }
             if (Input.GetKeyUp(KeyCode.UpArrow)) {
@@ -106,6 +108,12 @@ public class DebugTilePanelView : MonoBehaviour {
     public void TileSelected(Tile tile) {
         this.tile = tile;
         Refresh();
+    }
+
+    public void FinishMeshFeild() {
+        tile.culling = Int32.Parse(meshField.text);
+        //TileEditMode.selectedSection.RefreshMesh();
+
     }
 
 

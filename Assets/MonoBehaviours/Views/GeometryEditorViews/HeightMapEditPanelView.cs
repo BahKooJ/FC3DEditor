@@ -7,26 +7,12 @@ public class HeightMapEditPanelView: MonoBehaviour {
     // View Refs
     public Image keepOnTopToggleImage;
 
-    //Prefabs
-    public GameObject debugTilePanel;
-
     public HeightMapEditMode controller;
 
-    public GameObject debugTilePanelView = null;
 
     void Start() {
 
         controller.view = this;
-
-        if (Main.debug) {
-
-            debugTilePanelView = Instantiate(debugTilePanel);
-
-            debugTilePanelView.GetComponent<DebugTilePanelView>().controller = controller;
-
-            debugTilePanelView.transform.SetParent(transform.parent, false);
-
-        }
 
         ChangeToggleColor(keepOnTopToggleImage, HeightMapEditMode.keepHeightsOnTop);
 

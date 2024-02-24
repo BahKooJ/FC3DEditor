@@ -66,7 +66,12 @@ public class TileEditMode : EditMode {
     }
 
     public void OnDestroy() {
+
         ClearAllGameObjects();
+
+        if (view.debugTilePanelView != null) {
+            Object.Destroy(view.debugTilePanelView);
+        }
     }
 
     public void LookTile(Tile tile, TileColumn column, LevelMesh section) {
@@ -254,6 +259,7 @@ public class TileEditMode : EditMode {
         AddHeightObjects(VertexPosition.BottomRight);
 
     }
+
     void SelectTile(Tile tile, bool deSelectDuplicate = true) {
 
         if (selectedTiles.Contains(tile)) {
@@ -268,6 +274,10 @@ public class TileEditMode : EditMode {
 
             selectedTiles.Add(tile);
 
+        }
+
+        if (view.debugTilePanelView != null) {
+            view.debugTilePanelView.GetComponent<DebugTilePanelView>().TileSelected(tile);
         }
 
     }
