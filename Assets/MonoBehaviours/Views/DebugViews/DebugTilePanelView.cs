@@ -111,8 +111,13 @@ public class DebugTilePanelView : MonoBehaviour {
     }
 
     public void FinishMeshFeild() {
-        tile.culling = Int32.Parse(meshField.text);
-        //TileEditMode.selectedSection.RefreshMesh();
+        try {
+            tile.verticies = MeshType.VerticiesFromID(Int32.Parse(meshField.text));
+            tile.culling = 3;
+            TileEditMode.selectedSection.RefreshMesh();
+        } catch { 
+        
+        }
 
     }
 
