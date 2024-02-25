@@ -36,7 +36,7 @@ public class TileEditMode : EditMode {
             main.TestRayOnLevelMesh();
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha1)) {
+        if (Controls.OnDown("ChangeModes")) {
             SwitchModes();
         }
 

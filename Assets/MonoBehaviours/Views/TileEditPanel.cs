@@ -55,13 +55,12 @@ public class TileEditPanel : MonoBehaviour {
                 new TilePreset(75, 3, 0, 0, "PresetsIcon/presetTriangleWallLeftBottomH1H2"),
                 new TilePreset(77, 3, 0, 0, "PresetsIcon/presetTriangleWallLeftBottomH2H3"),
                 new TilePreset(99, 3, 0, 0, "PresetsIcon/presetTriangleWallLeftRightLeftH1H2"),
-                // new TilePreset(0, 0, 0, 0, "PresetsIcon/presetTriangleWallLeftRightLeftH2H3.png"), missing
-                // new TilePreset(0, 0, 0, 0, "PresetsIcon/presetTriangleWallLeftRightRightH1H2.png"), missing
+                new TilePreset(101, 3, 0, 0, "PresetsIcon/presetTriangleWallLeftRightLeftH2H3"), 
+                new TilePreset(95, 3, 0, 0, "PresetsIcon/presetTriangleWallLeftRightRightH1H2"), 
                 new TilePreset(97, 3, 0, 0, "PresetsIcon/presetTriangleWallLeftRightRightH2H3"),
                 new TilePreset(71, 3, 0, 0, "PresetsIcon/presetTriangleWallLeftTopH1H2"),
                 new TilePreset(73, 3, 0, 0, "PresetsIcon/presetTriangleWallLeftTopH2H3"),
                 new TilePreset(91, 3, 0, 0, "PresetsIcon/presetTriangleWallRightLeftBottomH1H2"),
-                new TilePreset(93, 3, 0, 0, "PresetsIcon/presetTriangleWallRightLeftBottomH2H3"),
                 new TilePreset(93, 3, 0, 0, "PresetsIcon/presetTriangleWallRightLeftBottomH2H3"),
                 new TilePreset(87, 3, 0, 0, "PresetsIcon/presetTriangleWallRightLeftTopH1H2"),
                 new TilePreset(89, 3, 0, 0, "PresetsIcon/presetTriangleWallRightLeftTopH2H3"),

@@ -27,4 +27,5 @@ Inputs = {
 "ModifierChannelSelect1":"Alpha1"
 "ModifierChannelSelect2":"Alpha2"
 "ModifierChannelSelect3":"Alpha3"
+"ChangeModes":"Alpha1"
 }
