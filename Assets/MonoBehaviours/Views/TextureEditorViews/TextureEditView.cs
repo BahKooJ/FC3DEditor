@@ -25,6 +25,8 @@ public class TextureEditView: MonoBehaviour {
 
         activeTexturePresetPanel.transform.SetParent(transform.parent, false);
 
+        openUVMapperToggle.isOn = TextureEditMode.openUVMapperByDefault;
+
     }
 
     void Update() {

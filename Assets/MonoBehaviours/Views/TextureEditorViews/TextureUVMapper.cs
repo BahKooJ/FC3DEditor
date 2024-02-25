@@ -220,6 +220,8 @@ public class TextureUVMapper : MonoBehaviour {
 
         }
 
+        textureLines.Refresh();
+
     }
 
     public void OnFlipTextureCoordsHorizontally() {
@@ -248,6 +250,8 @@ public class TextureUVMapper : MonoBehaviour {
             script.ChangePosition((int)point.transform.localPosition.x, (int)(minY + vFlippedY));
 
         }
+
+        textureLines.Refresh();
 
     }
 
@@ -314,7 +318,7 @@ public class TextureUVMapper : MonoBehaviour {
 
             controller.RefreshUVMapper();
 
-            controller.RefreshTileOverlayTexture();
+            controller.ReInitTileOverlayTexture();
 
             foreach (var section in controller.main.sectionMeshes) {
                 section.RefreshTexture();

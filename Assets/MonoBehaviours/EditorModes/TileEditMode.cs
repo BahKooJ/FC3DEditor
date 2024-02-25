@@ -553,7 +553,19 @@ public class TileEditMode : EditMode {
         if (selectedColumn != null) {
 
             foreach (var t in selectedColumn.tiles) {
+
+                // Checks to make sure the tile doesn't already exist
+                if (MeshType.IDFromVerticies(t.verticies) == preset.meshID) {
+                    return;
+                }
+
+            }
+
+            // Does this even do anything?
+            foreach (var t in selectedColumn.tiles) {
+                
                 t.isEndInColumnArray = false;
+
             }
 
             var tile = preset.Create(true, selectedColumn, selectedSection.section);

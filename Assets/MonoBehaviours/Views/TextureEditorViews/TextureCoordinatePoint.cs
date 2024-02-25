@@ -83,12 +83,14 @@ class TextureCoordinatePoint : MonoBehaviour {
     // --Event methods called by Unity--
     public void MouseDown() {
 
-        drag = true;
+        if (Input.GetMouseButton(0)) {
+            drag = true;
+        }
 
     }
 
     public void MouseUp() {
-
+        
         drag = false;
 
     }

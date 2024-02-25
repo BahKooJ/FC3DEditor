@@ -249,6 +249,14 @@ public class TextureEditMode : EditMode {
 
     }
 
+    public void ReInitTileOverlayTexture() {
+
+        foreach (var overly in selectedTileOverlays) {
+            overly.Refresh(true);
+        }
+
+    }
+
     void ClearTileOverlays() {
 
         foreach (var overlay in selectedTileOverlays) {

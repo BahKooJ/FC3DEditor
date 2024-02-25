@@ -31,10 +31,14 @@ public class TileTexturePreview : MonoBehaviour {
 
     }
 
-    public void Refresh() {
+    public void Refresh(bool newTexture = false) {
 
         if (mesh == null) {
             return;
+        }
+
+        if (newTexture) {
+            material.mainTexture = controller.levelTexturePallet;
         }
 
         mesh.Clear();
