@@ -10,8 +10,16 @@ namespace FCopParser {
 
     public class FCopTexture {
 
-        const int imageSize = 131072;
+        public static List<byte> CCBFourCC = new List<byte>() { 32, 66, 67, 67 };
+        public static List<byte> LkUpfourCC = new List<byte>() { 112, 85, 107, 76 };
+        public static List<byte> PX16fourCC = new List<byte>() { 54, 49, 88, 80 };
+        public static List<byte> PLUTfourCC = new List<byte>() { 84, 85, 76, 80 };
 
+        //PS1
+        public static List<byte> PDATfourCC = new List<byte>() { 84, 65, 68, 80 };
+
+
+        const int imageSize = 131072;
 
         public List<ChunkHeader> offsets = new List<ChunkHeader>();
 
@@ -19,17 +27,136 @@ namespace FCopParser {
 
         public List<byte> bitmap;
 
+        public List<XRGB555> colorPalette;
+        public List<byte> colorPaletteData;
+        public List<List<byte>> lookUpSections = new();
+        public List<byte> ccbData;
+
         public FCopTexture(IFFDataFile rawFile) {
 
             this.rawFile = rawFile;
 
             FindChunks(rawFile.data.ToArray());
 
-            var px16 = offsets.First(chunkHeader => {
-                return chunkHeader.fourCCDeclaration == "PX16";
+            ParseCCB();
+
+            try {
+                var px16 = offsets.First(chunkHeader => {
+                    return chunkHeader.fourCCDeclaration == "PX16";
+                });
+
+                bitmap = rawFile.data.GetRange(px16.index + 8, px16.chunkSize - 8);
+
+                ParseColorPalette();
+
+                ParseLookUp();
+
+            }
+            catch {
+
+                var pdat = offsets.First(chunkHeader => {
+                    return chunkHeader.fourCCDeclaration == "PDAT";
+                });
+
+                ParseColorPalette();
+
+                var paletteIndexes = rawFile.data.GetRange(pdat.index + 8, pdat.chunkSize - 8);
+
+                bitmap = new();
+
+                foreach (var b in paletteIndexes) {
+                    bitmap.AddRange(colorPalette[b].Compile(true));
+                }
+
+            }
+
+        }
+
+        void ParseCCB() {
+
+            var ccb = offsets.First(chunkHeader => {
+                return chunkHeader.fourCCDeclaration == "CCB ";
             });
 
-            bitmap = rawFile.data.GetRange(px16.index + 8, px16.chunkSize - 8);
+            ccbData = rawFile.data.GetRange(ccb.index + 60, 16);
+
+        }
+
+        void ParseLookUp() {
+
+            var lkup = offsets.First(chunkHeader => {
+                return chunkHeader.fourCCDeclaration == "LkUp";
+            });
+
+            var lkupData = rawFile.data.GetRange(lkup.index + 8, lkup.chunkSize - 8);
+
+            foreach (var i in Enumerable.Range(0, 4)) {
+
+                var data = lkupData.GetRange(i * 256, 256);
+
+                lookUpSections.Add(data);
+
+            }
+
+        }
+
+        void ParseColorPalette() {
+
+            var plut = offsets.First(chunkHeader => {
+                return chunkHeader.fourCCDeclaration == "PLUT";
+            });
+
+            colorPalette = new();
+
+            colorPaletteData = rawFile.data.GetRange(plut.index + 20, plut.chunkSize - 20);
+
+            foreach (var i in Enumerable.Range(0, colorPaletteData.Count / 2)) {
+
+                var rgb = new XRGB555(new BitArray(colorPaletteData.GetRange(i * 2, 2).ToArray()));
+
+                colorPalette.Add(rgb);
+
+            }
+
+        }
+
+        public void ApplyColorPalette() {
+
+            colorPaletteData.Clear();
+
+            foreach (var rgb in colorPalette) {
+                colorPaletteData.AddRange(rgb.Compile());
+            }
+
+        }
+
+        public List<byte> CreateLookupPaletteBMP() {
+
+            var total = new List<byte>();
+
+            var lkup = offsets.First(chunkHeader => {
+                return chunkHeader.fourCCDeclaration == "LkUp";
+            });
+
+            var lkupData = rawFile.data.GetRange(lkup.index + 8, lkup.chunkSize - 8);
+
+            foreach (var b in lkupData) {
+                total.AddRange(colorPalette[b].Compile());
+            }
+
+            return total;
+
+        }
+
+        public List<byte> CreateLookupPaletteBMPSingle(int i) {
+
+            var total = new List<byte>();
+
+            foreach (var b in lookUpSections[i]) {
+                total.AddRange(colorPalette[b].Compile());
+            }
+
+            return total;
 
         }
 
@@ -101,28 +228,41 @@ namespace FCopParser {
 
             var total = new List<byte>();
 
-            var px16 = offsets.First(chunkHeader => {
-                return chunkHeader.fourCCDeclaration == "PX16";
+            var ccb = offsets.First(chunkHeader => {
+                return chunkHeader.fourCCDeclaration == "CCB ";
             });
 
             var plut = offsets.First(chunkHeader => {
                 return chunkHeader.fourCCDeclaration == "PLUT";
             });
 
-            var offset = px16.index + 8 + imageSize;
+            total.AddRange(rawFile.data.GetRange(ccb.index, 60));
 
-            total.AddRange(rawFile.data.GetRange(0,px16.index));
-            total.AddRange(rawFile.data.GetRange(px16.index, 8));
+            total.AddRange(ccbData);
+
+            total.AddRange(LkUpfourCC);
+            total.AddRange(BitConverter.GetBytes(1032));
+
+            foreach (var section in lookUpSections) {
+
+                total.AddRange(section);
+
+            }
+
+            total.AddRange(PX16fourCC);
+            total.AddRange(BitConverter.GetBytes(imageSize + 8));
+
             total.AddRange(bitmap.GetRange(0, imageSize));
 
-            total.AddRange(rawFile.data.GetRange(plut.index, plut.chunkSize));
+            total.AddRange(rawFile.data.GetRange(plut.index, 20));
+
+            total.AddRange(colorPaletteData);
 
             rawFile.data = total;
             rawFile.modified = true;
 
-
-
         }
+
 
         void FindChunks(byte[] bytes) {
 
@@ -156,9 +296,9 @@ namespace FCopParser {
 
         const double maxChannelValue = 31;
 
-        public int r;
-        public int g;
-        public int b;
+        public int r = 0;
+        public int g = 0;
+        public int b = 0;
 
         public XRGB555(bool x, int r, int g, int b) {
             this.x = x;
@@ -168,7 +308,8 @@ namespace FCopParser {
         }
 
         public XRGB555(BitArray bits) {
-            
+
+
             r = Utils.BitsToInt(Utils.CopyBitsOfRange(bits, 0, 5));
             g = Utils.BitsToInt(Utils.CopyBitsOfRange(bits, 5, 10));
             b = Utils.BitsToInt(Utils.CopyBitsOfRange(bits, 10, 15));
@@ -195,7 +336,7 @@ namespace FCopParser {
 
             int calculatedGreen = (int)Math.Round(greenPercent * max6bitValue);
 
-            var bitfield = new BitField(16, new List<BitNumber> { 
+            var bitfield = new BitField(16, new List<BitNumber> {
 
                 new BitNumber(5,r),
                 new BitNumber(6,calculatedGreen),
@@ -232,7 +373,22 @@ namespace FCopParser {
 
         }
 
-        public byte[] Compile() {
+        public byte[] Compile(bool isBGR = false) {
+
+            if (isBGR) {
+
+                var bitfieldbgr = new BitField(16, new List<BitNumber> {
+
+                    new BitNumber(5,b),
+                    new BitNumber(5,g),
+                    new BitNumber(5,r),
+                    new BitNumber(x)
+
+                });
+
+                return Utils.BitArrayToByteArray(bitfieldbgr.Compile());
+
+            }
 
             var bitfield = new BitField(16, new List<BitNumber> {
 
