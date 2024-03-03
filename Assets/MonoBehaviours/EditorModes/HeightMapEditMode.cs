@@ -1,12 +1,8 @@
 ﻿
 using FCopParser;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
-using static System.Collections.Specialized.BitVector32;
 using Object = UnityEngine.Object;
 
 public class HeightMapEditMode : EditMode {

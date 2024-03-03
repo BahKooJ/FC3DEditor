@@ -4,10 +4,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using UnityEditor;
 using System.IO;
 using FCopParser;
-using System.Xml.Linq;
 
 public class TextureUVMapper : MonoBehaviour {
 

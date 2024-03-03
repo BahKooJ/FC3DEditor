@@ -1,6 +1,6 @@
-﻿using UnityEditorInternal;
+﻿
 using UnityEngine;
-using static UnityEngine.UI.ContentSizeFitter;
+
 
 class ToolbarView: MonoBehaviour {
 

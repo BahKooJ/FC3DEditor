@@ -1,7 +1,5 @@
 ﻿
-using FCopParser;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class AddTileButton : MonoBehaviour {
 

@@ -1,10 +1,7 @@
 ﻿
-using FCopParser;
 using System;
-using System.Drawing;
 using System.Linq;
 using TMPro;
-using UnityEditor.UIElements;
 using UnityEngine;
 
 class SetHeightValueTextField: MonoBehaviour {
