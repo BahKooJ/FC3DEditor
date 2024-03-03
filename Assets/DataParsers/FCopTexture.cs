@@ -130,6 +130,20 @@ namespace FCopParser {
 
         }
 
+        public void ReinitColorPalette() {
+
+            colorPalette.Clear();
+
+            foreach (var i in Enumerable.Range(0, colorPaletteData.Count / 2)) {
+
+                var rgb = new XRGB555(new BitArray(colorPaletteData.GetRange(i * 2, 2).ToArray()));
+
+                colorPalette.Add(rgb);
+
+            }
+
+        }
+
         public List<byte> CreateLookupPaletteBMP() {
 
             var total = new List<byte>();
@@ -224,7 +238,94 @@ namespace FCopParser {
 
         }
 
+        public (int, int) CreateColorPalette() {
+
+            Dictionary<Tuple<byte, byte>, int> colorCount = new();
+
+            foreach (var i in Enumerable.Range(0, bitmap.Count / 2)) {
+
+                var pixel = bitmap.GetRange(i * 2, 2).ToArray();
+
+                // The black pixel needs to be at the start
+                if (pixel.SequenceEqual(new byte[] { 0, 0 })) {
+                    continue;
+                }
+
+                var pair = new Tuple<byte, byte>(pixel[0], pixel[1]);
+
+                if (colorCount.ContainsKey(pair)) {
+                    colorCount[pair]++;
+                }
+                else {
+                    colorCount[pair] = 1;
+                }
+
+            }
+
+            var topColors = colorCount.OrderByDescending(pair => pair.Value).Take(255).Select(pair => pair.Key).ToList();
+
+            var semiTransparentColors = topColors.Where(tuple => {
+                return tuple.Item2 > 0x80;
+            }).ToList();
+
+            var opaqueColors = topColors.Where(tuple => {
+                return tuple.Item2 < 0x80;
+            }).ToList();
+
+            colorPaletteData.Clear();
+
+            colorPaletteData.AddRange(new byte[] { 0, 0 });
+
+            foreach (var pixel in semiTransparentColors) {
+                colorPaletteData.AddRange(new byte[] { pixel.Item1, pixel.Item2 });
+            }
+
+            foreach (var pixel in opaqueColors) {
+                colorPaletteData.AddRange(new byte[] { pixel.Item1, pixel.Item2 });
+            }
+
+            ReinitColorPalette();
+
+            return (semiTransparentColors.Count, opaqueColors.Count);
+
+        }
+
+        public void ClearLookUpData(int transparnetCount, int opaqueCount) {
+
+            ccbData = new List<byte>() { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+            var section1 = new List<byte>();
+            foreach (var i in Enumerable.Range(0, 256)) {
+                section1.Add((byte)transparnetCount);
+            }
+
+            var section2 = new List<byte>();
+            foreach (var i in Enumerable.Range(0, 256)) {
+                section2.Add(0xFF);
+            }
+
+            var section3 = new List<byte>();
+            foreach (var i in Enumerable.Range(0, 256)) {
+                section3.Add(0);
+            }
+
+            var section4 = new List<byte>();
+            foreach (var i in Enumerable.Range(0, 256)) {
+                section4.Add((byte)(transparnetCount - 1));
+            }
+
+            lookUpSections[0] = section1;
+            lookUpSections[1] = section2;
+            lookUpSections[2] = section3;
+            lookUpSections[3] = section4;
+
+        }
+
         public void Compile() {
+
+            //var counts = CreateColorPalette();
+
+            //ClearLookUpData(counts.Item1, counts.Item2);
 
             var total = new List<byte>();
 
@@ -262,7 +363,6 @@ namespace FCopParser {
             rawFile.modified = true;
 
         }
-
 
         void FindChunks(byte[] bytes) {
 
