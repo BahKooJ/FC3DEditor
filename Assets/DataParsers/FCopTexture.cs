@@ -72,6 +72,55 @@ namespace FCopParser {
 
         }
 
+        void ReInit(bool withTexture) {
+
+            offsets = new();
+            colorPalette = new();
+            colorPaletteData = new();
+            lookUpSections = new();
+            ccbData = new();
+
+            FindChunks(rawFile.data.ToArray());
+
+            ParseCCB();
+
+            //try {
+
+                if (withTexture) {
+
+                    var px16 = offsets.First(chunkHeader => {
+                        return chunkHeader.fourCCDeclaration == "PX16";
+                    });
+
+                    bitmap = rawFile.data.GetRange(px16.index + 8, px16.chunkSize - 8);
+
+                }
+
+                ParseColorPalette();
+
+                ParseLookUp();
+
+            //}
+            //catch {
+
+            //    var pdat = offsets.First(chunkHeader => {
+            //        return chunkHeader.fourCCDeclaration == "PDAT";
+            //    });
+
+            //    ParseColorPalette();
+
+            //    var paletteIndexes = rawFile.data.GetRange(pdat.index + 8, pdat.chunkSize - 8);
+
+            //    bitmap = new();
+
+            //    foreach (var b in paletteIndexes) {
+            //        bitmap.AddRange(colorPalette[b].Compile(true));
+            //    }
+
+            //}
+
+        }
+
         void ParseCCB() {
 
             var ccb = offsets.First(chunkHeader => {
@@ -200,6 +249,30 @@ namespace FCopParser {
 
         }
 
+        public byte[] CbmpColorPaletteData() {
+
+            var ccb = offsets.First(chunkHeader => {
+                return chunkHeader.fourCCDeclaration == "CCB ";
+            });
+
+            var lkup = offsets.First(chunkHeader => {
+                return chunkHeader.fourCCDeclaration == "LkUp";
+            });
+
+            var plut = offsets.First(chunkHeader => {
+                return chunkHeader.fourCCDeclaration == "PLUT";
+            });
+
+            var total = new List<byte>();
+
+            total.AddRange(rawFile.data.GetRange(ccb.index, ccb.chunkSize));
+            total.AddRange(rawFile.data.GetRange(lkup.index, lkup.chunkSize));
+            total.AddRange(rawFile.data.GetRange(plut.index, plut.chunkSize));
+
+            return total.ToArray();
+
+        }
+
         public byte[] ConvertToRGB565() {
 
             var total = new List<byte>();
@@ -235,6 +308,62 @@ namespace FCopParser {
             var offset = BitConverter.ToInt32(bytes, 10);
 
             bitmap = new List<byte>(bytes).GetRange(offset, imageSize);
+
+        }
+
+        public void ImportCbmp(byte[] bytes) {
+            rawFile.data = bytes.ToList();
+            rawFile.modified = true;
+
+            ReInit(true);
+
+        }
+
+        public void ImportColorPaletteData(byte[] bytes) {
+
+            var cpOffsets = new List<ChunkHeader>();
+            
+            int offset = 0;
+
+            while (offset < bytes.Length) {
+
+                var fourCC = BytesToStringReversed(bytes, offset, 4);
+                var size = Utils.BytesToInt(bytes, offset + 4);
+
+                cpOffsets.Add(new ChunkHeader(offset, fourCC, size));
+
+                offset += size;
+
+            }
+
+            var ccb = cpOffsets.First(chunkHeader => {
+                return chunkHeader.fourCCDeclaration == "CCB ";
+            });
+
+            var lkup = cpOffsets.First(chunkHeader => {
+                return chunkHeader.fourCCDeclaration == "LkUp";
+            });
+
+            var plut = cpOffsets.First(chunkHeader => {
+                return chunkHeader.fourCCDeclaration == "PLUT";
+            });
+
+            var total = new List<byte>();
+
+            total.AddRange(bytes.ToList().GetRange(ccb.index, ccb.chunkSize));
+            total.AddRange(bytes.ToList().GetRange(lkup.index, lkup.chunkSize));
+
+            total.AddRange(PX16fourCC);
+            total.AddRange(BitConverter.GetBytes(imageSize + 8));
+
+            total.AddRange(bitmap.GetRange(0, imageSize));
+
+            total.AddRange(bytes.ToList().GetRange(plut.index, plut.chunkSize));
+
+            rawFile.data = total;
+            rawFile.modified = true;
+
+            ReInit(false);
 
         }
 

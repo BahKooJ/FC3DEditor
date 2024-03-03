@@ -10,12 +10,23 @@ using UnityEngine.EventSystems;
 public class ContextMenuHandler : MonoBehaviour, IPointerClickHandler {
 
     public List<(string, Action)> items;
+    public bool isRightClick = true;
 
     public void OnPointerClick(PointerEventData eventData) {
 
-        if (eventData.button == PointerEventData.InputButton.Right) {
-            OpenContextMenu();
+        if (isRightClick) {
+            if (eventData.button == PointerEventData.InputButton.Right) {
+                OpenContextMenu();
+            }
+        } else {
+
+            if (eventData.button == PointerEventData.InputButton.Left) {
+                OpenContextMenu();
+            }
+
         }
+
+
 
     }
 

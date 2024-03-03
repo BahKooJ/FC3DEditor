@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using System.IO;
 using FCopParser;
+using System.Xml.Linq;
 
 public class TextureUVMapper : MonoBehaviour {
 
@@ -19,6 +20,10 @@ public class TextureUVMapper : MonoBehaviour {
     public GameObject texturePalette;
     public GameObject texturePaletteImage;
     public TextureCoordinatesLines textureLines;
+
+    public ContextMenuHandler exportcontextMenu;
+    public ContextMenuHandler importcontextMenu;
+
 
     public int bmpID;
 
@@ -42,6 +47,18 @@ public class TextureUVMapper : MonoBehaviour {
         InitView();
 
         ScaleToScreen();
+
+        exportcontextMenu.items = new() {
+            ("Export Bitmap", ExportTexture),
+            ("Export Color Palette", ExportColorPalette),
+            ("Export Cbmp (BMP and Palette)", ExportCbmp)
+        };
+
+        importcontextMenu.items = new() {
+            ("Import Bitmap", ImportTexture),
+            ("Import Color Palette", ImportColorPalette),
+            ("Import Cbmp (BMP and Palette)", ImportCbmp)
+        };
 
     }
 
@@ -290,7 +307,29 @@ public class TextureUVMapper : MonoBehaviour {
 
     }
 
-    public void OnClickExportTexture() {
+    public void OnClickGenerateColorPalette() {
+
+        DialogWindowUtil.Dialog("Color Palette Warning", 
+            "It is recommended to use already existing Future Cop color palettes. " +
+            "Future Cop's color palettes are not fully understood yet and the method for creating them is still work in progress. " +
+            "Textures might display low quality or incorrectly.", () => {
+
+            var bitmap = controller.main.level.textures[controller.selectedTiles[0].texturePalette];
+
+            var counts = bitmap.CreateColorPalette();
+
+            bitmap.ClearLookUpData(counts.Item1, counts.Item2);
+
+            return true;
+
+        });
+
+
+        
+
+    }
+
+    public void ExportTexture() {
 
         if (controller.selectedTiles.Count == 0) { return; }
 
@@ -304,7 +343,35 @@ public class TextureUVMapper : MonoBehaviour {
 
     }
 
-    public void OnClickImportTexture() {
+    public void ExportColorPalette() {
+
+        if (controller.selectedTiles.Count == 0) { return; }
+
+        OpenFileWindowUtil.SaveFile("Textures\\Color Palettes", "Color Palette", path => {
+
+            var data = controller.main.level.textures[controller.selectedTiles[0].texturePalette].CbmpColorPaletteData();
+
+            File.WriteAllBytes(Utils.RemoveExtensionFromFileName(path) + ".plut", data);
+
+        });
+
+    }
+
+    public void ExportCbmp() {
+
+        if (controller.selectedTiles.Count == 0) { return; }
+
+        OpenFileWindowUtil.SaveFile("Textures\\Cbmp", "Cbmp", path => {
+
+            var data = controller.main.level.textures[controller.selectedTiles[0].texturePalette].rawFile.data;
+
+            File.WriteAllBytes(Utils.RemoveExtensionFromFileName(path) + ".Cbmp", data.ToArray());
+
+        });
+
+    }
+
+    public void ImportTexture() {
 
         if (controller.selectedTiles.Count == 0) { return; }
 
@@ -313,6 +380,45 @@ public class TextureUVMapper : MonoBehaviour {
             var texture = controller.main.level.textures[controller.selectedTiles[0].texturePalette];
 
             texture.ImportBMP(File.ReadAllBytes(path));
+
+            controller.main.RefreshTextures();
+
+            controller.RefreshUVMapper();
+
+            controller.ReInitTileOverlayTexture();
+
+            foreach (var section in controller.main.sectionMeshes) {
+                section.RefreshTexture();
+                section.RefreshMesh();
+            }
+
+        });
+
+    }
+
+    public void ImportColorPalette() {
+
+        if (controller.selectedTiles.Count == 0) { return; }
+
+        OpenFileWindowUtil.OpenFile("Textures\\Color Palettes", "", path => {
+
+            var texture = controller.main.level.textures[controller.selectedTiles[0].texturePalette];
+
+            texture.ImportColorPaletteData(File.ReadAllBytes(path));
+
+        });
+
+    }
+
+    public void ImportCbmp() {
+
+        if (controller.selectedTiles.Count == 0) { return; }
+
+        OpenFileWindowUtil.OpenFile("Textures\\Cbmp", "", path => {
+
+            var texture = controller.main.level.textures[controller.selectedTiles[0].texturePalette];
+
+            texture.ImportCbmp(File.ReadAllBytes(path));
 
             controller.main.RefreshTextures();
 
