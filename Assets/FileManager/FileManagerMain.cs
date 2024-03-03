@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class FileManagerMain : MonoBehaviour {
 
@@ -46,6 +47,22 @@ public class FileManagerMain : MonoBehaviour {
         try {
             iffFile = new IFFParser(fileContent);
         } catch (InvalidFileException) {
+            DialogWindowUtil.Dialog("Select Future Cop mission File", "This file is not a mission file");
+        }
+
+        FileManagerMain.level = new FCopLevel(FileManagerMain.iffFile.parsedData);
+        SceneManager.LoadScene("Scenes/LevelEditorScene", LoadSceneMode.Single);
+
+    }
+
+    public void CreateMission(string path) {
+
+        var fileContent = File.ReadAllBytes(path);
+
+        try {
+            iffFile = new IFFParser(fileContent);
+        }
+        catch (InvalidFileException) {
             DialogWindowUtil.Dialog("Select Future Cop mission File", "This file is not a mission file");
         }
 

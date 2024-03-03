@@ -7,46 +7,31 @@ public class HomeScreenView : MonoBehaviour {
 
     public FileManagerMain main;
 
-    public GameObject FileListItem;
-
-    public GameObject listView;
-
     private void Start() {
 
-        // TODO: Hardcoded directory
-        foreach (var file in Directory.GetFiles("MissionFiles")) {
+    }
 
-            var item = Instantiate(FileListItem);
+    public void OnClickOpenFile() {
 
-            item.transform.SetParent(listView.transform, false);
+        OpenFileWindowUtil.OpenFile("MissionFiles", "", file => main.OpenFile(file));
 
-            var script = item.GetComponent<FileListButton>();
+    }
 
-            script.file = file;
+    public void OnClickCreateFile() {
 
-            script.main = main;
-
-        }
-
-        foreach (var file in Directory.GetFiles("Output")) {
-
-            var item = Instantiate(FileListItem);
-
-            item.transform.SetParent(listView.transform, false);
-
-            var script = item.GetComponent<FileListButton>();
-
-            script.file = file;
-
-            script.main = main;
-
-        }
+        OpenFileWindowUtil.OpenFile("MissionFiles", "", file => main.CreateMission(file));
 
     }
 
     public void OnClickSettings() {
 
         main.OpenSettings();
+
+    }
+
+    public void OnClickQuit() {
+
+
 
     }
 
