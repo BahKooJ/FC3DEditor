@@ -1,5 +1,6 @@
 ﻿
 
+using FCopParser;
 using System;
 using TMPro;
 using UnityEditor.UIElements;
@@ -30,7 +31,7 @@ public class ShaderDebug : MonoBehaviour {
         var total = "";
 
         //if (TileEditMode.selectedTiles[0].graphics.graphicsType == 1) {
-        //    foreach (var i in TileEditMode.selectedTiles[0].shaders.monoChrome) {
+        //    foreach (var i in ((DynamicMonoChromeShader)TileEditMode.selectedTiles[0].shaders).values) {
         //        total += i.ToString() + " ";
         //    }
         //}

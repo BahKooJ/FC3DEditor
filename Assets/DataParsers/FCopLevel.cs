@@ -1292,13 +1292,13 @@ namespace FCopParser {
 
             }
 
-            var shaderData = new List<byte> {
-                (byte)graphics.lightingInfo
-            };
+            var shaderData = new List<byte>();
 
             foreach (var meta in graphicsMetaData) {
                 shaderData.AddRange(meta.data);
             }
+
+            shaderData.Add((byte)graphics.lightingInfo);
 
             switch ((VertexColorType)graphics.graphicsType) {
                 case VertexColorType.MonoChrome:
@@ -1420,7 +1420,7 @@ namespace FCopParser {
 
             } else {
 
-                graphic.lightingInfo = shaderData[0];
+                graphic.lightingInfo = shaderData.Last();
 
                 graphicItems.Add(graphic);
 
@@ -1499,12 +1499,13 @@ namespace FCopParser {
 
     }
 
-    // Todo: Figure out how tf this works
     public class DynamicMonoChromeShader : TileShaders {
         public float[][] colors { get; set; }
         public bool isQuad { get; set; }
 
         public int[] values;
+
+        float white = 29f;
 
         public DynamicMonoChromeShader(List<byte> data, bool isQuad) {
 
@@ -1514,10 +1515,10 @@ namespace FCopParser {
 
             values = new int[] {
 
-                Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 0, 6)),
-                Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 6, 12)),
+                Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 18, 24)),
                 Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 12, 18)),
-                Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 18, 24))
+                Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 6, 12)),
+                Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 0, 6))
 
             };
 
@@ -1527,22 +1528,26 @@ namespace FCopParser {
 
         public void Apply() {
 
-            var dummyColors = new float[] { 2f,2f,2f };
+            var total = new List<float[]>();
 
             if (isQuad) {
 
-                colors = new float[][] {
-                    dummyColors, dummyColors, dummyColors, dummyColors
-                };
+                total.Add(new float[] { values[0] / white, values[0] / white, values[0] / white, values[0] / white });
+                total.Add(new float[] { values[1] / white, values[1] / white, values[1] / white, values[1] / white });
+                total.Add(new float[] { values[3] / white, values[3] / white, values[3] / white, values[3] / white });
+                total.Add(new float[] { values[2] / white, values[2] / white, values[2] / white, values[2] / white });
+
 
             }
             else {
 
-                colors = new float[][] {
-                    dummyColors, dummyColors, dummyColors
-                };
+                total.Add(new float[] { values[0] / white, values[0] / white, values[0] / white, values[0] / white });
+                total.Add(new float[] { values[2] / white, values[2] / white, values[2] / white, values[2] / white });
+                total.Add(new float[] { values[1] / white, values[1] / white, values[1] / white, values[1] / white });
 
             }
+
+            colors = total.ToArray();
 
         }
 
@@ -1577,7 +1582,7 @@ namespace FCopParser {
             var i = 0;
             foreach (var colorIndex in data) {
 
-                if (isQuad && i == 3) {
+                if (isQuad && i == 2) {
                     i++;
                     continue;
                 }
@@ -1599,17 +1604,17 @@ namespace FCopParser {
 
             if (isQuad) {
 
-                total.Add(values[0].ToColors());
-                total.Add(values[2].ToColors());
                 total.Add(values[3].ToColors());
                 total.Add(values[1].ToColors());
+                total.Add(values[2].ToColors());
+                total.Add(values[0].ToColors());
 
 
             } else {
 
+                total.Add(values[2].ToColors());
                 total.Add(values[0].ToColors());
                 total.Add(values[1].ToColors());
-                total.Add(values[2].ToColors());
 
             }
 
