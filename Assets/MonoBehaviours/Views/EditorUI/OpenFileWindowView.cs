@@ -6,11 +6,13 @@ using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 public class OpenFileWindowView : MonoBehaviour {
 
     // Prefabs
     public GameObject fileListItem;
+    public GameObject folderListItem;
 
     // View refs
     public RectTransform fileList;
@@ -24,6 +26,7 @@ public class OpenFileWindowView : MonoBehaviour {
     public Action<string> confirmAction;
 
     public List<FileListItemView> fileListItems = new();
+    public List<FolderListItemView> folderListItems = new();
 
     void Start() {
 
@@ -31,6 +34,52 @@ public class OpenFileWindowView : MonoBehaviour {
 
         if (!isOpen) {
             buttonText.text = "Save";
+        }
+
+        Refresh();
+
+    }
+
+    void Refresh() {
+
+        foreach (var obj in fileListItems) {
+            Destroy(obj.gameObject);
+        }
+
+        foreach (var obj in folderListItems) {
+            Destroy(obj.gameObject);
+        }
+
+        fileListItems.Clear();
+        folderListItems.Clear();
+
+        var rootItem = Instantiate(folderListItem);
+
+        rootItem.transform.SetParent(fileList, false);
+
+        var rootscript = rootItem.GetComponent<FolderListItemView>();
+
+        rootscript.view = this;
+
+        rootscript.path = Directory.GetParent(directory).FullName;
+        rootscript.displayName = "...";
+
+        folderListItems.Add(rootscript);
+
+        foreach (var dir in Directory.GetDirectories(directory)) {
+
+            var item = Instantiate(folderListItem);
+
+            item.transform.SetParent(fileList, false);
+
+            var script = item.GetComponent<FolderListItemView>();
+
+            script.view = this;
+
+            script.path = dir;
+
+            folderListItems.Add(script);
+
         }
 
         foreach (var file in Directory.GetFiles(directory)) {
@@ -57,6 +106,12 @@ public class OpenFileWindowView : MonoBehaviour {
 
         fileField.text = Utils.RemovePathingFromFilePath(filePath);
 
+    }
+
+    public void SelectFolder(string path) {
+        directory = path;
+
+        Refresh();
     }
 
     // Callbacks

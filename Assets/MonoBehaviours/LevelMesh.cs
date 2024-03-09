@@ -22,6 +22,8 @@ public class LevelMesh : MonoBehaviour {
     List<int> triangles = new List<int>();
     List<Vector2> textureCords = new List<Vector2>();
 
+    List<Color> vertexColors = new();
+
     public List<Tile> sortedTilesByTriangle = new List<Tile>();
 
     public float x = 0;
@@ -103,6 +105,10 @@ public class LevelMesh : MonoBehaviour {
                 triangles.Add(vertexIndex + 1);
                 triangles.Add(vertexIndex + 2);
 
+                vertexColors.Add(new Color(tile.shaders.colors[0][0], tile.shaders.colors[0][1], tile.shaders.colors[0][2]));
+                vertexColors.Add(new Color(tile.shaders.colors[1][0], tile.shaders.colors[1][1], tile.shaders.colors[1][2]));
+                vertexColors.Add(new Color(tile.shaders.colors[2][0], tile.shaders.colors[2][1], tile.shaders.colors[2][2]));
+
                 vertexIndex += 3;
 
             }
@@ -134,12 +140,17 @@ public class LevelMesh : MonoBehaviour {
 
 
                 triangles.Add(vertexIndex);
+                triangles.Add(vertexIndex + 2);
                 triangles.Add(vertexIndex + 1);
+
+                triangles.Add(vertexIndex + 1);
+                triangles.Add(vertexIndex + 2);
                 triangles.Add(vertexIndex + 3);
 
-                triangles.Add(vertexIndex);
-                triangles.Add(vertexIndex + 3);
-                triangles.Add(vertexIndex + 2);
+                vertexColors.Add(new Color(tile.shaders.colors[0][0], tile.shaders.colors[0][1], tile.shaders.colors[0][2]));
+                vertexColors.Add(new Color(tile.shaders.colors[1][0], tile.shaders.colors[1][1], tile.shaders.colors[1][2]));
+                vertexColors.Add(new Color(tile.shaders.colors[2][0], tile.shaders.colors[2][1], tile.shaders.colors[2][2]));
+                vertexColors.Add(new Color(tile.shaders.colors[3][0], tile.shaders.colors[3][1], tile.shaders.colors[3][2]));
 
                 vertexIndex += 4;
 
@@ -183,6 +194,7 @@ public class LevelMesh : MonoBehaviour {
         vertices.Clear();
         triangles.Clear();
         textureCords.Clear();
+        vertexColors.Clear();
         sortedTilesByTriangle.Clear();
 
         Generate(section);
@@ -191,6 +203,7 @@ public class LevelMesh : MonoBehaviour {
         mesh.triangles = triangles.ToArray();
 
         mesh.uv = textureCords.ToArray();
+        mesh.colors = vertexColors.ToArray();
 
         mesh.RecalculateNormals();
 

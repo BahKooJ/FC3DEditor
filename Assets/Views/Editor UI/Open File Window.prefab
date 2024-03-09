@@ -219,11 +219,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fileListItem: {fileID: 83138947552990607, guid: 0bfc513606c8258449894a420adba8f7, type: 3}
+  folderListItem: {fileID: 83138947552990607, guid: 3f5a7ed2420673f4f98531622c1014cc, type: 3}
   fileList: {fileID: 1627910738643446246}
   buttonText: {fileID: 5855193348809488747}
   fileField: {fileID: 606786997630956633}
   isOpen: 1
   directory: 
+  defaultFileName: 
   fileListItems: []
 --- !u!1 &3469190866826267048
 GameObject:

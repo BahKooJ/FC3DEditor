@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 57dfb21790a922449b06901b6a85ab1f, type: 2}
+  - {fileID: 2100000, guid: 78aba4074dec65240be14112328cd4fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -97,6 +97,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 083e8ced2e4899945b3ff6585a89c36e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  meshCollider: {fileID: 0}
+  levelTexturePallet: {fileID: 0}
+  controller: {fileID: 0}
   debugText: {fileID: 6046718917461793567, guid: b829a4e9e949534479850f3b590bea2f, type: 3}
   x: 0
   y: 0

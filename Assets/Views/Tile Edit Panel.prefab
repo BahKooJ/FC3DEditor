@@ -91,7 +91,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f8241c81ef95374a8e9eafbbcd149ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugTilePanel: {fileID: 8481524618504945480, guid: b5a0814779a6e38449daf924748309cc, type: 3}
+  debugTilePanel: {fileID: 8481524618504945480, guid: 0f9332c8bd146cb45b2ff6ca0bb002e6, type: 3}
   tilePresetPrefab: {fileID: 8977290598924302764, guid: 466baca0aaaa2d141a3d1feb7119be31, type: 3}
   presetList: {fileID: 52517549221597876}
   presetCatagory: {fileID: 6178175534636763459}

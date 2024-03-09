@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 213833462821643268}
   - component: {fileID: 5848354852381889439}
   - component: {fileID: 1706198100369656970}
-  - component: {fileID: 9119504897482158379}
+  - component: {fileID: 2467022605162978619}
   m_Layer: 0
-  m_Name: File List Item
+  m_Name: Folder List Item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -124,8 +124,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 9119504897482158379}
-        m_TargetAssemblyTypeName: FileListItemView, Assembly-CSharp
+      - m_Target: {fileID: 2467022605162978619}
+        m_TargetAssemblyTypeName: FolderListItemView, Assembly-CSharp
         m_MethodName: OnClick
         m_Mode: 1
         m_Arguments:
@@ -136,7 +136,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &9119504897482158379
+--- !u!114 &2467022605162978619
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -145,12 +145,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 83138947552990607}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1dc743f42b7ea648bfc1f158618221f, type: 3}
+  m_Script: {fileID: 11500000, guid: 164a40c14063bf643a2db2483869c29d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fileName: {fileID: 2892099685954788548}
+  folderName: {fileID: 2892099685954788548}
   view: {fileID: 0}
-  filePath: 
+  path: 
 --- !u!1 &4188383004852783907
 GameObject:
   m_ObjectHideFlags: 0
@@ -352,7 +352,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 89083bdace2ea1a41afec87c2a5af0b4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: abc554de8dc0e8e48b9ebc13838c1482, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

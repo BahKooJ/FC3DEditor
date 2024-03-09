@@ -276,7 +276,7 @@ public class TileEditMode : EditMode {
         }
 
         if (view.debugTilePanelView != null) {
-            view.debugTilePanelView.GetComponent<DebugTilePanelView>().TileSelected(tile);
+            view.debugTilePanelView.GetComponent<ShaderDebug>().Refresh();
         }
 
     }

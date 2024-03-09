@@ -351,7 +351,7 @@ namespace FCopParser {
 
             foreach (int i in Enumerable.Range(0, colorCount)) {
 
-                colors.Add(new XRGB555(bytes.GetRange(i * 2, 2)));
+                colors.Add(new XRGB555(bytes.GetRange(i * 2, 2), true));
 
             }
 
@@ -695,7 +695,7 @@ namespace FCopParser {
     public struct TileGraphicsMetaData: TileGraphicsItem {
 
         public List<byte> data;
-
+         
         public TileGraphicsMetaData(List<byte> data) {
             this.data = data;
         }

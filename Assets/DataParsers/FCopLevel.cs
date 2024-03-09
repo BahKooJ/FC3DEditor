@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace FCopParser {
 
@@ -1248,6 +1249,8 @@ namespace FCopParser {
         public List<int> uvs = new();
         public int texturePalette;
 
+        public TileShaders shaders;
+
         public TileGraphics graphics;
         public List<TileGraphicsMetaData> graphicsMetaData = new();
 
@@ -1289,8 +1292,34 @@ namespace FCopParser {
 
             }
 
+            var shaderData = new List<byte> {
+                (byte)graphics.lightingInfo
+            };
+
+            foreach (var meta in graphicsMetaData) {
+                shaderData.AddRange(meta.data);
+            }
+
+            switch ((VertexColorType)graphics.graphicsType) {
+                case VertexColorType.MonoChrome:
+                    shaders = new MonoChromeShader(shaderData[0], graphics.isRect == 1);
+                    break;
+                case VertexColorType.DynamicMonoChrome:
+                    shaders = new DynamicMonoChromeShader(shaderData, graphics.isRect == 1);
+                    break;
+                case VertexColorType.Color:
+                    shaders = new ColorShader(shaderData, section, graphics.isRect == 1);
+                    break;
+                case VertexColorType.ColorAnimated:
+                    shaders = new AnimatedShader(graphics.isRect == 1);
+                    break;
+            }
+
+            
             foreach (var i in Enumerable.Range(textureIndex, verticies.Count)) {
+
                 uvs.Add(section.textureCoordinates[i]);
+
             }
 
             texturePalette = graphics.cbmpID;
@@ -1378,17 +1407,327 @@ namespace FCopParser {
             var graphic = new TileGraphics(graphics.lightingInfo, texturePalette,
                 graphics.isAnimated, graphics.isSemiTransparent, isRect ? 1 : 0, graphics.graphicsType);
 
+            var shaderData = shaders.Compile();
+
             var graphicItems = new List<TileGraphicsItem>();
-            graphicItems.Add(graphic);
-            foreach (var metaData in graphicsMetaData) {
-                graphicItems.Add(metaData);
+
+            if (shaderData.Count == 0) {
+
+                graphicItems.Add(graphic);
+                foreach (var metaData in graphicsMetaData) {
+                    graphicItems.Add(metaData);
+                }
+
+            } else {
+
+                graphic.lightingInfo = shaderData[0];
+
+                graphicItems.Add(graphic);
+
+                if (shaderData.Count > 1) {
+
+                    foreach (var i in Enumerable.Range(0,shaderData.Count / 2)) {
+                        graphicItems.Add(new TileGraphicsMetaData(shaderData.GetRange((i * 2) + 1, 2)));
+                    }
+
+                }
+
             }
+
+
 
             return graphicItems;
 
         }
 
     }
+
+    public interface TileShaders {
+
+        public float[][] colors { get; set; }
+
+        public bool isQuad { get; set; }
+
+        public void Apply();
+
+        public List<byte> Compile();
+
+    }
+
+    public class MonoChromeShader : TileShaders {
+        public float[][] colors { get; set; }
+
+        public bool isQuad { get; set; }
+
+        public byte value;
+
+        float white = 116f;
+
+        public MonoChromeShader(byte lightingInfo, bool isQuad) {
+            this.value = lightingInfo;
+            this.isQuad = isQuad;
+
+            Apply();
+
+        }
+
+        public void Apply() {
+
+            var color = value / white;
+
+            var fColors = new float[] { color, color, color };
+
+            if (isQuad) {
+
+                colors = new float[][] {
+                    fColors, fColors, fColors, fColors
+                };
+
+            } else {
+
+                colors = new float[][] {
+                    fColors, fColors, fColors
+                };
+
+            }
+
+        }
+
+        public List<byte> Compile() {
+            return new List<byte> { value };
+        }
+
+    }
+
+    // Todo: Figure out how tf this works
+    public class DynamicMonoChromeShader : TileShaders {
+        public float[][] colors { get; set; }
+        public bool isQuad { get; set; }
+
+        public int[] values;
+
+        public DynamicMonoChromeShader(List<byte> data, bool isQuad) {
+
+            this.isQuad = isQuad;
+
+            var bitField = new BitArray(data.ToArray());
+
+            values = new int[] {
+
+                Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 0, 6)),
+                Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 6, 12)),
+                Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 12, 18)),
+                Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 18, 24))
+
+            };
+
+            Apply();
+
+        }
+
+        public void Apply() {
+
+            var dummyColors = new float[] { 2f,2f,2f };
+
+            if (isQuad) {
+
+                colors = new float[][] {
+                    dummyColors, dummyColors, dummyColors, dummyColors
+                };
+
+            }
+            else {
+
+                colors = new float[][] {
+                    dummyColors, dummyColors, dummyColors
+                };
+
+            }
+
+        }
+
+        public List<byte> Compile() {
+
+            var bitfield = new BitField(24, new() {
+                        new BitNumber(6, values[0]),
+                        new BitNumber(6, values[1]),
+                        new BitNumber(6, values[2]),
+                        new BitNumber(6, values[3])
+                    });
+
+            return Utils.BitArrayToByteArray(bitfield.Compile()).ToList();
+
+        }
+
+    }
+
+    public class ColorShader : TileShaders {
+
+        public float[][] colors { get; set; }
+        public bool isQuad { get; set; }
+
+        public XRGB555[] values;
+
+        public ColorShader(List<byte> data, FCopLevelSectionParser section, bool isQuad) {
+
+            this.isQuad = isQuad;
+
+            var colors = new List<XRGB555>();
+
+            var i = 0;
+            foreach (var colorIndex in data) {
+
+                if (isQuad && i == 3) {
+                    i++;
+                    continue;
+                }
+
+                colors.Add(section.colors[colorIndex]);
+
+                i++;
+            }
+
+            values = colors.ToArray();
+
+            Apply();
+
+        }
+
+        public void Apply() {
+
+            var total = new List<float[]>();
+
+            if (isQuad) {
+
+                total.Add(values[0].ToColors());
+                total.Add(values[2].ToColors());
+                total.Add(values[3].ToColors());
+                total.Add(values[1].ToColors());
+
+
+            } else {
+
+                total.Add(values[0].ToColors());
+                total.Add(values[1].ToColors());
+                total.Add(values[2].ToColors());
+
+            }
+
+            colors = total.ToArray();
+
+        }
+
+        public List<byte> Compile() {
+            return new();
+        }
+    }
+
+    // Same with this
+    public class AnimatedShader : TileShaders {
+
+        public float[][] colors { get; set; }
+        public bool isQuad { get; set; }
+
+        public AnimatedShader(bool isQuad) {
+            this.isQuad = isQuad;
+            Apply();
+        }
+
+        public void Apply() {
+
+            var dummyColors = new float[] { 2f, 2f, 2f };
+
+            if (isQuad) {
+
+                colors = new float[][] {
+                    dummyColors, dummyColors, dummyColors, dummyColors
+                };
+
+            }
+            else {
+
+                colors = new float[][] {
+                    dummyColors, dummyColors, dummyColors
+                };
+
+            }
+
+        }
+
+        public List<byte> Compile() {
+            return new();
+        }
+
+    }
+
+    //public class TileShaders {
+
+    //    public byte brightness;
+
+    //    public int[] monoChrome;
+
+    //    public XRGB555[] colors;
+
+    //    public TileShaders(byte brightness) {
+    //        this.brightness = brightness;
+    //    }
+
+    //    public TileShaders(int[] monoChrome) {
+    //        this.monoChrome = monoChrome;
+    //    }
+
+    //    public TileShaders(XRGB555[] colors) {
+    //        this.colors = colors;
+    //    }
+
+    //    public float[] BrightnessToColor() {
+
+    //        float multiplier = 116f;
+
+    //        return new float[] { brightness / multiplier, brightness / multiplier, brightness / multiplier };
+
+    //    }
+
+    //    public float[] MonoChromeToColor() {
+
+    //        float multiplier = 53f;
+
+    //        var total = new List<float>();
+
+    //        foreach (var i in monoChrome) {
+    //            total.Add(i / multiplier);
+    //        }
+
+    //        return total.ToArray();
+
+    //    }
+
+    //    public float[][] ColorsToColor() {
+
+    //        var total = new List<float[]>();
+
+    //        foreach (var c in colors) {
+    //            total.Add(c.ToColors());
+    //        }
+
+    //        return total.ToArray();
+
+    //    }
+
+    //    public List<byte> CompileMonoChrome() {
+
+    //        var bitfield = new BitField(24, new() {
+    //            new BitNumber(6, monoChrome[0]),
+    //            new BitNumber(6, monoChrome[1]),
+    //            new BitNumber(6, monoChrome[2]),
+    //            new BitNumber(6, monoChrome[3])
+    //        });
+
+    //        return Utils.BitArrayToByteArray(bitfield.Compile()).ToList();
+
+    //    }
+
+    //}
 
     public struct TileVertex {
 
@@ -1401,6 +1740,13 @@ namespace FCopParser {
             this.vertexPosition = vertexPosition;
         }
 
+    }
+
+    public enum VertexColorType {
+        MonoChrome = 0,
+        DynamicMonoChrome = 1,
+        Color = 2,
+        ColorAnimated = 3
     }
 
     public enum VertexPosition {

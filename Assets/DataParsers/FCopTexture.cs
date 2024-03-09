@@ -523,7 +523,7 @@ namespace FCopParser {
 
         public bool x;
 
-        const double maxChannelValue = 31;
+        const float maxChannelValue = 31;
 
         public int r = 0;
         public int g = 0;
@@ -546,7 +546,20 @@ namespace FCopParser {
 
         }
 
-        public XRGB555(List<byte> bytes) {
+        public XRGB555(List<byte> bytes, bool isBGR = false) {
+
+            if (isBGR) {
+
+                BitArray bitsBGR = new BitArray(bytes.ToArray());
+
+                b = Utils.BitsToInt(Utils.CopyBitsOfRange(bitsBGR, 0, 5));
+                g = Utils.BitsToInt(Utils.CopyBitsOfRange(bitsBGR, 5, 10));
+                r = Utils.BitsToInt(Utils.CopyBitsOfRange(bitsBGR, 10, 15));
+                x = bitsBGR[15];
+
+                return;
+
+            }
 
             BitArray bits = new BitArray(bytes.ToArray());
 
@@ -599,6 +612,16 @@ namespace FCopParser {
             byte calculatedBlue = (byte)Math.Round(bluePercent * max8BitValue);
 
             return new byte[] { calculatedAlpha, calculatedBlue, calculatedGreen, calculatedRed };
+
+        }
+
+        public float[] ToColors() {
+
+            float redPercent = r / maxChannelValue;
+            float greenPercent = g / maxChannelValue;
+            float bluePercent = b / maxChannelValue;
+
+            return new float[] { redPercent, greenPercent, bluePercent };
 
         }
 
