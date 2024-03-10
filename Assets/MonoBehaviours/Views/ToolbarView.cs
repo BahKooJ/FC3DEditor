@@ -10,6 +10,7 @@ class ToolbarView: MonoBehaviour {
     public GameObject navMeshEditPanel;
     public GameObject actorEditPanel;
     public GameObject textureEditPanel;
+    public GameObject shaderEditPanel;
 
     public Main controller;
 
@@ -156,6 +157,26 @@ class ToolbarView: MonoBehaviour {
         var obj = Instantiate(textureEditPanel);
 
         var script = obj.GetComponent<TextureEditView>();
+
+        script.controller = editMode;
+
+        obj.transform.SetParent(this.transform.parent, false);
+
+        activePanel = obj;
+
+        controller.ChangeEditMode(editMode);
+
+    }
+
+    public void SelectShaderEditMode() {
+
+        var editMode = new ShaderEditMode(controller);
+
+        Destroy(activePanel);
+
+        var obj = Instantiate(shaderEditPanel);
+
+        var script = obj.GetComponent<ShaderEditPanelView>();
 
         script.controller = editMode;
 

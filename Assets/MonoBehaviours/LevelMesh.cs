@@ -203,7 +203,11 @@ public class LevelMesh : MonoBehaviour {
         mesh.triangles = triangles.ToArray();
 
         mesh.uv = textureCords.ToArray();
-        mesh.colors = vertexColors.ToArray();
+        if (Main.showShaders) {
+            mesh.colors = vertexColors.ToArray();
+        } else {
+            mesh.colors = new Color[0];
+        }
 
         mesh.RecalculateNormals();
 

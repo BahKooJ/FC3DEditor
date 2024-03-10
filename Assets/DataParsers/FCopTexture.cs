@@ -570,6 +570,10 @@ namespace FCopParser {
 
         }
 
+        public XRGB555 Clone() {
+            return new XRGB555(x, r, g, b);
+        }
+
         public byte[] ToRGB565() {
 
             int max6bitValue = 63;

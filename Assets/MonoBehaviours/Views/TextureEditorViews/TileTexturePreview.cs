@@ -143,12 +143,12 @@ public class TileTexturePreview : MonoBehaviour {
 
 
             triangles.Add(vertexIndex);
-            triangles.Add(vertexIndex + 1);
-            triangles.Add(vertexIndex + 3);
-
-            triangles.Add(vertexIndex);
-            triangles.Add(vertexIndex + 3);
             triangles.Add(vertexIndex + 2);
+            triangles.Add(vertexIndex + 1);
+
+            triangles.Add(vertexIndex + 1);
+            triangles.Add(vertexIndex + 2);
+            triangles.Add(vertexIndex + 3);
 
             vertexIndex += 4;
 

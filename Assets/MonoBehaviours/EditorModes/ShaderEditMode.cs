@@ -1,15 +1,14 @@
-﻿using FCopParser;
+﻿
+
+
+using FCopParser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-public class TextureEditMode : EditMode {
-
-    public static bool openUVMapperByDefault = true;
-    public static UVPresets rootUVPresets = new UVPresets("Texture Presets", null);
-
+public class ShaderEditMode : EditMode {
     public Main main { get; set; }
     public List<Tile> selectedTiles = new();
     public TileColumn selectedColumn = null;
@@ -17,22 +16,10 @@ public class TextureEditMode : EditMode {
     public List<TileTexturePreview> selectedTileOverlays = new();
     public GameObject selectedSectionOverlay = null;
 
-    public TextureEditView view;
+    public ShaderEditPanelView view;
 
-    public UVPresets currentUVPresets;
-
-    public TextureEditMode(Main main) {
+    public ShaderEditMode(Main main) {
         this.main = main;
-    }
-
-    public void OnCreateMode() {
-        currentUVPresets = rootUVPresets;
-    }
-
-    public void OnDestroy() {
-        view.CloseTextureUVMapper();
-        view.CloseTexturePresetPanel();
-        ClearAllSelectedItems();
     }
 
     public void Update() {
@@ -44,14 +31,23 @@ public class TextureEditMode : EditMode {
         if (Main.ignoreAllInputs) { return; }
 
         if (Controls.OnDown("Unselect")) {
-            
-            if (view.activeTextureUVMapper != null) {
-                view.CloseTextureUVMapper();
+
+            if (view.activeShaderMapper != null) {
+                view.CloseShaderMapper();
             }
 
             ClearAllSelectedItems();
         }
-    
+
+    }
+
+    public void OnCreateMode() {
+
+    }
+
+    public void OnDestroy() {
+        view.CloseShaderMapper();
+        ClearAllSelectedItems();
     }
 
     public void LookTile(Tile tile, TileColumn column, LevelMesh section) {
@@ -97,13 +93,14 @@ public class TextureEditMode : EditMode {
 
             SelectTile(tile);
 
-            if (view.activeTextureUVMapper != null) {
-                view.activeTextureUVMapper.GetComponent<TextureUVMapper>().RefreshView();
-            } else {
+            if (view.activeShaderMapper != null) {
+                view.activeShaderMapper.GetComponent<ShaderMapperView>().RefreshView();
+            }
+            else {
+                
+                
+                view.OpenShaderMapper();
 
-                if (openUVMapperByDefault) {
-                    view.OpenUVMapper();
-                }
 
             }
 
@@ -137,8 +134,8 @@ public class TextureEditMode : EditMode {
 
                 if (selectedTiles.Count == 0) {
 
-                    if (view.activeTextureUVMapper != null) {
-                        view.CloseTextureUVMapper();
+                    if (view.activeShaderMapper != null) {
+                        view.CloseShaderMapper();
                     }
 
                     ClearAllSelectedItems();
@@ -266,63 +263,11 @@ public class TextureEditMode : EditMode {
 
     }
 
-    public void RefreshUVMapper() {
+    public void RefreshShaderMapper() {
 
-        if (view.activeTextureUVMapper != null) {
-            view.activeTextureUVMapper.GetComponent<TextureUVMapper>().RefreshView();
+        if (view.activeShaderMapper != null) {
+            view.activeShaderMapper.GetComponent<ShaderMapperView>().RefreshView();
         }
-
-    }
-
-    public void ChangeTexturePallette(int palletteOffset) {
-
-        foreach (var tile in selectedTiles) {
-
-            tile.texturePalette = palletteOffset;
-
-        }
-
-    }
-
-    public void DuplicateTileGraphics() {
-
-        if (selectedTiles.Count < 2) return;
-
-        var firstTile = selectedTiles[0];
-
-        foreach (var tile in selectedTiles.Skip(1)) {
-
-            tile.uvs = new List<int>(firstTile.uvs);
-            tile.texturePalette = firstTile.texturePalette;
-
-        }
-
-        selectedSection.RefreshMesh();
-
-        RefreshUVMapper();
-        RefreshTileOverlayTexture();
-
-    }
-
-    // UV Presets
-
-    public bool AddPreset() {
-
-        if (selectedTiles.Count == 0) { return false; }
-
-        var firstTile = selectedTiles[0];
-
-        var uvPreset = new UVPreset(firstTile.uvs, firstTile.texturePalette, "");
-
-        currentUVPresets.presets.Add(uvPreset);
-
-        return true;
-
-    }
-
-    public void AddPresetsDirectory() {
-
-        currentUVPresets.subFolders.Add(new UVPresets("", currentUVPresets));
 
     }
 

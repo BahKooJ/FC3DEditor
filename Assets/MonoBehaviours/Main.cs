@@ -8,7 +8,8 @@ using UnityEngine;
 public class Main : MonoBehaviour {
 
     public static bool ignoreAllInputs = false;
-    public static bool debug = true;
+    public static bool debug = false;
+    public static bool showShaders = true;
 
     public GameObject meshSection;
     public GameObject heightMapChannelPoint;
@@ -65,6 +66,19 @@ public class Main : MonoBehaviour {
 
         if (Controls.OnDown("Save")) {
             Compile();
+        }
+
+        if (Input.GetKeyDown(KeyCode.I)) {
+            showShaders = !showShaders;
+            RefreshLevel();
+        }
+
+    }
+
+    public void RefreshLevel() {
+
+        foreach (var section in sectionMeshes) {
+            section.RefreshMesh();
         }
 
     }

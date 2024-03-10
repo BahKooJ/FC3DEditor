@@ -1448,6 +1448,8 @@ namespace FCopParser {
 
         public bool isQuad { get; set; }
 
+        public VertexColorType type { get; set; }
+
         public void Apply();
 
         public List<byte> Compile();
@@ -1459,6 +1461,8 @@ namespace FCopParser {
 
         public bool isQuad { get; set; }
 
+        public VertexColorType type { get; set; }
+
         public byte value;
 
         float white = 116f;
@@ -1466,7 +1470,7 @@ namespace FCopParser {
         public MonoChromeShader(byte lightingInfo, bool isQuad) {
             this.value = lightingInfo;
             this.isQuad = isQuad;
-
+            type = VertexColorType.MonoChrome;
             Apply();
 
         }
@@ -1503,6 +1507,8 @@ namespace FCopParser {
         public float[][] colors { get; set; }
         public bool isQuad { get; set; }
 
+        public VertexColorType type { get; set; }
+
         public int[] values;
 
         float white = 29f;
@@ -1510,7 +1516,7 @@ namespace FCopParser {
         public DynamicMonoChromeShader(List<byte> data, bool isQuad) {
 
             this.isQuad = isQuad;
-
+            type = VertexColorType.DynamicMonoChrome;
             var bitField = new BitArray(data.ToArray());
 
             values = new int[] {
@@ -1571,12 +1577,14 @@ namespace FCopParser {
         public float[][] colors { get; set; }
         public bool isQuad { get; set; }
 
+        public VertexColorType type { get; set; }
+
         public XRGB555[] values;
 
         public ColorShader(List<byte> data, FCopLevelSectionParser section, bool isQuad) {
 
             this.isQuad = isQuad;
-
+            type = VertexColorType.Color;
             var colors = new List<XRGB555>();
 
             var i = 0;
@@ -1633,8 +1641,11 @@ namespace FCopParser {
         public float[][] colors { get; set; }
         public bool isQuad { get; set; }
 
+        public VertexColorType type { get; set; }
+
         public AnimatedShader(bool isQuad) {
             this.isQuad = isQuad;
+            type = VertexColorType.ColorAnimated;
             Apply();
         }
 
@@ -1664,75 +1675,6 @@ namespace FCopParser {
         }
 
     }
-
-    //public class TileShaders {
-
-    //    public byte brightness;
-
-    //    public int[] monoChrome;
-
-    //    public XRGB555[] colors;
-
-    //    public TileShaders(byte brightness) {
-    //        this.brightness = brightness;
-    //    }
-
-    //    public TileShaders(int[] monoChrome) {
-    //        this.monoChrome = monoChrome;
-    //    }
-
-    //    public TileShaders(XRGB555[] colors) {
-    //        this.colors = colors;
-    //    }
-
-    //    public float[] BrightnessToColor() {
-
-    //        float multiplier = 116f;
-
-    //        return new float[] { brightness / multiplier, brightness / multiplier, brightness / multiplier };
-
-    //    }
-
-    //    public float[] MonoChromeToColor() {
-
-    //        float multiplier = 53f;
-
-    //        var total = new List<float>();
-
-    //        foreach (var i in monoChrome) {
-    //            total.Add(i / multiplier);
-    //        }
-
-    //        return total.ToArray();
-
-    //    }
-
-    //    public float[][] ColorsToColor() {
-
-    //        var total = new List<float[]>();
-
-    //        foreach (var c in colors) {
-    //            total.Add(c.ToColors());
-    //        }
-
-    //        return total.ToArray();
-
-    //    }
-
-    //    public List<byte> CompileMonoChrome() {
-
-    //        var bitfield = new BitField(24, new() {
-    //            new BitNumber(6, monoChrome[0]),
-    //            new BitNumber(6, monoChrome[1]),
-    //            new BitNumber(6, monoChrome[2]),
-    //            new BitNumber(6, monoChrome[3])
-    //        });
-
-    //        return Utils.BitArrayToByteArray(bitfield.Compile()).ToList();
-
-    //    }
-
-    //}
 
     public struct TileVertex {
 
