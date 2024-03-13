@@ -9,7 +9,10 @@ using UnityEngine.UI;
 
 public class ShaderMapperView : MonoBehaviour {
 
+    public static int[] colorDataTrianglesIndexes = new int[] { 2, 0, 1 };
     public static int[] colorDataQuadIndexes = new int[] { 3, 1, 2, 0 };
+    public static int[] monoDataTrianglesIndexes = new int[] { 0, 2, 1 };
+    public static int[] monoDataQuadIndexes = new int[] { 0, 1, 3, 2 };
 
     const float meshSize = 250f;
 
@@ -19,11 +22,21 @@ public class ShaderMapperView : MonoBehaviour {
     public GameObject previewMesh;
     public TMP_Dropdown shaderTypeDropdown;
 
+    public GameObject solidMonoUI;
+    public GameObject monoUI;
+    public GameObject colorUI;
+
     // -Solid Monochrome-
 
     // View Refs
     public Slider solidMonoSlider;
     public TMP_InputField solidMonoValue;
+
+    // -Dynamic Monochrome-
+
+    // View Refs
+    public Slider monoSlider;
+    public TMP_InputField monoValue;
 
     // -Colors-
 
@@ -39,9 +52,12 @@ public class ShaderMapperView : MonoBehaviour {
     // Prefabs
     public GameObject vertexColor;
 
+    public byte solidMonoByteValue;
+    public int dynamicMonoValue;
     public XRGB555 colorValue;
 
     List<Vector3> vertices = new();
+    // These are the objects that actually set values to the tiles
     public List<VertexCornerShaderView> corners = new();
 
     bool refuseCallbacks = false;
@@ -84,6 +100,8 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void RefreshView() {
 
+        refuseCallbacks = true;
+
         foreach (var corner in corners) {
             Destroy(corner.gameObject);
         }
@@ -94,20 +112,53 @@ public class ShaderMapperView : MonoBehaviour {
 
         shaderTypeDropdown.value = (int)tile.shaders.type;
 
+        solidMonoUI.SetActive(false);
+        monoUI.SetActive(false);
+        colorUI.SetActive(false);
+
+        switch (tile.shaders.type) {
+            case VertexColorType.MonoChrome:
+                solidMonoUI.SetActive(true);
+                SetSolidMono(((MonoChromeShader)tile.shaders).value);
+                break;
+            case VertexColorType.DynamicMonoChrome:
+                monoUI.SetActive(true);
+                break;
+            case VertexColorType.Color:
+                colorUI.SetActive(true);
+                break;
+            case VertexColorType.ColorAnimated:
+                break;
+
+        }
+
         RefreshMesh();
 
         CreateCorners(vertices);
+
+        refuseCallbacks = false;
 
     }
 
     public void SelectedCorner(int index) {
 
-        
-
         switch (controller.selectedTiles[0].shaders.type) {
             case VertexColorType.MonoChrome:
                 break;
             case VertexColorType.DynamicMonoChrome:
+
+                var monoShader = (DynamicMonoChromeShader)controller.selectedTiles[0].shaders;
+
+                if (controller.selectedTiles[0].verticies.Count == 4) {
+
+                    SetMono(monoShader.values[monoDataQuadIndexes[index]]);
+
+                } else {
+
+                    SetMono(monoShader.values[monoDataTrianglesIndexes[index]]);
+
+                }
+
                 break;
             case VertexColorType.Color:
 
@@ -116,6 +167,10 @@ public class ShaderMapperView : MonoBehaviour {
                 if (controller.selectedTiles[0].verticies.Count == 4) {
 
                     SetColors(shader.values[colorDataQuadIndexes[index]]);
+
+                } else {
+
+                    SetColors(shader.values[colorDataTrianglesIndexes[index]]);
 
                 }
 
@@ -143,6 +198,38 @@ public class ShaderMapperView : MonoBehaviour {
         RefreshColorPreview();
 
         refuseCallbacks = false;
+
+    }
+
+    void SetSolidMono(byte value) {
+
+        refuseCallbacks = true;
+
+        solidMonoSlider.value = value;
+        solidMonoValue.text = value.ToString();
+        solidMonoByteValue = value;
+
+        refuseCallbacks = false;
+
+    }
+
+    void SetMono(int value) { 
+        
+        refuseCallbacks = true;
+
+        monoSlider.value = value;
+        monoValue.text = value.ToString();
+        dynamicMonoValue = value;
+
+        refuseCallbacks = false;
+
+    }
+
+    public void ApplyColorsToCorner() {
+
+        corners[0].ChangeValue();
+
+        RefreshMesh();
 
     }
 
@@ -198,6 +285,7 @@ public class ShaderMapperView : MonoBehaviour {
     void RefreshMesh() {
 
         mesh.Clear();
+        vertices.Clear();
 
         if (controller.selectedTiles[0].verticies.Count == 4) {
             GenerateQuad();
@@ -223,7 +311,8 @@ public class ShaderMapperView : MonoBehaviour {
         List<Color> vertexColors = new();
         List<Vector2> textureCords = new();
 
-        vertices = new List<Vector3>() { new Vector3(0, 0), new Vector3(meshSize, 0), new Vector3(0, -meshSize), new Vector3(meshSize, -meshSize) };
+        AddVerticies(tile);
+        //vertices = new List<Vector3>() { new Vector3(0, 0), new Vector3(meshSize, 0), new Vector3(0, -meshSize), new Vector3(meshSize, -meshSize) };
 
         textureCords.Add(new Vector2(
             TextureCoordinate.GetX(tile.uvs[0] + tile.texturePalette * 65536),
@@ -269,6 +358,146 @@ public class ShaderMapperView : MonoBehaviour {
 
     }
 
+    // This code is... very verbose
+    void AddVerticies(Tile tile) {
+
+        var isWall = false;
+
+        var lowestHeight = 10;
+        var positions = new List<VertexPosition>();
+        foreach (var vert in tile.verticies) {
+
+            if (lowestHeight > vert.heightChannel) {
+                lowestHeight = vert.heightChannel;
+            }
+
+            if (positions.Contains(vert.vertexPosition)) {
+                isWall = true;
+            }
+
+            positions.Add(vert.vertexPosition);
+
+        }
+
+        if (isWall) {
+
+            var isTop = positions.Contains(VertexPosition.TopLeft) && positions.Contains(VertexPosition.TopRight);
+            var isLeft = positions.Contains(VertexPosition.TopLeft) && positions.Contains(VertexPosition.BottomLeft);
+            var isDiagnal = 
+                positions.Contains(VertexPosition.TopLeft) && positions.Contains(VertexPosition.BottomRight) ||
+                positions.Contains(VertexPosition.BottomLeft) && positions.Contains(VertexPosition.TopRight);
+
+
+            foreach (var point in tile.verticies) {
+
+                switch (point.vertexPosition) {
+
+                    case VertexPosition.TopLeft:
+
+                        if (point.heightChannel == lowestHeight) {
+
+                            vertices.Add(new Vector3(0, -meshSize));
+
+                        }
+                        else {
+
+                            vertices.Add(new Vector3(x: 0, y: 0));
+
+                        }
+
+                        break;
+                    case VertexPosition.TopRight:
+
+                        if (point.heightChannel == lowestHeight) {
+
+                            vertices.Add(new Vector3(meshSize, -meshSize));
+
+                        }
+                        else {
+
+                            vertices.Add(new Vector3(meshSize, 0));
+
+                        }
+
+                        break;
+                    case VertexPosition.BottomLeft:
+
+                        if (isDiagnal) {
+
+                            if (point.heightChannel == lowestHeight) {
+
+                                vertices.Add(new Vector3(0, -meshSize));
+
+                            }
+                            else {
+
+                                vertices.Add(new Vector3(x: 0, y: 0));
+
+                            }
+
+                        } else {
+
+                            if (point.heightChannel == lowestHeight) {
+
+                                vertices.Add(new Vector3(meshSize, -meshSize));
+
+                            }
+                            else {
+
+                                vertices.Add(new Vector3(meshSize, 0));
+
+                            }
+
+                        }
+
+                        break;
+                    case VertexPosition.BottomRight:
+
+                        if (point.heightChannel == lowestHeight) {
+
+                            vertices.Add(new Vector3(meshSize, -meshSize));
+
+                        }
+                        else {
+
+                            vertices.Add(new Vector3(meshSize, 0));
+
+                        }
+
+                        break;
+                }
+
+            }
+
+            return;
+        }
+
+        foreach (var point in tile.verticies) {
+
+            switch (point.vertexPosition) {
+
+                case VertexPosition.TopLeft:
+                    vertices.Add(new Vector3(x: 0, y: 0));
+
+                    break;
+                case VertexPosition.TopRight:
+                    vertices.Add(new Vector3(meshSize, 0));
+
+                    break;
+                case VertexPosition.BottomLeft:
+                    vertices.Add(new Vector3(0, -meshSize));
+
+                    break;
+                case VertexPosition.BottomRight:
+                    vertices.Add(new Vector3(meshSize, -meshSize));
+
+                    break;
+            }
+
+        }
+
+    }
+
     void GenerateTriangle() {
 
         var tile = controller.selectedTiles[0];
@@ -276,7 +505,7 @@ public class ShaderMapperView : MonoBehaviour {
         List<Color> vertexColors = new();
         List<Vector2> textureCords = new();
 
-        vertices = new List<Vector3>() { new Vector3(0, 0), new Vector3(0, -meshSize), new Vector3(meshSize, -meshSize) };
+        AddVerticies(tile);
 
         textureCords.Add(new Vector2(
             TextureCoordinate.GetX(tile.uvs[0] + tile.texturePalette * 65536),
@@ -314,6 +543,45 @@ public class ShaderMapperView : MonoBehaviour {
 
     // Callbacks
 
+    public void OnChangeShaderTypeDropdown() {
+
+        if (refuseCallbacks) { return; }
+
+        var tile = controller.selectedTiles[0];
+
+        tile.ChangeShader((VertexColorType)shaderTypeDropdown.value);
+
+        RefreshView();
+        controller.RefreshTileOverlayShader();
+
+    }
+
+    public void OnChangeSolidMono() {
+
+        if (refuseCallbacks) { return; }
+
+        solidMonoByteValue = (byte)solidMonoSlider.value;
+        solidMonoValue.text = ((int)solidMonoSlider.value).ToString();
+
+        ApplyColorsToCorner();
+        controller.RefreshTileOverlayShader();
+
+
+    }
+
+    public void OnChangeMono() {
+
+        if (refuseCallbacks) { return; }
+
+        dynamicMonoValue = (int)monoSlider.value;
+        monoValue.text = ((int)monoSlider.value).ToString();
+
+        ApplyColorsToCorners();
+        controller.RefreshTileOverlayShader();
+
+
+    }
+
     public void OnChangeRed() {
 
         if (refuseCallbacks) { return; }
@@ -324,6 +592,7 @@ public class ShaderMapperView : MonoBehaviour {
 
         RefreshColorPreview();
         ApplyColorsToCorners();
+        controller.RefreshTileOverlayShader();
 
     }
 
@@ -337,6 +606,7 @@ public class ShaderMapperView : MonoBehaviour {
 
         RefreshColorPreview();
         ApplyColorsToCorners();
+        controller.RefreshTileOverlayShader();
 
     }
 
@@ -350,6 +620,7 @@ public class ShaderMapperView : MonoBehaviour {
 
         RefreshColorPreview();
         ApplyColorsToCorners();
+        controller.RefreshTileOverlayShader();
 
     }
 

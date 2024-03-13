@@ -1381,6 +1381,26 @@ namespace FCopParser {
             this.graphics = graphics;
         }
 
+        public void ChangeShader(VertexColorType type) {
+
+            switch (type) {
+
+                case VertexColorType.MonoChrome:
+                    shaders = new MonoChromeShader(verticies.Count == 4);
+                    break;
+                case VertexColorType.DynamicMonoChrome: 
+                    shaders = new DynamicMonoChromeShader(verticies.Count == 4);
+                    break;
+                case VertexColorType.Color: 
+                    shaders = new ColorShader(verticies.Count == 4);
+                    break;
+                case VertexColorType.ColorAnimated: 
+                    break;
+
+            }
+
+        }
+
         public TileBitfield Compile(int textureIndex, int graphicsIndex) {
 
             var id = MeshType.IDFromVerticies(verticies);
@@ -1405,12 +1425,13 @@ namespace FCopParser {
             var isRect = verticies.Count == 4;
 
             var graphic = new TileGraphics(graphics.lightingInfo, texturePalette,
-                graphics.isAnimated, graphics.isSemiTransparent, isRect ? 1 : 0, graphics.graphicsType);
+                graphics.isAnimated, graphics.isSemiTransparent, isRect ? 1 : 0, (int)shaders.type);
 
             var shaderData = shaders.Compile();
 
             var graphicItems = new List<TileGraphicsItem>();
 
+            // If no shader data just uses the existing data
             if (shaderData.Count == 0) {
 
                 graphicItems.Add(graphic);
@@ -1427,7 +1448,7 @@ namespace FCopParser {
                 if (shaderData.Count > 1) {
 
                     foreach (var i in Enumerable.Range(0,shaderData.Count / 2)) {
-                        graphicItems.Add(new TileGraphicsMetaData(shaderData.GetRange((i * 2) + 1, 2)));
+                        graphicItems.Add(new TileGraphicsMetaData(shaderData.GetRange((i * 2), 2)));
                     }
 
                 }
@@ -1469,6 +1490,15 @@ namespace FCopParser {
 
         public MonoChromeShader(byte lightingInfo, bool isQuad) {
             this.value = lightingInfo;
+            this.isQuad = isQuad;
+            type = VertexColorType.MonoChrome;
+            Apply();
+
+        }
+
+        public MonoChromeShader(bool isQuad) {
+
+            this.value = (byte)white;
             this.isQuad = isQuad;
             type = VertexColorType.MonoChrome;
             Apply();
@@ -1528,6 +1558,23 @@ namespace FCopParser {
 
             };
 
+
+            Apply();
+
+        }
+
+        public DynamicMonoChromeShader(bool isQuad) {
+
+            this.isQuad = isQuad;
+            type = VertexColorType.DynamicMonoChrome;
+
+            values = new int[] {
+                (int)white,
+                (int)white,
+                (int)white,
+                (int)white
+            };
+
             Apply();
 
         }
@@ -1560,10 +1607,10 @@ namespace FCopParser {
         public List<byte> Compile() {
 
             var bitfield = new BitField(24, new() {
-                        new BitNumber(6, values[0]),
-                        new BitNumber(6, values[1]),
+                        new BitNumber(6, values[3]),
                         new BitNumber(6, values[2]),
-                        new BitNumber(6, values[3])
+                        new BitNumber(6, values[1]),
+                        new BitNumber(6, values[0])
                     });
 
             return Utils.BitArrayToByteArray(bitfield.Compile()).ToList();
@@ -1595,12 +1642,28 @@ namespace FCopParser {
                     continue;
                 }
 
-                colors.Add(section.colors[colorIndex]);
+                colors.Add(section.colors[colorIndex].Clone());
 
                 i++;
             }
 
             values = colors.ToArray();
+
+            Apply();
+
+        }
+
+        public ColorShader(bool isQuad) {
+
+            this.isQuad = isQuad;
+            type = VertexColorType.Color;
+
+            values = new XRGB555[] { 
+                new XRGB555(false, 31, 31, 31), 
+                new XRGB555(false, 31, 31, 31), 
+                new XRGB555(false, 31, 31, 31), 
+                new XRGB555(false, 31, 31, 31) 
+            };
 
             Apply();
 

@@ -26,12 +26,14 @@ Shader "Custom/AllSideShader"
             {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
+                fixed4 color : COLOR;
             };
 
             struct v2f
             {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
+                fixed4 color : COLOR;
             };
 
             sampler2D _MainTex;
@@ -44,6 +46,7 @@ Shader "Custom/AllSideShader"
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 UNITY_TRANSFER_FOG(o,o.vertex);
+                o.color = v.color;
                 return o;
             }
 
@@ -51,7 +54,7 @@ Shader "Custom/AllSideShader"
             {
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv);
-                return col * _Color;
+                return col * i.color * _Color;
             }
         ENDCG
         }

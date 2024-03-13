@@ -47,20 +47,54 @@ public class VertexCornerShaderView : MonoBehaviour {
 
         foreach (var tile in controller.selectedTiles) {
 
+            if (tile.shaders.type != originalType) {
+                tile.ChangeShader(originalType);
+            }
+
             switch (originalType) {
                 case VertexColorType.MonoChrome:
+
+                    var shaderSolid = (MonoChromeShader)tile.shaders;
+
+                    shaderSolid.value = view.solidMonoByteValue;
+
+                    shaderSolid.Apply();
+
                     break;
                 case VertexColorType.DynamicMonoChrome:
-                    break;
-                case VertexColorType.Color:
 
-                    var shader = (ColorShader)tile.shaders;
+                    var monoShader = (DynamicMonoChromeShader)tile.shaders;
 
                     if (tile.verticies.Count == 4) {
 
-                        shader.values[ShaderMapperView.colorDataQuadIndexes[index]] = view.colorValue.Clone();
+                        monoShader.values[ShaderMapperView.monoDataQuadIndexes[index]] = view.dynamicMonoValue;
 
-                        shader.Apply();
+                        monoShader.Apply();
+
+                    } else {
+
+                        monoShader.values[ShaderMapperView.monoDataTrianglesIndexes[index]] = view.dynamicMonoValue;
+
+                        monoShader.Apply();
+
+                    }
+
+                    break;
+                case VertexColorType.Color:
+
+                    var shaderColor = (ColorShader)tile.shaders;
+
+                    if (tile.verticies.Count == 4) {
+
+                        shaderColor.values[ShaderMapperView.colorDataQuadIndexes[index]] = view.colorValue.Clone();
+
+                        shaderColor.Apply();
+
+                    } else {
+
+                        shaderColor.values[ShaderMapperView.colorDataTrianglesIndexes[index]] = view.colorValue.Clone();
+
+                        shaderColor.Apply();
 
                     }
 

@@ -9,6 +9,7 @@ public class TileTexturePreview : MonoBehaviour {
     public Tile tile;
     public TileColumn column;
     public FCopLevelSection section;
+    public bool showShaders = false;
 
     Mesh mesh;
     Material material;
@@ -16,6 +17,7 @@ public class TileTexturePreview : MonoBehaviour {
     List<Vector3> vertices = new();
     List<int> triangles = new();
     List<Vector2> textureCords = new();
+    List<Color> vertexColors = new();
 
 
     void Start() {
@@ -40,6 +42,7 @@ public class TileTexturePreview : MonoBehaviour {
             material.mainTexture = controller.levelTexturePallet;
         }
 
+        vertexColors.Clear();
         mesh.Clear();
         vertices.Clear();
         triangles.Clear();
@@ -51,6 +54,13 @@ public class TileTexturePreview : MonoBehaviour {
         mesh.triangles = triangles.ToArray();
 
         mesh.uv = textureCords.ToArray();
+
+        if (showShaders) {
+            mesh.colors = vertexColors.ToArray();
+        }
+        else {
+            mesh.colors = new Color[0];
+        }
 
         mesh.RecalculateNormals();
 
@@ -112,6 +122,10 @@ public class TileTexturePreview : MonoBehaviour {
             triangles.Add(vertexIndex + 1);
             triangles.Add(vertexIndex + 2);
 
+            vertexColors.Add(new Color(tile.shaders.colors[0][0], tile.shaders.colors[0][1], tile.shaders.colors[0][2]));
+            vertexColors.Add(new Color(tile.shaders.colors[1][0], tile.shaders.colors[1][1], tile.shaders.colors[1][2]));
+            vertexColors.Add(new Color(tile.shaders.colors[2][0], tile.shaders.colors[2][1], tile.shaders.colors[2][2]));
+
             vertexIndex += 3;
 
         }
@@ -149,6 +163,11 @@ public class TileTexturePreview : MonoBehaviour {
             triangles.Add(vertexIndex + 1);
             triangles.Add(vertexIndex + 2);
             triangles.Add(vertexIndex + 3);
+
+            vertexColors.Add(new Color(tile.shaders.colors[0][0], tile.shaders.colors[0][1], tile.shaders.colors[0][2]));
+            vertexColors.Add(new Color(tile.shaders.colors[1][0], tile.shaders.colors[1][1], tile.shaders.colors[1][2]));
+            vertexColors.Add(new Color(tile.shaders.colors[2][0], tile.shaders.colors[2][1], tile.shaders.colors[2][2]));
+            vertexColors.Add(new Color(tile.shaders.colors[3][0], tile.shaders.colors[3][1], tile.shaders.colors[3][2]));
 
             vertexIndex += 4;
 

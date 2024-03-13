@@ -231,24 +231,17 @@ public class ShaderEditMode : EditMode {
         var script = overlay.GetComponent<TileTexturePreview>();
         script.controller = main;
         script.tile = tile;
+        script.showShaders = true;
         selectedTileOverlays.Add(script);
         overlay.transform.SetParent(selectedSection.transform);
         overlay.transform.localPosition = Vector3.zero;
 
     }
 
-    public void RefreshTileOverlayTexture() {
+    public void RefreshTileOverlayShader() {
 
         foreach (var overly in selectedTileOverlays) {
             overly.Refresh();
-        }
-
-    }
-
-    public void ReInitTileOverlayTexture() {
-
-        foreach (var overly in selectedTileOverlays) {
-            overly.Refresh(true);
         }
 
     }
