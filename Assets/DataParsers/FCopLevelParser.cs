@@ -28,6 +28,7 @@ namespace FCopParser {
 
         static List<byte> fourCC = new List<byte>() { 116, 99, 101, 83 };
         static List<byte> fourCCScTA = new List<byte>() { 65, 84, 99, 83 };
+        static List<byte> fourCCSLFX = new List<byte>() { 88, 70, 76, 83 };
 
 
 
@@ -48,6 +49,9 @@ namespace FCopParser {
         // ScTA
         public List<TileUVAnimationMetaData> tileUVAnimationMetaData = new();
         public List<int> animatedTextureCoordinates = new();
+
+        // SLFX
+        public List<byte> slfxData;
 
         List<ChunkHeader> offsets = new List<ChunkHeader>();
 
@@ -72,6 +76,7 @@ namespace FCopParser {
             ParseTileGraphics();
 
             ParseUVAnimations();
+            ParseShaderAnimations();
 
         }
 
@@ -190,15 +195,15 @@ namespace FCopParser {
 
             void CompileSLFX() {
 
-                var slfxHeader = offsets.Find(header => {
-                    return header.fourCCDeclaration == "SLFX";
-                });
-
-                if (slfxHeader == null) {
+                if (slfxData == null) {
                     return;
                 }
 
-                compiledFile.AddRange(rawFile.data.GetRange(slfxHeader.index, slfxHeader.chunkSize));
+                var header = new List<byte>();
+                header.AddRange(fourCCSLFX);
+                header.AddRange(BitConverter.GetBytes(slfxData.Count + 8));
+                header.AddRange(slfxData);
+                compiledFile.AddRange(header);
 
             }
 
@@ -221,10 +226,13 @@ namespace FCopParser {
             }
 
             foreach (XRGB555 color in colors) {
-                compiledFile.AddRange(color.Compile());
+                compiledFile.AddRange(color.Compile(true));
             }
 
             CompileGraphics();
+
+            compiledFile.Add(0);
+            compiledFile.Add(0);
 
             var header = new List<byte>();
 
@@ -245,6 +253,8 @@ namespace FCopParser {
 
             rawFile.data = compiledFile;
             rawFile.modified = true;
+
+
 
         }
 
@@ -445,6 +455,20 @@ namespace FCopParser {
                 animatedTextureCoordinates.Add(Utils.BytesToUShort(sctaData.ToArray(), offset + (i * 2)));
 
             }
+
+        }
+
+        void ParseShaderAnimations() {
+
+            var slfxHeader = offsets.Find(header => {
+                return header.fourCCDeclaration == "SLFX";
+            });
+
+            if (slfxHeader == null) {
+                return;
+            }
+
+            slfxData = rawFile.data.GetRange(slfxHeader.index + 8, slfxHeader.chunkSize - 8);
 
         }
 

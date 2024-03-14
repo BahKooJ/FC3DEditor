@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using static UnityEngine.UI.GridLayoutGroup;
 
 namespace FCopParser {
 
@@ -372,6 +372,9 @@ namespace FCopParser {
             var tileUVAnimationMetaData = new List<TileUVAnimationMetaData>();
             var animatedTextureCoordinates = new List<int>();
 
+            var existingColors = new Dictionary<ushort, (int, XRGB555)>();
+            var colorIndex = 0;
+
             List<Chunk> chunks = new List<Chunk>() { new Chunk(0,0) };
 
             foreach (var point in heightMap) {
@@ -430,6 +433,8 @@ namespace FCopParser {
 
                     // Now that the tile columns are sorted to fit the 4x4 chunk pattern in the tile array, we can simple add the tiles after they're sorted.
                     foreach (var tile in column.tiles) {
+
+                        // TODO: Maybe these compressions would be better with dictonaries?
 
                         // Compresses both the uv mapping and tile graphics
                         int textureIndex = -1;
@@ -528,10 +533,45 @@ namespace FCopParser {
                         }
 
                         #endregion
-                        // Second the graphics
+
+                        // Next the colors... (these are for colored vertices)
+                        #region Compile Colors
+
+                        if (tile.shaders.type == VertexColorType.Color) {
+                            var shader = (ColorShader)tile.shaders;
+
+                            foreach (var color in shader.values) {
+
+                                if (!existingColors.ContainsKey(color.ToUShort())) {
+                                    existingColors.Add(color.ToUShort(), (colorIndex, color));
+                                    colorIndex++;
+                                }
+
+                            }
+
+                        }
+
+                        if (existingColors.Count > 255) {
+                            throw new ColorArrayMaxExceeded();
+                        }
+
+                        
+
+                        #endregion
+
+                        // Finally the graphics
                         #region CompileGraphics
 
-                        var compiledGraphics = tile.CompileGraphics();
+                        // TEMPORARY
+                        // If tile has animated shaders add SLFX data
+
+                        //if (tile.shaders.type == VertexColorType.ColorAnimated) {
+
+                        //    parser.slfxData = new List<byte> { 16, 128, 50, 20 };
+
+                        //}
+
+                        var compiledGraphics = tile.CompileGraphics(existingColors);
 
                         if (tileGraphics.Count != 0) {
 
@@ -603,7 +643,7 @@ namespace FCopParser {
 
                             tileGraphics.AddRange(compiledGraphics);
 
-                            if (textureCoordinates.Count > 1023) {
+                            if (tileGraphics.Count > 1023) {
                                 throw new GraphicsArrayMaxExceeded();
                             }
 
@@ -682,8 +722,14 @@ namespace FCopParser {
             parser.thirdSectionBitfields = thirdSectionBitfields;
             parser.tiles = tiles;
             parser.textureCoordinates = textureCoordinates;
-            parser.tileGraphics = tileGraphics;
 
+            colors.Clear();
+            foreach (var existingColor in existingColors) {
+                colors.Add(existingColor.Value.Item2);
+            }
+            parser.colors = colors;
+
+            parser.tileGraphics = tileGraphics;
             parser.tileUVAnimationMetaData = tileUVAnimationMetaData;
             parser.animatedTextureCoordinates = animatedTextureCoordinates;
 
@@ -1394,7 +1440,8 @@ namespace FCopParser {
                 case VertexColorType.Color: 
                     shaders = new ColorShader(verticies.Count == 4);
                     break;
-                case VertexColorType.ColorAnimated: 
+                case VertexColorType.ColorAnimated:
+                    shaders = new AnimatedShader(verticies.Count == 4);
                     break;
 
             }
@@ -1420,14 +1467,21 @@ namespace FCopParser {
 
         }
 
-        public List<TileGraphicsItem> CompileGraphics() {
+        public List<TileGraphicsItem> CompileGraphics(Dictionary<ushort, (int, XRGB555)> existingColors) {
 
             var isRect = verticies.Count == 4;
 
             var graphic = new TileGraphics(graphics.lightingInfo, texturePalette,
                 graphics.isAnimated, graphics.isSemiTransparent, isRect ? 1 : 0, (int)shaders.type);
 
-            var shaderData = shaders.Compile();
+            var shaderData = new List<byte>();
+
+            if (shaders.type == VertexColorType.Color) {
+                shaderData = ((ColorShader)shaders).ColorCompile(existingColors);
+            } else {
+                shaderData = shaders.Compile();
+            }
+
 
             var graphicItems = new List<TileGraphicsItem>();
 
@@ -1696,6 +1750,24 @@ namespace FCopParser {
         public List<byte> Compile() {
             return new();
         }
+
+        public List<byte> ColorCompile(Dictionary<ushort, (int, XRGB555)> existingColors) {
+            var corner1 = (byte)existingColors[values[0].ToUShort()].Item1;
+            var corner2 = (byte)existingColors[values[1].ToUShort()].Item1;
+            var corner3 = (byte)existingColors[values[2].ToUShort()].Item1;
+
+            if (isQuad) {
+                var corner4 = (byte)existingColors[values[3].ToUShort()].Item1;
+
+                return new() { corner1, corner2, 0, corner3, corner4 };
+
+            } else {
+                return new() { corner1, corner2, corner3 };
+            }
+
+
+        }
+
     }
 
     // Same with this
@@ -1734,7 +1806,7 @@ namespace FCopParser {
         }
 
         public List<byte> Compile() {
-            return new();
+            return new List<byte> { 0 };
         }
 
     }

@@ -629,6 +629,36 @@ namespace FCopParser {
 
         }
 
+        public ushort ToUShort(bool isBGR = false) {
+
+            if (isBGR) {
+
+                var bitfieldbgr = new BitField(16, new List<BitNumber> {
+
+                    new BitNumber(5,b),
+                    new BitNumber(5,g),
+                    new BitNumber(5,r),
+                    new BitNumber(x)
+
+                });
+
+                return BitConverter.ToUInt16(Utils.BitArrayToByteArray(bitfieldbgr.Compile()));
+
+            }
+
+            var bitfield = new BitField(16, new List<BitNumber> {
+
+                new BitNumber(5,r),
+                new BitNumber(5,g),
+                new BitNumber(5,b),
+                new BitNumber(x)
+
+            });
+
+            return BitConverter.ToUInt16(Utils.BitArrayToByteArray(bitfield.Compile()));
+
+        }
+
         public byte[] Compile(bool isBGR = false) {
 
             if (isBGR) {

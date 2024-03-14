@@ -31,4 +31,10 @@ namespace FCopParser {
 
     }
 
+    public class ColorArrayMaxExceeded : Exception { 
+        public ColorArrayMaxExceeded() {
+
+        } 
+    }
+
 }
