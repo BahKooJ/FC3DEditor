@@ -157,3 +157,30 @@ public class ShaderPreset {
     }
 
 }
+
+public class ColorPresets {
+
+    public static string tag = "COLOTAG";
+
+    public List<XRGB555> presets = new();
+
+    public string Compile() {
+
+        var total = "[";
+
+        foreach (var preset in presets) {
+
+            total += preset.ToUShort().ToString() + ",";
+
+        }
+
+        // Removes the access comma
+        if (total != "[") {
+            total = total.Remove(total.Length - 1);
+        }
+
+        return total + "]";
+
+    }
+
+}

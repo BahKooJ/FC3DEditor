@@ -11,6 +11,7 @@ public abstract class Presets {
 
     public static UVPresets uvPresets = new UVPresets("Texture Presets", null);
     public static ShaderPresets shaderPresets = new ShaderPresets("Shader Presets", null);
+    public static ColorPresets colorPresets = new ColorPresets();
 
     public static void ReadFile(string fileName) {
 
@@ -482,8 +483,49 @@ public abstract class Presets {
         
         }
 
+        void ReadColorPresets() {
+
+            var startIndex = file.IndexOf(ColorPresets.tag);
+
+            if (startIndex == -1) {
+                return;
+            }
+
+            var openArray = false;
+            var value = "";
+            foreach (var i in Enumerable.Range(startIndex, file.Count())) {
+
+                var c = file[i];
+
+                if (c == '[') {
+                    openArray = true;
+                    continue;
+                }
+
+                if (openArray) {
+
+                    if (c == ',') {
+                        colorPresets.presets.Add(new XRGB555(new BitArray(BitConverter.GetBytes(UInt16.Parse(value)))));
+                        value = "";
+
+                    }
+                    else if (numbers.Contains(c)) {
+                        value += c;
+                    }
+
+                }
+
+                if (c == ']') {
+                    return;
+                }
+
+            }
+
+        }
+
         ReadUVPresets();
         ReadShaderPresets();
+        ReadColorPresets();
 
     }
 
@@ -494,7 +536,7 @@ public abstract class Presets {
         total += UVPresets.tag + uvPresets.Compile();
         total += ShaderPresets.tag + shaderPresets.Compile();
 
-        File.WriteAllText("TexturePresets/" + name + ".txt", total);
+        File.WriteAllText("Presets/" + name + ".txt", total);
 
     }
 

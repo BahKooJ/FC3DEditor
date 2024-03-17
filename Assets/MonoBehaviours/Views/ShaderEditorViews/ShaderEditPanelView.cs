@@ -1,12 +1,16 @@
 ﻿
 
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class ShaderEditPanelView : MonoBehaviour {
 
     // Prefabs
     public GameObject shaderMapper;
     public GameObject shaderPresetPanel;
+
+    public Toggle openShaderMapperToggle;
 
     public ShaderEditMode controller;
 
@@ -23,11 +27,13 @@ public class ShaderEditPanelView : MonoBehaviour {
 
         activeShaderPresetPanel.transform.SetParent(transform.parent, false);
 
+        openShaderMapperToggle.isOn = ShaderEditMode.openShaderMapperByDefault;
+
     }
 
     public void OpenShaderMapper() {
 
-        //if (controller.selectedTiles.Count == 0) { return; }
+        if (controller.selectedTiles.Count == 0) { return; }
 
         if (activeShaderMapper != null) {
             CloseShaderMapper();
@@ -56,6 +62,17 @@ public class ShaderEditPanelView : MonoBehaviour {
 
     public void ClosePresetPanel() {
         Destroy(activeShaderPresetPanel);
+    }
+
+    public void OnClickDuplicateShader() {
+
+        controller.DuplicateTileShader();
+
+    }
+
+    public void OnChangeOpenMapperOnTileSelect() {
+        ShaderEditMode.openShaderMapperByDefault = openShaderMapperToggle.isOn;
+
     }
 
 }

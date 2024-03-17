@@ -1,6 +1,7 @@
 ﻿
 
 using FCopParser;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -105,6 +106,87 @@ public class VertexCornerShaderView : MonoBehaviour {
             }
 
         }
+
+    }
+
+    public void ChangeMonoValue(int value) {
+
+        foreach (var tile in controller.selectedTiles) {
+
+            if (tile.shaders.type != VertexColorType.DynamicMonoChrome) {
+                tile.ChangeShader(VertexColorType.DynamicMonoChrome);
+            }
+
+            var monoShader = (DynamicMonoChromeShader)tile.shaders;
+
+            if (tile.verticies.Count == 4) {
+
+                monoShader.values[ShaderMapperView.monoDataQuadIndexes[index]] = value;
+
+                monoShader.Apply();
+
+            }
+            else {
+
+                monoShader.values[ShaderMapperView.monoDataTrianglesIndexes[index]] = value;
+
+                monoShader.Apply();
+
+            }
+
+        }
+
+    }
+
+    public void ChangeColor(XRGB555 value) {
+
+        foreach (var tile in controller.selectedTiles) {
+
+            if (tile.shaders.type != VertexColorType.Color) {
+                tile.ChangeShader(VertexColorType.Color);
+            }
+
+            var colorShader = (ColorShader)tile.shaders;
+
+            if (tile.verticies.Count == 4) {
+
+                colorShader.values[ShaderMapperView.colorDataQuadIndexes[index]] = value;
+
+                colorShader.Apply();
+
+            }
+            else {
+
+                colorShader.values[ShaderMapperView.colorDataTrianglesIndexes[index]] = value;
+
+                colorShader.Apply();
+
+            }
+
+        }
+
+    }
+
+    public int GetMonochromeValue() {
+        var monoColor = (DynamicMonoChromeShader)controller.selectedTiles[0].shaders;
+
+        if (monoColor.isQuad) {
+            return monoColor.values[ShaderMapperView.monoDataQuadIndexes[index]];
+        }
+
+        return monoColor.values[ShaderMapperView.monoDataTrianglesIndexes[index]];
+
+    }
+
+    public XRGB555 GetColorValue() {
+
+        var shaderColor = (ColorShader)controller.selectedTiles[0].shaders;
+
+        if (shaderColor.isQuad) {
+            return shaderColor.values[ShaderMapperView.colorDataQuadIndexes[index]].Clone();
+        }
+
+        return shaderColor.values[ShaderMapperView.colorDataTrianglesIndexes[index]].Clone();
 
     }
 

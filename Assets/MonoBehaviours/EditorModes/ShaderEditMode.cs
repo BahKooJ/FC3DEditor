@@ -10,6 +10,8 @@ using Object = UnityEngine.Object;
 
 public class ShaderEditMode : EditMode {
 
+    public static bool openShaderMapperByDefault = true;
+
     public Main main { get; set; }
     public List<Tile> selectedTiles = new();
     public TileColumn selectedColumn = null;
@@ -102,8 +104,9 @@ public class ShaderEditMode : EditMode {
             }
             else {
                 
-                
-                view.OpenShaderMapper();
+                if (openShaderMapperByDefault) {
+                    view.OpenShaderMapper();
+                }
 
 
             }
@@ -265,6 +268,25 @@ public class ShaderEditMode : EditMode {
         if (view.activeShaderMapper != null) {
             view.activeShaderMapper.GetComponent<ShaderMapperView>().RefreshView();
         }
+
+    }
+
+    public void DuplicateTileShader() {
+
+        if (selectedTiles.Count < 2) return;
+
+        var firstTile = selectedTiles[0];
+
+        foreach (var tile in selectedTiles.Skip(1)) {
+
+            tile.shaders = firstTile.shaders.Clone();
+
+        }
+
+        selectedSection.RefreshMesh();
+
+        RefreshShaderMapper();
+        RefreshTileOverlayShader();
 
     }
 

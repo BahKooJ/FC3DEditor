@@ -4,6 +4,7 @@ using FCopParser;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using UnityEditor.Presets;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +15,7 @@ public class ShaderMapperView : MonoBehaviour {
     public static int[] monoDataTrianglesIndexes = new int[] { 0, 2, 1 };
     public static int[] monoDataQuadIndexes = new int[] { 0, 1, 3, 2 };
 
-    const float meshSize = 250f;
+    const float meshSize = 230;
 
     public ShaderEditMode controller;
 
@@ -48,9 +49,13 @@ public class ShaderMapperView : MonoBehaviour {
     public TMP_InputField redInput;
     public TMP_InputField greenInput;
     public TMP_InputField blueInput;
+    public Transform colorPresetsList;
 
     // Prefabs
     public GameObject vertexColor;
+    public GameObject colorPresetItem;
+
+    public List<ColorPresetItemView> colorPresetItemViews = new();
 
     public byte solidMonoByteValue;
     public int dynamicMonoValue;
@@ -106,6 +111,12 @@ public class ShaderMapperView : MonoBehaviour {
             Destroy(corner.gameObject);
         }
 
+        foreach (var obj in colorPresetItemViews) {
+            Destroy(obj.gameObject);
+        }
+
+        colorPresetItemViews.Clear();
+
         corners.Clear();
 
         var tile = controller.selectedTiles[0];
@@ -126,6 +137,7 @@ public class ShaderMapperView : MonoBehaviour {
                 break;
             case VertexColorType.Color:
                 colorUI.SetActive(true);
+                InitColorView();
                 break;
             case VertexColorType.ColorAnimated:
                 break;
@@ -137,6 +149,42 @@ public class ShaderMapperView : MonoBehaviour {
         CreateCorners(vertices);
 
         refuseCallbacks = false;
+
+    }
+
+    void InitColorView() {
+
+        foreach (var preset in Presets.colorPresets.presets) {
+
+            var obj = Instantiate(colorPresetItem);
+
+            var script = obj.GetComponent<ColorPresetItemView>();
+            script.view = this;
+            script.color = preset;
+
+            obj.transform.SetParent(colorPresetsList, false);
+
+            obj.SetActive(true);
+
+            colorPresetItemViews.Add(script);
+
+        }
+
+    }
+
+    void AddColorPreset() {
+
+        var obj = Instantiate(colorPresetItem);
+
+        var script = obj.GetComponent<ColorPresetItemView>();
+        script.view = this;
+        script.color = Presets.colorPresets.presets.Last();
+
+        obj.transform.SetParent(colorPresetsList, false);
+
+        obj.SetActive(true);
+
+        colorPresetItemViews.Add(script);
 
     }
 
@@ -182,7 +230,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     }
 
-    void SetColors(XRGB555 rgb) {
+    public void SetColors(XRGB555 rgb) {
 
         refuseCallbacks = true;
 
@@ -481,6 +529,299 @@ public class ShaderMapperView : MonoBehaviour {
         RefreshColorPreview();
         ApplyColorsToCorners();
         controller.RefreshTileOverlayShader();
+
+    }
+
+    public void OnClickAddColorPresetButton() {
+
+        Presets.colorPresets.presets.Add(colorValue.Clone());
+
+        AddColorPreset();
+
+    }
+
+    public void OnClickClearColorPresetsButton() {
+        Presets.colorPresets.presets.Clear();
+
+        RefreshView();
+
+    }
+
+    public void OnClickRotateClockwise() {
+
+        var tile = controller.selectedTiles[0];
+
+        if (tile.shaders.type == VertexColorType.MonoChrome || tile.shaders.type == VertexColorType.ColorAnimated) {
+            return;
+        }
+
+        if (tile.shaders.type == VertexColorType.DynamicMonoChrome) {
+
+            var mono = (DynamicMonoChromeShader)tile.shaders;
+
+            if (mono.isQuad) {
+
+                var cornerValues = new List<int> {
+                    corners[2].GetMonochromeValue(),
+                    corners[0].GetMonochromeValue(),
+                    corners[3].GetMonochromeValue(),
+                    corners[1].GetMonochromeValue()
+                };
+
+                corners[0].ChangeMonoValue(cornerValues[0]);
+                corners[1].ChangeMonoValue(cornerValues[1]);
+                corners[2].ChangeMonoValue(cornerValues[2]);
+                corners[3].ChangeMonoValue(cornerValues[3]);
+
+            }
+            else {
+
+                var cornerValues = new List<int> {
+                    corners[1].GetMonochromeValue(),
+                    corners[2].GetMonochromeValue(),
+                    corners[0].GetMonochromeValue()
+                };
+
+                corners[0].ChangeMonoValue(cornerValues[0]);
+                corners[1].ChangeMonoValue(cornerValues[1]);
+                corners[2].ChangeMonoValue(cornerValues[2]);
+
+            }
+
+        }
+        else if (tile.shaders.type == VertexColorType.Color) {
+
+            var color = (ColorShader)tile.shaders;
+
+            if (color.isQuad) {
+
+                var cornerValues = new List<XRGB555> {
+                    corners[2].GetColorValue(),
+                    corners[0].GetColorValue(),
+                    corners[3].GetColorValue(),
+                    corners[1].GetColorValue()
+                };
+
+                corners[0].ChangeColor(cornerValues[0]);
+                corners[1].ChangeColor(cornerValues[1]);
+                corners[2].ChangeColor(cornerValues[2]);
+                corners[3].ChangeColor(cornerValues[3]);
+
+            }
+            else {
+
+                var cornerValues = new List<XRGB555> {
+                    corners[1].GetColorValue(),
+                    corners[2].GetColorValue(),
+                    corners[0].GetColorValue()
+                };
+
+                corners[0].ChangeColor(cornerValues[0]);
+                corners[1].ChangeColor(cornerValues[1]);
+                corners[2].ChangeColor(cornerValues[2]);
+
+            }
+
+        }
+
+        controller.RefreshTileOverlayShader();
+        RefreshView();
+
+    }
+
+    public void OnClickRotateCounterClockwise() {
+
+        var tile = controller.selectedTiles[0];
+
+        if (tile.shaders.type == VertexColorType.MonoChrome || tile.shaders.type == VertexColorType.ColorAnimated) {
+            return;
+        }
+
+        if (tile.shaders.type == VertexColorType.DynamicMonoChrome) {
+
+            var mono = (DynamicMonoChromeShader)tile.shaders;
+
+            if (mono.isQuad) {
+
+                var cornerValues = new List<int> {
+                    corners[1].GetMonochromeValue(),
+                    corners[3].GetMonochromeValue(),
+                    corners[0].GetMonochromeValue(),
+                    corners[2].GetMonochromeValue()
+                };
+
+                corners[0].ChangeMonoValue(cornerValues[0]);
+                corners[1].ChangeMonoValue(cornerValues[1]);
+                corners[2].ChangeMonoValue(cornerValues[2]);
+                corners[3].ChangeMonoValue(cornerValues[3]);
+
+            }
+            else {
+
+                var cornerValues = new List<int> {
+                    corners[2].GetMonochromeValue(),
+                    corners[0].GetMonochromeValue(),
+                    corners[1].GetMonochromeValue()
+                };
+
+                corners[0].ChangeMonoValue(cornerValues[0]);
+                corners[1].ChangeMonoValue(cornerValues[1]);
+                corners[2].ChangeMonoValue(cornerValues[2]);
+
+            }
+
+        }
+        else if (tile.shaders.type == VertexColorType.Color) {
+
+            var color = (ColorShader)tile.shaders;
+
+            if (color.isQuad) {
+
+                var cornerValues = new List<XRGB555> {
+                    corners[1].GetColorValue(),
+                    corners[3].GetColorValue(),
+                    corners[0].GetColorValue(),
+                    corners[2].GetColorValue()
+                };
+
+                corners[0].ChangeColor(cornerValues[0]);
+                corners[1].ChangeColor(cornerValues[1]);
+                corners[2].ChangeColor(cornerValues[2]);
+                corners[3].ChangeColor(cornerValues[3]);
+
+            }
+            else {
+
+                var cornerValues = new List<XRGB555> {
+                    corners[2].GetColorValue(),
+                    corners[0].GetColorValue(),
+                    corners[1].GetColorValue()
+                };
+
+                corners[0].ChangeColor(cornerValues[0]);
+                corners[1].ChangeColor(cornerValues[1]);
+                corners[2].ChangeColor(cornerValues[2]);
+
+            }
+
+        }
+
+        controller.RefreshTileOverlayShader();
+        RefreshView();
+
+    }
+
+    public void OnClickFlipVertically() {
+
+        var tile = controller.selectedTiles[0];
+
+        if (tile.shaders.type == VertexColorType.MonoChrome || tile.shaders.type == VertexColorType.ColorAnimated) {
+            return;
+        }
+
+        if (tile.shaders.type == VertexColorType.DynamicMonoChrome) {
+
+            var mono = (DynamicMonoChromeShader)tile.shaders;
+
+            if (mono.isQuad) {
+
+                var cornerValues = new List<int> {
+                    corners[2].GetMonochromeValue(),
+                    corners[3].GetMonochromeValue(),
+                    corners[0].GetMonochromeValue(),
+                    corners[1].GetMonochromeValue()
+                };
+
+                corners[0].ChangeMonoValue(cornerValues[0]);
+                corners[1].ChangeMonoValue(cornerValues[1]);
+                corners[2].ChangeMonoValue(cornerValues[2]);
+                corners[3].ChangeMonoValue(cornerValues[3]);
+
+            }
+
+
+        }
+        else if (tile.shaders.type == VertexColorType.Color) {
+
+            var color = (ColorShader)tile.shaders;
+
+            if (color.isQuad) {
+
+                var cornerValues = new List<XRGB555> {
+                    corners[2].GetColorValue(),
+                    corners[3].GetColorValue(),
+                    corners[0].GetColorValue(),
+                    corners[1].GetColorValue()
+                };
+
+                corners[0].ChangeColor(cornerValues[0]);
+                corners[1].ChangeColor(cornerValues[1]);
+                corners[2].ChangeColor(cornerValues[2]);
+                corners[3].ChangeColor(cornerValues[3]);
+
+            }
+
+        }
+
+        controller.RefreshTileOverlayShader();
+        RefreshView();
+
+    }
+
+    public void OnClickFlipHorizontally() {
+
+        var tile = controller.selectedTiles[0];
+
+        if (tile.shaders.type == VertexColorType.MonoChrome || tile.shaders.type == VertexColorType.ColorAnimated) {
+            return;
+        }
+
+        if (tile.shaders.type == VertexColorType.DynamicMonoChrome) {
+
+            var mono = (DynamicMonoChromeShader)tile.shaders;
+
+            if (mono.isQuad) {
+
+                var cornerValues = new List<int> {
+                    corners[1].GetMonochromeValue(),
+                    corners[0].GetMonochromeValue(),
+                    corners[3].GetMonochromeValue(),
+                    corners[2].GetMonochromeValue()
+                };
+
+                corners[0].ChangeMonoValue(cornerValues[0]);
+                corners[1].ChangeMonoValue(cornerValues[1]);
+                corners[2].ChangeMonoValue(cornerValues[2]);
+                corners[3].ChangeMonoValue(cornerValues[3]);
+
+            }
+
+
+        }
+        else if (tile.shaders.type == VertexColorType.Color) {
+
+            var color = (ColorShader)tile.shaders;
+
+            if (color.isQuad) {
+
+                var cornerValues = new List<XRGB555> {
+                    corners[1].GetColorValue(),
+                    corners[0].GetColorValue(),
+                    corners[3].GetColorValue(),
+                    corners[2].GetColorValue()
+                };
+
+                corners[0].ChangeColor(cornerValues[0]);
+                corners[1].ChangeColor(cornerValues[1]);
+                corners[2].ChangeColor(cornerValues[2]);
+                corners[3].ChangeColor(cornerValues[3]);
+
+            }
+
+        }
+
+        controller.RefreshTileOverlayShader();
+        RefreshView();
 
     }
 
