@@ -90,4 +90,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shaderMapper: {fileID: 8615949219453062521, guid: e2731e21700846148a18df7f8352a899, type: 3}
+  shaderPresetPanel: {fileID: 1369666686304929049, guid: e90c7664c6f1c7848999b2eb02b4fa5c, type: 3}
   activeShaderMapper: {fileID: 0}
+  activeShaderPresetPanel: {fileID: 0}

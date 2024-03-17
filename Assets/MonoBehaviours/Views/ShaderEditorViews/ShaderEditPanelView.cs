@@ -6,14 +6,22 @@ public class ShaderEditPanelView : MonoBehaviour {
 
     // Prefabs
     public GameObject shaderMapper;
+    public GameObject shaderPresetPanel;
 
     public ShaderEditMode controller;
 
     public GameObject activeShaderMapper = null;
+    public GameObject activeShaderPresetPanel = null;
 
     void Start() {
 
         controller.view = this;
+
+        activeShaderPresetPanel = Instantiate(shaderPresetPanel);
+
+        activeShaderPresetPanel.GetComponent<ShaderPresetsView>().controller = controller;
+
+        activeShaderPresetPanel.transform.SetParent(transform.parent, false);
 
     }
 
@@ -44,6 +52,10 @@ public class ShaderEditPanelView : MonoBehaviour {
         //    controller.selectedSection.RefreshMesh();
         //}
 
+    }
+
+    public void ClosePresetPanel() {
+        Destroy(activeShaderPresetPanel);
     }
 
 }

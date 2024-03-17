@@ -6,7 +6,9 @@ using System.Linq;
 
 public class UVPresets {
 
-    public static UVPresets ReadFile(string fileName) {
+    public static string tag = "TEXTTAG";
+
+    public static UVPresets ReadFileOld(string fileName) {
 
         var file = File.ReadAllText(fileName);
 
@@ -169,39 +171,38 @@ public class UVPresets {
         directoryName = "";
     }
 
-    public void SaveToFile() {
+    public string Compile() {
 
-        if (parent != null) { return; }
+        if (parent != null) { return ""; }
 
         string SavePreset(List<UVPreset> presets) {
 
             var total = "";
 
-            var addCommaPreset = false;
             foreach (var preset in presets) {
 
-                if (addCommaPreset) {
-                    total += ",";
-                }
+                total += "(";
 
-                total += "(\"" + preset.name + "\",";
+                total += "\"" + preset.name + "\",";
+                total += preset.texturePalette.ToString() + ",";
+                total += preset.meshID.ToString() + ",";
+
 
                 total += "[";
-
-                var addCommaUV = false;
                 foreach (var uv in preset.uvs) {
 
-                    if (addCommaUV) {
-                        total += ",";
-                    }
+                    total += uv.ToString() + ",";
 
-                    total += uv.ToString();
-
-                    addCommaUV = true;
                 }
+                total = total.Remove(total.Length - 1);
 
-                total += "]," + preset.texturePalette.ToString() + ")";
+                total += "]),";
 
+            }
+
+            // Removes the access comma
+            if (total != "") {
+                total = total.Remove(total.Length - 1);
             }
 
             return total;
@@ -241,7 +242,7 @@ public class UVPresets {
 
         var total = SavePresets(this);
 
-        File.WriteAllText("TexturePresets/" + directoryName + ".txt", total);
+        return total;
 
     }
 
@@ -252,11 +253,13 @@ public class UVPreset {
     public List<int> uvs;
     public int texturePalette;
     public string name;
+    public int meshID;
 
-    public UVPreset(List<int> uvs, int texturePalette, string name) {
+    public UVPreset(List<int> uvs, int texturePalette, string name, int meshID) {
         this.uvs = new List<int>(uvs);
         this.texturePalette = texturePalette;
         this.name = name;
+        this.meshID = meshID;
     }
 
     public UVPreset() {

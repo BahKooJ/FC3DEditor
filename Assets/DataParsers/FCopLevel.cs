@@ -1529,6 +1529,8 @@ namespace FCopParser {
 
         public List<byte> Compile();
 
+        public TileShaders Clone();
+
     }
 
     public class MonoChromeShader : TileShaders {
@@ -1583,6 +1585,12 @@ namespace FCopParser {
 
         public List<byte> Compile() {
             return new List<byte> { value };
+        }
+
+        public TileShaders Clone() {
+
+            return new MonoChromeShader(value, isQuad);
+
         }
 
     }
@@ -1671,6 +1679,12 @@ namespace FCopParser {
 
         }
 
+        public TileShaders Clone() {
+
+            return new DynamicMonoChromeShader(this.Compile(), isQuad);
+
+        }
+
     }
 
     public class ColorShader : TileShaders {
@@ -1702,6 +1716,17 @@ namespace FCopParser {
             }
 
             values = colors.ToArray();
+
+            Apply();
+
+        }
+
+        public ColorShader(XRGB555[] values, bool isQuad) {
+
+            this.isQuad = isQuad;
+            type = VertexColorType.Color;
+
+            this.values = values;
 
             Apply();
 
@@ -1768,6 +1793,18 @@ namespace FCopParser {
 
         }
 
+        public TileShaders Clone() {
+
+            var colors = new List<XRGB555>();
+
+            foreach (var color in values) {
+                colors.Add(color.Clone());
+            }
+
+            return new ColorShader(colors.ToArray(), isQuad);
+
+        }
+
     }
 
     // Same with this
@@ -1807,6 +1844,10 @@ namespace FCopParser {
 
         public List<byte> Compile() {
             return new List<byte> { 0 };
+        }
+
+        public TileShaders Clone() {
+            return new AnimatedShader(this.isQuad);
         }
 
     }

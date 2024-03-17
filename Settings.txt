@@ -7,7 +7,7 @@ Inputs = {
 "CameraDown":"Q"
 "CameraWorldUp":"Space"
 "CameraWorldDown":"LeftControl"
-"CameraEnable":"#2"
+"CameraEnable":"#3"
 "GeometryEditingMode":"G"
 "TileBuildingMode":"T"
 "SectionEditingMode":"Y"

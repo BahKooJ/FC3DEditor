@@ -8,7 +8,6 @@ using Object = UnityEngine.Object;
 public class TextureEditMode : EditMode {
 
     public static bool openUVMapperByDefault = true;
-    public static UVPresets rootUVPresets = new UVPresets("Texture Presets", null);
 
     public Main main { get; set; }
     public List<Tile> selectedTiles = new();
@@ -26,7 +25,7 @@ public class TextureEditMode : EditMode {
     }
 
     public void OnCreateMode() {
-        currentUVPresets = rootUVPresets;
+        currentUVPresets = Presets.uvPresets;
     }
 
     public void OnDestroy() {
@@ -312,7 +311,14 @@ public class TextureEditMode : EditMode {
 
         var firstTile = selectedTiles[0];
 
-        var uvPreset = new UVPreset(firstTile.uvs, firstTile.texturePalette, "");
+        var potentialID = MeshType.IDFromVerticies(firstTile.verticies);
+
+        if (potentialID == null) {
+            DialogWindowUtil.Dialog("Cannot Save Preset", "Cannot save shader preset, tile mesh is invalid!");
+            return false;
+        }
+
+        var uvPreset = new UVPreset(firstTile.uvs, firstTile.texturePalette, "", (int)potentialID);
 
         currentUVPresets.presets.Add(uvPreset);
 

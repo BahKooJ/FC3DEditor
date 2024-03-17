@@ -117,13 +117,14 @@ public class TexturePresetsView : MonoBehaviour {
 
     public void OnClickSavePresetsButton() {
 
-        OpenFileWindowUtil.SaveFile("TexturePresets", TextureEditMode.rootUVPresets.directoryName, path => {
+        OpenFileWindowUtil.SaveFile("TexturePresets", "Presets", path => {
 
             var fileName = Utils.RemovePathingFromFilePath(path);
 
-            TextureEditMode.rootUVPresets.directoryName = Utils.RemoveExtensionFromFileName(fileName);
+            Presets.uvPresets.directoryName = Utils.RemoveExtensionFromFileName(fileName);
+            Presets.shaderPresets.directoryName = Utils.RemoveExtensionFromFileName(fileName);
 
-            TextureEditMode.rootUVPresets.SaveToFile();
+            Presets.SaveToFile(Utils.RemoveExtensionFromFileName(fileName));
 
         });
 
@@ -133,9 +134,9 @@ public class TexturePresetsView : MonoBehaviour {
 
         OpenFileWindowUtil.OpenFile("TexturePresets", "", path => {
 
-            TextureEditMode.rootUVPresets = UVPresets.ReadFile(path);
+            Presets.ReadFile(path);
 
-            controller.currentUVPresets = TextureEditMode.rootUVPresets;
+            controller.currentUVPresets = Presets.uvPresets;
 
             Refresh();
 

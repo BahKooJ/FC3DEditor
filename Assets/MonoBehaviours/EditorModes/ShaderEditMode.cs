@@ -9,6 +9,7 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 
 public class ShaderEditMode : EditMode {
+
     public Main main { get; set; }
     public List<Tile> selectedTiles = new();
     public TileColumn selectedColumn = null;
@@ -17,6 +18,8 @@ public class ShaderEditMode : EditMode {
     public GameObject selectedSectionOverlay = null;
 
     public ShaderEditPanelView view;
+
+    public ShaderPresets currentShaderPresets;
 
     public ShaderEditMode(Main main) {
         this.main = main;
@@ -42,11 +45,12 @@ public class ShaderEditMode : EditMode {
     }
 
     public void OnCreateMode() {
-
+        currentShaderPresets = Presets.shaderPresets;
     }
 
     public void OnDestroy() {
         view.CloseShaderMapper();
+        view.ClosePresetPanel();
         ClearAllSelectedItems();
     }
 
@@ -261,6 +265,35 @@ public class ShaderEditMode : EditMode {
         if (view.activeShaderMapper != null) {
             view.activeShaderMapper.GetComponent<ShaderMapperView>().RefreshView();
         }
+
+    }
+
+    public bool AddPreset() {
+
+        if (selectedTiles.Count == 0) { return false; }
+
+        var firstTile = selectedTiles[0];
+
+        if (firstTile.shaders is AnimatedShader) { return false; }
+
+        var potentialID = MeshType.IDFromVerticies(firstTile.verticies);
+
+        if (potentialID == null) {
+            DialogWindowUtil.Dialog("Cannot Save Preset", "Cannot save shader preset, tile mesh is invalid!");
+            return false; 
+        }
+
+        var shaderPreset = new ShaderPreset(firstTile.shaders, "", (int)potentialID);
+
+        currentShaderPresets.presets.Add(shaderPreset);
+
+        return true;
+
+    }
+
+    public void AddPresetsDirectory() {
+
+        currentShaderPresets.subFolders.Add(new ShaderPresets("", currentShaderPresets));
 
     }
 

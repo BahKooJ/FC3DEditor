@@ -311,7 +311,7 @@ public class ShaderMapperView : MonoBehaviour {
         List<Color> vertexColors = new();
         List<Vector2> textureCords = new();
 
-        AddVerticies(tile);
+        vertices = MeshUtils.FlatScreenVerticies(tile.verticies, meshSize);
         //vertices = new List<Vector3>() { new Vector3(0, 0), new Vector3(meshSize, 0), new Vector3(0, -meshSize), new Vector3(meshSize, -meshSize) };
 
         textureCords.Add(new Vector2(
@@ -358,146 +358,6 @@ public class ShaderMapperView : MonoBehaviour {
 
     }
 
-    // This code is... very verbose
-    void AddVerticies(Tile tile) {
-
-        var isWall = false;
-
-        var lowestHeight = 10;
-        var positions = new List<VertexPosition>();
-        foreach (var vert in tile.verticies) {
-
-            if (lowestHeight > vert.heightChannel) {
-                lowestHeight = vert.heightChannel;
-            }
-
-            if (positions.Contains(vert.vertexPosition)) {
-                isWall = true;
-            }
-
-            positions.Add(vert.vertexPosition);
-
-        }
-
-        if (isWall) {
-
-            var isTop = positions.Contains(VertexPosition.TopLeft) && positions.Contains(VertexPosition.TopRight);
-            var isLeft = positions.Contains(VertexPosition.TopLeft) && positions.Contains(VertexPosition.BottomLeft);
-            var isDiagnal = 
-                positions.Contains(VertexPosition.TopLeft) && positions.Contains(VertexPosition.BottomRight) ||
-                positions.Contains(VertexPosition.BottomLeft) && positions.Contains(VertexPosition.TopRight);
-
-
-            foreach (var point in tile.verticies) {
-
-                switch (point.vertexPosition) {
-
-                    case VertexPosition.TopLeft:
-
-                        if (point.heightChannel == lowestHeight) {
-
-                            vertices.Add(new Vector3(0, -meshSize));
-
-                        }
-                        else {
-
-                            vertices.Add(new Vector3(x: 0, y: 0));
-
-                        }
-
-                        break;
-                    case VertexPosition.TopRight:
-
-                        if (point.heightChannel == lowestHeight) {
-
-                            vertices.Add(new Vector3(meshSize, -meshSize));
-
-                        }
-                        else {
-
-                            vertices.Add(new Vector3(meshSize, 0));
-
-                        }
-
-                        break;
-                    case VertexPosition.BottomLeft:
-
-                        if (isDiagnal) {
-
-                            if (point.heightChannel == lowestHeight) {
-
-                                vertices.Add(new Vector3(0, -meshSize));
-
-                            }
-                            else {
-
-                                vertices.Add(new Vector3(x: 0, y: 0));
-
-                            }
-
-                        } else {
-
-                            if (point.heightChannel == lowestHeight) {
-
-                                vertices.Add(new Vector3(meshSize, -meshSize));
-
-                            }
-                            else {
-
-                                vertices.Add(new Vector3(meshSize, 0));
-
-                            }
-
-                        }
-
-                        break;
-                    case VertexPosition.BottomRight:
-
-                        if (point.heightChannel == lowestHeight) {
-
-                            vertices.Add(new Vector3(meshSize, -meshSize));
-
-                        }
-                        else {
-
-                            vertices.Add(new Vector3(meshSize, 0));
-
-                        }
-
-                        break;
-                }
-
-            }
-
-            return;
-        }
-
-        foreach (var point in tile.verticies) {
-
-            switch (point.vertexPosition) {
-
-                case VertexPosition.TopLeft:
-                    vertices.Add(new Vector3(x: 0, y: 0));
-
-                    break;
-                case VertexPosition.TopRight:
-                    vertices.Add(new Vector3(meshSize, 0));
-
-                    break;
-                case VertexPosition.BottomLeft:
-                    vertices.Add(new Vector3(0, -meshSize));
-
-                    break;
-                case VertexPosition.BottomRight:
-                    vertices.Add(new Vector3(meshSize, -meshSize));
-
-                    break;
-            }
-
-        }
-
-    }
-
     void GenerateTriangle() {
 
         var tile = controller.selectedTiles[0];
@@ -505,7 +365,7 @@ public class ShaderMapperView : MonoBehaviour {
         List<Color> vertexColors = new();
         List<Vector2> textureCords = new();
 
-        AddVerticies(tile);
+        vertices = MeshUtils.FlatScreenVerticies(tile.verticies, meshSize);
 
         textureCords.Add(new Vector2(
             TextureCoordinate.GetX(tile.uvs[0] + tile.texturePalette * 65536),

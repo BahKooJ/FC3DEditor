@@ -6,10 +6,11 @@ Shader "Unlit/LevelMeshSader"
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags { "RenderType"="Transparent" }
         LOD 100
 
         Cull Off
+        //Blend SrcAlpha OneMinusSrcAlpha
 
         Pass
         {
@@ -50,6 +51,7 @@ Shader "Unlit/LevelMeshSader"
             {
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv);
+                //clip(col.a - 1);
                 return col * i.color;
             }
             ENDCG
