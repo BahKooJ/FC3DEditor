@@ -8,6 +8,7 @@ public class UVPresets {
 
     public static string tag = "TEXTTAG";
 
+    // This is the old method for parsing texture presets
     public static UVPresets ReadFileOld(string fileName) {
 
         var file = File.ReadAllText(fileName);
@@ -100,6 +101,12 @@ public class UVPresets {
                 lookingForPaletteNum = false;
 
                 value = "";
+
+                if (currentUVPreset.uvs.Count == 4) {
+                    currentUVPreset.meshID = 68;
+                } else {
+                    currentUVPreset.meshID = 0;
+                }
 
                 opened.Last().presets.Add(currentUVPreset);
 

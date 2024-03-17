@@ -1561,6 +1561,10 @@ namespace FCopParser {
 
         }
 
+        public MonoChromeShader() {
+            type = VertexColorType.MonoChrome;
+        }
+
         public void Apply() {
 
             var color = value / white;
@@ -1639,6 +1643,11 @@ namespace FCopParser {
 
             Apply();
 
+        }
+
+        public DynamicMonoChromeShader() {
+            type = VertexColorType.DynamicMonoChrome;
+            values = new int[0];
         }
 
         public void Apply() {
@@ -1748,6 +1757,13 @@ namespace FCopParser {
 
         }
 
+        public ColorShader() {
+
+            type = VertexColorType.Color;
+            values = new XRGB555[0];
+
+        }
+
         public void Apply() {
 
             var total = new List<float[]>();
@@ -1819,6 +1835,10 @@ namespace FCopParser {
             this.isQuad = isQuad;
             type = VertexColorType.ColorAnimated;
             Apply();
+        }
+
+        public AnimatedShader() {
+            type = VertexColorType.ColorAnimated;
         }
 
         public void Apply() {

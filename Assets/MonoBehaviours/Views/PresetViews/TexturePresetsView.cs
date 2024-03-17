@@ -117,7 +117,7 @@ public class TexturePresetsView : MonoBehaviour {
 
     public void OnClickSavePresetsButton() {
 
-        OpenFileWindowUtil.SaveFile("TexturePresets", "Presets", path => {
+        OpenFileWindowUtil.SaveFile("Presets", "Presets", path => {
 
             var fileName = Utils.RemovePathingFromFilePath(path);
 
@@ -132,7 +132,7 @@ public class TexturePresetsView : MonoBehaviour {
 
     public void OnClickOpenPresetsButton() {
 
-        OpenFileWindowUtil.OpenFile("TexturePresets", "", path => {
+        OpenFileWindowUtil.OpenFile("Presets", "", path => {
 
             Presets.ReadFile(path);
 

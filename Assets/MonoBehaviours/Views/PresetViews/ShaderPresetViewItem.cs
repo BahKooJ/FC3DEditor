@@ -65,7 +65,7 @@ public class ShaderPresetViewItem : MonoBehaviour {
 
         }
 
-        if (preset.meshID > 70) {
+        if (preset.meshID > 70 && preset.shader.type != VertexColorType.MonoChrome) {
             typeText.text = "(Wall) " + typeText.text;
         }
 

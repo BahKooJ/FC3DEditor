@@ -152,4 +152,8 @@ public class ShaderPreset {
         this.meshID = meshID;
     }
 
+    public ShaderPreset() {
+
+    }
+
 }
