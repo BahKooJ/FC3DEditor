@@ -56,6 +56,8 @@ public class Main : MonoBehaviour {
 
         RenderFullMap();
 
+        //RenderSection(3);
+
     }
 
     void Update() {
@@ -239,6 +241,8 @@ public class Main : MonoBehaviour {
 
             var bmpTexture = new Texture2D(256, 256, TextureFormat.ARGB32, false);
 
+            bmpTexture.filterMode = FilterMode.Point;
+
             bmpTexture.LoadRawTextureData(bmp.ConvertToARGB32());
             bmpTexture.Apply();
 
@@ -247,6 +251,7 @@ public class Main : MonoBehaviour {
         }
 
         var texture = new Texture2D(256, 2560, TextureFormat.ARGB32, false);
+        texture.filterMode = FilterMode.Point;
         var texturePallet = new List<byte>();
 
         texturePallet.AddRange(level.textures[0].ConvertToARGB32());

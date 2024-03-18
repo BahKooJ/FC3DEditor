@@ -10,7 +10,6 @@ Shader "Unlit/LevelMeshSader"
         LOD 100
 
         Cull Off
-        //Blend SrcAlpha OneMinusSrcAlpha
 
         Pass
         {
@@ -42,7 +41,6 @@ Shader "Unlit/LevelMeshSader"
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                UNITY_TRANSFER_FOG(o,o.vertex);
                 o.color = v.color;
                 return o;
             }
@@ -51,7 +49,7 @@ Shader "Unlit/LevelMeshSader"
             {
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv);
-                //clip(col.a - 1);
+                clip(col.a - 0.1);
                 return col * i.color;
             }
             ENDCG
