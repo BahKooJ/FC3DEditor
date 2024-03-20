@@ -1,15 +1,15 @@
-Shader "Unlit/LevelMeshSader"
+Shader "Unlit/LevelMeshSaderTransparent"
 {
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _ClipBlack ("Clip Black", Float) = 0.1
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags { "Queue" = "Transparent" "RenderType"="Transparent" }
         LOD 100
 
+        Blend SrcAlpha OneMinusSrcAlpha
         Cull Off
 
         Pass
@@ -36,7 +36,6 @@ Shader "Unlit/LevelMeshSader"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
-            Float _ClipBlack;
 
             v2f vert (appdata v)
             {
@@ -51,7 +50,7 @@ Shader "Unlit/LevelMeshSader"
             {
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv);
-                clip(col.a - _ClipBlack);
+                clip(col.a - 0.1);
                 return col * i.color;
             }
             ENDCG

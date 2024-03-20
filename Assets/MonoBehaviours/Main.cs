@@ -74,6 +74,11 @@ public class Main : MonoBehaviour {
             showShaders = !showShaders;
             RefreshLevel();
         }
+        if (Input.GetKeyDown(KeyCode.K)) {
+            SettingsManager.showTransparency = !SettingsManager.showTransparency;
+            SettingsManager.clipBlack = !SettingsManager.clipBlack;
+            RefreshLevel();
+        }
 
     }
 
@@ -241,7 +246,9 @@ public class Main : MonoBehaviour {
 
             var bmpTexture = new Texture2D(256, 256, TextureFormat.ARGB32, false);
 
-            bmpTexture.filterMode = FilterMode.Point;
+            if (SettingsManager.renderMode == RenderType.Pixelated) {
+                bmpTexture.filterMode = FilterMode.Point;
+            }
 
             bmpTexture.LoadRawTextureData(bmp.ConvertToARGB32());
             bmpTexture.Apply();
@@ -250,8 +257,13 @@ public class Main : MonoBehaviour {
 
         }
 
-        var texture = new Texture2D(256, 2560, TextureFormat.ARGB32, false);
-        texture.filterMode = FilterMode.Point;
+        // Height = Cbmp height * Cbmp Count + Black Padding
+        var texture = new Texture2D(256, 2580, TextureFormat.ARGB32, false);
+
+        if (SettingsManager.renderMode == RenderType.Pixelated) {
+            texture.filterMode = FilterMode.Point;
+        }
+
         var texturePallet = new List<byte>();
 
         texturePallet.AddRange(level.textures[0].ConvertToARGB32());
@@ -264,6 +276,17 @@ public class Main : MonoBehaviour {
         texturePallet.AddRange(level.textures[7].ConvertToARGB32());
         texturePallet.AddRange(level.textures[8].ConvertToARGB32());
         texturePallet.AddRange(level.textures[9].ConvertToARGB32());
+
+        // This is here to add a section of black to the texture.
+        // This is used for prevent tiles to display.
+        foreach (var _ in Enumerable.Range(0, 20)) {
+
+            foreach (var i in Enumerable.Range(0, 256)) {
+                texturePallet.AddRange(new List<byte> { 0, 0, 255, 0 });
+            }
+
+        }
+
 
         texture.LoadRawTextureData(texturePallet.ToArray());
         texture.Apply();

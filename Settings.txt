@@ -29,3 +29,4 @@ Inputs = {
 "ModifierChannelSelect3":"Alpha3"
 "ChangeModes":"Alpha1"
 }
+RenderMode = "Pixelated";

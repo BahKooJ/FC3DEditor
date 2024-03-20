@@ -646,7 +646,7 @@ namespace FCopParser {
             return (offset % width) / width;
         }
 
-        static public float GetY(int offset, float width = 256f, float height = 2560f) {
+        static public float GetY(int offset, float width = 256f, float height = 2580f) {
             return (float)Math.Floor(offset / width) / height;
         }
 

@@ -9,6 +9,10 @@ public abstract class SettingsManager {
 
     public static Dictionary<string, string> keyBinds = new();
 
+    public static RenderType renderMode = RenderType.Smooth;
+    public static bool showTransparency = true;
+    public static bool clipBlack = true;
+
     static public void ParseSettings() {
 
         var fileContents = File.ReadAllText("Settings.txt");
@@ -32,6 +36,22 @@ public abstract class SettingsManager {
 
                         keyBinds.Add(values[offset], values[offset + 1]);
 
+                    }
+
+                }
+
+            } 
+            else {
+
+                if (property == "RenderMode") {
+
+                    switch (values[0]) {
+                        case "Smooth":
+                            renderMode = RenderType.Smooth;
+                            break;
+                        case "Pixelated":
+                            renderMode = RenderType.Pixelated;
+                            break;
                     }
 
                 }
@@ -71,6 +91,11 @@ public abstract class SettingsManager {
                     continue;
                 }
 
+                if (c == ';') {
+                    CloseSet();
+                    continue;
+                }
+
                 if (insideData) {
 
                     values[values.Count - 1] = values.Last() + c;
@@ -86,7 +111,7 @@ public abstract class SettingsManager {
                 continue;
             }
 
-            if (c != ' ') {
+            if (c != ' ' && c != '\n') {
                 property += c;
             }
 
@@ -105,7 +130,9 @@ public abstract class SettingsManager {
             total += "\"" + binds.Key + "\":\"" + binds.Value + "\"\n";
         }
 
-        total += "}";
+        total += "}\n";
+
+        total += "RenderMode = \"" + renderMode.ToString() + "\";";
 
         File.WriteAllText("Settings.txt", total);
 
@@ -195,5 +222,12 @@ public abstract class Controls {
         }
 
     }
+
+}
+
+public enum RenderType {
+
+    Smooth = 0,
+    Pixelated = 1
 
 }

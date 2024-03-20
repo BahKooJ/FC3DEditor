@@ -8,6 +8,49 @@ using UnityEngine.UI;
 
 public class LevelMesh : MonoBehaviour {
 
+    class SubMesh {
+
+        public Mesh mesh = new Mesh();
+        public MeshRenderer meshRenderer;
+
+        public List<Vector3> vertices = new List<Vector3>();
+        public List<int> triangles = new List<int>();
+        public List<Vector2> textureCords = new List<Vector2>();
+        public List<Color> vertexColors = new();
+
+        public int vertexIndex = 0;
+
+        public void ClearMesh() {
+            vertexIndex = 0;
+            mesh.Clear();
+            vertices.Clear();
+            triangles.Clear();
+            textureCords.Clear();
+            vertexColors.Clear();
+        }
+
+        public void SetMesh() {
+
+            mesh.vertices = vertices.ToArray();
+            mesh.triangles = triangles.ToArray();
+
+            mesh.uv = textureCords.ToArray();
+            if (Main.showShaders) {
+                mesh.colors = vertexColors.ToArray();
+            }
+            else {
+                mesh.colors = new Color[0];
+            }
+
+            mesh.RecalculateNormals();
+
+        }
+
+    }
+
+    // Prefabs
+    public GameObject subMeshTransparent;
+
     Mesh mesh;
     MeshRenderer meshRenderer;
     public MeshCollider meshCollider;
@@ -16,7 +59,7 @@ public class LevelMesh : MonoBehaviour {
     public Texture2D levelTexturePallet;
     public Main controller;
 
-    public GameObject debugText;
+    SubMesh transparentSubMesh;
 
     List<Vector3> vertices = new List<Vector3>();
     List<int> triangles = new List<int>();
@@ -37,6 +80,13 @@ public class LevelMesh : MonoBehaviour {
         meshCollider = GetComponent<MeshCollider>();
         meshRenderer = GetComponent<MeshRenderer>();
 
+        transparentSubMesh = new();
+        var subMesh = Instantiate(subMeshTransparent);
+        subMesh.transform.SetParent(transform, false);
+        subMesh.GetComponent<MeshFilter>().mesh = transparentSubMesh.mesh;
+        transparentSubMesh.meshRenderer = subMesh.GetComponent<MeshRenderer>();
+        transparentSubMesh.meshRenderer.material.mainTexture = levelTexturePallet;
+
         meshRenderer.material.mainTexture = levelTexturePallet;
         RefreshMesh();
 
@@ -54,7 +104,9 @@ public class LevelMesh : MonoBehaviour {
         var index = 0;
         foreach (var column in section.tileColumns) {
 
-            void AddVerticies(Tile tile) {
+            List<Vector3> AddVerticies(Tile tile) {
+
+                var vertices = new List<Vector3>();
 
                 foreach (var point in tile.verticies) {
 
@@ -80,34 +132,88 @@ public class LevelMesh : MonoBehaviour {
 
                 }
 
+                return vertices;
+
+            }
+
+            Vector2 GetTextureCoord(Tile tile, int i) {
+                return new Vector2(
+                        TextureCoordinate.GetX(tile.uvs[i] + tile.texturePalette * 65536),
+                        TextureCoordinate.GetY(tile.uvs[i] + tile.texturePalette * 65536)
+                    );
+            }
+
+            void MakeEmptyTile(bool isQuad) {
+
+                if (isQuad) {
+
+                    textureCords.Add(new Vector2(5f / 256f, 2565f / 2580f));
+                    textureCords.Add(new Vector2(10f / 256f, 2565f / 2580f));
+                    textureCords.Add(new Vector2(5f / 256f, 2570f / 2580f));
+                    textureCords.Add(new Vector2(10f / 256f, 2570f / 2580f));
+
+                    vertexColors.Add(Color.white);
+                    vertexColors.Add(Color.white);
+                    vertexColors.Add(Color.white);
+                    vertexColors.Add(Color.white);
+
+
+
+                }
+                else {
+
+                    textureCords.Add(new Vector2(5f / 256f, 2565f / 2580f));
+                    textureCords.Add(new Vector2(10f / 256f, 2565f / 2580f));
+                    textureCords.Add(new Vector2(5f / 256f, 2570f / 2580f));
+
+                    vertexColors.Add(Color.white);
+                    vertexColors.Add(Color.white);
+                    vertexColors.Add(Color.white);
+
+                }
+
             }
 
             void GenerateTriangle(Tile tile) {
 
-                AddVerticies(tile);
+                vertices.AddRange(AddVerticies(tile));
 
-                textureCords.Add(new Vector2(
-                    TextureCoordinate.GetX(tile.uvs[0] + tile.texturePalette * 65536),
-                    TextureCoordinate.GetY(tile.uvs[0] + tile.texturePalette * 65536)
-                ));
+                if (tile.graphics.isSemiTransparent == 1 && SettingsManager.showTransparency) {
 
-                textureCords.Add(new Vector2(
-                    TextureCoordinate.GetX(tile.uvs[2] + tile.texturePalette * 65536),
-                    TextureCoordinate.GetY(tile.uvs[2] + tile.texturePalette * 65536)
-                ));
+                    MakeEmptyTile(false);
 
-                textureCords.Add(new Vector2(
-                    TextureCoordinate.GetX(tile.uvs[1] + tile.texturePalette * 65536),
-                    TextureCoordinate.GetY(tile.uvs[1] + tile.texturePalette * 65536)
-                ));
+                    transparentSubMesh.vertices.AddRange(AddVerticies(tile));
+
+                    transparentSubMesh.textureCords.Add(GetTextureCoord(tile, 0));
+                    transparentSubMesh.textureCords.Add(GetTextureCoord(tile, 2));
+                    transparentSubMesh.textureCords.Add(GetTextureCoord(tile, 1));
+
+                    transparentSubMesh.vertexColors.Add(new Color(tile.shaders.colors[0][0], tile.shaders.colors[0][1], tile.shaders.colors[0][2]));
+                    transparentSubMesh.vertexColors.Add(new Color(tile.shaders.colors[1][0], tile.shaders.colors[1][1], tile.shaders.colors[1][2]));
+                    transparentSubMesh.vertexColors.Add(new Color(tile.shaders.colors[2][0], tile.shaders.colors[2][1], tile.shaders.colors[2][2]));
+
+                    transparentSubMesh.triangles.Add(transparentSubMesh.vertexIndex);
+                    transparentSubMesh.triangles.Add(transparentSubMesh.vertexIndex + 1);
+                    transparentSubMesh.triangles.Add(transparentSubMesh.vertexIndex + 2);
+
+                    transparentSubMesh.vertexIndex += 3;
+
+                }
+                else {
+
+                    textureCords.Add(GetTextureCoord(tile, 0));
+                    textureCords.Add(GetTextureCoord(tile, 2));
+                    textureCords.Add(GetTextureCoord(tile, 1));
+
+                    vertexColors.Add(new Color(tile.shaders.colors[0][0], tile.shaders.colors[0][1], tile.shaders.colors[0][2]));
+                    vertexColors.Add(new Color(tile.shaders.colors[1][0], tile.shaders.colors[1][1], tile.shaders.colors[1][2]));
+                    vertexColors.Add(new Color(tile.shaders.colors[2][0], tile.shaders.colors[2][1], tile.shaders.colors[2][2]));
+
+                }
 
                 triangles.Add(vertexIndex);
                 triangles.Add(vertexIndex + 1);
                 triangles.Add(vertexIndex + 2);
-
-                vertexColors.Add(new Color(tile.shaders.colors[0][0], tile.shaders.colors[0][1], tile.shaders.colors[0][2]));
-                vertexColors.Add(new Color(tile.shaders.colors[1][0], tile.shaders.colors[1][1], tile.shaders.colors[1][2]));
-                vertexColors.Add(new Color(tile.shaders.colors[2][0], tile.shaders.colors[2][1], tile.shaders.colors[2][2]));
 
                 vertexIndex += 3;
 
@@ -115,29 +221,48 @@ public class LevelMesh : MonoBehaviour {
 
             void GenerateSquare(Tile tile) {
 
-                AddVerticies(tile);
+                vertices.AddRange(AddVerticies(tile));
 
-                textureCords.Add(new Vector2(
-                    TextureCoordinate.GetX(tile.uvs[0] + tile.texturePalette * 65536),
-                    TextureCoordinate.GetY(tile.uvs[0] + tile.texturePalette * 65536)
-                ));
+                if (tile.graphics.isSemiTransparent == 1 && SettingsManager.showTransparency) {
 
-                textureCords.Add(new Vector2(
-                    TextureCoordinate.GetX(tile.uvs[1] + tile.texturePalette * 65536),
-                    TextureCoordinate.GetY(tile.uvs[1] + tile.texturePalette * 65536)
-                ));
+                    MakeEmptyTile(true);
 
-                textureCords.Add(new Vector2(
-                    TextureCoordinate.GetX(tile.uvs[3] + tile.texturePalette * 65536),
-                    TextureCoordinate.GetY(tile.uvs[3] + tile.texturePalette * 65536)
-                ));
+                    transparentSubMesh.vertices.AddRange(AddVerticies(tile));
 
-                textureCords.Add(new Vector2(
-                    TextureCoordinate.GetX(tile.uvs[2] + tile.texturePalette * 65536),
-                    TextureCoordinate.GetY(tile.uvs[2] + tile.texturePalette * 65536)
-                ));
+                    transparentSubMesh.textureCords.Add(GetTextureCoord(tile, 0));
+                    transparentSubMesh.textureCords.Add(GetTextureCoord(tile, 1));
+                    transparentSubMesh.textureCords.Add(GetTextureCoord(tile, 3));
+                    transparentSubMesh.textureCords.Add(GetTextureCoord(tile, 2));
 
+                    transparentSubMesh.vertexColors.Add(new Color(tile.shaders.colors[0][0], tile.shaders.colors[0][1], tile.shaders.colors[0][2]));
+                    transparentSubMesh.vertexColors.Add(new Color(tile.shaders.colors[1][0], tile.shaders.colors[1][1], tile.shaders.colors[1][2]));
+                    transparentSubMesh.vertexColors.Add(new Color(tile.shaders.colors[2][0], tile.shaders.colors[2][1], tile.shaders.colors[2][2]));
+                    transparentSubMesh.vertexColors.Add(new Color(tile.shaders.colors[3][0], tile.shaders.colors[3][1], tile.shaders.colors[3][2]));
 
+                    transparentSubMesh.triangles.Add(transparentSubMesh.vertexIndex);
+                    transparentSubMesh.triangles.Add(transparentSubMesh.vertexIndex + 2);
+                    transparentSubMesh.triangles.Add(transparentSubMesh.vertexIndex + 1);
+
+                    transparentSubMesh.triangles.Add(transparentSubMesh.vertexIndex + 1);
+                    transparentSubMesh.triangles.Add(transparentSubMesh.vertexIndex + 2);
+                    transparentSubMesh.triangles.Add(transparentSubMesh.vertexIndex + 3);
+
+                    transparentSubMesh.vertexIndex += 4;
+
+                }
+                else {
+
+                    textureCords.Add(GetTextureCoord(tile, 0));
+                    textureCords.Add(GetTextureCoord(tile, 1));
+                    textureCords.Add(GetTextureCoord(tile, 3));
+                    textureCords.Add(GetTextureCoord(tile, 2));
+
+                    vertexColors.Add(new Color(tile.shaders.colors[0][0], tile.shaders.colors[0][1], tile.shaders.colors[0][2]));
+                    vertexColors.Add(new Color(tile.shaders.colors[1][0], tile.shaders.colors[1][1], tile.shaders.colors[1][2]));
+                    vertexColors.Add(new Color(tile.shaders.colors[2][0], tile.shaders.colors[2][1], tile.shaders.colors[2][2]));
+                    vertexColors.Add(new Color(tile.shaders.colors[3][0], tile.shaders.colors[3][1], tile.shaders.colors[3][2]));
+
+                }
 
                 triangles.Add(vertexIndex);
                 triangles.Add(vertexIndex + 2);
@@ -147,27 +272,14 @@ public class LevelMesh : MonoBehaviour {
                 triangles.Add(vertexIndex + 2);
                 triangles.Add(vertexIndex + 3);
 
-                vertexColors.Add(new Color(tile.shaders.colors[0][0], tile.shaders.colors[0][1], tile.shaders.colors[0][2]));
-                vertexColors.Add(new Color(tile.shaders.colors[1][0], tile.shaders.colors[1][1], tile.shaders.colors[1][2]));
-                vertexColors.Add(new Color(tile.shaders.colors[2][0], tile.shaders.colors[2][1], tile.shaders.colors[2][2]));
-                vertexColors.Add(new Color(tile.shaders.colors[3][0], tile.shaders.colors[3][1], tile.shaders.colors[3][2]));
-
                 vertexIndex += 4;
 
             }
 
-            //var tall = -5f;
+
             foreach (var tile in column.tiles) {
 
-
-                if (tile.verticies.Count == 0) {
-
-                    //var text = Instantiate(debugText, new Vector3(column.x + 0.5f + this.x, tall, -column.y - 0.5f - this.y), Quaternion.identity);
-                    //text.GetComponent<TextMeshPro>().text = tile.parsedTile.number5.ToString();
-
-                    //tall += 0.5f;
-
-                } else if (tile.verticies.Count == 3) {
+                if (tile.verticies.Count == 3) {
                     GenerateTriangle(tile);
                     sortedTilesByTriangle.Add(tile);
                 } else if (tile.verticies.Count == 4) {
@@ -175,11 +287,6 @@ public class LevelMesh : MonoBehaviour {
                     sortedTilesByTriangle.Add(tile);
                     sortedTilesByTriangle.Add(tile);
                 }
-
-                //var text = Instantiate(debugText, new Vector3(column.x + 0.5f + this.x, tall, -column.y - 0.5f - this.y), Quaternion.identity);
-                //text.GetComponent<TextMeshPro>().text = tile.parsedTile.number5.ToString();
-
-                //tall += 0.5f;
 
             }
 
@@ -197,7 +304,13 @@ public class LevelMesh : MonoBehaviour {
         vertexColors.Clear();
         sortedTilesByTriangle.Clear();
 
+        transparentSubMesh.ClearMesh();
+
         Generate(section);
+
+        if (transparentSubMesh.vertices.Count != 0) {
+            transparentSubMesh.SetMesh();
+        }
 
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
@@ -212,6 +325,13 @@ public class LevelMesh : MonoBehaviour {
         mesh.RecalculateNormals();
 
         meshCollider.sharedMesh = mesh;
+
+        if (SettingsManager.clipBlack) {
+            meshRenderer.material.SetFloat("_ClipBlack", 0.1f);
+        } else {
+            meshRenderer.material.SetFloat("_ClipBlack", 0f);
+        }
+
 
     }
 
