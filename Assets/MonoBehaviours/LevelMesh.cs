@@ -48,6 +48,50 @@ public class LevelMesh : MonoBehaviour {
 
     }
 
+    class AnimatedTile {
+
+        public Tile tile;
+        public int textureIndex;
+
+        int frame = 0;
+        float timmer = 0f;
+
+        public AnimatedTile(Tile tile, int textureIndex) {
+            this.tile = tile;
+            this.textureIndex = textureIndex;
+        }
+
+        public bool Update(LevelMesh mesh) {
+
+            var animationData = (TileUVAnimationMetaData)tile.uvAnimationData;
+
+            if (frame == animationData.frames) {
+                frame = 0;
+            }
+
+            ChangeTexture(mesh);
+
+            frame++;
+            return true;
+
+        }
+
+        public void ChangeTexture(LevelMesh mesh) {
+            mesh.textureCords[textureIndex] = GetTextureCoord(tile, frame + 1);
+            mesh.textureCords[textureIndex + 1] = GetTextureCoord(tile, frame);
+            mesh.textureCords[textureIndex + 2] = GetTextureCoord(tile, frame + 3);
+            mesh.textureCords[textureIndex + 3] = GetTextureCoord(tile, frame + 2);
+        }
+
+        Vector2 GetTextureCoord(Tile tile, int i) {
+            return new Vector2(
+                    TextureCoordinate.GetX(tile.animatedUVs[i] + tile.texturePalette * 65536),
+                    TextureCoordinate.GetY(tile.animatedUVs[i] + tile.texturePalette * 65536)
+                );
+        }
+
+    }
+
     // Prefabs
     public GameObject subMeshTransparent;
 
@@ -68,6 +112,8 @@ public class LevelMesh : MonoBehaviour {
     List<Color> vertexColors = new();
 
     public List<Tile> sortedTilesByTriangle = new List<Tile>();
+
+    List<AnimatedTile> animatedTiles = new();
 
     public float x = 0;
     public float y = 0;
@@ -94,7 +140,20 @@ public class LevelMesh : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-       
+
+        //var didChange = false;
+        //foreach (var tile in animatedTiles) {
+        //    var value = tile.Update(this);
+
+        //    if (value) {
+        //        didChange = true;
+        //    }
+
+        //}
+
+        //if (didChange) {
+        //    RefreshCurrentUVs();
+        //}
 
     }
 
@@ -279,6 +338,10 @@ public class LevelMesh : MonoBehaviour {
 
             foreach (var tile in column.tiles) {
 
+                if (tile.uvAnimationData != null) {
+                    animatedTiles.Add(new AnimatedTile(tile, vertexIndex));
+                }
+
                 if (tile.verticies.Count == 3) {
                     GenerateTriangle(tile);
                     sortedTilesByTriangle.Add(tile);
@@ -305,6 +368,7 @@ public class LevelMesh : MonoBehaviour {
         sortedTilesByTriangle.Clear();
 
         transparentSubMesh.ClearMesh();
+        animatedTiles.Clear();
 
         Generate(section);
 
@@ -339,6 +403,10 @@ public class LevelMesh : MonoBehaviour {
         levelTexturePallet = controller.levelTexturePallet;
         meshRenderer.material.mainTexture = levelTexturePallet;
 
+    }
+
+    public void RefreshCurrentUVs() {
+        mesh.uv = textureCords.ToArray();
     }
 
 }
