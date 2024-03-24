@@ -17,8 +17,9 @@ namespace FCopParser {
         const int heightMapLength = 867;
 
         const int renderDistanceOffset = 880;
-        const int rednerDistanceLength = 90;
+        const int rednerDistanceLength = 88;
 
+        const int animationVectorOffset = 968;
         const int tileCountOffset = 970;
 
         const int thirdSectionOffset = 972;
@@ -41,6 +42,7 @@ namespace FCopParser {
         // Sect
         public List<HeightPoint3> heightPoints = new();
         public List<ThirdSectionBitfield> thirdSectionBitfields = new();
+        public List<byte> animationVector = new();
         public List<TileBitfield> tiles = new();
         public List<int> textureCoordinates = new();
         public List<XRGB555> colors = new();
@@ -70,6 +72,9 @@ namespace FCopParser {
             tileCount = Utils.BytesToShort(rawFile.data.ToArray(), tileCountOffset);
 
             ParseThirdSection();
+
+            animationVector = rawFile.data.GetRange(animationVectorOffset, 2);
+
             ParseTiles();
             ParseTextures();
             ParseColors();
@@ -212,6 +217,8 @@ namespace FCopParser {
             compiledFile.AddRange(
                 rawFile.data.GetRange(renderDistanceOffset, rednerDistanceLength)
                 );
+
+            compiledFile.AddRange(animationVector);
 
             compiledFile.AddRange(BitConverter.GetBytes((short)tiles.Count));
 
@@ -727,6 +734,8 @@ namespace FCopParser {
     }
 
     public struct TileUVAnimationMetaData {
+
+        public const float secondsPerValue = 1f / 300f;
 
         public int frames;
         public int number1;

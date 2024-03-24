@@ -10,8 +10,10 @@ public abstract class SettingsManager {
     public static Dictionary<string, string> keyBinds = new();
 
     public static RenderType renderMode = RenderType.Smooth;
+    public static bool showShaders = true;
     public static bool showTransparency = true;
     public static bool clipBlack = true;
+    public static bool showAnimations = true;
 
     static public void ParseSettings() {
 

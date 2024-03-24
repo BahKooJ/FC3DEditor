@@ -9,7 +9,7 @@ public class Main : MonoBehaviour {
 
     public static bool ignoreAllInputs = false;
     public static bool debug = false;
-    public static bool showShaders = true;
+    
 
     public GameObject meshSection;
     public GameObject heightMapChannelPoint;
@@ -71,12 +71,16 @@ public class Main : MonoBehaviour {
         }
 
         if (Input.GetKeyDown(KeyCode.I)) {
-            showShaders = !showShaders;
+            SettingsManager.showShaders = !SettingsManager.showShaders;
             RefreshLevel();
         }
         if (Input.GetKeyDown(KeyCode.K)) {
             SettingsManager.showTransparency = !SettingsManager.showTransparency;
             SettingsManager.clipBlack = !SettingsManager.clipBlack;
+            RefreshLevel();
+        }
+        if (Input.GetKeyDown(KeyCode.L)) {
+            SettingsManager.showAnimations = !SettingsManager.showAnimations;
             RefreshLevel();
         }
 

@@ -1,10 +1,10 @@
+
 using FCopParser;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using TMPro;
+using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.UI;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
+
 
 public class LevelMesh : MonoBehaviour {
 
@@ -17,8 +17,27 @@ public class LevelMesh : MonoBehaviour {
         public List<int> triangles = new List<int>();
         public List<Vector2> textureCords = new List<Vector2>();
         public List<Color> vertexColors = new();
+        public List<AnimatedTile> animatedTiles = new();
 
         public int vertexIndex = 0;
+
+        public void Update() {
+
+            var didChange = false;
+            foreach (var tile in animatedTiles) {
+                var value = tile.Update(textureCords);
+
+                if (value) {
+                    didChange = true;
+                }
+
+            }
+
+            if (didChange) {
+                RefreshCurrentUVs();
+            }
+
+        }
 
         public void ClearMesh() {
             vertexIndex = 0;
@@ -27,6 +46,7 @@ public class LevelMesh : MonoBehaviour {
             triangles.Clear();
             textureCords.Clear();
             vertexColors.Clear();
+            animatedTiles.Clear();
         }
 
         public void SetMesh() {
@@ -35,7 +55,7 @@ public class LevelMesh : MonoBehaviour {
             mesh.triangles = triangles.ToArray();
 
             mesh.uv = textureCords.ToArray();
-            if (Main.showShaders) {
+            if (SettingsManager.showShaders) {
                 mesh.colors = vertexColors.ToArray();
             }
             else {
@@ -46,41 +66,160 @@ public class LevelMesh : MonoBehaviour {
 
         }
 
+        public void RefreshCurrentUVs() {
+            mesh.uv = textureCords.ToArray();
+        }
+
     }
 
-    class AnimatedTile {
+    interface AnimatedTile { 
 
-        public Tile tile;
-        public int textureIndex;
+        public Tile tile { get; set; }
+        public int textureIndex { get; set; }
+
+        public bool Update(List<Vector2> textureCoords);
+
+
+
+    }
+
+    class VectorAnimatedTile : AnimatedTile {
+
+        public Tile tile { get; set; }
+        public int textureIndex { get; set; }
+        public FCopLevelSection section;
+
+        int displacementX = 0;
+        int displacementY = 0;
+
+        public VectorAnimatedTile(Tile tile, int textureIndex, FCopLevelSection section) {
+            this.tile = tile;
+            this.textureIndex = textureIndex;
+            this.section = section;
+        }
+
+        float timerX = 0f;
+        float timerY = 0f;
+
+        public bool Update(List<Vector2> textureCoords) {
+
+            var didChange = false;
+
+            if (section.animationVector.x != 0) {
+
+                if (timerX >= AnimationVector.frameTime / section.animationVector.x) {
+                    displacementX++;
+                    timerX -= AnimationVector.frameTime / section.animationVector.x;
+                    didChange = true;
+                } 
+                
+                timerX += Time.deltaTime;
+
+
+            }
+
+            if (section.animationVector.y != 0) {
+
+                if (timerY >= AnimationVector.frameTime / section.animationVector.y) {
+                    displacementY++;
+                    timerY -= AnimationVector.frameTime / section.animationVector.y;
+                    didChange = true;
+                }
+                
+                timerY += Time.deltaTime;
+
+
+            }
+
+            if (displacementX > AnimationVector.maxDistance) {
+                displacementX = 0;
+            }
+
+            if (displacementY > AnimationVector.maxDistance) {
+                displacementY = 0;
+            }
+
+            ChangeTexture(textureCoords);
+
+            return didChange;
+
+        }
+
+        public void ChangeTexture(List<Vector2> textureCoords) {
+
+            if (tile.verticies.Count == 4) {
+                textureCoords[textureIndex] = GetTextureCoord(tile, 0);
+                textureCoords[textureIndex + 1] = GetTextureCoord(tile, 1);
+                textureCoords[textureIndex + 2] = GetTextureCoord(tile, 3);
+                textureCoords[textureIndex + 3] = GetTextureCoord(tile, 2);
+            } else {
+                textureCoords[textureIndex] = GetTextureCoord(tile, 0);
+                textureCoords[textureIndex + 1] = GetTextureCoord(tile, 1);
+                textureCoords[textureIndex + 2] = GetTextureCoord(tile, 2);
+            }
+
+
+        }
+
+        Vector2 GetTextureCoord(Tile tile, int i) {
+            return new Vector2(
+                    TextureCoordinate.GetX((tile.uvs[i] + tile.texturePalette * 65536) + displacementX),
+                    TextureCoordinate.GetY((tile.uvs[i] + tile.texturePalette * 65536) + (256 * displacementY))
+                );
+        }
+
+    }
+
+    class FrameAnimatedTile : AnimatedTile {
+
+        public Tile tile { get; set; }
+        public int textureIndex { get; set; }
 
         int frame = 0;
-        float timmer = 0f;
+        float timer = 0f;
 
-        public AnimatedTile(Tile tile, int textureIndex) {
+        public FrameAnimatedTile(Tile tile, int textureIndex) {
             this.tile = tile;
             this.textureIndex = textureIndex;
         }
 
-        public bool Update(LevelMesh mesh) {
+        public bool Update(List<Vector2> textureCoords) {
+
+            var didChange = false;
 
             var animationData = (TileUVAnimationMetaData)tile.uvAnimationData;
 
-            if (frame == animationData.frames) {
-                frame = 0;
+            if (timer >= TileUVAnimationMetaData.secondsPerValue * animationData.frameDuration) {
+                ChangeTexture(textureCoords);
+                frame++;
+
+                if (frame == animationData.frames) {
+                    frame = 0;
+                }
+
+                timer -= TileUVAnimationMetaData.secondsPerValue * animationData.frameDuration;
+                didChange = true;
             }
 
-            ChangeTexture(mesh);
+            timer += Time.deltaTime;
 
-            frame++;
-            return true;
+            return didChange;
 
         }
 
-        public void ChangeTexture(LevelMesh mesh) {
-            mesh.textureCords[textureIndex] = GetTextureCoord(tile, frame + 1);
-            mesh.textureCords[textureIndex + 1] = GetTextureCoord(tile, frame);
-            mesh.textureCords[textureIndex + 2] = GetTextureCoord(tile, frame + 3);
-            mesh.textureCords[textureIndex + 3] = GetTextureCoord(tile, frame + 2);
+        public void ChangeTexture(List<Vector2> textureCoords) {
+
+            if (tile.verticies.Count == 4) {
+                textureCoords[textureIndex] = GetTextureCoord(tile, (frame * 4));
+                textureCoords[textureIndex + 1] = GetTextureCoord(tile, (frame * 4) + 1);
+                textureCoords[textureIndex + 2] = GetTextureCoord(tile, (frame * 4) + 3);
+                textureCoords[textureIndex + 3] = GetTextureCoord(tile, (frame * 4) + 2);
+            } else {
+                textureCoords[textureIndex] = GetTextureCoord(tile, (frame * 4));
+                textureCoords[textureIndex + 1] = GetTextureCoord(tile, (frame * 4) + 1);
+                textureCoords[textureIndex + 2] = GetTextureCoord(tile, (frame * 4) + 2);
+            }
+
         }
 
         Vector2 GetTextureCoord(Tile tile, int i) {
@@ -141,19 +280,21 @@ public class LevelMesh : MonoBehaviour {
     // Update is called once per frame
     void Update() {
 
-        //var didChange = false;
-        //foreach (var tile in animatedTiles) {
-        //    var value = tile.Update(this);
+        var didChange = false;
+        foreach (var tile in animatedTiles) {
+            var value = tile.Update(textureCords);
 
-        //    if (value) {
-        //        didChange = true;
-        //    }
+            if (value) {
+                didChange = true;
+            }
 
-        //}
+        }
 
-        //if (didChange) {
-        //    RefreshCurrentUVs();
-        //}
+        if (didChange) {
+            RefreshCurrentUVs();
+        }
+
+        transparentSubMesh.Update();
 
     }
 
@@ -239,6 +380,14 @@ public class LevelMesh : MonoBehaviour {
 
                 if (tile.graphics.isSemiTransparent == 1 && SettingsManager.showTransparency) {
 
+                    if (tile.isVectorAnimated && SettingsManager.showAnimations) {
+                        transparentSubMesh.animatedTiles.Add(new VectorAnimatedTile(tile, transparentSubMesh.vertexIndex, section));
+                    }
+
+                    if (tile.uvAnimationData != null && SettingsManager.showAnimations) {
+                        transparentSubMesh.animatedTiles.Add(new FrameAnimatedTile(tile, transparentSubMesh.vertexIndex));
+                    }
+
                     MakeEmptyTile(false);
 
                     transparentSubMesh.vertices.AddRange(AddVerticies(tile));
@@ -259,6 +408,14 @@ public class LevelMesh : MonoBehaviour {
 
                 }
                 else {
+
+                    if (tile.isVectorAnimated && SettingsManager.showAnimations) {
+                        animatedTiles.Add(new VectorAnimatedTile(tile, vertexIndex, section));
+                    }
+
+                    if (tile.uvAnimationData != null && SettingsManager.showAnimations) {
+                        animatedTiles.Add(new FrameAnimatedTile(tile, vertexIndex));
+                    }
 
                     textureCords.Add(GetTextureCoord(tile, 0));
                     textureCords.Add(GetTextureCoord(tile, 2));
@@ -283,6 +440,14 @@ public class LevelMesh : MonoBehaviour {
                 vertices.AddRange(AddVerticies(tile));
 
                 if (tile.graphics.isSemiTransparent == 1 && SettingsManager.showTransparency) {
+
+                    if (tile.isVectorAnimated && SettingsManager.showAnimations) {
+                        transparentSubMesh.animatedTiles.Add(new VectorAnimatedTile(tile, transparentSubMesh.vertexIndex, section));
+                    }
+
+                    if (tile.uvAnimationData != null && SettingsManager.showAnimations) {
+                        transparentSubMesh.animatedTiles.Add(new FrameAnimatedTile(tile, transparentSubMesh.vertexIndex));
+                    }
 
                     MakeEmptyTile(true);
 
@@ -311,6 +476,14 @@ public class LevelMesh : MonoBehaviour {
                 }
                 else {
 
+                    if (tile.isVectorAnimated && SettingsManager.showAnimations) {
+                        animatedTiles.Add(new VectorAnimatedTile(tile, vertexIndex, section));
+                    }
+
+                    if (tile.uvAnimationData != null && SettingsManager.showAnimations) {
+                        animatedTiles.Add(new FrameAnimatedTile(tile, vertexIndex));
+                    }
+
                     textureCords.Add(GetTextureCoord(tile, 0));
                     textureCords.Add(GetTextureCoord(tile, 1));
                     textureCords.Add(GetTextureCoord(tile, 3));
@@ -337,10 +510,6 @@ public class LevelMesh : MonoBehaviour {
 
 
             foreach (var tile in column.tiles) {
-
-                if (tile.uvAnimationData != null) {
-                    animatedTiles.Add(new AnimatedTile(tile, vertexIndex));
-                }
 
                 if (tile.verticies.Count == 3) {
                     GenerateTriangle(tile);
@@ -380,7 +549,7 @@ public class LevelMesh : MonoBehaviour {
         mesh.triangles = triangles.ToArray();
 
         mesh.uv = textureCords.ToArray();
-        if (Main.showShaders) {
+        if (SettingsManager.showShaders) {
             mesh.colors = vertexColors.ToArray();
         } else {
             mesh.colors = new Color[0];

@@ -265,10 +265,9 @@ namespace FCopParser {
         public const int tileColumnsWidth = 16;
 
         public List<HeightPoints> heightMap = new List<HeightPoints>();
-
         public List<TileColumn> tileColumns = new List<TileColumn>();
-
         List<XRGB555> colors = new List<XRGB555>();
+        public AnimationVector animationVector;
 
         // Until the file can be fully parsed, we need to have the parser
         public FCopLevelSectionParser parser;
@@ -277,6 +276,8 @@ namespace FCopParser {
 
             this.parser = parser;
             this.colors = parser.colors;
+
+            animationVector = new AnimationVector(parser.animationVector);
 
             foreach (var parsePoint in parser.heightPoints) {
                 heightMap.Add(new HeightPoints(parsePoint));
@@ -1294,6 +1295,7 @@ namespace FCopParser {
 
         public List<int> uvs = new();
         public int texturePalette;
+        public bool isVectorAnimated;
 
         public TileShaders shaders;
 
@@ -1369,6 +1371,7 @@ namespace FCopParser {
             }
 
             texturePalette = graphics.cbmpID;
+            isVectorAnimated = graphics.isAnimated == 1;
 
             #region ParseAnimationData
 
@@ -1378,7 +1381,7 @@ namespace FCopParser {
 
             foreach (var metaData in section.tileUVAnimationMetaData) {
 
-                if (metaData.textureReplaceOffset * 2 == textureIndex) {
+                if (metaData.textureReplaceOffset / 2 == textureIndex) {
                     uvAnimationData = metaData;
 
                     var frameUVs = section.animatedTextureCoordinates.GetRange(metaData.animationOffset / 2, metaData.frames * 4);
@@ -1868,6 +1871,26 @@ namespace FCopParser {
 
         public TileShaders Clone() {
             return new AnimatedShader(this.isQuad);
+        }
+
+    }
+
+    public class AnimationVector {
+
+        public const int maxDistance = 27;
+        public const float frameTime = 5.95f / 27f;
+
+        public int x;
+        public int y;
+
+        public AnimationVector(List<byte> bytes) {
+            x = bytes[0];
+            y = bytes[1];
+        }
+
+        public AnimationVector(int x, int y) {
+            this.x = x;
+            this.y = y;
         }
 
     }

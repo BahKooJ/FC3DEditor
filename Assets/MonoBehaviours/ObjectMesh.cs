@@ -99,7 +99,7 @@ public class ObjectMesh : MonoBehaviour {
         void AddSingleTextureCoord(FCopObject.FCopUVMap uvMap, int index) {
 
             var x = (uvMap.x[index] + TextureCoordinate.GetXPixel(textureOffset)) / 256f;
-            var y = (uvMap.y[index] + TextureCoordinate.GetYPixel(textureOffset) + (256 * uvMap.textureResourceIndex)) / 2560f;
+            var y = (uvMap.y[index] + TextureCoordinate.GetYPixel(textureOffset) + (256 * uvMap.textureResourceIndex)) / 2580f;
 
             textureCords.Add(new Vector2(x, y));
 
