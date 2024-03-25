@@ -9,15 +9,23 @@ using FCopParser;
 
 public class TextureUVMapper : MonoBehaviour {
 
+    public bool editTransparency = false;
+
     public TextureEditMode controller;
 
     public GameObject textureCoordinatePoint;
 
     // --View References--
+    public TextureTransparentMapper transparentMapper;
+
     public GameObject texturePaletteDropdown;
     public GameObject texturePalette;
     public GameObject texturePaletteImage;
     public TextureCoordinatesLines textureLines;
+    public GameObject uvMapperTools;
+    public GameObject transparentMapperTools;
+    public GameObject paletteConfirmationButtons;
+    public GameObject editPaletteButton;
 
     public ContextMenuHandler exportcontextMenu;
     public ContextMenuHandler importcontextMenu;
@@ -102,7 +110,7 @@ public class TextureUVMapper : MonoBehaviour {
 
     }
 
-    bool IsCursorInTexturePallete() {
+    public bool IsCursorInTexturePallete() {
 
         Vector2 pointOnPallete = Vector2.zero;
 
@@ -115,6 +123,21 @@ public class TextureUVMapper : MonoBehaviour {
     }
 
     void InitTexturePallette() {
+
+        if (editTransparency) {
+            transparentMapper.bmpID = texturePaletteDropdown.GetComponent<TMP_Dropdown>().value;
+            transparentMapper.CreateTransparentMap();
+            return;
+        }
+
+        if (controller.selectedTiles.Count == 0) {
+
+            var bmpID = texturePaletteDropdown.GetComponent<TMP_Dropdown>().value;
+
+            texturePaletteImage.GetComponent<Image>().sprite = controller.main.bmpTextures[bmpID];
+
+            return;
+        }
 
         var sameTexture = true;
 
@@ -146,13 +169,57 @@ public class TextureUVMapper : MonoBehaviour {
 
         InitTexturePallette();
 
+        uvMapperTools.SetActive(controller.selectedTiles.Count != 0);
+
     }
 
     public void RefreshView() {
 
+        if (editTransparency) {
+            return;
+        }
+
         InitTexturePallette();
 
+        uvMapperTools.SetActive(controller.selectedTiles.Count != 0);
+
+        textureLines.gameObject.SetActive(controller.selectedTiles.Count != 0);
+
         textureLines.ReInit();
+
+    }
+
+    void EditTransparency() {
+
+        if (editTransparency) {
+
+            editTransparency = false;
+
+            paletteConfirmationButtons.SetActive(false);
+            transparentMapperTools.SetActive(false);
+            editPaletteButton.SetActive(true);
+
+
+            InitView();
+
+            return;
+        }
+
+        editTransparency = true;
+
+        uvMapperTools.SetActive(false);
+
+        textureLines.ReInit();
+
+        textureLines.gameObject.SetActive(false);
+
+        uvMapperTools.SetActive(false);
+        transparentMapperTools.SetActive(true);
+
+        paletteConfirmationButtons.SetActive(true);
+        editPaletteButton.SetActive(false);
+
+        InitTexturePallette();
 
     }
 
@@ -164,6 +231,11 @@ public class TextureUVMapper : MonoBehaviour {
     }
 
     public void OnChangeTexturePalleteValue() {
+
+        if (editTransparency || controller.selectedTiles.Count == 0) {
+            InitTexturePallette();
+            return;
+        }
 
         controller.ChangeTexturePallette(texturePaletteDropdown.GetComponent<TMP_Dropdown>().value);
 
@@ -325,6 +397,22 @@ public class TextureUVMapper : MonoBehaviour {
 
         
 
+    }
+
+    public void OnClickEditTexturePalette() {
+        EditTransparency();
+    }
+
+    public void OnClickConfirmPaletteChanges() {
+        transparentMapper.Apply();
+
+        controller.main.RefreshTextures();
+        foreach (var section in controller.main.sectionMeshes) {
+            section.RefreshTexture();
+            section.RefreshMesh();
+        }
+
+        EditTransparency();
     }
 
     public void ExportTexture() {

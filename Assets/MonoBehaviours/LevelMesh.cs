@@ -18,6 +18,7 @@ public class LevelMesh : MonoBehaviour {
         public List<Vector2> textureCords = new List<Vector2>();
         public List<Color> vertexColors = new();
         public List<AnimatedTile> animatedTiles = new();
+        public List<ShaderAnimatedTile> shaderAnimatedTiles = new();
 
         public int vertexIndex = 0;
 
@@ -37,6 +38,12 @@ public class LevelMesh : MonoBehaviour {
                 RefreshCurrentUVs();
             }
 
+            //foreach (var tile in shaderAnimatedTiles) {
+            //    tile.Update(vertexColors);
+            //}
+
+            //RefreshCurrentVertexColors();
+
         }
 
         public void ClearMesh() {
@@ -47,6 +54,7 @@ public class LevelMesh : MonoBehaviour {
             textureCords.Clear();
             vertexColors.Clear();
             animatedTiles.Clear();
+            shaderAnimatedTiles.Clear();
         }
 
         public void SetMesh() {
@@ -68,6 +76,10 @@ public class LevelMesh : MonoBehaviour {
 
         public void RefreshCurrentUVs() {
             mesh.uv = textureCords.ToArray();
+        }
+
+        public void RefreshCurrentVertexColors() {
+            mesh.colors = vertexColors.ToArray();
         }
 
     }
@@ -231,6 +243,26 @@ public class LevelMesh : MonoBehaviour {
 
     }
 
+    class ShaderAnimatedTile {
+
+        static System.Random random = new();
+
+        public Tile tile;
+        public int colorIndex;
+
+        public ShaderAnimatedTile(Tile tile, int colorIndex) {
+            this.tile = tile;
+            this.colorIndex = colorIndex;
+        }
+
+        public void Update(List<Color> colors) {
+
+
+        }
+
+
+    }
+
     // Prefabs
     public GameObject subMeshTransparent;
 
@@ -253,6 +285,7 @@ public class LevelMesh : MonoBehaviour {
     public List<Tile> sortedTilesByTriangle = new List<Tile>();
 
     List<AnimatedTile> animatedTiles = new();
+    List<ShaderAnimatedTile> shaderAnimatedTiles = new();
 
     public float x = 0;
     public float y = 0;
@@ -293,6 +326,12 @@ public class LevelMesh : MonoBehaviour {
         if (didChange) {
             RefreshCurrentUVs();
         }
+
+        //foreach (var tile in shaderAnimatedTiles) {
+        //    tile.Update(vertexColors);
+        //}
+
+        //RefreshCurrentVertexColors();
 
         transparentSubMesh.Update();
 
@@ -378,7 +417,7 @@ public class LevelMesh : MonoBehaviour {
 
                 vertices.AddRange(AddVerticies(tile));
 
-                if (tile.graphics.isSemiTransparent == 1 && SettingsManager.showTransparency) {
+                if (tile.isSemiTransparent && SettingsManager.showTransparency) {
 
                     if (tile.isVectorAnimated && SettingsManager.showAnimations) {
                         transparentSubMesh.animatedTiles.Add(new VectorAnimatedTile(tile, transparentSubMesh.vertexIndex, section));
@@ -439,7 +478,7 @@ public class LevelMesh : MonoBehaviour {
 
                 vertices.AddRange(AddVerticies(tile));
 
-                if (tile.graphics.isSemiTransparent == 1 && SettingsManager.showTransparency) {
+                if (tile.isSemiTransparent && SettingsManager.showTransparency) {
 
                     if (tile.isVectorAnimated && SettingsManager.showAnimations) {
                         transparentSubMesh.animatedTiles.Add(new VectorAnimatedTile(tile, transparentSubMesh.vertexIndex, section));
@@ -447,6 +486,10 @@ public class LevelMesh : MonoBehaviour {
 
                     if (tile.uvAnimationData != null && SettingsManager.showAnimations) {
                         transparentSubMesh.animatedTiles.Add(new FrameAnimatedTile(tile, transparentSubMesh.vertexIndex));
+                    }
+
+                    if (tile.shaders.type == VertexColorType.ColorAnimated) {
+                        transparentSubMesh.shaderAnimatedTiles.Add(new ShaderAnimatedTile(tile, transparentSubMesh.vertexIndex));
                     }
 
                     MakeEmptyTile(true);
@@ -482,6 +525,10 @@ public class LevelMesh : MonoBehaviour {
 
                     if (tile.uvAnimationData != null && SettingsManager.showAnimations) {
                         animatedTiles.Add(new FrameAnimatedTile(tile, vertexIndex));
+                    }
+
+                    if (tile.shaders.type == VertexColorType.ColorAnimated) {
+                        shaderAnimatedTiles.Add(new ShaderAnimatedTile(tile, vertexIndex));
                     }
 
                     textureCords.Add(GetTextureCoord(tile, 0));
@@ -538,6 +585,7 @@ public class LevelMesh : MonoBehaviour {
 
         transparentSubMesh.ClearMesh();
         animatedTiles.Clear();
+        shaderAnimatedTiles.Clear();
 
         Generate(section);
 
@@ -571,11 +619,15 @@ public class LevelMesh : MonoBehaviour {
     public void RefreshTexture() {
         levelTexturePallet = controller.levelTexturePallet;
         meshRenderer.material.mainTexture = levelTexturePallet;
-
+        transparentSubMesh.meshRenderer.material.mainTexture = levelTexturePallet;
     }
 
     public void RefreshCurrentUVs() {
         mesh.uv = textureCords.ToArray();
+    }
+
+    public void RefreshCurrentVertexColors() {
+        mesh.colors = vertexColors.ToArray();
     }
 
 }

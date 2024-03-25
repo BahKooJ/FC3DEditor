@@ -303,6 +303,26 @@ public class TextureEditMode : EditMode {
 
     }
 
+    public void MakeTilesOpaque() {
+
+        foreach (var tile in selectedTiles) {
+            tile.isSemiTransparent = false;
+        }
+
+        selectedSection.RefreshMesh();
+
+    }
+
+    public void MakeTilesTransparent() {
+
+        foreach (var tile in selectedTiles) {
+            tile.isSemiTransparent = true;
+        }
+
+        selectedSection.RefreshMesh();
+
+    }
+
     // UV Presets
 
     public bool AddPreset() {

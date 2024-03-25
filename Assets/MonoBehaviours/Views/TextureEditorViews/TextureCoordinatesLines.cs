@@ -32,7 +32,7 @@ public class TextureCoordinatesLines : MonoBehaviour {
 
         points.Clear();
 
-        if (view.controller.selectedTiles.Count == 0) { return; }
+        if (view.controller.selectedTiles.Count == 0 || view.editTransparency) { return; }
 
         GrabTextureCoords();
 

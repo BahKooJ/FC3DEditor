@@ -43,7 +43,7 @@ public class TextureEditView: MonoBehaviour {
 
     public void OpenUVMapper() {
 
-        if (controller.selectedTiles.Count == 0) { return; }
+        //if (controller.selectedTiles.Count == 0) { return; }
 
         if (activeTextureUVMapper != null) {
             CloseTextureUVMapper();
@@ -81,6 +81,14 @@ public class TextureEditView: MonoBehaviour {
 
     public void OnChangeOpenUVMapperOnTileSelect() {
         TextureEditMode.openUVMapperByDefault = openUVMapperToggle.isOn;
+    }
+
+    public void OnClickMakeTilesOpaque() {
+        controller.MakeTilesOpaque();
+    }
+
+    public void OnClickMakeTilesTransparent() {
+        controller.MakeTilesTransparent();
     }
 
 

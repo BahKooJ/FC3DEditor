@@ -1296,6 +1296,7 @@ namespace FCopParser {
         public List<int> uvs = new();
         public int texturePalette;
         public bool isVectorAnimated;
+        public bool isSemiTransparent;
 
         public TileShaders shaders;
 
@@ -1372,6 +1373,7 @@ namespace FCopParser {
 
             texturePalette = graphics.cbmpID;
             isVectorAnimated = graphics.isAnimated == 1;
+            isSemiTransparent = graphics.isSemiTransparent == 1;
 
             #region ParseAnimationData
 
@@ -1846,7 +1848,7 @@ namespace FCopParser {
 
         public void Apply() {
 
-            var dummyColors = new float[] { 2f, 2f, 2f };
+            var dummyColors = new float[] { 1f, 1f, 1f };
 
             if (isQuad) {
 

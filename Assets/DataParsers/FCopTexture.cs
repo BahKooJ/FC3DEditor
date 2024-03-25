@@ -303,6 +303,21 @@ namespace FCopParser {
 
         }
 
+        public byte[] ConvertToAlphaMap() {
+
+            var total = new List<byte>();
+
+            foreach (var i in Enumerable.Range(0, bitmap.Count / 2)) {
+
+                var rgb = new XRGB555(new BitArray(bitmap.GetRange(i * 2, 2).ToArray()));
+                total.AddRange(rgb.ToA32());
+
+            }
+
+            return total.ToArray();
+
+        }
+
         public void ImportBMP(byte[] bytes) {
 
             var offset = BitConverter.ToInt32(bytes, 10);
@@ -616,6 +631,20 @@ namespace FCopParser {
             byte calculatedBlue = (byte)Math.Round(bluePercent * max8BitValue);
 
             return new byte[] { calculatedAlpha, calculatedBlue, calculatedGreen, calculatedRed };
+
+        }
+
+        public byte[] ToA32() {
+
+            byte calculatedAlpha = 255;
+            if (r + g + b == 0) {
+                calculatedAlpha = 0;
+            }
+            else if (x) {
+                calculatedAlpha = (byte)Math.Round(0.50 * 255); ;
+            }
+
+            return new byte[] { calculatedAlpha, 255, 255, 255 };
 
         }
 
