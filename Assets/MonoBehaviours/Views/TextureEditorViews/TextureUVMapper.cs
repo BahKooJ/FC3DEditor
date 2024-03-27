@@ -26,10 +26,17 @@ public class TextureUVMapper : MonoBehaviour {
     public GameObject transparentMapperTools;
     public GameObject paletteConfirmationButtons;
     public GameObject editPaletteButton;
+    public TMP_Dropdown textureTypeDropDown;
 
     public ContextMenuHandler exportcontextMenu;
     public ContextMenuHandler importcontextMenu;
 
+    // Vector Animation View Refs
+    public GameObject vectorAnimationProperties;
+    public Slider xVectorSlider;
+    public TMP_Text xVectorText;
+    public Slider yVectorSlider;
+    public TMP_Text yVectorText;
 
     public int bmpID;
 
@@ -118,7 +125,7 @@ public class TextureUVMapper : MonoBehaviour {
 
         var palleteRect = (RectTransform)texturePalette.transform;
 
-        return pointOnPallete.x < palleteRect.rect.width && pointOnPallete.y < palleteRect.rect.height;
+        return pointOnPallete.x < palleteRect.rect.width && -pointOnPallete.y < palleteRect.rect.height && pointOnPallete.x > -1 && pointOnPallete.y < 1;
 
     }
 
@@ -171,6 +178,21 @@ public class TextureUVMapper : MonoBehaviour {
 
         uvMapperTools.SetActive(controller.selectedTiles.Count != 0);
 
+        if (controller.selectedTiles.Count != 0) {
+            var tile = controller.selectedTiles[0];
+
+            if (tile.isVectorAnimated) {
+                textureTypeDropDown.value = (int)TextureType.VectorAnimated;
+            }
+            else if (tile.animatedUVs.Count != 0) {
+                textureTypeDropDown.value = (int)TextureType.FrameAnimated;
+            }
+            else {
+                textureTypeDropDown.value = 0;
+            }
+
+        }
+
     }
 
     public void RefreshView() {
@@ -186,6 +208,24 @@ public class TextureUVMapper : MonoBehaviour {
         textureLines.gameObject.SetActive(controller.selectedTiles.Count != 0);
 
         textureLines.ReInit();
+
+        EndEditingVectorAnimation();
+
+        if (controller.selectedTiles.Count != 0) {
+            var tile = controller.selectedTiles[0];
+
+            if (tile.isVectorAnimated) {
+                textureTypeDropDown.value = (int)TextureType.VectorAnimated;
+                StartEditingVectorAnimation();
+            }
+            else if (tile.animatedUVs.Count != 0) {
+                textureTypeDropDown.value = (int)TextureType.FrameAnimated;
+            }
+            else {
+                textureTypeDropDown.value = 0;
+            }
+
+        }
 
     }
 
@@ -205,6 +245,8 @@ public class TextureUVMapper : MonoBehaviour {
             return;
         }
 
+        EndEditingVectorAnimation();
+
         editTransparency = true;
 
         uvMapperTools.SetActive(false);
@@ -220,6 +262,30 @@ public class TextureUVMapper : MonoBehaviour {
         editPaletteButton.SetActive(false);
 
         InitTexturePallette();
+
+    }
+
+    void StartEditingVectorAnimation() {
+
+        vectorAnimationProperties.SetActive(true);
+
+        xVectorSlider.value = controller.selectedSection.section.animationVector.x;
+        yVectorSlider.value = controller.selectedSection.section.animationVector.y;
+        xVectorText.text = controller.selectedSection.section.animationVector.x.ToString();
+        yVectorText.text = controller.selectedSection.section.animationVector.y.ToString();
+
+        if (controller.selectedSection.section.animationVector.x == 0) {
+            xVectorText.text = "Disabled";
+        }
+        if (controller.selectedSection.section.animationVector.y == 0) {
+            yVectorText.text = "Disabled";
+        }
+
+    }
+
+    void EndEditingVectorAnimation() {
+
+        vectorAnimationProperties.SetActive(false);
 
     }
 
@@ -519,6 +585,74 @@ public class TextureUVMapper : MonoBehaviour {
 
         });
 
+    }
+
+    public void OnChangeTextureType() {
+
+        if (controller.selectedTiles.Count == 0) {
+            return;
+        }
+
+        EndEditingVectorAnimation();
+
+        switch ((TextureType)textureTypeDropDown.value) {
+
+            case TextureType.Static:
+
+                foreach (var tile in controller.selectedTiles) {
+                    tile.isVectorAnimated = false;
+                }
+
+                break;
+            case TextureType.VectorAnimated:
+
+                foreach (var tile in controller.selectedTiles) {
+                    tile.isVectorAnimated = true;
+                }
+
+                StartEditingVectorAnimation();
+                break;
+            case TextureType.FrameAnimated: 
+                break;
+
+        }
+
+    }
+
+    public void OnChangeVectorXSlider() {
+
+        var value = (int)xVectorSlider.value;
+
+        controller.selectedSection.section.animationVector.x = value;
+        xVectorText.text = value.ToString();
+
+        if (value == 0) {
+            xVectorText.text = "Disabled";
+        }
+
+        textureLines.RefreshGhostPoints();
+
+    }
+
+    public void OnChangeVectorYSlider() {
+
+        var value = (int)yVectorSlider.value;
+
+        controller.selectedSection.section.animationVector.y = value;
+        yVectorText.text = value.ToString();
+
+        if (value == 0) {
+            yVectorText.text = "Disabled";
+        }
+
+        textureLines.RefreshGhostPoints();
+
+    }
+
+    enum TextureType {
+        Static = 0,
+        VectorAnimated = 1,
+        FrameAnimated = 2
     }
 
 }

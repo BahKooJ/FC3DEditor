@@ -180,6 +180,9 @@ public class TextureTransparentMapper : MonoBehaviour {
 
             if (alphaValue < 255 && alphaValue > 0) {
                 xrgb.x = true;
+            } 
+            else if (alphaValue == 255) {
+                xrgb.x = false;
             }
 
             texture.bitmap.RemoveRange(i * 2, 2);

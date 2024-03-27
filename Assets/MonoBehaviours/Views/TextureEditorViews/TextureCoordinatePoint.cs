@@ -2,6 +2,7 @@
 using FCopParser;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEditor.PlayerSettings;
 
 class TextureCoordinatePoint : MonoBehaviour {
 
@@ -12,7 +13,7 @@ class TextureCoordinatePoint : MonoBehaviour {
     public RectTransform imageTransform;
     public TextureCoordinatesLines lines;
 
-    public Button button;
+    public Image ghostPoint;
 
     bool drag = false;
 
@@ -23,6 +24,19 @@ class TextureCoordinatePoint : MonoBehaviour {
         pos.x += x;
         pos.y += y;
 
+        if (pos.x > 255) {
+            pos.x = 255;
+        }
+        if (pos.x < 0) {
+            pos.x = 0;
+        }
+        if (pos.y > 255) {
+            pos.y = 255;
+        }
+        if (pos.y < 0) {
+            pos.y = 0;
+        }
+
         transform.localPosition = pos;
 
         foreach (var tile in view.controller.selectedTiles) {
@@ -31,17 +45,102 @@ class TextureCoordinatePoint : MonoBehaviour {
 
         controller.RefreshTileOverlayTexture();
 
+        if (view.controller.selectedSection.section.animationVector.x != 0) {
+            var ghostPos = ghostPoint.transform.localPosition;
+            
+            if (view.controller.selectedSection.section.animationVector.x > 0) {
+                ghostPos.x = 27;
+            }
+            else {
+                ghostPos.x = -27;
+            }
+
+            ghostPoint.transform.localPosition = ghostPos;
+
+        }
+
+
     }
 
     public void ChangePosition(int x, int y) {
 
         transform.localPosition = new Vector2(x, y);
 
+        var pos = transform.localPosition;
+
+        if (pos.x > 255) {
+            pos.x = 255;
+        }
+        if (pos.x < 0) {
+            pos.x = 0;
+        }
+        if (pos.y > 255) {
+            pos.y = 255;
+        }
+        if (pos.y < 0) {
+            pos.y = 0;
+        }
+
+        transform.localPosition = pos;
+
         foreach (var tile in view.controller.selectedTiles) {
             tile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
         }
 
         controller.RefreshTileOverlayTexture();
+
+        
+
+    }
+
+    public void ChangeGhostPos() {
+
+        var ghostPos = ghostPoint.transform.localPosition;
+        if (view.controller.selectedSection.section.animationVector.x != 0) {
+            
+
+            if (view.controller.selectedSection.section.animationVector.x > 0) {
+                ghostPos.x = 27;
+            }
+            else {
+                ghostPos.x = -27;
+            }
+
+            
+
+        } else {
+            ghostPos.x = 0;
+        }
+
+        if (view.controller.selectedSection.section.animationVector.y != 0) {
+
+
+            if (view.controller.selectedSection.section.animationVector.y > 0) {
+                ghostPos.y = 27;
+            }
+            else {
+                ghostPos.y = -27;
+            }
+
+        } else {
+            ghostPos.y = 0;
+        }
+
+        ghostPoint.transform.localPosition = ghostPos;
+
+    }
+
+    void Start() {
+        
+        if (view.controller.selectedTiles[0].isVectorAnimated) {
+            ghostPoint.gameObject.SetActive(true);
+            var originalColor = GetComponent<Image>().color;
+            originalColor.r -= 0.5f;
+            originalColor.g -= 0.5f;
+            originalColor.b -= 0.5f;
+            ghostPoint.color = originalColor;
+            ChangeGhostPos();
+        }
 
     }
 

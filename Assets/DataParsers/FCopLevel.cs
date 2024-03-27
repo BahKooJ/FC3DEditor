@@ -1886,8 +1886,8 @@ namespace FCopParser {
         public int y;
 
         public AnimationVector(List<byte> bytes) {
-            x = bytes[0];
-            y = bytes[1];
+            x = (sbyte)bytes[0];
+            y = (sbyte)bytes[1];
         }
 
         public AnimationVector(int x, int y) {

@@ -113,6 +113,12 @@ public class TextureCoordinatesLines : MonoBehaviour {
 
     }
 
+    public void RefreshGhostPoints() {
+        foreach (var point in points) {
+            point.GetComponent<TextureCoordinatePoint>().ChangeGhostPos();
+        }
+    }
+
     void GrabTextureCoords() {
 
         textureCoords.Clear();

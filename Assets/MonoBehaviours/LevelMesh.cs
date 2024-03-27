@@ -119,9 +119,15 @@ public class LevelMesh : MonoBehaviour {
 
             if (section.animationVector.x != 0) {
 
-                if (timerX >= AnimationVector.frameTime / section.animationVector.x) {
-                    displacementX++;
-                    timerX -= AnimationVector.frameTime / section.animationVector.x;
+                if (timerX >= AnimationVector.frameTime / Mathf.Abs(section.animationVector.x)) {
+
+                    if (section.animationVector.x > 0) {
+                        displacementX++;
+                    } else {
+                        displacementX--;
+                    }
+
+                    timerX -= AnimationVector.frameTime / Mathf.Abs(section.animationVector.x);
                     didChange = true;
                 } 
                 
@@ -132,9 +138,16 @@ public class LevelMesh : MonoBehaviour {
 
             if (section.animationVector.y != 0) {
 
-                if (timerY >= AnimationVector.frameTime / section.animationVector.y) {
-                    displacementY++;
-                    timerY -= AnimationVector.frameTime / section.animationVector.y;
+                if (timerY >= AnimationVector.frameTime / Mathf.Abs(section.animationVector.y)) {
+
+                    if (section.animationVector.y > 0) {
+                        displacementY++;
+                    }
+                    else {
+                        displacementY--;
+                    }
+
+                    timerY -= AnimationVector.frameTime / Mathf.Abs(section.animationVector.y);
                     didChange = true;
                 }
                 
@@ -143,12 +156,35 @@ public class LevelMesh : MonoBehaviour {
 
             }
 
-            if (displacementX > AnimationVector.maxDistance) {
-                displacementX = 0;
+            if (section.animationVector.x > 0) {
+
+                if (displacementX > AnimationVector.maxDistance) {
+                    displacementX = 0;
+                }
+
+            } else {
+
+                if (displacementX < 0) {
+                    displacementX = AnimationVector.maxDistance;
+                }
+
             }
 
-            if (displacementY > AnimationVector.maxDistance) {
-                displacementY = 0;
+
+
+            if (section.animationVector.y > 0) {
+
+                if (displacementY > AnimationVector.maxDistance) {
+                    displacementY = 0;
+                }
+
+            }
+            else {
+
+                if (displacementY < 0) {
+                    displacementY = AnimationVector.maxDistance;
+                }
+
             }
 
             ChangeTexture(textureCoords);
