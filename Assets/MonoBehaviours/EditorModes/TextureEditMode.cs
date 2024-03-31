@@ -233,6 +233,7 @@ public class TextureEditMode : EditMode {
         var script = overlay.GetComponent<TileTexturePreview>();
         script.controller = main;
         script.tile = tile;
+        script.section = selectedSection.section;
         selectedTileOverlays.Add(script);
         overlay.transform.SetParent(selectedSection.transform);
         overlay.transform.localPosition = Vector3.zero;

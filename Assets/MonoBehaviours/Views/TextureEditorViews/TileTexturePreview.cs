@@ -19,6 +19,7 @@ public class TileTexturePreview : MonoBehaviour {
     List<Vector2> textureCords = new();
     List<Color> vertexColors = new();
 
+    AnimatedTile animatedTile = null;
 
     void Start() {
 
@@ -29,6 +30,27 @@ public class TileTexturePreview : MonoBehaviour {
         material.mainTexture = controller.levelTexturePallet;
 
         Refresh();
+
+    }
+
+    void Update() {
+
+        if (animatedTile == null) {
+            return;
+        }
+
+        var didChange = false;
+
+        var value = animatedTile.Update(textureCords);
+
+        if (value) {
+            didChange = true;
+        }
+
+
+        if (didChange) {
+            RefreshCurrentUVs();
+        }
 
     }
 
@@ -60,6 +82,16 @@ public class TileTexturePreview : MonoBehaviour {
         }
         else {
             mesh.colors = new Color[0];
+        }
+
+        if (tile.isVectorAnimated) {
+            animatedTile = new VectorAnimatedTile(tile, 0, section);
+        }
+        else if (tile.GetFrameCount() != 0) {
+            animatedTile = new FrameAnimatedTile(tile, 0);
+        }
+        else {
+            animatedTile = null;
         }
 
         mesh.RecalculateNormals();
@@ -179,6 +211,10 @@ public class TileTexturePreview : MonoBehaviour {
             GenerateSquare(tile);
         }
 
+    }
+
+    public void RefreshCurrentUVs() {
+        mesh.uv = textureCords.ToArray();
     }
 
 }

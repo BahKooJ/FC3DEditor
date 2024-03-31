@@ -26,6 +26,7 @@ public class TextureUVMapper : MonoBehaviour {
     public GameObject transparentMapperTools;
     public GameObject paletteConfirmationButtons;
     public GameObject editPaletteButton;
+    public GameObject generageColorPaletteButton;
     public TMP_Dropdown textureTypeDropDown;
 
     public ContextMenuHandler exportcontextMenu;
@@ -37,6 +38,18 @@ public class TextureUVMapper : MonoBehaviour {
     public TMP_Text xVectorText;
     public Slider yVectorSlider;
     public TMP_Text yVectorText;
+
+    // Frame Animation View Refs
+    public GameObject frameAnimationPanel;
+    public Transform framesContent;
+    public Slider frameAnimationSpeedSlider;
+    public TMP_Text frameAnimationSpeedText;
+
+    // Frame Animation Prefabs
+    public GameObject frameListItem;
+
+    public List<FrameItemView> frameItems;
+    public int frameSelected = -1;
 
     public int bmpID;
 
@@ -56,6 +69,9 @@ public class TextureUVMapper : MonoBehaviour {
     }
 
     void Start() {
+
+        // For whatever reason, despite being set to -1 on declaration, it's 0 and I don't understand why
+        frameSelected = -1;
 
         InitView();
 
@@ -207,9 +223,8 @@ public class TextureUVMapper : MonoBehaviour {
 
         textureLines.gameObject.SetActive(controller.selectedTiles.Count != 0);
 
-        textureLines.ReInit();
-
         EndEditingVectorAnimation();
+        EndEditingFrameAnimation();
 
         if (controller.selectedTiles.Count != 0) {
             var tile = controller.selectedTiles[0];
@@ -220,12 +235,15 @@ public class TextureUVMapper : MonoBehaviour {
             }
             else if (tile.animatedUVs.Count != 0) {
                 textureTypeDropDown.value = (int)TextureType.FrameAnimated;
+                StartEditingFrameAnimation();
             }
             else {
                 textureTypeDropDown.value = 0;
             }
 
         }
+
+        textureLines.ReInit();
 
     }
 
@@ -289,6 +307,97 @@ public class TextureUVMapper : MonoBehaviour {
 
     }
 
+    void StartEditingFrameAnimation(int startingFrame = 0) {
+
+        if (controller.selectedTiles.Count == 0) {
+            return;
+        }
+
+        frameSelected = startingFrame;
+
+        var tile = controller.selectedTiles[0];
+
+        generageColorPaletteButton.SetActive(false);
+        editPaletteButton.SetActive(false);
+
+        frameAnimationPanel.SetActive(true);
+
+        // This method is called twice because of a Unity event handeler
+        // so it just clears the existing items to not double add.
+        foreach (var item in frameItems) {
+            Destroy(item.gameObject);
+        }
+
+        frameItems.Clear();
+
+        foreach (var i in Enumerable.Range(0, tile.GetFrameCount())) {
+            var obj = Instantiate(frameListItem);
+            obj.transform.SetParent(framesContent.transform, false);
+            obj.SetActive(true);
+            var frameItem = obj.GetComponent<FrameItemView>();
+            frameItem.view = this;
+            frameItem.controller = controller;
+            frameItem.tile = tile;
+            frameItem.frame = i;
+
+            frameItems.Add(frameItem);
+
+        }
+
+        frameAnimationSpeedText.text = tile.animationSpeed.ToString();
+        frameAnimationSpeedSlider.value = tile.animationSpeed;
+
+    }
+
+    void EndEditingFrameAnimation() {
+
+        generageColorPaletteButton.SetActive(true);
+        editPaletteButton.SetActive(true);
+
+        frameAnimationPanel.SetActive(false);
+
+        foreach (var item in frameItems) {
+            Destroy(item.gameObject);
+        }
+
+        frameItems.Clear();
+
+        frameSelected = -1;
+
+    }
+
+    public void RefreshUVFrameItems() {
+
+        foreach (var item in frameItems) {
+            Destroy(item.gameObject);
+        }
+
+        frameItems.Clear();
+
+        var tile = controller.selectedTiles[0];
+
+        foreach (var i in Enumerable.Range(0, tile.animatedUVs.Count / 4)) {
+            var obj = Instantiate(frameListItem);
+            obj.transform.SetParent(framesContent.transform, false);
+            obj.SetActive(true);
+            var frameItem = obj.GetComponent<FrameItemView>();
+            frameItem.view = this;
+            frameItem.controller = controller;
+            frameItem.tile = tile;
+            frameItem.frame = i;
+
+            frameItems.Add(frameItem);
+
+        }
+
+    }
+
+    public void ClickedFrameItem(int frame) {
+        EndEditingFrameAnimation();
+        StartEditingFrameAnimation(frame);
+        textureLines.ReInit();
+    }
+
     // --Event Handlers--
 
     public void CloseWindow() {
@@ -344,6 +453,10 @@ public class TextureUVMapper : MonoBehaviour {
 
         }
 
+        if (frameSelected != -1) {
+            RefreshUVFrameItems();
+        }
+
     }
 
     public void OnFlipTextureCoordsVertically() {
@@ -375,6 +488,10 @@ public class TextureUVMapper : MonoBehaviour {
 
         textureLines.Refresh();
 
+        if (frameSelected != -1) {
+            RefreshUVFrameItems();
+        }
+
     }
 
     public void OnFlipTextureCoordsHorizontally() {
@@ -405,6 +522,10 @@ public class TextureUVMapper : MonoBehaviour {
         }
 
         textureLines.Refresh();
+
+        if (frameSelected != -1) {
+            RefreshUVFrameItems();
+        }
 
     }
 
@@ -439,6 +560,10 @@ public class TextureUVMapper : MonoBehaviour {
 
             index++;
 
+        }
+
+        if (frameSelected != -1) {
+            RefreshUVFrameItems();
         }
 
     }
@@ -594,25 +719,58 @@ public class TextureUVMapper : MonoBehaviour {
         }
 
         EndEditingVectorAnimation();
+        EndEditingFrameAnimation();
+
+        var refreshRequired = false;
 
         switch ((TextureType)textureTypeDropDown.value) {
 
             case TextureType.Static:
 
                 foreach (var tile in controller.selectedTiles) {
+
+                    if (tile.GetFrameCount() > 0 || tile.isVectorAnimated) {
+                        refreshRequired = true;
+                    }
+
                     tile.isVectorAnimated = false;
+                    tile.animatedUVs.Clear();
+
+                }
+
+                if (refreshRequired) {
+                    controller.selectedSection.RefreshMesh();
+                    controller.RefreshTileOverlayTexture();
                 }
 
                 break;
             case TextureType.VectorAnimated:
 
                 foreach (var tile in controller.selectedTiles) {
+
+                    if (tile.GetFrameCount() > 0 || !tile.isVectorAnimated) {
+                        refreshRequired = true;
+                    }
+
                     tile.isVectorAnimated = true;
+                    tile.animatedUVs.Clear();
+
+                }
+
+                if (refreshRequired) {
+                    controller.selectedSection.RefreshMesh();
+                    controller.RefreshTileOverlayTexture();
                 }
 
                 StartEditingVectorAnimation();
                 break;
-            case TextureType.FrameAnimated: 
+            case TextureType.FrameAnimated:
+
+                foreach (var tile in controller.selectedTiles) {
+                    tile.isVectorAnimated = false;
+                }
+
+                StartEditingFrameAnimation();
                 break;
 
         }
@@ -646,6 +804,40 @@ public class TextureUVMapper : MonoBehaviour {
         }
 
         textureLines.RefreshGhostPoints();
+
+    }
+
+    public void OnClickAddFrame() {
+
+        var tile = controller.selectedTiles[0];
+        var currentUVs = tile.animatedUVs.GetRange(frameSelected * 4, 4);
+        tile.animatedUVs.AddRange(currentUVs);
+
+        RefreshUVFrameItems();
+
+    }
+
+    public void OnClickRemoveFrame() {
+
+        var tile = controller.selectedTiles[0];
+
+        if (tile.GetFrameCount() == 2) {
+            return;
+        }
+
+        tile.animatedUVs.RemoveRange(frameSelected * 4, 4);
+
+        RefreshUVFrameItems();
+
+    }
+
+    public void OnChangeAnimationSpeedSlide() {
+
+        var tile = controller.selectedTiles[0];
+
+        tile.animationSpeed = (int)frameAnimationSpeedSlider.value;
+
+        frameAnimationSpeedText.text = tile.animationSpeed.ToString();
 
     }
 

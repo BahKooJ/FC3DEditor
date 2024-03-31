@@ -1307,6 +1307,7 @@ namespace FCopParser {
 
         public TileUVAnimationMetaData? uvAnimationData = null;
         public List<int> animatedUVs = new();
+        public int animationSpeed;
 
         public TileBitfield parsedTile;
 
@@ -1395,6 +1396,10 @@ namespace FCopParser {
 
             }
 
+            if (uvAnimationData != null) {
+                animationSpeed = uvAnimationData.Value.frameDuration;
+            }
+
             #endregion
 
             this.parsedTile = parsedTile;
@@ -1430,6 +1435,10 @@ namespace FCopParser {
             this.uvs = uvs;
             this.texturePalette = graphics.cbmpID;
             this.graphics = graphics;
+        }
+
+        public int GetFrameCount() {
+            return animatedUVs.Count / 4;
         }
 
         public void ChangeShader(VertexColorType type) {

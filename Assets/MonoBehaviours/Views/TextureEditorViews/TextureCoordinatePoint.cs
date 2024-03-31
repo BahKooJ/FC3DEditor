@@ -39,26 +39,26 @@ class TextureCoordinatePoint : MonoBehaviour {
 
         transform.localPosition = pos;
 
-        foreach (var tile in view.controller.selectedTiles) {
-            tile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
+        if (view.frameSelected != -1) {
+
+            var tile = view.controller.selectedTiles[0];
+
+            tile.animatedUVs[(view.frameSelected * 4) + uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
+
+            if (view.frameSelected == 0) {
+                tile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
+            }
+
+        }
+        else {
+
+            foreach (var tile in view.controller.selectedTiles) {
+                tile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
+            }
+
         }
 
         controller.RefreshTileOverlayTexture();
-
-        if (view.controller.selectedSection.section.animationVector.x != 0) {
-            var ghostPos = ghostPoint.transform.localPosition;
-            
-            if (view.controller.selectedSection.section.animationVector.x > 0) {
-                ghostPos.x = 27;
-            }
-            else {
-                ghostPos.x = -27;
-            }
-
-            ghostPoint.transform.localPosition = ghostPos;
-
-        }
-
 
     }
 
@@ -83,8 +83,26 @@ class TextureCoordinatePoint : MonoBehaviour {
 
         transform.localPosition = pos;
 
-        foreach (var tile in view.controller.selectedTiles) {
-            tile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
+        if (view.frameSelected != -1) {
+
+            var tile = view.controller.selectedTiles[0];
+
+            tile.animatedUVs[(view.frameSelected * 4) + uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
+
+            if (view.frameSelected == 0) {
+
+                if (!(tile.uvs.Count <= uvOffset)) {
+                    tile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
+                }
+
+            }
+
+        } else {
+
+            foreach (var tile in view.controller.selectedTiles) {
+                tile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
+            }
+
         }
 
         controller.RefreshTileOverlayTexture();
@@ -190,6 +208,10 @@ class TextureCoordinatePoint : MonoBehaviour {
 
     public void MouseUp() {
         
+        if (drag && view.frameSelected != -1) {
+            view.RefreshUVFrameItems();
+        }
+
         drag = false;
 
     }

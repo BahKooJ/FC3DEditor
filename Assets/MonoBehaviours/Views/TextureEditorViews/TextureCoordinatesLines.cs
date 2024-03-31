@@ -123,6 +123,12 @@ public class TextureCoordinatesLines : MonoBehaviour {
 
         textureCoords.Clear();
 
+        if (view.frameSelected != -1) {
+            var animatedUVs = view.controller.selectedTiles[0].animatedUVs.GetRange(view.frameSelected * 4, 4);
+            textureCoords = new List<int>(animatedUVs);
+            return;
+        }
+
         var uvs = view.controller.selectedTiles[0].uvs;
         if (view.controller.selectedTiles.Count > 1) {
 
