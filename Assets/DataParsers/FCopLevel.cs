@@ -1118,6 +1118,8 @@ namespace FCopParser {
 
             colors.Clear();
 
+            animationVector = new AnimationVector(section.animationVector.x, section.animationVector.y);
+
             foreach (var newColor in section.colors) {
 
                 colors.Add(new XRGB555(newColor.x, newColor.r, newColor.g, newColor.b));
@@ -1415,20 +1417,25 @@ namespace FCopParser {
             isEndInColumnArray = tile.isEndInColumnArray;
 
             verticies = new List<TileVertex>(tile.verticies);
+            uvs = new List<int>(tile.uvs);
+            shaders = tile.shaders.Clone();
+            animatedUVs = new List<int>(tile.animatedUVs);
+            animationSpeed = tile.animationSpeed;
 
             culling = tile.culling;
-
-            uvs = new List<int>(tile.uvs);
-
             texturePalette = tile.texturePalette;
+            isVectorAnimated = tile.isVectorAnimated;
+            isSemiTransparent = tile.isSemiTransparent;
+            effectIndex = tile.effectIndex;
 
             graphics = tile.graphics;
             graphicsMetaData = new(tile.graphicsMetaData);
-
+            uvAnimationData = tile.uvAnimationData;
             this.parsedTile = tile.parsedTile;
 
         }
 
+        // This is only used for flattening a level.
         public Tile(TileColumn column, List<TileVertex> vertices, int culling, List<int> uvs, TileGraphics graphics) {
             this.column = column;
             isEndInColumnArray = true;
@@ -1436,7 +1443,13 @@ namespace FCopParser {
             this.culling = culling;
             this.uvs = uvs;
             this.texturePalette = graphics.cbmpID;
-            this.graphics = graphics;
+
+            isVectorAnimated = false;
+            isSemiTransparent = false;
+            effectIndex = 0;
+
+            shaders = new MonoChromeShader(116, vertices.Count == 4);
+
         }
 
         public int GetFrameCount() {

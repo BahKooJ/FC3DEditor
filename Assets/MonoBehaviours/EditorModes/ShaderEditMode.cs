@@ -35,6 +35,12 @@ public class ShaderEditMode : EditMode {
 
         if (Main.ignoreAllInputs) { return; }
 
+        if (Controls.OnDown("Save")) {
+            if (view.activeShaderMapper != null) {
+                view.CloseShaderMapper();
+            }
+        }
+
         if (Controls.OnDown("Unselect")) {
 
             if (view.activeShaderMapper != null) {
