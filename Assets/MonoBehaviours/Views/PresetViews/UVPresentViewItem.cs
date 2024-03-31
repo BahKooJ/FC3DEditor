@@ -20,6 +20,7 @@ public class UVPresentViewItem : MonoBehaviour {
     public TMP_InputField nameTextField;
     public ContextMenuHandler contextMenu;
     public RawImage texturePreview;
+    public TMP_Text typeText;
 
     public UVPreset preset;
     public TextureEditMode controller;
@@ -42,6 +43,23 @@ public class UVPresentViewItem : MonoBehaviour {
 
         nameText.text = preset.name;
 
+        var typeString = "";
+
+        if (preset.isSemiTransparent) {
+            typeString += "(T) ";
+        }
+
+        if (preset.isVectorAnimated) {
+            typeString += "Vector Animated";
+        }
+        else if (preset.animatedUVs.Count != 0) {
+            typeString += "Frame Animated";
+        }
+        else {
+            typeString += "Static";
+        }
+
+        typeText.text = typeString;
 
         if (forceNameChange) {
             nameTextField.Select();
@@ -225,10 +243,29 @@ public class UVPresentViewItem : MonoBehaviour {
 
         foreach (var tile in controller.selectedTiles) {
 
+            if (preset.animatedUVs.Count > 0) {
+
+                tile.animationSpeed = preset.animationSpeed;
+                tile.animatedUVs = new List<int>(preset.animatedUVs);
+                tile.texturePalette = preset.texturePalette;
+                tile.isVectorAnimated = false;
+                tile.isSemiTransparent = preset.isSemiTransparent;
+                
+                if (tile.verticies.Count == 4) {
+                    tile.uvs = new List<int>(preset.animatedUVs.GetRange(0, 4));
+                } else {
+                    tile.uvs = new List<int>(preset.animatedUVs.GetRange(0, 3));
+                }
+
+
+            }
+
             if (tile.uvs.Count == preset.uvs.Count) {
 
                 tile.uvs = new List<int>(preset.uvs);
                 tile.texturePalette = preset.texturePalette;
+                tile.isVectorAnimated = preset.isVectorAnimated;
+                tile.isSemiTransparent = preset.isSemiTransparent;
 
             }
 

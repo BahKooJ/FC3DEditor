@@ -452,18 +452,25 @@ namespace FCopParser {
 
                                     // If no UV animations exist no need to test for them
                                     if (tileUVAnimationMetaData.Count == 0) {
+
+                                        // Index was found, but no uv animation data has been collected so this is a static texture.
+                                        // This index is invalid.
+                                        if (tile.IsFrameAnimated()) {
+                                            break;
+                                        }
+
                                         textureIndex = i;
                                         break;
                                     }
 
-                                    var isTileAnimated = tile.uvAnimationData != null;
+                                    var isTileAnimated = tile.IsFrameAnimated();
 
                                     var found = false;
 
                                     // Tests to see if the index is overwritten by animated UVs
                                     foreach (var metaData in tileUVAnimationMetaData) {
 
-                                        if (metaData.textureReplaceOffset * 2 == i) {
+                                        if (metaData.textureReplaceOffset / 2 == i) {
 
                                             // If this tile is not animated but this index is overwritten,
                                             // this index is not valid.
@@ -472,7 +479,7 @@ namespace FCopParser {
                                                 break;
                                             }
 
-                                            if (metaData == (TileUVAnimationMetaData)tile.uvAnimationData) {
+                                            if (metaData.frames == tile.GetFrameCount() && metaData.frameDuration == tile.animationSpeed) {
 
                                                 // Tests to see if that animated UVs are the same
                                                 if (animatedTextureCoordinates.GetRange(metaData.animationOffset / 2, metaData.frames * 4).SequenceEqual(tile.animatedUVs)) {
@@ -510,16 +517,9 @@ namespace FCopParser {
 
                             textureIndex = textureCoordinates.Count;
 
-                            if (tile.uvAnimationData != null) {
+                            if (tile.IsFrameAnimated()) {
 
-                                var nonNullData = (TileUVAnimationMetaData)tile.uvAnimationData;
-
-                                nonNullData.textureReplaceOffset = textureCoordinates.Count * 2;
-                                nonNullData.animationOffset = animatedTextureCoordinates.Count * 2;
-
-                                tile.uvAnimationData = nonNullData;
-
-                                tileUVAnimationMetaData.Add(nonNullData);
+                                tileUVAnimationMetaData.Add(tile.CompileFrameAnimation(animatedTextureCoordinates.Count * 2, textureCoordinates.Count * 2));
                                 animatedTextureCoordinates.AddRange(tile.animatedUVs);
 
                             }
@@ -733,6 +733,8 @@ namespace FCopParser {
             parser.tileGraphics = tileGraphics;
             parser.tileUVAnimationMetaData = tileUVAnimationMetaData;
             parser.animatedTextureCoordinates = animatedTextureCoordinates;
+
+            parser.animationVector = animationVector.Compile();
 
             parser.Compile();
 
@@ -1294,22 +1296,21 @@ namespace FCopParser {
         public List<TileVertex> verticies;
 
         public List<int> uvs = new();
+        public TileShaders shaders;
+        public List<int> animatedUVs = new();
+        public int animationSpeed = -1;
+
         public int texturePalette;
         public bool isVectorAnimated;
         public bool isSemiTransparent;
-
-        public TileShaders shaders;
-
-        public TileGraphics graphics;
-        public List<TileGraphicsMetaData> graphicsMetaData = new();
-
         public int culling;
+        public int effectIndex;
 
-        public TileUVAnimationMetaData? uvAnimationData = null;
-        public List<int> animatedUVs = new();
-        public int animationSpeed;
-
-        public TileBitfield parsedTile;
+        // Original parsed data from file
+        TileGraphics graphics;
+        List<TileGraphicsMetaData> graphicsMetaData = new();
+        TileUVAnimationMetaData? uvAnimationData = null;
+        TileBitfield parsedTile;
 
         public Tile(TileBitfield parsedTile, TileColumn column, FCopLevelSectionParser section) {
 
@@ -1321,6 +1322,7 @@ namespace FCopParser {
             verticies = MeshType.VerticiesFromID(parsedTile.meshID);
 
             culling = parsedTile.culling;
+            effectIndex = parsedTile.number4;
 
             var textureIndex = parsedTile.textureIndex;
             var graphicsIndex = parsedTile.graphicIndex;
@@ -1441,6 +1443,10 @@ namespace FCopParser {
             return animatedUVs.Count / 4;
         }
 
+        public bool IsFrameAnimated() {
+            return animatedUVs.Count > 0;
+        }
+
         public void ChangeShader(VertexColorType type) {
 
             switch (type) {
@@ -1474,7 +1480,7 @@ namespace FCopParser {
             parsedTile.meshID = (int)id;
             parsedTile.textureIndex = textureIndex;
             parsedTile.culling = culling;
-            //parsedTile.number4 = 0;
+            parsedTile.number4 = effectIndex;
             parsedTile.graphicIndex = graphicsIndex;
 
             return parsedTile;
@@ -1485,8 +1491,12 @@ namespace FCopParser {
 
             var isRect = verticies.Count == 4;
 
-            var graphic = new TileGraphics(graphics.lightingInfo, texturePalette,
-                graphics.isAnimated, graphics.isSemiTransparent, isRect ? 1 : 0, (int)shaders.type);
+            var graphic = new TileGraphics(graphics.lightingInfo, 
+                texturePalette,
+                isVectorAnimated ? 1 : 0,
+                isSemiTransparent ? 1 : 0, 
+                isRect ? 1 : 0, 
+                (int)shaders.type);
 
             var shaderData = new List<byte>();
 
@@ -1527,6 +1537,12 @@ namespace FCopParser {
 
             return graphicItems;
 
+        }
+
+        public TileUVAnimationMetaData CompileFrameAnimation(int animationOffset, int textureReplaceOffset) {
+            var metaData = new TileUVAnimationMetaData(GetFrameCount(), 9, animationSpeed, animationOffset, textureReplaceOffset);
+            uvAnimationData = metaData;
+            return metaData;
         }
 
     }
@@ -1904,6 +1920,9 @@ namespace FCopParser {
             this.y = y;
         }
 
+        public List<byte> Compile() {
+            return new List<byte>() { (byte)x, (byte)y };
+        }
     }
 
     public struct TileVertex {

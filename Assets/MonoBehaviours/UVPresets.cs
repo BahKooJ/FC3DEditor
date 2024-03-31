@@ -192,6 +192,8 @@ public class UVPresets {
 
                 total += "\"" + preset.name + "\",";
                 total += preset.texturePalette.ToString() + ",";
+                total += (preset.isSemiTransparent ? 1 : 0).ToString() + ",";
+                total += (preset.isVectorAnimated ? 1 : 0).ToString() + ",";
                 total += preset.meshID.ToString() + ",";
 
 
@@ -203,7 +205,27 @@ public class UVPresets {
                 }
                 total = total.Remove(total.Length - 1);
 
-                total += "]),";
+                if (preset.animatedUVs.Count == 0) {
+                    total += "]),";
+                }
+                else {
+
+                    total += "],";
+
+                    total += preset.animationSpeed.ToString() + ",";
+
+                    total += "[";
+                    foreach (var uv in preset.animatedUVs) {
+
+                        total += uv.ToString() + ",";
+
+                    }
+                    total = total.Remove(total.Length - 1);
+
+                    total += "]),";
+
+                }
+
 
             }
 
@@ -260,13 +282,21 @@ public class UVPreset {
     public List<int> uvs;
     public int texturePalette;
     public string name;
+    public bool isSemiTransparent;
+    public bool isVectorAnimated;
     public int meshID;
+    public int animationSpeed;
+    public List<int> animatedUVs;
 
-    public UVPreset(List<int> uvs, int texturePalette, string name, int meshID) {
+    public UVPreset(List<int> uvs, int texturePalette, string name, int meshID, bool isSemiTransparent, bool isVectorAnimated, int animationSpeed, List<int> animatedUVs) {
         this.uvs = new List<int>(uvs);
         this.texturePalette = texturePalette;
         this.name = name;
         this.meshID = meshID;
+        this.isSemiTransparent = isSemiTransparent;
+        this.isVectorAnimated = isVectorAnimated;
+        this.animationSpeed = animationSpeed;
+        this.animatedUVs = new List<int>(animatedUVs);
     }
 
     public UVPreset() {
@@ -274,6 +304,11 @@ public class UVPreset {
         uvs = new List<int>();
         texturePalette = 0;
         name = "";
+        meshID = 0;
+        isSemiTransparent = false;
+        isVectorAnimated = false;
+        animationSpeed = -1;
+        animatedUVs = new List<int>();
 
     }
 

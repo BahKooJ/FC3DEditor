@@ -35,6 +35,10 @@ public class TileTexturePreview : MonoBehaviour {
 
     void Update() {
 
+        if (showShaders) {
+            return;
+        }
+
         if (animatedTile == null) {
             return;
         }

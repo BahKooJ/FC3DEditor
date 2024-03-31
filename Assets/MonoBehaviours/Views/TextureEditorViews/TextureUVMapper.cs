@@ -53,6 +53,8 @@ public class TextureUVMapper : MonoBehaviour {
 
     public int bmpID;
 
+    bool preventDropdownCallback = false;
+
     void ScaleToScreen() {
 
         var screenWidth = Screen.width * 0.40f;
@@ -190,6 +192,8 @@ public class TextureUVMapper : MonoBehaviour {
 
     void InitView() {
 
+        preventDropdownCallback = true;
+
         InitTexturePallette();
 
         uvMapperTools.SetActive(controller.selectedTiles.Count != 0);
@@ -199,9 +203,11 @@ public class TextureUVMapper : MonoBehaviour {
 
             if (tile.isVectorAnimated) {
                 textureTypeDropDown.value = (int)TextureType.VectorAnimated;
+                StartEditingVectorAnimation();
             }
             else if (tile.animatedUVs.Count != 0) {
                 textureTypeDropDown.value = (int)TextureType.FrameAnimated;
+                StartEditingFrameAnimation();
             }
             else {
                 textureTypeDropDown.value = 0;
@@ -209,9 +215,13 @@ public class TextureUVMapper : MonoBehaviour {
 
         }
 
+        preventDropdownCallback = false;
+
     }
 
     public void RefreshView() {
+
+        preventDropdownCallback = true;
 
         if (editTransparency) {
             return;
@@ -244,6 +254,8 @@ public class TextureUVMapper : MonoBehaviour {
         }
 
         textureLines.ReInit();
+
+        preventDropdownCallback = false;
 
     }
 
@@ -419,6 +431,10 @@ public class TextureUVMapper : MonoBehaviour {
         InitTexturePallette();
 
         controller.RefreshTileOverlayTexture();
+
+        if (controller.selectedTiles[0].GetFrameCount() > 0) {
+            RefreshUVFrameItems();
+        }
 
     }
 
@@ -718,6 +734,10 @@ public class TextureUVMapper : MonoBehaviour {
             return;
         }
 
+        if (preventDropdownCallback) {
+            return;
+        }
+
         EndEditingVectorAnimation();
         EndEditingFrameAnimation();
 
@@ -766,8 +786,17 @@ public class TextureUVMapper : MonoBehaviour {
                 break;
             case TextureType.FrameAnimated:
 
-                foreach (var tile in controller.selectedTiles) {
-                    tile.isVectorAnimated = false;
+                controller.DeselectAllButLastTile();
+
+                var firstTile = controller.selectedTiles[0];
+
+                if (firstTile.GetFrameCount() == 0) {
+
+                    firstTile.animationSpeed = 50;
+
+                    firstTile.animatedUVs.AddRange(firstTile.uvs);
+                    firstTile.animatedUVs.AddRange(firstTile.uvs);
+
                 }
 
                 StartEditingFrameAnimation();

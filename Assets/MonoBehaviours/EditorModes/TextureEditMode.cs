@@ -79,6 +79,19 @@ public class TextureEditMode : EditMode {
 
         }
 
+        // Since frame animated tiles are a little weird it will try to only have one animated tile selected
+        if (tile.GetFrameCount() > 0) {
+            selectedTiles.Clear();
+        }
+
+        if (selectedTiles.Count > 0) {
+
+            if (selectedTiles[0].GetFrameCount() > 0) {
+                selectedTiles.Clear();
+            }
+
+        }
+
         // Updates the remaining data
         selectedColumn = column;
         selectedSection = section;
@@ -193,6 +206,34 @@ public class TextureEditMode : EditMode {
             }
 
         }
+
+    }
+
+    public void DeselectAllButFirstTile() {
+
+        if (selectedTiles.Count <= 1) { return; }
+
+        var first = selectedTiles[0];
+
+        selectedTiles.Clear();
+
+        selectedTiles.Add(first);
+
+        RefeshTileOverlay();
+
+    }
+
+    public void DeselectAllButLastTile() {
+
+        if (selectedTiles.Count <= 1) { return; }
+
+        var last = selectedTiles.Last();
+
+        selectedTiles.Clear();
+
+        selectedTiles.Add(last);
+
+        RefeshTileOverlay();
 
     }
 
@@ -339,7 +380,16 @@ public class TextureEditMode : EditMode {
             return false;
         }
 
-        var uvPreset = new UVPreset(firstTile.uvs, firstTile.texturePalette, "", (int)potentialID);
+        var uvPreset = new UVPreset(
+            firstTile.uvs, 
+            firstTile.texturePalette, 
+            "", 
+            (int)potentialID,
+            firstTile.isSemiTransparent,
+            firstTile.isVectorAnimated,
+            firstTile.animationSpeed, 
+            firstTile.animatedUVs
+            );
 
         currentUVPresets.presets.Add(uvPreset);
 

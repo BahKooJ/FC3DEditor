@@ -37,7 +37,7 @@ public abstract class Presets {
 
             var isReadingValue = false;
             var openArray = false;
-            var nextProperty = new List<string> { "NAME", "CBMP", "MESH", "UV" };
+            var nextProperty = new List<string> { "NAME", "CBMP", "TRANSPARENT", "VECTOR", "MESH", "UV", "SPEED", "AUV" };
             var lookingForValue = -1;
 
             foreach (var i in Enumerable.Range(startIndex, file.Count())) {
@@ -111,6 +111,30 @@ public abstract class Presets {
                             }
 
                             break;
+                        case "TRANSPARENT":
+
+                            if (c == ',') {
+                                currentUVPreset.isSemiTransparent = value == "1";
+                                value = "";
+                                lookingForValue++;
+                            }
+                            else if (numbers.Contains(c)) {
+                                value += c;
+                            }
+
+                            break;
+                        case "VECTOR":
+
+                            if (c == ',') {
+                                currentUVPreset.isVectorAnimated = value == "1";
+                                value = "";
+                                lookingForValue++;
+                            }
+                            else if (numbers.Contains(c)) {
+                                value += c;
+                            }
+
+                            break;
                         case "MESH":
 
                             if (c == ',') {
@@ -140,6 +164,41 @@ public abstract class Presets {
                             else {
                                 
                                 currentUVPreset.uvs.Add(Int32.Parse(value));
+                                value = "";
+                                lookingForValue++;
+
+                            }
+
+                            break;
+                        case "SPEED":
+
+                            if (c == ',') {
+                                currentUVPreset.animationSpeed = Int32.Parse(value);
+                                value = "";
+                                lookingForValue++;
+                            }
+                            else if (numbers.Contains(c)) {
+                                value += c;
+                            }
+
+                            break;
+                        case "AUV":
+
+                            if (openArray) {
+
+                                if (c == ',') {
+                                    currentUVPreset.animatedUVs.Add(Int32.Parse(value));
+                                    value = "";
+
+                                }
+                                else if (numbers.Contains(c)) {
+                                    value += c;
+                                }
+
+                            }
+                            else {
+
+                                currentUVPreset.animatedUVs.Add(Int32.Parse(value));
                                 value = "";
                                 lookingForValue++;
 

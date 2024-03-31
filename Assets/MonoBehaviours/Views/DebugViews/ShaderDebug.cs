@@ -25,8 +25,8 @@ public class ShaderDebug : MonoBehaviour {
             return;
         }
 
-        graphicsTypeText.text = TileEditMode.selectedTiles[0].graphics.graphicsType.ToString();
-        shaderDataText.text = TileEditMode.selectedTiles[0].graphics.lightingInfo.ToString();
+        //graphicsTypeText.text = TileEditMode.selectedTiles[0].graphics.graphicsType.ToString();
+        //shaderDataText.text = TileEditMode.selectedTiles[0].graphics.lightingInfo.ToString();
 
         var total = "";
 
@@ -36,13 +36,13 @@ public class ShaderDebug : MonoBehaviour {
         //    }
         //}
 
-        foreach (var meta in TileEditMode.selectedTiles[0].graphicsMetaData) {
+        //foreach (var meta in TileEditMode.selectedTiles[0].graphicsMetaData) {
 
-            foreach (var b in meta.data) {
-                total += b.ToString() + " ";
-            }
+        //    foreach (var b in meta.data) {
+        //        total += b.ToString() + " ";
+        //    }
 
-        }
+        //}
 
         extraShaderDataText.text = total;
 
