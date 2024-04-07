@@ -475,6 +475,7 @@ public class TextureUVMapper : MonoBehaviour {
 
     }
 
+    // This is misnamed
     public void OnFlipTextureCoordsVertically() {
 
         var minX = textureLines.points.Min(obj => {
@@ -510,6 +511,7 @@ public class TextureUVMapper : MonoBehaviour {
 
     }
 
+    // Same with this
     public void OnFlipTextureCoordsHorizontally() {
 
         var minY = textureLines.points.Min(obj => {
@@ -542,6 +544,85 @@ public class TextureUVMapper : MonoBehaviour {
         if (frameSelected != -1) {
             RefreshUVFrameItems();
         }
+
+    }
+
+    public void OnClickFlipUVOrderVertically() {
+
+        List<Vector2> oldPoints = new();
+
+        foreach (var point in textureLines.points) {
+            oldPoints.Add(point.transform.localPosition);
+        }
+
+        if (textureLines.points.Count == 4) {
+            textureLines.points[0].GetComponent<TextureCoordinatePoint>()
+                .ChangePosition((int)oldPoints[3].x, (int)oldPoints[3].y);
+            textureLines.points[1].GetComponent<TextureCoordinatePoint>()
+                .ChangePosition((int)oldPoints[2].x, (int)oldPoints[2].y);
+            textureLines.points[2].GetComponent<TextureCoordinatePoint>()
+                .ChangePosition((int)oldPoints[1].x, (int)oldPoints[1].y);
+            textureLines.points[3].GetComponent<TextureCoordinatePoint>()
+                .ChangePosition((int)oldPoints[0].x, (int)oldPoints[0].y);
+        } else {
+            textureLines.points[0].GetComponent<TextureCoordinatePoint>()
+                .ChangePosition((int)oldPoints[2].x, (int)oldPoints[2].y);
+            textureLines.points[2].GetComponent<TextureCoordinatePoint>()
+                .ChangePosition((int)oldPoints[0].x, (int)oldPoints[0].y);
+        }
+
+        if (frameSelected != -1) {
+            RefreshUVFrameItems();
+        }
+
+    }
+
+    public void OnClickFlipUVOrderHorizontally() {
+
+        List<Vector2> oldPoints = new();
+
+        foreach (var point in textureLines.points) {
+            oldPoints.Add(point.transform.localPosition);
+        }
+
+        if (textureLines.points.Count == 4) {
+            textureLines.points[0].GetComponent<TextureCoordinatePoint>()
+                .ChangePosition((int)oldPoints[1].x, (int)oldPoints[1].y);
+            textureLines.points[1].GetComponent<TextureCoordinatePoint>()
+                .ChangePosition((int)oldPoints[0].x, (int)oldPoints[0].y);
+            textureLines.points[2].GetComponent<TextureCoordinatePoint>()
+                .ChangePosition((int)oldPoints[3].x, (int)oldPoints[3].y);
+            textureLines.points[3].GetComponent<TextureCoordinatePoint>()
+                .ChangePosition((int)oldPoints[2].x, (int)oldPoints[2].y);
+        }
+        else {
+            textureLines.points[0].GetComponent<TextureCoordinatePoint>()
+                .ChangePosition((int)oldPoints[1].x, (int)oldPoints[1].y);
+            textureLines.points[1].GetComponent<TextureCoordinatePoint>()
+                .ChangePosition((int)oldPoints[0].x, (int)oldPoints[0].y);
+        }
+
+        if (frameSelected != -1) {
+            RefreshUVFrameItems();
+        }
+
+    }
+
+    public void FlipLastTwoUVs() {
+
+        if (controller.selectedTiles.Count == 0) {
+            return;
+        }
+
+        if (controller.selectedTiles[0].uvs.Count != 3) {
+            return;
+        }
+
+        var secondPoint = textureLines.points[1].transform.localPosition;
+        var thirdPoint = textureLines.points[2].transform.localPosition;
+
+        textureLines.points[1].GetComponent<TextureCoordinatePoint>().ChangePosition((int)thirdPoint.x, (int)thirdPoint.y);
+        textureLines.points[2].GetComponent<TextureCoordinatePoint>().ChangePosition((int)secondPoint.x, (int)secondPoint.y);
 
     }
 

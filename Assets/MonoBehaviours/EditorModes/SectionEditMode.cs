@@ -124,4 +124,30 @@ public class SectionEditMode : EditMode {
 
     }
 
+    public void RemoveShadersFromSection() {
+
+        DialogWindowUtil.Dialog("Warning",
+        "This will remove all tile shader data, are you sure you want to continue?",
+        () => {
+
+        if (selectedSection != null) {
+
+                foreach (var column in selectedSection.section.tileColumns) {
+
+                    foreach (var tile in column.tiles) {
+                        tile.ChangeShader(VertexColorType.MonoChrome);
+                    }
+
+                }
+
+                selectedSection.RefreshMesh();
+            }
+
+            return true;
+
+        });
+
+
+    }
+
 }

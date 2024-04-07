@@ -681,6 +681,10 @@ namespace FCopParser {
             return (y * 256) + x;
         }
 
+        static public int[] GetVector(int offset) {
+            return new int[] { GetXPixel(offset), GetYPixel(offset) };
+        }
+
     }
 
     public interface TileGraphicsItem { }

@@ -2,8 +2,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
-using static UnityEngine.UI.GridLayoutGroup;
 
 namespace FCopParser {
 
@@ -742,126 +742,12 @@ namespace FCopParser {
 
         public void MirrorDiagonally() {
 
-            var newHeightOrder = new List<HeightPoints>();
-
-            foreach (var hy in Enumerable.Range(0, 17)) {
-
-                foreach (var hx in Enumerable.Range(0, 17)) {
-                    newHeightOrder.Add(GetHeightPoint(16 - hx, 16 - hy));
-                }
-
-            }
-
-            heightMap = newHeightOrder;
-
-            var newTileColum = new List<TileColumn>();
-
-            foreach (var ty in Enumerable.Range(0, 16)) {
-
-                foreach (var tx in Enumerable.Range(0, 16)) {
-                    var column = tileColumns[((15 - ty) * 16) + (15 - tx)];
-
-                    var heights = new List<HeightPoints>();
-
-                    heights.Add(GetHeightPoint(tx, ty));
-                    heights.Add(GetHeightPoint(tx + 1, ty));
-                    heights.Add(GetHeightPoint(tx, ty + 1));
-                    heights.Add(GetHeightPoint(tx + 1, ty + 1));
-
-                    column.x = tx;
-                    column.y = ty;
-                    column.heights = heights;
-
-                    newTileColum.Add(column);
-                }
-
-            }
-
-            tileColumns = newTileColum;
-
-            var movedTiles = new List<Tile>();
-
-            foreach (var column in tileColumns) {
-
-                var validTiles = new List<Tile>();
-
-                foreach (var tile in column.tiles) {
-
-                    if (movedTiles.Contains(tile)) {
-                        validTiles.Add(tile);
-                        continue;
-                    }
-
-                    int ogMeshID = (int)MeshType.IDFromVerticies(tile.verticies);
-
-                    var mirorVertices = new List<TileVertex>();
-
-                    foreach (var vertex in tile.verticies) {
-
-                        switch (vertex.vertexPosition) {
-
-                            case VertexPosition.TopLeft:
-                                mirorVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.BottomRight));
-                                break;
-                            case VertexPosition.TopRight:
-                                mirorVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.BottomLeft));
-                                break;
-                            case VertexPosition.BottomLeft:
-                                mirorVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.TopRight));
-                                break;
-                            case VertexPosition.BottomRight:
-                                mirorVertices.Add(new TileVertex(vertex.heightChannel, VertexPosition.TopLeft));
-                                break;
-
-                        }
-
-                    }
-
-                    var mirorVID = MeshType.IDFromVerticies(mirorVertices);
-
-                    if (mirorVID != null) {
-                        tile.verticies = MeshType.VerticiesFromID((int)mirorVID);
-                        validTiles.Add(tile);
-                    } else {
-
-                        if (new int[] { 71, 72, 73, 74, 75, 76, 77, 78, 107, 109 }.Contains(ogMeshID)) {
-
-                            if (column.x < 15) {
-
-                                var nextColumn = tileColumns[(column.y * 16) + (column.x + 1)];
-
-                                tile.column = nextColumn;
-
-                                nextColumn.tiles.Add(tile);
-                                movedTiles.Add(tile);
-
-                            }
-
-                        } else if (new int[] { 79, 80, 81, 82, 83, 84, 85, 86, 108, 110 }.Contains(ogMeshID)) {
-
-                            if (column.y < 15) {
-
-                                var nextColumn = tileColumns[((column.y + 1) * 16) + (column.x)];
-
-                                tile.column = nextColumn;
-
-                                nextColumn.tiles.Add(tile);
-                                movedTiles.Add(tile);
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-                column.tiles = validTiles;
-            }
+            MirrorVertically();
+            MirrorHorizontally();
 
         }
 
-        public void MirrorVertically() {
+        public void MirrorHorizontally() {
 
             var newHeightOrder = new List<HeightPoints>();
 
@@ -941,7 +827,11 @@ namespace FCopParser {
                     var mirorVID = MeshType.IDFromVerticies(mirorVertices);
 
                     if (mirorVID != null) {
+
                         tile.verticies = MeshType.VerticiesFromID((int)mirorVID);
+
+                        FlipUVOrderHorizontal(tile);
+
                         validTiles.Add(tile);
                     } else {
 
@@ -970,7 +860,7 @@ namespace FCopParser {
 
         }
 
-        public void MirrorHorizontally() {
+        public void MirrorVertically() {
 
             var newHeightOrder = new List<HeightPoints>();
 
@@ -1050,7 +940,11 @@ namespace FCopParser {
                     var mirorVID = MeshType.IDFromVerticies(mirorVertices);
 
                     if (mirorVID != null) {
+
                         tile.verticies = MeshType.VerticiesFromID((int)mirorVID);
+
+                        FlipUVOrderVertically(tile);
+
                         validTiles.Add(tile);
                     } else {
 
@@ -1076,6 +970,134 @@ namespace FCopParser {
                 column.tiles = validTiles;
             }
 
+
+        }
+
+        void FlipUVOrderVertically(Tile tile) {
+
+            var uvVectors = new List<int[]>();
+
+            foreach (var uv in tile.uvs) {
+                uvVectors.Add(TextureCoordinate.GetVector(uv));
+            }
+
+            var newUVs = new List<int[]>();
+
+            if (tile.uvs.Count == 4) {
+
+                newUVs.Add(uvVectors[3]);
+                newUVs.Add(uvVectors[2]);
+                newUVs.Add(uvVectors[1]);
+                newUVs.Add(uvVectors[0]);
+
+            }
+            else {
+
+                newUVs.Add(uvVectors[2]);
+                newUVs.Add(uvVectors[1]);
+                newUVs.Add(uvVectors[0]);
+
+            }
+
+            foreach (var i in Enumerable.Range(0, tile.uvs.Count)) {
+                tile.uvs[i] = TextureCoordinate.SetPixel(newUVs[i][0], newUVs[i][1]);
+            }
+
+        }
+
+        void FlipUVOrderHorizontal(Tile tile) {
+
+            var positions = new List<VertexPosition>();
+            foreach (var vert in tile.verticies) {
+
+                if (positions.Contains(vert.vertexPosition)) {
+
+                    FlipUVPositionHorizontally(tile);
+                    return;
+
+                }
+
+                positions.Add(vert.vertexPosition);
+
+            }
+
+            var uvVectors = new List<int[]>();
+
+            foreach (var uv in tile.uvs) {
+                uvVectors.Add(TextureCoordinate.GetVector(uv));
+            }
+
+            var newUVs = new List<int[]>();
+
+            if (tile.uvs.Count == 4) {
+
+                newUVs.Add(uvVectors[1]);
+                newUVs.Add(uvVectors[0]);
+                newUVs.Add(uvVectors[3]);
+                newUVs.Add(uvVectors[2]);
+
+            }
+            else {
+
+                var hasTopLeft = tile.verticies.Exists(v => v.vertexPosition == VertexPosition.TopLeft);
+                var hasTopRight = tile.verticies.Exists(v => v.vertexPosition == VertexPosition.TopRight);
+                var hasBottomLeft = tile.verticies.Exists(v => v.vertexPosition == VertexPosition.BottomLeft);
+                var hasBottomRight = tile.verticies.Exists(v => v.vertexPosition == VertexPosition.BottomRight);
+
+                // Top right triangle or top left triangle
+                if ((hasTopRight && !hasBottomLeft) || (hasTopLeft && !hasBottomRight)) {
+
+                    newUVs.Add(uvVectors[1]);
+                    newUVs.Add(uvVectors[0]);
+                    newUVs.Add(uvVectors[2]);
+
+                } else {
+
+                    newUVs.Add(uvVectors[0]);
+                    newUVs.Add(uvVectors[2]);
+                    newUVs.Add(uvVectors[1]);
+
+                }
+
+
+
+            }
+
+            foreach (var i in Enumerable.Range(0, tile.uvs.Count)) {
+                tile.uvs[i] = TextureCoordinate.SetPixel(newUVs[i][0], newUVs[i][1]);
+            }
+
+        }
+
+        void FlipUVPositionHorizontally(Tile tile) {
+
+            var uvVectors = new List<int[]>();
+
+            foreach (var uv in tile.uvs) {
+                uvVectors.Add(TextureCoordinate.GetVector(uv));
+            }
+
+            float minX = uvVectors.Min(v => v[0]);
+            float maxX = uvVectors.Max(v => v[0]);
+
+            float width = maxX - minX;
+            var center = width / 2f;
+
+            foreach (var uv in uvVectors) {
+
+                var localX = uv[0] - minX;
+
+                var distanceFromCenter = localX - center;
+
+                var vFlippedX = center - distanceFromCenter;
+
+                uv[0] = (int)(minX + vFlippedX);
+
+            }
+
+            foreach (var i in Enumerable.Range(0, tile.uvs.Count)) {
+                tile.uvs[i] = TextureCoordinate.SetPixel(uvVectors[i][0], uvVectors[i][1]);
+            }
 
         }
 

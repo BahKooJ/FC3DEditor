@@ -257,17 +257,24 @@ public class UVPresentViewItem : MonoBehaviour {
                     tile.uvs = new List<int>(preset.animatedUVs.GetRange(0, 3));
                 }
 
-
+                return;
             }
 
             if (tile.uvs.Count == preset.uvs.Count) {
 
                 tile.uvs = new List<int>(preset.uvs);
-                tile.texturePalette = preset.texturePalette;
-                tile.isVectorAnimated = preset.isVectorAnimated;
-                tile.isSemiTransparent = preset.isSemiTransparent;
 
             }
+            else if (tile.uvs.Count < preset.uvs.Count) {
+                tile.uvs = new List<int>(preset.uvs.GetRange(0, 3));
+            }
+            else {
+                return;
+            }
+
+            tile.texturePalette = preset.texturePalette;
+            tile.isVectorAnimated = preset.isVectorAnimated;
+            tile.isSemiTransparent = preset.isSemiTransparent;
 
         }
 

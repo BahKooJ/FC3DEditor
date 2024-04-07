@@ -15,15 +15,19 @@ public class SectionEditView : MonoBehaviour {
     }
 
     public void OnClickMirrorSectionVerticallyButton() {
-        controller.MirrorSectionVertically();
+        controller.MirrorSectionHorizontally();
     }
 
     public void OnClickMirrorSectionHorizontallyButton() {
-        controller.MirrorSectionHorizontally();
+        controller.MirrorSectionVertically();
     }
 
     public void OnClickMirrorSectionDiagonallyButton() {
         controller.MirrorSectionDiagonally();
+    }
+
+    public void OnClickRemoveShadersFromSectionButton() {
+        controller.RemoveShadersFromSection();
     }
 
 }
