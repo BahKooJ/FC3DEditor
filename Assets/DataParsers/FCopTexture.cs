@@ -32,6 +32,8 @@ namespace FCopParser {
         public List<List<byte>> lookUpSections = new();
         public List<byte> ccbData;
 
+        public bool isColorIndexed = false;
+
         public FCopTexture(IFFDataFile rawFile) {
 
             this.rawFile = rawFile;
@@ -57,6 +59,8 @@ namespace FCopParser {
                 var pdat = offsets.First(chunkHeader => {
                     return chunkHeader.fourCCDeclaration == "PDAT";
                 });
+
+                isColorIndexed = true;
 
                 ParseColorPalette();
 
@@ -470,6 +474,11 @@ namespace FCopParser {
             //var counts = CreateColorPalette();
 
             //ClearLookUpData(counts.Item1, counts.Item2);
+
+            // Not yet...
+            if (isColorIndexed) {
+                return;
+            }
 
             var total = new List<byte>();
 

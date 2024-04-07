@@ -42,6 +42,16 @@ namespace FCopParser {
             this.subFileName = subFileName;
         }
 
+        public MusicHeader musicHeader = null;
+
+        public ChunkHeader(int index, string fourCCDeclaration, int chunkSize, string fourCCType, MusicHeader musicHeader) {
+            this.index = index;
+            this.fourCCDeclaration = fourCCDeclaration;
+            this.chunkSize = chunkSize;
+            this.fourCCType = fourCCType;
+            this.musicHeader = musicHeader;
+        }
+
     }
 
     public class FileHeader {
@@ -58,6 +68,18 @@ namespace FCopParser {
             this.dataID = dataID;
             this.dataSize = dataSize;
             this.actData = actData;
+        }
+
+    }
+
+    public class MusicHeader {
+
+        public int chunkCount;
+        public int chunkIteration;
+
+        public MusicHeader(int chunkCount, int chunkIteration) {
+            this.chunkCount = chunkCount;
+            this.chunkIteration = chunkIteration;
         }
 
     }

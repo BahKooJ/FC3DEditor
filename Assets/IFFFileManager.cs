@@ -16,6 +16,8 @@ namespace FCopParser {
         // Nothing but the music, the key is the name of the song.
         public KeyValuePair<byte[], List<byte>>? music = null;
 
+        public bool isPS1 = false;
+
     }
 
     // Object for storing important meta data to a game file.
