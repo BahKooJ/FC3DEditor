@@ -1,9 +1,7 @@
 
 using FCopParser;
 using System.Collections.Generic;
-using UnityEditor.UIElements;
 using UnityEngine;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 
 public class LevelMesh : MonoBehaviour {

@@ -1,7 +1,4 @@
-﻿
-
-using System.Xml.Linq;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 
 public class ShaderPresetsDirectoryViewItem : MonoBehaviour {

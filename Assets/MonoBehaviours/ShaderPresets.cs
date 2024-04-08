@@ -2,8 +2,6 @@
 
 using FCopParser;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 public class ShaderPresets {
 

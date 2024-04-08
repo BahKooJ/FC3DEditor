@@ -2,7 +2,6 @@
 using FCopParser;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.PlayerSettings;
 
 class TextureCoordinatePoint : MonoBehaviour {
 

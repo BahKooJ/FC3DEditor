@@ -2,9 +2,7 @@
 
 using FCopParser;
 using System.Collections.Generic;
-using System.Xml.Linq;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;

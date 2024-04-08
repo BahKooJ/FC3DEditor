@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using static UnityEditor.Progress;
 
 public class OpenFileWindowView : MonoBehaviour {
 

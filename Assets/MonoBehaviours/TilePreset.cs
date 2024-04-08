@@ -1,7 +1,6 @@
 ﻿
 
 using FCopParser;
-using System.Collections.Generic;
 
 public struct TilePreset {
 

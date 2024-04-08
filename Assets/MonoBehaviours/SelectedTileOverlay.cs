@@ -2,7 +2,6 @@
 using FCopParser;
 using System.Collections.Generic;
 using UnityEngine;
-using static System.Collections.Specialized.BitVector32;
 
 public class SelectedTileOverlay : MonoBehaviour {
 

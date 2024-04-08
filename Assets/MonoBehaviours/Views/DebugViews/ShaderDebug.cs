@@ -1,9 +1,4 @@
-﻿
-
-using FCopParser;
-using System;
-using TMPro;
-using UnityEditor.UIElements;
+﻿using TMPro;
 using UnityEngine;
 
 public class ShaderDebug : MonoBehaviour {

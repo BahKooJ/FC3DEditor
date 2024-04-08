@@ -3,7 +3,6 @@ namespace FCopParser {
     using System;
     using System.Collections;
     using System.Linq;
-    using System.Text;
     class Utils {
 
         public static Element[] CopyOfRange<Element>(Element[] array, int start, int end) {

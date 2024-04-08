@@ -1,7 +1,6 @@
 ﻿
 
 using FCopParser;
-using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
