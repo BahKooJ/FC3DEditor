@@ -1,12 +1,15 @@
 ﻿
 
 using FCopParser;
+using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ColorPresetItemView : MonoBehaviour {
 
     public Image image;
+    public ContextMenuHandler contextMenu;
+
 
     public ShaderMapperView view;
     public XRGB555 color;
@@ -17,6 +20,10 @@ public class ColorPresetItemView : MonoBehaviour {
 
         image.color = new Color(floatColors[0], floatColors[1], floatColors[2]);
 
+        contextMenu.items = new() {
+            ("Delete", Delete)
+        };
+
     }
 
     public void OnClick() {
@@ -24,6 +31,14 @@ public class ColorPresetItemView : MonoBehaviour {
         view.SetColors(color.Clone());
         view.ApplyColorsToCorners();
         view.controller.RefreshTileOverlayShader();
+
+    }
+
+    void Delete() {
+
+        Presets.colorPresets.presets.Remove(color);
+
+        view.RefreshView();
 
     }
 

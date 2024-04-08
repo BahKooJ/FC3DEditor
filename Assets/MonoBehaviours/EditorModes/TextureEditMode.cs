@@ -174,6 +174,10 @@ public class TextureEditMode : EditMode {
             return;
         }
 
+        if (selectedTiles.Count == 0) {
+            return;
+        }
+
         var xDif = column.x - oldColumn.x;
         var yDif = column.y - oldColumn.y;
 

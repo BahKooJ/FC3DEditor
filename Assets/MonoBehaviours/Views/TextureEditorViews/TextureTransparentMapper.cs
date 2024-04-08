@@ -19,7 +19,6 @@ public class TextureTransparentMapper : MonoBehaviour {
     // View Refs
     public RectTransform drawingCursor;
     public Image drawColorButton;
-    public Image showRGBValuesToggle;
 
     public Sprite transparentMap;
     public int bmpID;

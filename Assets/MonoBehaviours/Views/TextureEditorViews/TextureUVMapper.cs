@@ -311,11 +311,15 @@ public class TextureUVMapper : MonoBehaviour {
             yVectorText.text = "Disabled";
         }
 
+        textureLines.ReInit();
+
     }
 
     void EndEditingVectorAnimation() {
 
         vectorAnimationProperties.SetActive(false);
+
+        textureLines.ReInit();
 
     }
 
@@ -375,6 +379,8 @@ public class TextureUVMapper : MonoBehaviour {
         frameItems.Clear();
 
         frameSelected = -1;
+
+        textureLines.ReInit();
 
     }
 
@@ -878,6 +884,15 @@ public class TextureUVMapper : MonoBehaviour {
                     firstTile.animatedUVs.AddRange(firstTile.uvs);
                     firstTile.animatedUVs.AddRange(firstTile.uvs);
 
+                }
+
+                refreshRequired = firstTile.isVectorAnimated;
+
+                firstTile.isVectorAnimated = false;
+
+                if (refreshRequired) {
+                    controller.selectedSection.RefreshMesh();
+                    controller.RefreshTileOverlayTexture();
                 }
 
                 StartEditingFrameAnimation();

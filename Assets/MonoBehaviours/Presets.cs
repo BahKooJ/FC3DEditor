@@ -544,6 +544,8 @@ public abstract class Presets {
 
         void ReadColorPresets() {
 
+            colorPresets = new ColorPresets();
+
             var startIndex = file.IndexOf(ColorPresets.tag);
 
             if (startIndex == -1) {
@@ -594,6 +596,7 @@ public abstract class Presets {
 
         total += UVPresets.tag + uvPresets.Compile();
         total += ShaderPresets.tag + shaderPresets.Compile();
+        total += ColorPresets.tag + colorPresets.Compile();
 
         File.WriteAllText("Presets/" + name + ".txt", total);
 

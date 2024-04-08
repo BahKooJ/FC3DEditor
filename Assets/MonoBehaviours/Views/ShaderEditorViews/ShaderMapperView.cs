@@ -1,10 +1,10 @@
 ﻿
 
 using FCopParser;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using UnityEditor.Presets;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -275,6 +275,10 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void ApplyColorsToCorner() {
 
+        if (corners.Count == 0) {
+            return;
+        }
+
         corners[0].ChangeValue();
 
         RefreshMesh();
@@ -474,6 +478,30 @@ public class ShaderMapperView : MonoBehaviour {
         ApplyColorsToCorner();
         controller.RefreshTileOverlayShader();
 
+
+    }
+
+    public void OnFinishSolidMonoType() {
+
+        if (controller.selectedSection == null) {
+            return;
+        }
+
+        try {
+
+            var value = Int32.Parse(solidMonoValue.text);
+
+            solidMonoByteValue = (byte)value;
+            solidMonoSlider.value = value;
+
+            ApplyColorsToCorner();
+            controller.RefreshTileOverlayShader();
+
+        } catch {
+
+            OnChangeSolidMono();
+
+        }
 
     }
 

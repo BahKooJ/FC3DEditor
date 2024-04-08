@@ -283,6 +283,8 @@ public class TileEditMode : EditMode {
 
     void SelectRangeOfTiles(TileColumn oldColumn, TileColumn column) {
 
+        if (oldColumn == null) { return; }
+
         var xDif = column.x - oldColumn.x;
         var yDif = column.y - oldColumn.y;
 

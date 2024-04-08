@@ -148,16 +148,24 @@ class TextureCoordinatePoint : MonoBehaviour {
 
     }
 
+    public void ShowGhostPos() {
+        ghostPoint.gameObject.SetActive(true);
+        var originalColor = GetComponent<Image>().color;
+        originalColor.r -= 0.5f;
+        originalColor.g -= 0.5f;
+        originalColor.b -= 0.5f;
+        ghostPoint.color = originalColor;
+        ChangeGhostPos();
+    }
+
+    public void HideGhostPos() {
+        ghostPoint.gameObject.SetActive(false);
+    }
+
     void Start() {
         
         if (view.controller.selectedTiles[0].isVectorAnimated) {
-            ghostPoint.gameObject.SetActive(true);
-            var originalColor = GetComponent<Image>().color;
-            originalColor.r -= 0.5f;
-            originalColor.g -= 0.5f;
-            originalColor.b -= 0.5f;
-            ghostPoint.color = originalColor;
-            ChangeGhostPos();
+            ShowGhostPos();
         }
 
     }
