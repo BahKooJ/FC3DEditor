@@ -37,10 +37,12 @@ namespace FCopParser {
             // PS1
             public const string VAGB = "VAGB";
             public const string VAGM = "VAGM";
+            public const string CANM = "CANM";
 
             public readonly static List<byte> VAGBbytes = new() { 66, 71, 65, 86 };
             public readonly static List<byte> VAGMbytes = new() { 77, 71, 65, 86 };
-
+            public readonly static List<byte> CANMbytes = new() { 77, 78, 65, 67 };
+            public readonly static List<byte> MDECbytes = new() { 67, 69, 68, 77 };
 
         }
 
@@ -155,6 +157,25 @@ namespace FCopParser {
                     }
                     else {
                         fileMananger.subFiles[subFileName].Add(vagbFile);
+                    }
+
+                }
+                else if (header.fourCCDeclaration == FourCC.CANM) {
+
+                    if (subFileName == null) {
+                        throw new Exception("This should only be inside of of a SWVR?");
+                    }
+
+                    var camnFile = new IFFDataFile(0,
+                        CopyOfRange(header.index + 20, header.index + header.chunkSize).ToList(),
+                        header.fourCCDeclaration, 0, new()
+                        );
+
+                    if (!fileMananger.subFiles.ContainsKey(subFileName)) {
+                        fileMananger.subFiles[subFileName] = new List<IFFDataFile> { camnFile };
+                    }
+                    else {
+                        fileMananger.subFiles[subFileName].Add(camnFile);
                     }
 
                 }
@@ -433,7 +454,29 @@ namespace FCopParser {
 
                         current24kSectionSize += chunkHeader.Count + file.data.Count;
 
-                    } else {
+                    } 
+                    else if (file.dataFourCC == FourCC.CANM) {
+
+                        var chunkHeader = new List<byte>();
+
+                        chunkHeader.AddRange(FourCC.CANMbytes);
+                        chunkHeader.AddRange(BitConverter.GetBytes(20 + file.data.Count));
+                        // In all my time looking at these files I've never seen these 8 bytes be something other than 0.
+                        // Does it matter though?
+                        chunkHeader.AddRange(new List<byte>() { 0, 0, 0, 0, 0, 0, 0, 0 });
+                        chunkHeader.AddRange(FourCC.MDECbytes);
+
+                        if (subFile.Value.Count > 1) {
+                            FILLCheck(chunkHeader.Count + file.data.Count);
+                        }
+
+                        compiledFile.AddRange(chunkHeader);
+                        compiledFile.AddRange(file.data);
+
+                        current24kSectionSize += chunkHeader.Count + file.data.Count;
+
+                    }
+                    else {
 
                         CompileDataFile(file);
 

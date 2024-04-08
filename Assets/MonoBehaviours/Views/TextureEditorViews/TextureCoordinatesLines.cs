@@ -26,6 +26,10 @@ public class TextureCoordinatesLines : MonoBehaviour {
 
     public void ReInit() {
 
+        if (lineRenderer == null) {
+            return;
+        }
+
         foreach (var point in points) {
             Destroy(point);
         }

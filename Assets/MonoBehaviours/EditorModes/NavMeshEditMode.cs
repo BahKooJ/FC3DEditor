@@ -35,7 +35,7 @@ public class NavMeshEditMode : EditMode {
 
             if (Controls.OnDown("Select")) {
 
-                var node = new NavNode(navNodes.Count,
+                var node = new NavNode(navNodes.Count, -64, 0,
                     Mathf.RoundToInt(navNodeToAdd.transform.position.x * 32f),
                     Mathf.RoundToInt(navNodeToAdd.transform.position.z * -32f), false);
 

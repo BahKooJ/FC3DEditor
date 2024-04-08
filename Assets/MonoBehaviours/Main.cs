@@ -115,9 +115,18 @@ public class Main : MonoBehaviour {
                     int clickX = (int)Math.Floor(hit.point.x - section.x);
                     int clickY = (int)Math.Floor(Math.Abs(hit.point.z + section.y));
 
-                    var column = section.section.tileColumns.First(tileColumn => {
-                        return tileColumn.x == clickX && tileColumn.y == clickY;
-                    });
+                    TileColumn column;
+
+                    // This just sometimes doesn't work and I don't really understand why
+                    try {
+                        column = section.section.tileColumns.First(tileColumn => {
+                            return tileColumn.x == clickX && tileColumn.y == clickY;
+                        });
+                    } catch {
+                        return;
+                    }
+
+
 
                     if (Controls.OnDown("Select")) {
 

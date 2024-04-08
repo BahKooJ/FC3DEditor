@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 
 namespace FCopParser {
 
+    // TODO: Turns out the starting node is not just a bool but has more going on with it.
     public class FCopNavMesh {
 
         const int nodeCountOffset = 14;
@@ -33,6 +34,8 @@ namespace FCopParser {
 
                 nodes.Add(new NavNode(
                     index,
+                    Utils.BytesToShort(rawFile.data.ToArray(), offset + 4),
+                    Utils.BytesToShort(rawFile.data.ToArray(), offset + 10),
                     Utils.BytesToShort(rawFile.data.ToArray(), offset + 6),
                     Utils.BytesToShort(rawFile.data.ToArray(), offset + 8),
                     Utils.BytesToShort(rawFile.data.ToArray(), offset + 10) == 1,
@@ -68,12 +71,16 @@ namespace FCopParser {
                 total.AddRange(Utils.BitArrayToByteArray(bitfield.Compile()));
 
                 // There's a 16 bit number after the paths, the use is unknown but it seems to mostly be -64, temp -64 is placed.
-                total.AddRange(BitConverter.GetBytes((short)-64));
+                total.AddRange(BitConverter.GetBytes((short)node.unknown));
 
                 total.AddRange(BitConverter.GetBytes((short)node.x));
                 total.AddRange(BitConverter.GetBytes((short)node.y));
-                total.AddRange(BitConverter.GetBytes((short)(node.isStartingPoint ? 1 : 0)));
 
+                if (node.unknown2 != 0 && node.unknown2 != 1) {
+                    total.AddRange(BitConverter.GetBytes((short)node.unknown2));
+                } else {
+                    total.AddRange(BitConverter.GetBytes((short)(node.isStartingPoint ? 1 : 0)));
+                }
 
             }
 
@@ -107,8 +114,13 @@ namespace FCopParser {
         public int y;
         public bool isStartingPoint;
 
-        public NavNode(int index, int x, int y, bool isStartingPoint, int nextNodeA = 1023, int nextNodeB = 1023, int nextNodeC = 1023) {
+        public int unknown;
+        public int unknown2;
+
+        public NavNode(int index, int unknown, int unknown2, int x, int y, bool isStartingPoint, int nextNodeA = 1023, int nextNodeB = 1023, int nextNodeC = 1023) {
             this.index = index;
+            this.unknown = unknown;
+            this.unknown2 = unknown2;
             this.nextNode[0] = nextNodeA;
             this.nextNode[1] = nextNodeB;
             this.nextNode[2] = nextNodeC;
