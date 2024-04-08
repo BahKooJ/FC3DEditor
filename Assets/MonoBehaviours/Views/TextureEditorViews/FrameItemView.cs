@@ -3,7 +3,6 @@
 
 using FCopParser;
 using System.Collections.Generic;
-using UnityEditor.Presets;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
