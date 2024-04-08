@@ -27,6 +27,12 @@ public class TextureTransparentMapper : MonoBehaviour {
     int penSize = 1;
     bool drawingTransparency = true;
 
+    void Start() {
+
+        drawingCursor.gameObject.SetActive(false);
+
+    }
+
     void Update() {
 
         if (!uvMapper.editTransparency) {

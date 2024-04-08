@@ -269,6 +269,7 @@ public class TextureUVMapper : MonoBehaviour {
             transparentMapperTools.SetActive(false);
             editPaletteButton.SetActive(true);
 
+            transparentMapper.drawingCursor.gameObject.SetActive(false);
 
             InitView();
 
@@ -276,8 +277,11 @@ public class TextureUVMapper : MonoBehaviour {
         }
 
         EndEditingVectorAnimation();
+        EndEditingFrameAnimation();
 
         editTransparency = true;
+
+        transparentMapper.drawingCursor.gameObject.SetActive(true);
 
         uvMapperTools.SetActive(false);
 

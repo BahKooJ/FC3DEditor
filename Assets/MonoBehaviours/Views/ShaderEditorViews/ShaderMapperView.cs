@@ -518,6 +518,38 @@ public class ShaderMapperView : MonoBehaviour {
 
     }
 
+    public void OnFinishMonoType() {
+
+        if (controller.selectedSection == null) {
+            return;
+        }
+
+        try {
+
+            var value = Int32.Parse(monoValue.text);
+
+            if (value < 0) {
+                value = 0;
+            }
+            if (value > 63) {
+                value = 63;
+            }
+
+            dynamicMonoValue = value;
+            monoSlider.value = value;
+
+            ApplyColorsToCorner();
+            controller.RefreshTileOverlayShader();
+
+        }
+        catch {
+
+            OnChangeMono();
+
+        }
+
+    }
+
     public void OnChangeRed() {
 
         if (refuseCallbacks) { return; }
@@ -529,6 +561,38 @@ public class ShaderMapperView : MonoBehaviour {
         RefreshColorPreview();
         ApplyColorsToCorners();
         controller.RefreshTileOverlayShader();
+
+    }
+
+    public void OnFinishRedType() {
+
+        if (controller.selectedSection == null) {
+            return;
+        }
+
+        try {
+
+            var value = Int32.Parse(redInput.text);
+
+            if (value < 0) {
+                value = 0;
+            }
+            if (value > 31) {
+                value = 31;
+            }
+
+            colorValue.r = value;
+            redSlider.value = value;
+
+            ApplyColorsToCorner();
+            controller.RefreshTileOverlayShader();
+
+        }
+        catch {
+
+            OnChangeRed();
+
+        }
 
     }
 
@@ -546,6 +610,38 @@ public class ShaderMapperView : MonoBehaviour {
 
     }
 
+    public void OnFinishGreenType() {
+
+        if (controller.selectedSection == null) {
+            return;
+        }
+
+        try {
+
+            var value = Int32.Parse(greenInput.text);
+
+            if (value < 0) {
+                value = 0;
+            }
+            if (value > 31) {
+                value = 31;
+            }
+
+            colorValue.g = value;
+            greenSlider.value = value;
+
+            ApplyColorsToCorner();
+            controller.RefreshTileOverlayShader();
+
+        }
+        catch {
+
+            OnChangeGreen();
+
+        }
+
+    }
+
     public void OnChangeBlue() {
 
         if (refuseCallbacks) { return; }
@@ -557,6 +653,38 @@ public class ShaderMapperView : MonoBehaviour {
         RefreshColorPreview();
         ApplyColorsToCorners();
         controller.RefreshTileOverlayShader();
+
+    }
+
+    public void OnFinishBlueType() {
+
+        if (controller.selectedSection == null) {
+            return;
+        }
+
+        try {
+
+            var value = Int32.Parse(blueInput.text);
+
+            if (value < 0) {
+                value = 0;
+            }
+            if (value > 31) {
+                value = 31;
+            }
+
+            colorValue.b = value;
+            blueSlider.value = value;
+
+            ApplyColorsToCorner();
+            controller.RefreshTileOverlayShader();
+
+        }
+        catch {
+
+            OnChangeBlue();
+
+        }
 
     }
 
