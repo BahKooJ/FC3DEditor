@@ -221,7 +221,9 @@ public class ShaderPresetViewItem : MonoBehaviour {
 
     public void OnClick() {
 
-        foreach (var tile in controller.selectedTiles) {
+        foreach (var selection in controller.selectedItems) {
+
+            var tile = selection.tile;
 
             if (tile.shaders.isQuad == preset.shader.isQuad) {
 

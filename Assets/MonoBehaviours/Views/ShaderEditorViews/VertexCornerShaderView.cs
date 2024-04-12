@@ -1,6 +1,7 @@
 ﻿
 
 using FCopParser;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,7 +19,7 @@ public class VertexCornerShaderView : MonoBehaviour {
 
     public void Init() {
 
-        var tile = controller.selectedTiles[0];
+        var tile = controller.FirstTile;
 
         if (isSelected) {
             image.color = Color.green;
@@ -43,9 +44,11 @@ public class VertexCornerShaderView : MonoBehaviour {
 
     public void ChangeValue() {
 
-        var originalType = controller.selectedTiles[0].shaders.type;
+        var originalType = controller.FirstTile.shaders.type;
 
-        foreach (var tile in controller.selectedTiles) {
+        foreach (var selection in controller.selectedItems) {
+
+            var tile = selection.tile;
 
             if (tile.shaders.type != originalType) {
                 tile.ChangeShader(originalType);
@@ -110,7 +113,9 @@ public class VertexCornerShaderView : MonoBehaviour {
 
     public void ChangeMonoValue(int value) {
 
-        foreach (var tile in controller.selectedTiles) {
+        foreach (var selection in controller.selectedItems) {
+
+            var tile = selection.tile;
 
             if (tile.shaders.type != VertexColorType.DynamicMonoChrome) {
                 tile.ChangeShader(VertexColorType.DynamicMonoChrome);
@@ -139,7 +144,9 @@ public class VertexCornerShaderView : MonoBehaviour {
 
     public void ChangeColor(XRGB555 value) {
 
-        foreach (var tile in controller.selectedTiles) {
+        foreach (var selection in controller.selectedItems) {
+
+            var tile = selection.tile;
 
             if (tile.shaders.type != VertexColorType.Color) {
                 tile.ChangeShader(VertexColorType.Color);
@@ -167,7 +174,7 @@ public class VertexCornerShaderView : MonoBehaviour {
     }
 
     public int GetMonochromeValue() {
-        var monoColor = (DynamicMonoChromeShader)controller.selectedTiles[0].shaders;
+        var monoColor = (DynamicMonoChromeShader)controller.FirstTile.shaders;
 
         if (monoColor.isQuad) {
             return monoColor.values[ShaderMapperView.monoDataQuadIndexes[index]];
@@ -179,7 +186,7 @@ public class VertexCornerShaderView : MonoBehaviour {
 
     public XRGB555 GetColorValue() {
 
-        var shaderColor = (ColorShader)controller.selectedTiles[0].shaders;
+        var shaderColor = (ColorShader)controller.FirstTile.shaders;
 
         if (shaderColor.isQuad) {
             return shaderColor.values[ShaderMapperView.colorDataQuadIndexes[index]].Clone();

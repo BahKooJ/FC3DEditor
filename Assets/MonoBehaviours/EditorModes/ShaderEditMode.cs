@@ -6,18 +6,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-public class ShaderEditMode : EditMode {
+public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
     public static bool openShaderMapperByDefault = true;
 
     public Main main { get; set; }
-    public List<Tile> selectedTiles = new();
-    public TileColumn selectedColumn = null;
-    public LevelMesh selectedSection = null;
+
     public List<TileTexturePreview> selectedTileOverlays = new();
-    public GameObject selectedSectionOverlay = null;
+    public List<GameObject> selectedSectionOverlays = new();
 
     public ShaderEditPanelView view;
 
@@ -68,42 +67,28 @@ public class ShaderEditMode : EditMode {
 
     public void SelectTile(Tile tile, TileColumn column, LevelMesh section) {
 
-        var oldColumn = selectedColumn;
-
         // If shift is held then multiple tiles can be selected
-        if (Controls.IsDown("ModifierMultiSelect")) {
-
-            // Checks if the new selected tile is inside the selected Section, if it is not this method cannot continue.
-            if (selectedSection != null) {
-                if (selectedSection != section) {
-                    return;
-                }
-            }
-
-        }
-        else {
+        if (!Controls.IsDown("ModifierMultiSelect")) {
 
             // Clears the selected tile(s).
-            selectedTiles.Clear();
+            selectedItems.Clear();
+            selectedSections.Clear();
 
         }
-
-        // Updates the remaining data
-        selectedColumn = column;
-        selectedSection = section;
 
         // Selects a range of tiles if the mutli-select modifier is held.
         if (Controls.IsDown("ModifierAltSelect") && Controls.IsDown("ModifierMultiSelect")) {
 
-            SelectRangeOfTiles(oldColumn, column);
+            //SelectRangeOfTiles(tile);
 
         }
 
         // Checks to see if the tiles vertex count is the same as the first selected tile
-        // This needs to be done because there are many differences in triangle tiles and rect tiles 
-        else if (selectedTiles.Count == 0) {
+        // This needs to be done because there are many differences in triangle tiles and rect tiles
+        // TODO: Make it so it doesn't matter
+        else if (selectedItems.Count == 0) {
 
-            SelectTile(tile);
+            MakeSelection(tile, column, section);
 
             if (view.activeShaderMapper != null) {
                 view.activeShaderMapper.GetComponent<ShaderMapperView>().RefreshView();
@@ -118,34 +103,34 @@ public class ShaderEditMode : EditMode {
             }
 
         }
-        else if (selectedTiles[0].verticies.Count == tile.verticies.Count) {
+        else if (IsSameShape(tile)) {
 
-            SelectTile(tile);
+            MakeSelection(tile, column, section);
 
         }
         else {
             return;
         }
 
-        if (selectedSectionOverlay != null) {
-            Object.Destroy(selectedSectionOverlay);
-        }
+        ClearSectionOverlays();
 
-        selectedSectionOverlay = Object.Instantiate(main.SectionBoarders, new Vector3(section.x, 0, -section.y), Quaternion.identity);
+        foreach (var iSection in selectedSections) {
+            selectedSectionOverlays.Add(Object.Instantiate(main.SectionBoarders, new Vector3(iSection.x, 0, -iSection.y), Quaternion.identity));
+        }
 
         RefeshTileOverlay();
 
     }
 
-    void SelectTile(Tile tile, bool deSelectDuplicate = true) {
+    void MakeSelection(Tile tile, TileColumn column, LevelMesh section, bool deSelectDuplicate = true) {
 
-        if (selectedTiles.Contains(tile)) {
+        if (IsTileAlreadySelected(tile)) {
 
             if (deSelectDuplicate) {
-                selectedTiles.Remove(tile);
+                RemoveTile(tile);
                 RefeshTileOverlay();
 
-                if (selectedTiles.Count == 0) {
+                if (!HasSelection) {
 
                     if (view.activeShaderMapper != null) {
                         view.CloseShaderMapper();
@@ -160,48 +145,8 @@ public class ShaderEditMode : EditMode {
         }
         else {
 
-            selectedTiles.Add(tile);
-
-        }
-
-    }
-
-    void SelectRangeOfTiles(TileColumn oldColumn, TileColumn column) {
-
-        if (oldColumn == null) {
-            return;
-        }
-
-        var xDif = column.x - oldColumn.x;
-        var yDif = column.y - oldColumn.y;
-
-        var xOrigin = oldColumn.x;
-        var yOrigin = oldColumn.y;
-
-        if (xDif < 0) {
-            xOrigin = column.x;
-        }
-        if (yDif < 0) {
-            yOrigin = column.y;
-        }
-
-        foreach (var y in Enumerable.Range(yOrigin, Math.Abs(yDif) + 1)) {
-
-            foreach (var x in Enumerable.Range(xOrigin, Math.Abs(xDif) + 1)) {
-
-                var itColumn = selectedSection.section.GetTileColumn(x, y);
-
-                foreach (var itTile in itColumn.tiles) {
-
-                    if (selectedTiles[0].verticies.Count == itTile.verticies.Count) {
-
-                        SelectTile(itTile, false);
-
-                    }
-
-                }
-
-            }
+            selectedItems.Add(new TileSelection(tile, column, section));
+            selectedSections.Add(section);
 
         }
 
@@ -209,20 +154,13 @@ public class ShaderEditMode : EditMode {
 
     void ClearAllSelectedItems() {
 
-        if (selectedSection != null) {
-            selectedSection.RefreshMesh();
-        }
+        RefreshMeshes();
 
-        selectedTiles.Clear();
+        selectedItems.Clear();
+        selectedSections.Clear();
         ClearTileOverlays();
 
-        if (selectedSectionOverlay != null) {
-            Object.Destroy(selectedSectionOverlay);
-            selectedSectionOverlay = null;
-        }
-
-        selectedColumn = null;
-        selectedSection = null;
+        ClearSectionOverlays();
 
     }
 
@@ -230,7 +168,7 @@ public class ShaderEditMode : EditMode {
 
         ClearTileOverlays();
 
-        foreach (var tile in selectedTiles) {
+        foreach (var tile in selectedItems) {
 
             InitTileOverlay(tile);
 
@@ -238,15 +176,15 @@ public class ShaderEditMode : EditMode {
 
     }
 
-    void InitTileOverlay(Tile tile) {
+    void InitTileOverlay(TileSelection selection) {
 
         var overlay = Object.Instantiate(main.TileTexturePreview);
         var script = overlay.GetComponent<TileTexturePreview>();
         script.controller = main;
-        script.tile = tile;
+        script.tile = selection.tile;
         script.showShaders = true;
         selectedTileOverlays.Add(script);
-        overlay.transform.SetParent(selectedSection.transform);
+        overlay.transform.SetParent(selection.section.transform);
         overlay.transform.localPosition = Vector3.zero;
 
     }
@@ -269,6 +207,16 @@ public class ShaderEditMode : EditMode {
 
     }
 
+    void ClearSectionOverlays() {
+
+        foreach (var selectedSectionOverlay in selectedSectionOverlays) {
+            Object.Destroy(selectedSectionOverlay);
+        }
+
+        selectedSectionOverlays.Clear();
+
+    }
+
     public void RefreshShaderMapper() {
 
         if (view.activeShaderMapper != null) {
@@ -279,17 +227,15 @@ public class ShaderEditMode : EditMode {
 
     public void DuplicateTileShader() {
 
-        if (selectedTiles.Count < 2) return;
+        if (selectedItems.Count < 2) return;
 
-        var firstTile = selectedTiles[0];
+        foreach (var selection in selectedItems.Skip(1)) {
 
-        foreach (var tile in selectedTiles.Skip(1)) {
-
-            tile.shaders = firstTile.shaders.Clone();
+            selection.tile.shaders = FirstTile.shaders.Clone();
 
         }
 
-        selectedSection.RefreshMesh();
+        RefreshMeshes();
 
         RefreshShaderMapper();
         RefreshTileOverlayShader();
@@ -298,20 +244,18 @@ public class ShaderEditMode : EditMode {
 
     public bool AddPreset() {
 
-        if (selectedTiles.Count == 0) { return false; }
+        if (selectedItems.Count == 0) { return false; }
 
-        var firstTile = selectedTiles[0];
+        if (FirstTile.shaders is AnimatedShader) { return false; }
 
-        if (firstTile.shaders is AnimatedShader) { return false; }
-
-        var potentialID = MeshType.IDFromVerticies(firstTile.verticies);
+        var potentialID = MeshType.IDFromVerticies(FirstTile.verticies);
 
         if (potentialID == null) {
             DialogWindowUtil.Dialog("Cannot Save Preset", "Cannot save shader preset, tile mesh is invalid!");
             return false; 
         }
 
-        var shaderPreset = new ShaderPreset(firstTile.shaders, "", (int)potentialID);
+        var shaderPreset = new ShaderPreset(FirstTile.shaders, "", (int)potentialID);
 
         currentShaderPresets.presets.Add(shaderPreset);
 

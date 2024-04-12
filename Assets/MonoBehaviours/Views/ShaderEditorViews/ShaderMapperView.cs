@@ -97,7 +97,7 @@ public class ShaderMapperView : MonoBehaviour {
 
         material.mainTexture = controller.main.levelTexturePallet;
 
-        if (controller.selectedTiles.Count != 0) {
+        if (controller.selectedItems.Count != 0) {
             RefreshView();
         }
 
@@ -119,7 +119,7 @@ public class ShaderMapperView : MonoBehaviour {
 
         corners.Clear();
 
-        var tile = controller.selectedTiles[0];
+        var tile = controller.FirstTile;
 
         shaderTypeDropdown.value = (int)tile.shaders.type;
 
@@ -190,14 +190,14 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void SelectedCorner(int index) {
 
-        switch (controller.selectedTiles[0].shaders.type) {
+        switch (controller.FirstTile.shaders.type) {
             case VertexColorType.MonoChrome:
                 break;
             case VertexColorType.DynamicMonoChrome:
 
-                var monoShader = (DynamicMonoChromeShader)controller.selectedTiles[0].shaders;
+                var monoShader = (DynamicMonoChromeShader)controller.FirstTile.shaders;
 
-                if (controller.selectedTiles[0].verticies.Count == 4) {
+                if (controller.IsFirstTileQuad) {
 
                     SetMono(monoShader.values[monoDataQuadIndexes[index]]);
 
@@ -210,9 +210,9 @@ public class ShaderMapperView : MonoBehaviour {
                 break;
             case VertexColorType.Color:
 
-                var shader = (ColorShader)controller.selectedTiles[0].shaders;
+                var shader = (ColorShader)controller.FirstTile.shaders;
 
-                if (controller.selectedTiles[0].verticies.Count == 4) {
+                if (controller.IsFirstTileQuad) {
 
                     SetColors(shader.values[colorDataQuadIndexes[index]]);
 
@@ -339,7 +339,7 @@ public class ShaderMapperView : MonoBehaviour {
         mesh.Clear();
         vertices.Clear();
 
-        if (controller.selectedTiles[0].verticies.Count == 4) {
+        if (controller.IsFirstTileQuad) {
             GenerateQuad();
         }
         else {
@@ -358,7 +358,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     void GenerateQuad() {
 
-        var tile = controller.selectedTiles[0];
+        var tile = controller.FirstTile;
 
         List<Color> vertexColors = new();
         List<Vector2> textureCords = new();
@@ -412,7 +412,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     void GenerateTriangle() {
 
-        var tile = controller.selectedTiles[0];
+        var tile = controller.FirstTile;
 
         List<Color> vertexColors = new();
         List<Vector2> textureCords = new();
@@ -459,7 +459,7 @@ public class ShaderMapperView : MonoBehaviour {
 
         if (refuseCallbacks) { return; }
 
-        var tile = controller.selectedTiles[0];
+        var tile = controller.FirstTile;
 
         tile.ChangeShader((VertexColorType)shaderTypeDropdown.value);
 
@@ -483,7 +483,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void OnFinishSolidMonoType() {
 
-        if (controller.selectedSection == null) {
+        if (controller.HasSelection) {
             return;
         }
 
@@ -520,7 +520,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void OnFinishMonoType() {
 
-        if (controller.selectedSection == null) {
+        if (controller.HasSelection) {
             return;
         }
 
@@ -566,7 +566,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void OnFinishRedType() {
 
-        if (controller.selectedSection == null) {
+        if (controller.HasSelection) {
             return;
         }
 
@@ -612,7 +612,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void OnFinishGreenType() {
 
-        if (controller.selectedSection == null) {
+        if (controller.HasSelection) {
             return;
         }
 
@@ -658,7 +658,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void OnFinishBlueType() {
 
-        if (controller.selectedSection == null) {
+        if (controller.HasSelection) {
             return;
         }
 
@@ -705,7 +705,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void OnClickRotateClockwise() {
 
-        var tile = controller.selectedTiles[0];
+        var tile = controller.FirstTile;
 
         if (tile.shaders.type == VertexColorType.MonoChrome || tile.shaders.type == VertexColorType.ColorAnimated) {
             return;
@@ -787,7 +787,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void OnClickRotateCounterClockwise() {
 
-        var tile = controller.selectedTiles[0];
+        var tile = controller.FirstTile;
 
         if (tile.shaders.type == VertexColorType.MonoChrome || tile.shaders.type == VertexColorType.ColorAnimated) {
             return;
@@ -869,7 +869,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void OnClickFlipVertically() {
 
-        var tile = controller.selectedTiles[0];
+        var tile = controller.FirstTile;
 
         if (tile.shaders.type == VertexColorType.MonoChrome || tile.shaders.type == VertexColorType.ColorAnimated) {
             return;
@@ -926,7 +926,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void OnClickFlipHorizontally() {
 
-        var tile = controller.selectedTiles[0];
+        var tile = controller.FirstTile;
 
         if (tile.shaders.type == VertexColorType.MonoChrome || tile.shaders.type == VertexColorType.ColorAnimated) {
             return;

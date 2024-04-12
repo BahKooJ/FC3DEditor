@@ -33,7 +33,7 @@ public class ShaderEditPanelView : MonoBehaviour {
 
     public void OpenShaderMapper() {
 
-        if (controller.selectedTiles.Count == 0) { return; }
+        if (controller.selectedItems.Count == 0) { return; }
 
         if (activeShaderMapper != null) {
             CloseShaderMapper();
