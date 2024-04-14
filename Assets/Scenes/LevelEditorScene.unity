@@ -2022,6 +2022,7 @@ MonoBehaviour:
   meshSection: {fileID: 3982175839306991789, guid: d2f3b92a7ae38644b87000c94b6447b4, type: 3}
   heightMapChannelPoint: {fileID: 1298310605505145416, guid: 804d2b1c507598948a3e68434291bfc0, type: 3}
   tileHeightMapChannelPoint: {fileID: 1298310605505145416, guid: f51c5e561cc50c441a5a06599292ebdc, type: 3}
+  vertexColorPoint: {fileID: 1298310605505145416, guid: 800c001ec0661e3469f526e87076749f, type: 3}
   SelectedTileOverlay: {fileID: 3982175839306991789, guid: c11d8fe31bdf1aa4887436153193d9c9, type: 3}
   TileTexturePreview: {fileID: 3982175839306991789, guid: 2759ef5779e33c643944bdeae490ddfa, type: 3}
   SectionBoarders: {fileID: 2168547336867362444, guid: 9ea2ba9bd14a6d84f92bbce323964dbf, type: 3}

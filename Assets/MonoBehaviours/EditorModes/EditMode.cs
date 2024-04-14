@@ -37,7 +37,66 @@ public class TileMutatingEditMode {
         get => _IsFirstTileQuad();
     }
 
+    virtual public void MakeSelection(Tile tile, TileColumn column, LevelMesh section, bool deSelectDuplicate = true) { }
+
     public void SelectRangeOfTiles(TileSelection tile) {
+
+        var firstSelection = selectedItems[0];
+
+        var firstClickColumnX = firstSelection.column.x;
+        var firstClickColumnY = firstSelection.column.y;
+
+        var lastClickColumnX = tile.column.x;
+        var lastClickColumnY = tile.column.y;
+
+        var sameMesh = firstSelection.tile.verticies.SequenceEqual(tile.tile.verticies);
+
+        if (firstSelection.section == tile.section) {
+
+            var startX = firstClickColumnX < lastClickColumnX ? firstClickColumnX : lastClickColumnX;
+            var startY = firstClickColumnY < lastClickColumnY ? firstClickColumnY : lastClickColumnY;
+
+            var endX = firstClickColumnX > lastClickColumnX ? firstClickColumnX : lastClickColumnX;
+            var endY = firstClickColumnY > lastClickColumnY ? firstClickColumnY : lastClickColumnY;
+
+            foreach (var y in Enumerable.Range(startY, endY - startY + 1)) {
+
+                foreach (var x in Enumerable.Range(startX, endX - startX + 1)) {
+
+                    var itColumn = tile.section.section.GetTileColumn(x, y);
+
+                    foreach (var itTile in itColumn.tiles) {
+
+                        if (sameMesh) {
+
+                            if (itTile.verticies.SequenceEqual(firstSelection.tile.verticies)) {
+
+                                MakeSelection(itTile, itColumn, tile.section, false);
+
+                            }
+
+                        }
+                        else {
+
+                            MakeSelection(itTile, itColumn, tile.section, false);
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        else {
+
+
+
+        }
+
+
 
         //if (oldColumn == null) {
         //    return;

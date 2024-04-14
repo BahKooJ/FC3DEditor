@@ -144,9 +144,29 @@ public class ShaderMapperView : MonoBehaviour {
 
         }
 
-        RefreshMesh();
+        var trans = (RectTransform)transform;
+        var pos = trans.anchoredPosition;
+        var rect = trans.sizeDelta;
 
-        CreateCorners(vertices);
+        if (controller.worldSpaceEditMode) {
+
+            rect.y = 250;
+            pos.y = 100;
+
+        }
+        else {
+
+            rect.y = 500;
+            pos.y = 0;
+
+            RefreshMesh();
+
+            CreateCorners(vertices);
+
+        }
+
+        trans.anchoredPosition = pos;
+        trans.sizeDelta = rect;
 
         refuseCallbacks = false;
 
@@ -275,6 +295,11 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void ApplyColorsToCorner() {
 
+        if (controller.worldSpaceEditMode) {
+            controller.ApplyColorsToVertexColorCorners();
+            return;
+        }
+
         if (corners.Count == 0) {
             return;
         }
@@ -286,6 +311,11 @@ public class ShaderMapperView : MonoBehaviour {
     }
 
     public void ApplyColorsToCorners() {
+
+        if (controller.worldSpaceEditMode) {
+            controller.ApplyColorsToVertexColorCorners();
+            return;
+        }
 
         foreach (var corner in corners) {
 
@@ -483,7 +513,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void OnFinishSolidMonoType() {
 
-        if (controller.HasSelection) {
+        if (!controller.HasSelection) {
             return;
         }
 
@@ -520,7 +550,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void OnFinishMonoType() {
 
-        if (controller.HasSelection) {
+        if (!controller.HasSelection) {
             return;
         }
 
@@ -566,7 +596,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void OnFinishRedType() {
 
-        if (controller.HasSelection) {
+        if (!controller.HasSelection) {
             return;
         }
 
@@ -612,7 +642,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void OnFinishGreenType() {
 
-        if (controller.HasSelection) {
+        if (!controller.HasSelection) {
             return;
         }
 
@@ -658,7 +688,7 @@ public class ShaderMapperView : MonoBehaviour {
 
     public void OnFinishBlueType() {
 
-        if (controller.HasSelection) {
+        if (!controller.HasSelection) {
             return;
         }
 
