@@ -1,6 +1,7 @@
 ﻿
 
 using FCopParser;
+using UnityEditor;
 using UnityEngine;
 
 public class VertexColorPoint : MonoBehaviour {
@@ -9,11 +10,9 @@ public class VertexColorPoint : MonoBehaviour {
     Material material;
 
     public ShaderEditMode controller;
-    public ShaderMapperView mapper;
+    
     public TileSelection selectedItem;
     public int index;
-
-    public bool isSelected = false;
 
     void Start() {
 
@@ -21,133 +20,121 @@ public class VertexColorPoint : MonoBehaviour {
 
         material = GetComponent<MeshRenderer>().material;
 
-        var tile = selectedItem.tile;
-
-        material.color = new Color(tile.shaders.colors[index][0], tile.shaders.colors[index][1], tile.shaders.colors[index][2]);
-
-    }
-
-    public void SelectOrDeselect() {
-
-        isSelected = !isSelected;
-
         RefreshColors();
 
-        if (isSelected) {
-            mapper.SelectedCorner(index);
-        }
-
     }
 
-    public void Select() {
 
-        isSelected = true;
+
+    public void Select() {
         
         material.color = Color.green;
 
-        mapper.SelectedCorner(index);
-
-    }
-
-    public void Deselect() {
-
-        isSelected = false;
-
-        var tile = selectedItem.tile;
-
-        material.color = new Color(tile.shaders.colors[index][0], tile.shaders.colors[index][1], tile.shaders.colors[index][2]);
+        controller.colorPicker.SelectedVertexColor(index);
 
     }
 
     public void RefreshColors() {
 
-        if (isSelected) {
-            material.color = Color.green;
-        }
-        else {
+        var tile = selectedItem.tile;
 
-            var tile = selectedItem.tile;
-
-            material.color = new Color(tile.shaders.colors[index][0], tile.shaders.colors[index][1], tile.shaders.colors[index][2]);
-
-        }
+        material.color = new Color(tile.shaders.colors[index][0], tile.shaders.colors[index][1], tile.shaders.colors[index][2]);
 
     }
 
     public void ChangeValue() {
 
-        if (mapper == null) {
+        if (controller.colorPicker == null) {
             return;
         }
 
-        var originalType = controller.FirstTile.shaders.type;
+        if (!controller.painting) {
+            ManualChangeValue();
+        }
+        else {
+            ApplyChanges(selectedItem, controller.colorPicker.colorType);
 
-        foreach (var selection in controller.selectedItems) {
-
-            var tile = selection.tile;
-
-            if (tile.shaders.type != originalType) {
-                tile.ChangeShader(originalType);
-            }
-
-            switch (originalType) {
-                case VertexColorType.MonoChrome:
-
-                    var shaderSolid = (MonoChromeShader)tile.shaders;
-
-                    shaderSolid.value = mapper.solidMonoByteValue;
-
-                    shaderSolid.Apply();
-
-                    break;
-                case VertexColorType.DynamicMonoChrome:
-
-                    var monoShader = (DynamicMonoChromeShader)tile.shaders;
-
-                    if (tile.verticies.Count == 4) {
-
-                        monoShader.values[ShaderMapperView.monoDataQuadIndexes[index]] = mapper.dynamicMonoValue;
-
-                        monoShader.Apply();
-
-                    }
-                    else {
-
-                        monoShader.values[ShaderMapperView.monoDataTrianglesIndexes[index]] = mapper.dynamicMonoValue;
-
-                        monoShader.Apply();
-
-                    }
-
-                    break;
-                case VertexColorType.Color:
-
-                    var shaderColor = (ColorShader)tile.shaders;
-
-                    if (tile.verticies.Count == 4) {
-
-                        shaderColor.values[ShaderMapperView.colorDataQuadIndexes[index]] = mapper.colorValue.Clone();
-
-                        shaderColor.Apply();
-
-                    }
-                    else {
-
-                        shaderColor.values[ShaderMapperView.colorDataTrianglesIndexes[index]] = mapper.colorValue.Clone();
-
-                        shaderColor.Apply();
-
-                    }
-
-                    break;
-                case VertexColorType.ColorAnimated:
-                    break;
-
-            }
+            selectedItem.section.RefreshMesh();
 
         }
 
     }
 
+    void ApplyChanges(TileSelection selection, VertexColorType originalType) {
+
+        var tile = selection.tile;
+
+        if (tile.shaders.type != originalType) {
+            tile.ChangeShader(originalType);
+        }
+
+        switch (originalType) {
+            case VertexColorType.MonoChrome:
+
+                var shaderSolid = (MonoChromeShader)tile.shaders;
+
+                shaderSolid.value = controller.colorPicker.solidMonoByteValue;
+
+                shaderSolid.Apply();
+
+                break;
+            case VertexColorType.DynamicMonoChrome:
+
+                var monoShader = (DynamicMonoChromeShader)tile.shaders;
+
+                if (tile.verticies.Count == 4) {
+
+                    monoShader.values[ShaderColorPickerView.monoDataQuadIndexes[index]] = controller.colorPicker.dynamicMonoValue;
+
+                    monoShader.Apply();
+
+                }
+                else {
+
+                    monoShader.values[ShaderColorPickerView.monoDataTrianglesIndexes[index]] = controller.colorPicker.dynamicMonoValue;
+
+                    monoShader.Apply();
+
+                }
+
+                break;
+            case VertexColorType.Color:
+
+                var shaderColor = (ColorShader)tile.shaders;
+
+                if (tile.verticies.Count == 4) {
+
+                    shaderColor.values[ShaderColorPickerView.colorDataQuadIndexes[index]] = controller.colorPicker.colorValue.Clone();
+
+                    shaderColor.Apply();
+
+                }
+                else {
+
+                    shaderColor.values[ShaderColorPickerView.colorDataTrianglesIndexes[index]] = controller.colorPicker.colorValue.Clone();
+
+                    shaderColor.Apply();
+
+                }
+
+                break;
+            case VertexColorType.ColorAnimated:
+                break;
+
+        }
+
+    }
+
+    void ManualChangeValue() {
+
+        var originalType = controller.FirstTile.shaders.type;
+
+        foreach (var selection in controller.selectedItems) {
+
+            ApplyChanges(selection, controller.colorPicker.colorType);
+
+        }
+
+    }
 
 }

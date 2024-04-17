@@ -10,7 +10,7 @@ public class ColorPresetItemView : MonoBehaviour {
     public ContextMenuHandler contextMenu;
 
 
-    public ShaderMapperView view;
+    public ShaderColorPickerView view;
     public XRGB555 color;
 
     void Start() {
@@ -28,8 +28,6 @@ public class ColorPresetItemView : MonoBehaviour {
     public void OnClick() {
 
         view.SetColors(color.Clone());
-        view.ApplyColorsToCorners();
-        view.controller.RefreshTileOverlayShader();
 
     }
 

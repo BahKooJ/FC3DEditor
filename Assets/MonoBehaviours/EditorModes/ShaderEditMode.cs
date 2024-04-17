@@ -6,13 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEngine.UI.GridLayoutGroup;
 using Object = UnityEngine.Object;
 
 public class ShaderEditMode : TileMutatingEditMode, EditMode {
-
-    public static bool openShaderMapperByDefault = true;
 
     public Main main { get; set; }
 
@@ -21,10 +17,11 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
     public List<VertexColorPoint> vertexColorPoints = new();
 
     public ShaderEditPanelView view;
+    public ShaderColorPickerView colorPicker;
 
     public ShaderPresets currentShaderPresets;
 
-    public bool worldSpaceEditMode = true;
+    public bool painting = false;
 
     public ShaderEditMode(Main main) {
         this.main = main;
@@ -40,6 +37,54 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
         TestVertexColorCornerSelection();
 
+        //if (painting) {
+
+        //    var hover = main.GetTileOnLevelMesh();
+
+        //    if (hover == null) {
+        //        ClearVertexColors();
+        //    }
+        //    else {
+
+        //        if (vertexColorPoints.Count == 0) {
+
+        //            selectedSections.Clear();
+
+        //            selectedSections.Add(hover.section);
+
+        //            foreach (var column in selectedSections.Last().section.tileColumns) {
+
+        //                foreach (var tile in column.tiles) {
+        //                    InitVertexColorCorners(new TileSelection(tile, column, selectedSections.Last()));
+        //                } 
+
+        //            }
+
+        //            //InitVertexColorCorners(hover);
+        //        }
+        //        else if (selectedSections.Last() != hover.section) {
+
+        //            selectedSections.Clear();
+
+        //            selectedSections.Add(hover.section);
+
+        //            foreach (var column in selectedSections.Last().section.tileColumns) {
+
+        //                foreach (var tile in column.tiles) {
+        //                    InitVertexColorCorners(new TileSelection(tile, column, selectedSections.Last()));
+        //                }
+
+        //            }
+
+        //        }
+        //        //else if (vertexColorPoints[0].selectedItem.tile != hover.tile) {
+        //        //    InitVertexColorCorners(hover);
+        //        //}
+
+        //    }
+
+        //}
+
         if (Controls.OnDown("Save")) {
             if (view.activeShaderMapper != null) {
                 view.CloseShaderMapper();
@@ -48,11 +93,8 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
         if (Controls.OnDown("Unselect")) {
 
-            if (view.activeShaderMapper != null) {
-                view.CloseShaderMapper();
-            }
-
             ClearAllSelectedItems();
+
         }
 
     }
@@ -100,20 +142,6 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
             MakeSelection(tile, column, section);
 
-            if (view.activeShaderMapper != null) {
-                view.activeShaderMapper.GetComponent<ShaderMapperView>().RefreshView();
-            }
-            else {
-                
-                if (openShaderMapperByDefault) {
-                    view.OpenShaderMapper();
-                }
-
-
-            }
-
-
-
         }
         else if (IsSameShape(tile)) {
 
@@ -130,8 +158,8 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
             selectedSectionOverlays.Add(Object.Instantiate(main.SectionBoarders, new Vector3(iSection.x, 0, -iSection.y), Quaternion.identity));
         }
 
-        if (worldSpaceEditMode) {
-            InitVertexColorCorners();
+        if (!painting) {
+            InitVertexColorCorners(selectedItems[0]);
         }
 
         RefeshTileOverlay();
@@ -174,7 +202,7 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
             return;
         }
 
-        if (!Controls.OnDown("Select") && !Controls.OnDown("Interact")) {
+        if (!Controls.OnDown("Select") && !Controls.OnDown("Interact") && !painting) {
             return;
         }
 
@@ -187,18 +215,23 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
                 if (hit.colliderInstanceID == vertex.boxCollider.GetInstanceID()) {
 
-                    if (Controls.OnDown("Select") && Controls.IsDown("ModifierMultiSelect")) {
+                    if (painting) {
 
-                        vertex.SelectOrDeselect();
+                        vertex.ChangeValue();
+
+                        RefreshTileOverlayShader();
+
+                        return;
 
                     }
+
                     else if (Controls.OnDown("Select")) {
 
-                        foreach (var vert in vertexColorPoints) {
-                            vert.Deselect();
-                        }
+                        vertex.ChangeValue();
 
-                        vertex.Select();
+                        RefreshTileOverlayShader();
+                        RefreshVertexColorCorners();
+
 
                     }
 
@@ -267,28 +300,26 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
     }
 
-    void InitVertexColorCorners() {
+    void InitVertexColorCorners(TileSelection tile) {
 
-        ClearVertexColors();
+        //ClearVertexColors();
 
-        if (!HasSelection) {
+        if (!HasSelection && !painting) {
             return;
         }
 
-        foreach (var i in Enumerable.Range(0, FirstTile.verticies.Count)) {
-            InitSingleVertexColorCorner(i);
+        foreach (var i in Enumerable.Range(0, tile.tile.verticies.Count)) {
+            InitSingleVertexColorCorner(i, tile);
         }
 
     }
 
-    void InitSingleVertexColorCorner(int index) {
+    void InitSingleVertexColorCorner(int index, TileSelection tile) {
 
-        var firstSelectedItem = selectedItems[0];
+        var worldX = tile.section.x + tile.column.x;
+        var worldY = -(tile.section.y + tile.column.y);
 
-        var worldX = firstSelectedItem.section.x + firstSelectedItem.column.x;
-        var worldY = -(firstSelectedItem.section.y + firstSelectedItem.column.y);
-
-        var tileVert = firstSelectedItem.tile.verticies[index];
+        var tileVert = tile.tile.verticies[index];
 
         switch (tileVert.vertexPosition) {
             case VertexPosition.TopRight:
@@ -305,18 +336,13 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
                 break;
         }
 
-        var pos = new Vector3(worldX, firstSelectedItem.column.heights[(int)tileVert.vertexPosition - 1].GetPoint(tileVert.heightChannel), worldY);
+        var pos = new Vector3(worldX, tile.column.heights[(int)tileVert.vertexPosition - 1].GetPoint(tileVert.heightChannel), worldY);
 
 
         var obj = Object.Instantiate(main.vertexColorPoint, pos, Quaternion.identity);
         var vertPoint = obj.GetComponent<VertexColorPoint>();
         vertPoint.controller = this;
-
-        if (view.activeShaderMapper != null) {
-            vertPoint.mapper = view.activeShaderMapper.GetComponent<ShaderMapperView>();
-        }
-
-        vertPoint.selectedItem = selectedItems[0];
+        vertPoint.selectedItem = tile;
         vertPoint.index = index;
 
         vertexColorPoints.Add(vertPoint);
@@ -330,6 +356,14 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
         }
 
         vertexColorPoints.Clear();
+
+    }
+
+    void RefreshVertexColorCorners() {
+
+        foreach (var vertexColorPoint in vertexColorPoints) {
+            vertexColorPoint.RefreshColors();
+        }
 
     }
 
@@ -361,23 +395,10 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
     }
 
-    // This is called by the mapper
-    public void ApplyColorsToVertexColorCorners() {
-
-        foreach (var colorPoint in vertexColorPoints) {
-
-            if (colorPoint.isSelected) {
-                colorPoint.ChangeValue();
-            }
-
-        }
-
-    }
-
     public void RefreshShaderMapper() {
 
         if (view.activeShaderMapper != null) {
-            view.activeShaderMapper.GetComponent<ShaderMapperView>().RefreshView();
+            view.activeShaderMapper.GetComponent<ShaderColorPickerView>().RefreshView();
         }
 
     }
