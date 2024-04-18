@@ -22,9 +22,14 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
     public ShaderPresets currentShaderPresets;
 
     public bool painting = false;
+    public Tile previousPaintTile = null;
 
     public ShaderEditMode(Main main) {
         this.main = main;
+    }
+
+    public void StartPainting() {
+        painting = !painting;
     }
 
     public void Update() {
@@ -37,53 +42,29 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
         TestVertexColorCornerSelection();
 
-        //if (painting) {
+        if (painting) {
 
-        //    var hover = main.GetTileOnLevelMesh();
+            var hover = main.GetTileOnLevelMesh();
 
-        //    if (hover == null) {
-        //        ClearVertexColors();
-        //    }
-        //    else {
+            if (hover == null) {
+                ClearVertexColors();
+            }
+            else {
 
-        //        if (vertexColorPoints.Count == 0) {
+                if (vertexColorPoints.Count == 0) {
+                    ClearVertexColors();
+                    InitPaintVertexColorCorners(hover);
+                    previousPaintTile = hover.tile;
+                }
+                else if (previousPaintTile != hover.tile) {
+                    ClearVertexColors();
+                    InitPaintVertexColorCorners(hover);
+                    previousPaintTile = hover.tile;
+                }
 
-        //            selectedSections.Clear();
+            }
 
-        //            selectedSections.Add(hover.section);
-
-        //            foreach (var column in selectedSections.Last().section.tileColumns) {
-
-        //                foreach (var tile in column.tiles) {
-        //                    InitVertexColorCorners(new TileSelection(tile, column, selectedSections.Last()));
-        //                } 
-
-        //            }
-
-        //            //InitVertexColorCorners(hover);
-        //        }
-        //        else if (selectedSections.Last() != hover.section) {
-
-        //            selectedSections.Clear();
-
-        //            selectedSections.Add(hover.section);
-
-        //            foreach (var column in selectedSections.Last().section.tileColumns) {
-
-        //                foreach (var tile in column.tiles) {
-        //                    InitVertexColorCorners(new TileSelection(tile, column, selectedSections.Last()));
-        //                }
-
-        //            }
-
-        //        }
-        //        //else if (vertexColorPoints[0].selectedItem.tile != hover.tile) {
-        //        //    InitVertexColorCorners(hover);
-        //        //}
-
-        //    }
-
-        //}
+        }
 
         if (Controls.OnDown("Save")) {
             if (view.activeShaderMapper != null) {
@@ -207,9 +188,10 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
         }
 
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, 8)) {
+        var hits = Physics.RaycastAll(ray, Mathf.Infinity, 8);
+
+        foreach (var hit in hits) {
 
             foreach (var vertex in vertexColorPoints) {
 
@@ -217,11 +199,15 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
                     if (painting) {
 
-                        vertex.ChangeValue();
+                        if (Controls.IsDown("Select")) {
 
-                        RefreshTileOverlayShader();
+                            vertex.ChangeValue();
 
-                        return;
+                            RefreshTileOverlayShader();
+
+                        }
+
+                        continue;
 
                     }
 
@@ -297,6 +283,50 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
         selectedTileOverlays.Add(script);
         overlay.transform.SetParent(selection.section.transform);
         overlay.transform.localPosition = Vector3.zero;
+
+    }
+
+    void InitPaintVertexColorCorners(TileSelection hover) {
+
+        var startX = hover.column.x - 1;
+        var Xcount = 3;
+
+        if (startX < 0) {
+            startX = 0;
+            Xcount = 2;
+        }
+        if (startX == 14) {
+            startX = 14;
+            Xcount = 2;
+        }
+
+        var startY = hover.column.y - 1;
+        var Ycount = 3;
+
+        if (startY < 0) {
+            startY = 0;
+            Ycount = 2;
+        }
+        if (startY == 14) {
+            startY = 14;
+            Ycount = 2;
+        }
+
+        foreach (var y in Enumerable.Range(startY, Ycount)) {
+
+            foreach (var x in Enumerable.Range(startX, Xcount)) {
+
+                var itColumn = hover.section.section.GetTileColumn(x, y);
+
+                foreach (var tile in itColumn.tiles) {
+
+                    InitVertexColorCorners(new TileSelection(tile, itColumn, hover.section));
+
+                }
+
+            }
+
+        }
 
     }
 

@@ -3,12 +3,14 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-
 public class ShaderEditPanelView : MonoBehaviour {
 
     // Prefabs
     public GameObject shaderMapper;
     public GameObject shaderPresetPanel;
+
+    // View refs
+    public Image paintTool;
 
     public ShaderEditMode controller;
 
@@ -24,6 +26,13 @@ public class ShaderEditPanelView : MonoBehaviour {
         activeShaderPresetPanel.GetComponent<ShaderPresetsView>().controller = controller;
 
         activeShaderPresetPanel.transform.SetParent(transform.parent, false);
+
+        if (!controller.painting) {
+            paintTool.color = Color.gray;
+        }
+        else {
+            paintTool.color = Color.white;
+        }
 
     }
 
@@ -65,6 +74,18 @@ public class ShaderEditPanelView : MonoBehaviour {
     public void OnClickDuplicateShader() {
 
         controller.DuplicateTileShader();
+
+    }
+
+    public void PaintToolButton() {
+
+        controller.StartPainting();
+
+        if (!controller.painting) {
+            paintTool.color = Color.gray;
+        } else {
+            paintTool.color = Color.white;
+        }
 
     }
 
