@@ -10,6 +10,8 @@ using Object = UnityEngine.Object;
 
 public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
+    public static bool applyColorsOnClick = false;
+
     public Main main { get; set; }
 
     public List<TileTexturePreview> selectedTileOverlays = new();
@@ -29,7 +31,40 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
     }
 
     public void StartPainting() {
+
         painting = !painting;
+
+        if (!painting) {
+            ClearVertexColors();
+        }
+
+    }
+
+    public void ChangeClickToggle() {
+
+        applyColorsOnClick = !applyColorsOnClick;
+
+        foreach (var vertex in vertexColorPoints) {
+            vertex.Deselect();
+        }
+
+    }
+
+    public void ApplyColorsToVertexColorCorners() {
+
+        if (applyColorsOnClick) {
+            return;
+        }
+
+        foreach (var colorPoint in vertexColorPoints) {
+
+            if (colorPoint.isSelected) {
+                colorPoint.ChangeValue();
+            }
+
+        }
+        RefreshTileOverlayShader();
+
     }
 
     public void Update() {
@@ -140,6 +175,7 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
         }
 
         if (!painting) {
+            ClearVertexColors();
             InitVertexColorCorners(selectedItems[0]);
         }
 
@@ -201,9 +237,25 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
                         if (Controls.IsDown("Select")) {
 
-                            vertex.ChangeValue();
+                            if (HasSelection) {
 
-                            RefreshTileOverlayShader();
+                                var index = selectedItems.FindIndex(item => {
+                                    return item.tile == vertex.selectedItem.tile;
+                                });
+
+                                if (index != -1) {
+
+                                    vertex.ChangeValue();
+
+                                    RefreshTileOverlayShader();
+
+                                }
+
+                            } else {
+
+                                vertex.ChangeValue();
+
+                            }
 
                         }
 
@@ -213,11 +265,30 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
                     else if (Controls.OnDown("Select")) {
 
-                        vertex.ChangeValue();
+                        if (applyColorsOnClick) {
 
-                        RefreshTileOverlayShader();
-                        RefreshVertexColorCorners();
+                            vertex.ChangeValue();
 
+                            RefreshTileOverlayShader();
+                            RefreshVertexColorCorners();
+
+                        }
+                        else {
+
+                            if (Controls.IsDown("ModifierMultiSelect")) {
+                                vertex.SelectOrDeselect();
+                            }
+                            else {
+
+                                foreach (var vert in vertexColorPoints) {
+                                    vert.Deselect();
+                                }
+
+                                vertex.Select();
+
+                            }
+
+                        }
 
                     }
 

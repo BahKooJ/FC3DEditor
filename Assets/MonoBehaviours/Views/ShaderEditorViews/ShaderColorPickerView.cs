@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class ShaderColorPickerView : MonoBehaviour {
@@ -81,7 +82,7 @@ public class ShaderColorPickerView : MonoBehaviour {
 
         colorValue = new XRGB555(false, 0, 0, 0);
 
-        ScaleToScreen();
+        //ScaleToScreen();
 
         if (controller.selectedItems.Count != 0) {
             RefreshView();
@@ -96,6 +97,8 @@ public class ShaderColorPickerView : MonoBehaviour {
         foreach (var obj in colorPresetItemViews) {
             Destroy(obj.gameObject);
         }
+
+        shaderTypeDropdown.value = (int)colorType;
 
         colorPresetItemViews.Clear();
 
@@ -163,8 +166,18 @@ public class ShaderColorPickerView : MonoBehaviour {
 
         switch (controller.FirstTile.shaders.type) {
             case VertexColorType.MonoChrome:
+
+                colorType = VertexColorType.MonoChrome;
+
+                var solidMonoShader = (MonoChromeShader)controller.FirstTile.shaders;
+
+                SetSolidMono(solidMonoShader.value);
+
                 break;
             case VertexColorType.DynamicMonoChrome:
+
+                colorType = VertexColorType.DynamicMonoChrome;
+
 
                 var monoShader = (DynamicMonoChromeShader)controller.FirstTile.shaders;
 
@@ -180,6 +193,8 @@ public class ShaderColorPickerView : MonoBehaviour {
 
                 break;
             case VertexColorType.Color:
+
+                colorType = VertexColorType.Color;
 
                 var shader = (ColorShader)controller.FirstTile.shaders;
 
@@ -198,6 +213,8 @@ public class ShaderColorPickerView : MonoBehaviour {
                 break;
 
         }
+
+        RefreshView();
 
     }
 
@@ -260,6 +277,14 @@ public class ShaderColorPickerView : MonoBehaviour {
 
         if (refuseCallbacks) { return; }
 
+        if (!ShaderEditMode.applyColorsOnClick && controller.HasSelection) {
+
+            var tile = controller.FirstTile;
+
+            tile.ChangeShader((VertexColorType)shaderTypeDropdown.value);
+
+        }
+
         colorType = (VertexColorType)shaderTypeDropdown.value;
 
         RefreshView();
@@ -272,6 +297,8 @@ public class ShaderColorPickerView : MonoBehaviour {
 
         solidMonoByteValue = (byte)solidMonoSlider.value;
         solidMonoValue.text = ((int)solidMonoSlider.value).ToString();
+
+        controller.ApplyColorsToVertexColorCorners();
 
     }
 
@@ -287,6 +314,7 @@ public class ShaderColorPickerView : MonoBehaviour {
 
             solidMonoByteValue = (byte)value;
             solidMonoSlider.value = value;
+            controller.ApplyColorsToVertexColorCorners();
 
         } catch {
 
@@ -302,6 +330,8 @@ public class ShaderColorPickerView : MonoBehaviour {
 
         dynamicMonoValue = (int)monoSlider.value;
         monoValue.text = ((int)monoSlider.value).ToString();
+
+        controller.ApplyColorsToVertexColorCorners();
 
 
     }
@@ -325,6 +355,7 @@ public class ShaderColorPickerView : MonoBehaviour {
 
             dynamicMonoValue = value;
             monoSlider.value = value;
+            controller.ApplyColorsToVertexColorCorners();
 
         }
         catch {
@@ -342,6 +373,8 @@ public class ShaderColorPickerView : MonoBehaviour {
         colorValue.r = (int)redSlider.value;
 
         redInput.text = ((int)redSlider.value).ToString();
+
+        controller.ApplyColorsToVertexColorCorners();
 
         RefreshColorPreview();
 
@@ -366,6 +399,7 @@ public class ShaderColorPickerView : MonoBehaviour {
 
             colorValue.r = value;
             redSlider.value = value;
+            controller.ApplyColorsToVertexColorCorners();
 
         }
         catch {
@@ -383,6 +417,8 @@ public class ShaderColorPickerView : MonoBehaviour {
         colorValue.g = (int)greenSlider.value;
 
         greenInput.text = ((int)greenSlider.value).ToString();
+
+        controller.ApplyColorsToVertexColorCorners();
 
         RefreshColorPreview();
 
@@ -408,6 +444,8 @@ public class ShaderColorPickerView : MonoBehaviour {
             colorValue.g = value;
             greenSlider.value = value;
 
+            controller.ApplyColorsToVertexColorCorners();
+
         }
         catch {
 
@@ -424,6 +462,8 @@ public class ShaderColorPickerView : MonoBehaviour {
         colorValue.b = (int)blueSlider.value;
 
         blueInput.text = ((int)blueSlider.value).ToString();
+
+        controller.ApplyColorsToVertexColorCorners();
 
         RefreshColorPreview();
 
@@ -448,6 +488,7 @@ public class ShaderColorPickerView : MonoBehaviour {
 
             colorValue.b = value;
             blueSlider.value = value;
+            controller.ApplyColorsToVertexColorCorners();
 
         }
         catch {

@@ -5,12 +5,27 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Main : MonoBehaviour {
 
+    public const int uiLayerMask = 480;
+
     public static bool ignoreAllInputs = false;
     public static bool debug = false;
-    
+
+    public static bool IsMouseOverUI() {
+
+        PointerEventData pointerData = new PointerEventData(EventSystem.current);
+        pointerData.position = Input.mousePosition;
+
+        var results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(pointerData, results);
+
+        return results.Count > 0;
+
+    }
+
 
     public GameObject meshSection;
     public GameObject heightMapChannelPoint;
@@ -160,6 +175,10 @@ public class Main : MonoBehaviour {
         ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         RaycastHit hit;
+
+        if (IsMouseOverUI()) {
+            return null;
+        }
 
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, 1)) {
 

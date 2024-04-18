@@ -11,6 +11,7 @@ public class ShaderEditPanelView : MonoBehaviour {
 
     // View refs
     public Image paintTool;
+    public Image clickToggle;
 
     public ShaderEditMode controller;
 
@@ -32,6 +33,13 @@ public class ShaderEditPanelView : MonoBehaviour {
         }
         else {
             paintTool.color = Color.white;
+        }
+
+        if (!ShaderEditMode.applyColorsOnClick) {
+            clickToggle.color = Color.gray;
+        }
+        else {
+            clickToggle.color = Color.white;
         }
 
     }
@@ -85,6 +93,19 @@ public class ShaderEditPanelView : MonoBehaviour {
             paintTool.color = Color.gray;
         } else {
             paintTool.color = Color.white;
+        }
+
+    }
+
+    public void OnClickApplyColorOnClickToggle() {
+
+        controller.ChangeClickToggle();
+
+        if (!ShaderEditMode.applyColorsOnClick) {
+            clickToggle.color = Color.gray;
+        }
+        else {
+            clickToggle.color = Color.white;
         }
 
     }

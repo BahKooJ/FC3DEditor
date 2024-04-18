@@ -3,6 +3,7 @@
 using FCopParser;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Timeline;
 
 public class VertexColorPoint : MonoBehaviour {
 
@@ -13,6 +14,7 @@ public class VertexColorPoint : MonoBehaviour {
     
     public TileSelection selectedItem;
     public int index;
+    public bool isSelected = false;
 
     void Start() {
 
@@ -24,21 +26,52 @@ public class VertexColorPoint : MonoBehaviour {
 
     }
 
+    public void SelectOrDeselect() {
 
+        isSelected = !isSelected;
+
+        RefreshColors();
+
+        if (isSelected) {
+            controller.colorPicker.SelectedVertexColor(index);
+        }
+
+    }
 
     public void Select() {
+
+        isSelected = true;
         
         material.color = Color.green;
+
+        if (controller.colorPicker == null) {
+            controller.view.OpenShaderMapper();
+        }
 
         controller.colorPicker.SelectedVertexColor(index);
 
     }
 
+    public void Deselect() {
+
+        isSelected = false;
+
+        RefreshColors();
+
+    }
+
     public void RefreshColors() {
 
-        var tile = selectedItem.tile;
+        if (isSelected) {
+            material.color = Color.green;
+        }
+        else {
 
-        material.color = new Color(tile.shaders.colors[index][0], tile.shaders.colors[index][1], tile.shaders.colors[index][2]);
+            var tile = selectedItem.tile;
+
+            material.color = new Color(tile.shaders.colors[index][0], tile.shaders.colors[index][1], tile.shaders.colors[index][2]);
+
+        }
 
     }
 
@@ -57,6 +90,7 @@ public class VertexColorPoint : MonoBehaviour {
             selectedItem.section.RefreshMesh();
 
         }
+        RefreshColors();
 
     }
 
