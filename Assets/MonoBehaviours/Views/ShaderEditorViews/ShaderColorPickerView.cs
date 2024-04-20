@@ -24,6 +24,11 @@ public class ShaderColorPickerView : MonoBehaviour {
     public GameObject solidMonoUI;
     public GameObject monoUI;
     public GameObject colorUI;
+    public GameObject overrideWhiteUI;
+
+    public Toggle overrideWhiteToggle;
+    public TMP_Text overrideWhiteText;
+    public Image overrideWhiteImage;
 
     // -Solid Monochrome-
 
@@ -57,9 +62,15 @@ public class ShaderColorPickerView : MonoBehaviour {
 
     public VertexColorType colorType = VertexColorType.MonoChrome;
 
+    // These are the values that are applied to tiles
     public byte solidMonoByteValue;
     public int dynamicMonoValue;
     public XRGB555 colorValue;
+
+    public static int overrideWhiteDynamicMonoValue = (int)DynamicMonoChromeShader.white;
+    public static XRGB555 overrideWhiteColorValue = new XRGB555(false, 31, 31, 31);
+
+    public  static bool overrideWhite = false;
 
     bool refuseCallbacks = false;
 
@@ -81,12 +92,26 @@ public class ShaderColorPickerView : MonoBehaviour {
     void Start() {
 
         colorValue = new XRGB555(false, 0, 0, 0);
+        solidMonoByteValue = (byte)MonoChromeShader.white;
+        dynamicMonoValue = (int)DynamicMonoChromeShader.white;
 
-        //ScaleToScreen();
+        overrideWhiteToggle.isOn = overrideWhite;
 
-        if (controller.selectedItems.Count != 0) {
-            RefreshView();
+        if (overrideWhite) {
+
+            overrideWhiteText.color = Color.white;
+
+            RefreshOverrideWhiteImage();
+
         }
+        else {
+
+            overrideWhiteText.color = Color.gray;
+            overrideWhiteImage.color = Color.white;
+
+        }
+
+        RefreshView();
 
     }
 
@@ -106,21 +131,33 @@ public class ShaderColorPickerView : MonoBehaviour {
         monoUI.SetActive(false);
         colorUI.SetActive(false);
 
+        if (colorValue == null) {
+            colorValue = new XRGB555(false, 0, 0, 0);
+        }
+
         switch (colorType) {
             case VertexColorType.MonoChrome:
                 solidMonoUI.SetActive(true);
+                overrideWhiteUI.SetActive(false);
+                controller.OnSwitchToSolidMonoChrome();
                 break;
             case VertexColorType.DynamicMonoChrome:
                 monoUI.SetActive(true);
+                overrideWhiteUI.SetActive(true);
                 break;
             case VertexColorType.Color:
                 colorUI.SetActive(true);
+                overrideWhiteUI.SetActive(true);
                 InitColorView();
                 break;
             case VertexColorType.ColorAnimated:
+                overrideWhiteUI.SetActive(false);
                 break;
 
         }
+
+        RefreshColorPreview();
+        RefreshOverrideWhiteImage();
 
         refuseCallbacks = false;
 
@@ -261,12 +298,71 @@ public class ShaderColorPickerView : MonoBehaviour {
 
     }
 
-
     void RefreshColorPreview() {
 
-        var colors = colorValue.ToColors();
+        switch (colorType) {
+            case VertexColorType.MonoChrome:
 
-        colorPreview.color = new Color(colors[0], colors[1], colors[2]);
+                var SolidMonoColor = solidMonoByteValue / MonoChromeShader.white;
+
+                if (SolidMonoColor > 1f) {
+                    colorPreview.color = new Color(SolidMonoColor - 1f, 1f, SolidMonoColor - 1f);
+                }
+                else {
+                    colorPreview.color = new Color(0f, SolidMonoColor, 0f);
+                }
+
+                break;
+            case VertexColorType.DynamicMonoChrome:
+
+                var monoColor = dynamicMonoValue / DynamicMonoChromeShader.white;
+
+                if (monoColor > 1f) {
+                    colorPreview.color = new Color(monoColor - 1f, 1f, monoColor - 1f);
+                }
+                else {
+                    colorPreview.color = new Color(0f, monoColor, 0f);
+                }
+
+
+                break;
+            case VertexColorType.Color:
+
+                var colors = colorValue.ToColors();
+
+                colorPreview.color = new Color(colors[0], colors[1], colors[2]);
+
+                break;
+            case VertexColorType.ColorAnimated:
+                break;
+
+        }
+
+
+
+    }
+
+    void RefreshOverrideWhiteImage() {
+
+        if (colorType == VertexColorType.DynamicMonoChrome) {
+
+            var monoColor = overrideWhiteDynamicMonoValue / DynamicMonoChromeShader.white;
+
+            if (monoColor > 1f) {
+                overrideWhiteImage.color = new Color(monoColor - 1f, 1f, monoColor - 1f);
+            }
+            else {
+                overrideWhiteImage.color = new Color(0f, monoColor, 0f);
+            }
+
+        }
+        else if (colorType == VertexColorType.Color) {
+
+            var colors = overrideWhiteColorValue.ToColors();
+
+            overrideWhiteImage.color = new Color(colors[0], colors[1], colors[2]);
+
+        }
 
     }
 
@@ -298,15 +394,12 @@ public class ShaderColorPickerView : MonoBehaviour {
         solidMonoByteValue = (byte)solidMonoSlider.value;
         solidMonoValue.text = ((int)solidMonoSlider.value).ToString();
 
-        controller.ApplyColorsToVertexColorCorners();
+        controller.ApplySolidMonoToTile();
+        RefreshColorPreview();
 
     }
 
     public void OnFinishSolidMonoType() {
-
-        if (!controller.HasSelection) {
-            return;
-        }
 
         try {
 
@@ -314,9 +407,10 @@ public class ShaderColorPickerView : MonoBehaviour {
 
             solidMonoByteValue = (byte)value;
             solidMonoSlider.value = value;
-            controller.ApplyColorsToVertexColorCorners();
+            controller.ApplySolidMonoToTile();
 
-        } catch {
+        }
+        catch {
 
             OnChangeSolidMono();
 
@@ -332,15 +426,11 @@ public class ShaderColorPickerView : MonoBehaviour {
         monoValue.text = ((int)monoSlider.value).ToString();
 
         controller.ApplyColorsToVertexColorCorners();
-
+        RefreshColorPreview();
 
     }
 
     public void OnFinishMonoType() {
-
-        if (!controller.HasSelection) {
-            return;
-        }
 
         try {
 
@@ -382,10 +472,6 @@ public class ShaderColorPickerView : MonoBehaviour {
 
     public void OnFinishRedType() {
 
-        if (!controller.HasSelection) {
-            return;
-        }
-
         try {
 
             var value = Int32.Parse(redInput.text);
@@ -425,10 +511,6 @@ public class ShaderColorPickerView : MonoBehaviour {
     }
 
     public void OnFinishGreenType() {
-
-        if (!controller.HasSelection) {
-            return;
-        }
 
         try {
 
@@ -471,10 +553,6 @@ public class ShaderColorPickerView : MonoBehaviour {
 
     public void OnFinishBlueType() {
 
-        if (!controller.HasSelection) {
-            return;
-        }
-
         try {
 
             var value = Int32.Parse(blueInput.text);
@@ -511,6 +589,43 @@ public class ShaderColorPickerView : MonoBehaviour {
         Presets.colorPresets.presets.Clear();
 
         RefreshView();
+
+    }
+
+    public void OnToggleOverrideWhite() {
+
+        overrideWhite = overrideWhiteToggle.isOn;
+
+        if (overrideWhite) {
+
+            overrideWhiteText.color = Color.white;
+
+            RefreshOverrideWhiteImage();
+
+        }
+        else {
+
+            overrideWhiteText.color = Color.gray;
+            overrideWhiteImage.color = Color.white;
+
+        }
+
+    }
+
+    public void OnClickOverrideWhiteColor() {
+
+        if (!overrideWhite) {
+            return;
+        }
+
+        if (colorType == VertexColorType.DynamicMonoChrome) {
+            overrideWhiteDynamicMonoValue = dynamicMonoValue;
+            RefreshOverrideWhiteImage();
+        }
+        else if (colorType == VertexColorType.Color) {
+            overrideWhiteColorValue = colorValue.Clone();
+            RefreshOverrideWhiteImage();
+        }
 
     }
 

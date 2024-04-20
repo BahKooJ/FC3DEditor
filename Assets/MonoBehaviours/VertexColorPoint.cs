@@ -26,6 +26,12 @@ public class VertexColorPoint : MonoBehaviour {
 
     }
 
+    public float[] GetColor() {
+
+        return selectedItem.tile.shaders.colors[index];
+
+    }
+
     public void SelectOrDeselect() {
 
         isSelected = !isSelected;
@@ -75,6 +81,77 @@ public class VertexColorPoint : MonoBehaviour {
 
     }
 
+    public void OverrideWhite() {
+
+        var tile = selectedItem.tile;
+
+
+        switch (tile.shaders.type) {
+            case VertexColorType.MonoChrome:
+                break;
+            case VertexColorType.DynamicMonoChrome:
+
+                var monoShader = (DynamicMonoChromeShader)tile.shaders;
+
+                if (tile.verticies.Count == 4) {
+
+                    if (!(monoShader.values[ShaderColorPickerView.monoDataQuadIndexes[index]] == DynamicMonoChromeShader.white)) {
+                        return;
+                    }
+
+                    monoShader.values[ShaderColorPickerView.monoDataQuadIndexes[index]] = ShaderColorPickerView.overrideWhiteDynamicMonoValue;
+
+                    monoShader.Apply();
+
+                }
+                else {
+
+                    if (!(monoShader.values[ShaderColorPickerView.monoDataTrianglesIndexes[index]] == DynamicMonoChromeShader.white)) {
+                        return;
+                    }
+
+                    monoShader.values[ShaderColorPickerView.monoDataTrianglesIndexes[index]] = ShaderColorPickerView.overrideWhiteDynamicMonoValue;
+
+                    monoShader.Apply();
+
+                }
+
+                break;
+            case VertexColorType.Color:
+
+                var shaderColor = (ColorShader)tile.shaders;
+
+                if (tile.verticies.Count == 4) {
+
+                    if (!shaderColor.values[ShaderColorPickerView.colorDataQuadIndexes[index]].IsWhite()) {
+                        return;
+                    }
+
+                    shaderColor.values[ShaderColorPickerView.colorDataQuadIndexes[index]] = ShaderColorPickerView.overrideWhiteColorValue.Clone();
+
+                    shaderColor.Apply();
+
+                }
+                else {
+
+                    if (!shaderColor.values[ShaderColorPickerView.colorDataTrianglesIndexes[index]].IsWhite()) {
+                        return;
+                    }
+
+                    shaderColor.values[ShaderColorPickerView.colorDataTrianglesIndexes[index]] = ShaderColorPickerView.overrideWhiteColorValue.Clone();
+
+                    shaderColor.Apply();
+
+                }
+
+                break;
+            case VertexColorType.ColorAnimated:
+                break;
+
+        }
+
+    }
+
     public void ChangeValue() {
 
         if (controller.colorPicker == null) {
@@ -93,6 +170,7 @@ public class VertexColorPoint : MonoBehaviour {
         RefreshColors();
 
     }
+
 
     void ApplyChanges(TileSelection selection, VertexColorType originalType) {
 

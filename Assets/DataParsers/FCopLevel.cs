@@ -1489,10 +1489,10 @@ namespace FCopParser {
                     shaders = new MonoChromeShader(verticies.Count == 4);
                     break;
                 case VertexColorType.DynamicMonoChrome: 
-                    shaders = new DynamicMonoChromeShader(verticies.Count == 4);
+                    shaders = new DynamicMonoChromeShader(shaders);
                     break;
                 case VertexColorType.Color: 
-                    shaders = new ColorShader(verticies.Count == 4);
+                    shaders = new ColorShader(shaders);
                     break;
                 case VertexColorType.ColorAnimated:
                     shaders = new AnimatedShader(verticies.Count == 4);
@@ -1606,7 +1606,7 @@ namespace FCopParser {
 
         public byte value;
 
-        float white = 116f;
+        public const float white = 116f;
 
         public MonoChromeShader(byte lightingInfo, bool isQuad) {
             this.value = lightingInfo;
@@ -1671,7 +1671,7 @@ namespace FCopParser {
 
         public int[] values;
 
-        float white = 29f;
+        public const float white = 29f;
 
         public DynamicMonoChromeShader(List<byte> data, bool isQuad) {
 
@@ -1704,6 +1704,42 @@ namespace FCopParser {
                 (int)white,
                 (int)white
             };
+
+            Apply();
+
+        }
+
+        public DynamicMonoChromeShader(TileShaders previousShader) {
+
+            if (previousShader.type == VertexColorType.MonoChrome) {
+
+                var monoChrome = (MonoChromeShader)previousShader;
+
+                var whitePercentage = monoChrome.value / MonoChromeShader.white;
+
+                var valueConversion = (int)MathF.Round(white * whitePercentage);
+
+                values = new int[] {
+                    valueConversion,
+                    valueConversion,
+                    valueConversion,
+                    valueConversion
+                };
+
+            }
+            else {
+
+                values = new int[] {
+                    (int)white,
+                    (int)white,
+                    (int)white,
+                    (int)white
+                };
+
+            }
+
+            this.isQuad = previousShader.isQuad;
+            type = VertexColorType.DynamicMonoChrome;
 
             Apply();
 
@@ -1816,6 +1852,89 @@ namespace FCopParser {
                 new XRGB555(false, 31, 31, 31), 
                 new XRGB555(false, 31, 31, 31) 
             };
+
+            Apply();
+
+        }
+
+        public ColorShader(TileShaders previousShader) {
+
+            if (previousShader.type == VertexColorType.MonoChrome) {
+
+                var monoChrome = (MonoChromeShader)previousShader;
+
+                var whitePercentage = monoChrome.value / MonoChromeShader.white;
+
+                var valueConversion = (int)MathF.Round(XRGB555.maxChannelValue * whitePercentage);
+
+                if (valueConversion > XRGB555.maxChannelValue) {
+                    valueConversion = (int)XRGB555.maxChannelValue;
+                }
+
+                values = new XRGB555[] {
+                    new XRGB555(false, valueConversion, valueConversion, valueConversion),
+                    new XRGB555(false, valueConversion, valueConversion, valueConversion),
+                    new XRGB555(false, valueConversion, valueConversion, valueConversion),
+                    new XRGB555(false, valueConversion, valueConversion, valueConversion)
+                };
+
+            }
+            else if (previousShader.type == VertexColorType.DynamicMonoChrome) {
+
+                // Filler Data
+                values = new XRGB555[] {
+                    new XRGB555(false, 31, 31, 31),
+                    new XRGB555(false, 31, 31, 31),
+                    new XRGB555(false, 31, 31, 31),
+                    new XRGB555(false, 31, 31, 31)
+                };
+
+                var dyanmicMonoChrome = (DynamicMonoChromeShader)previousShader;
+
+                var quadMonoPosToColor = new int[] { 3, 1, 0, 2 };
+                var triangleMonoPosToColor = new int[] { 1, 0, 2 };
+
+                var i = 0;
+                foreach (var value in dyanmicMonoChrome.values) {
+
+                    var whitePercentage = value / DynamicMonoChromeShader.white;
+
+                    var valueConversion = (int)MathF.Round(XRGB555.maxChannelValue * whitePercentage);
+
+                    if (valueConversion > XRGB555.maxChannelValue) {
+                        valueConversion = (int)XRGB555.maxChannelValue;
+                    }
+
+                    if (previousShader.isQuad) {
+                        values[quadMonoPosToColor[i]] = new XRGB555(false, valueConversion, valueConversion, valueConversion);
+                    } else {
+
+                        if (i != 3) {
+
+                            values[triangleMonoPosToColor[i]] = new XRGB555(false, valueConversion, valueConversion, valueConversion);
+
+                        }
+
+                    }
+
+                    i++;
+
+                }
+
+            }
+            else {
+
+                values = new XRGB555[] {
+                    new XRGB555(false, 31, 31, 31),
+                    new XRGB555(false, 31, 31, 31),
+                    new XRGB555(false, 31, 31, 31),
+                    new XRGB555(false, 31, 31, 31)
+                };
+
+            }
+
+            this.isQuad = previousShader.isQuad;
+            type = VertexColorType.Color;
 
             Apply();
 

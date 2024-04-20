@@ -214,58 +214,6 @@ public class Main : MonoBehaviour {
 
     }
 
-    //public TileSelection TestSphereRayOnLevelMesh() {
-
-    //    var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-    //    RaycastHit hit;
-
-    //    if (Physics.Raycast(ray, out hit, Mathf.Infinity, 1)) {
-
-    //        foreach (var section in sectionMeshes) {
-
-    //            if (hit.colliderInstanceID == section.meshCollider.GetInstanceID()) {
-
-    //                int clickX = (int)Math.Floor(hit.point.x - section.x);
-    //                int clickY = (int)Math.Floor(Math.Abs(hit.point.z + section.y));
-
-    //                TileColumn column;
-
-    //                // This just sometimes doesn't work and I don't really understand why
-    //                try {
-    //                    column = section.section.tileColumns.First(tileColumn => {
-    //                        return tileColumn.x == clickX && tileColumn.y == clickY;
-    //                    });
-    //                }
-    //                catch {
-                        
-    //                }
-
-
-    //                if (Controls.OnDown("Select")) {
-
-    //                    SelectTile(section.sortedTilesByTriangle[hit.triangleIndex], column, section);
-
-    //                    section.RefreshMesh();
-
-    //                }
-    //                else {
-
-    //                    LookTile(section.sortedTilesByTriangle[hit.triangleIndex], column, section);
-
-    //                }
-
-    //            }
-
-
-    //        }
-
-    //    }
-
-    //    return null;
-
-    //}
-
     public Vector3? CursorOnLevelMesh() {
 
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);

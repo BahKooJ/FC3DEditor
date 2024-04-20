@@ -546,7 +546,7 @@ namespace FCopParser {
 
         public bool x;
 
-        const float maxChannelValue = 31;
+        public const float maxChannelValue = 31;
 
         public int r = 0;
         public int g = 0;
@@ -590,6 +590,12 @@ namespace FCopParser {
             g = Utils.BitsToInt(Utils.CopyBitsOfRange(bits, 5, 10));
             b = Utils.BitsToInt(Utils.CopyBitsOfRange(bits, 10, 15));
             x = bits[15];
+
+        }
+
+        public bool IsWhite() {
+
+            return r == maxChannelValue && g == maxChannelValue && b == maxChannelValue;
 
         }
 

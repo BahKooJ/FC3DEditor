@@ -5,7 +5,10 @@ using FCopParser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 public class ShaderEditMode : TileMutatingEditMode, EditMode {
@@ -56,6 +59,10 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
             return;
         }
 
+        if (painting) {
+            return;
+        }
+
         foreach (var colorPoint in vertexColorPoints) {
 
             if (colorPoint.isSelected) {
@@ -67,6 +74,34 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
     }
 
+    public void ApplySolidMonoToTile() {
+
+        foreach (var item in selectedItems) {
+
+            var tile = item.tile;
+
+            if (tile.shaders.type != colorPicker.colorType) {
+                tile.ChangeShader(colorPicker.colorType);
+            }
+
+            var shaderSolid = (MonoChromeShader)tile.shaders;
+
+            shaderSolid.value = colorPicker.solidMonoByteValue;
+
+            shaderSolid.Apply();
+
+        }
+
+        RefreshTileOverlayShader();
+
+    }
+
+    public void OnSwitchToSolidMonoChrome() {
+
+        ClearVertexColors();
+
+    }
+
     public void Update() {
 
         if (FreeMove.looking) {
@@ -75,26 +110,39 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
         if (Main.ignoreAllInputs) { return; }
 
-        TestVertexColorCornerSelection();
+        if (colorPicker != null) {
 
-        if (painting) {
+            if (colorPicker.colorType == VertexColorType.MonoChrome) {
 
-            var hover = main.GetTileOnLevelMesh();
+                TestTileSelection();
 
-            if (hover == null) {
-                ClearVertexColors();
             }
             else {
 
-                if (vertexColorPoints.Count == 0) {
-                    ClearVertexColors();
-                    InitPaintVertexColorCorners(hover);
-                    previousPaintTile = hover.tile;
-                }
-                else if (previousPaintTile != hover.tile) {
-                    ClearVertexColors();
-                    InitPaintVertexColorCorners(hover);
-                    previousPaintTile = hover.tile;
+                TestVertexColorCornerSelection();
+
+                if (painting) {
+
+                    var hover = main.GetTileOnLevelMesh();
+
+                    if (hover == null) {
+                        ClearVertexColors();
+                    }
+                    else {
+
+                        if (vertexColorPoints.Count == 0) {
+                            ClearVertexColors();
+                            InitPaintVertexColorCorners(hover);
+                            previousPaintTile = hover.tile;
+                        }
+                        else if (previousPaintTile != hover.tile) {
+                            ClearVertexColors();
+                            InitPaintVertexColorCorners(hover);
+                            previousPaintTile = hover.tile;
+                        }
+
+                    }
+
                 }
 
             }
@@ -174,7 +222,19 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
             selectedSectionOverlays.Add(Object.Instantiate(main.SectionBoarders, new Vector3(iSection.x, 0, -iSection.y), Quaternion.identity));
         }
 
-        if (!painting) {
+        if (colorPicker != null && !applyColorsOnClick && !painting && HasSelection) {
+
+            colorPicker.colorType = FirstTile.shaders.type;
+
+            if (colorPicker.colorType == VertexColorType.MonoChrome && FirstTile.shaders.type == VertexColorType.MonoChrome) {
+                colorPicker.SelectedVertexColor(0);
+            }
+
+            colorPicker.RefreshView();
+
+        }
+
+        if (!painting && HasSelection) {
             ClearVertexColors();
             InitVertexColorCorners(selectedItems[0]);
         }
@@ -213,9 +273,27 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
     }
 
+    void OverrideWhite() {
+
+        if (!ShaderColorPickerView.overrideWhite) {
+            return;
+        }
+
+        foreach (var point in vertexColorPoints) {
+
+            point.OverrideWhite();
+
+        }
+
+    }
+
     void TestVertexColorCornerSelection() {
 
         if (FreeMove.looking) {
+            return;
+        }
+
+        if (vertexColorPoints.Count == 0) {
             return;
         }
 
@@ -247,13 +325,18 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
                                     vertex.ChangeValue();
 
+                                    OverrideWhite();
+
                                     RefreshTileOverlayShader();
+
 
                                 }
 
                             } else {
 
                                 vertex.ChangeValue();
+
+                                OverrideWhite();
 
                             }
 
@@ -269,8 +352,11 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
                             vertex.ChangeValue();
 
+                            OverrideWhite();
+
                             RefreshTileOverlayShader();
                             RefreshVertexColorCorners();
+
 
                         }
                         else {
@@ -300,20 +386,61 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
     }
 
-    void TestPaint() {
+    // This is for solid monochrome
+    void TestTileSelection() {
 
         if (FreeMove.looking) {
             return;
         }
 
-        if (!Controls.IsDown("Select")) {
-            return;
+        var hover = main.GetTileOnLevelMesh();
+
+        void PaintTile() {
+
+            var tile = hover.tile;
+
+            if (tile.shaders.type != colorPicker.colorType) {
+                tile.ChangeShader(colorPicker.colorType);
+            }
+
+            var shaderSolid = (MonoChromeShader)tile.shaders;
+
+            shaderSolid.value = colorPicker.solidMonoByteValue;
+
+            shaderSolid.Apply();
         }
 
-        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
 
-        if (Physics.SphereCast(ray, 1.4f, Mathf.Infinity, 8)) {
+        if (hover == null) {
+            return;
+        }
+        if (painting) {
+
+            if (Controls.IsDown("Select")) {
+                PaintTile();
+                ClearAllSelectedItems();
+                selectedSections.Add(hover.section);
+                RefreshMeshes();
+            }
+
+        }
+        else if (applyColorsOnClick) {
+
+            if (Controls.OnDown("Select")) {
+                PaintTile();
+                SelectTile(hover.tile, hover.column, hover.section);
+                RefreshMeshes();
+
+            }
+
+        }
+        else {
+
+            if (Controls.OnDown("Select")) {
+
+                SelectTile(hover.tile, hover.column, hover.section);
+
+            }
 
         }
 
@@ -403,11 +530,24 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
     void InitVertexColorCorners(TileSelection tile) {
 
-        //ClearVertexColors();
-
         if (!HasSelection && !painting) {
             return;
         }
+        if (colorPicker != null) {
+
+            if (colorPicker.colorType == VertexColorType.MonoChrome) {
+                return;
+            }
+
+        }
+        if (!painting) {
+
+            if (FirstTile.shaders.type == VertexColorType.MonoChrome) {
+                return;
+            }
+
+        }
+
 
         foreach (var i in Enumerable.Range(0, tile.tile.verticies.Count)) {
             InitSingleVertexColorCorner(i, tile);

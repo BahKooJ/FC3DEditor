@@ -235,6 +235,7 @@ public class ShaderPresetViewItem : MonoBehaviour {
 
         controller.RefreshTileOverlayShader();
         controller.RefreshShaderMapper();
+        controller.RefreshMeshes();
 
     }
 
