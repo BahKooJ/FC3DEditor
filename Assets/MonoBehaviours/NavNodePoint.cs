@@ -69,6 +69,11 @@ public class NavNodePoint : MonoBehaviour {
 
             if (node.nextNode[index] != NavNode.invalid && nextNodeLines[index] == null) {
 
+                if (node.nextNode[index] == node.index) {
+                    ClearPaths();
+                    return;
+                }
+
                 var lineObject = Object.Instantiate(controller.main.line3d);
 
                 var lineRenderer = lineObject.GetComponent<LineRenderer>();

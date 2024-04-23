@@ -359,8 +359,11 @@ namespace FCopParser {
 
         public void Compile() {
 
-            //actor.rawFile.data.RemoveRange(64, 2);
-            //actor.rawFile.data.InsertRange(64, BitConverter.GetBytes((short)headRotation.compiledRotation));
+            actor.rawFile.data.RemoveRange(64, 2);
+            actor.rawFile.data.InsertRange(64, BitConverter.GetBytes((short)headRotation.value.compiledRotation));
+
+            actor.rawFile.data.RemoveRange(78, 2);
+            actor.rawFile.data.InsertRange(78, BitConverter.GetBytes((short)headRotation.value.compiledRotation));
 
         }
 
@@ -375,12 +378,30 @@ namespace FCopParser {
 
         public int textureOffset;
 
+        public ValueActorProperty potentialSpawnLocation;
+        public ValueActorProperty idkWhatThisIs;
+
         public FCopBehavior9(FCopActor actor) {
             this.actor = actor;
 
             var rawFile = actor.rawFile;
 
             textureOffset = Utils.BytesToShort(rawFile.data.ToArray(), 42);
+
+            potentialSpawnLocation = new("Spawn Location?", Utils.BytesToInt(actor.rawFile.data.ToArray(), 88));
+            idkWhatThisIs = new("wtf is this?", Utils.BytesToShort(actor.rawFile.data.ToArray(), 64));
+
+            properties = new() { potentialSpawnLocation, idkWhatThisIs };
+
+        }
+
+        public void Compile() {
+
+            actor.rawFile.data.RemoveRange(64, 2);
+            actor.rawFile.data.InsertRange(64, BitConverter.GetBytes((short)idkWhatThisIs.value));
+
+            actor.rawFile.data.RemoveRange(88, 4);
+            actor.rawFile.data.InsertRange(88, BitConverter.GetBytes(potentialSpawnLocation.value));
 
         }
 
@@ -405,8 +426,8 @@ namespace FCopParser {
 
         public void Compile() {
 
-            //actor.rawFile.data.RemoveRange(46, 2);
-            //actor.rawFile.data.InsertRange(46, BitConverter.GetBytes((short)rotation.compiledRotation));
+            actor.rawFile.data.RemoveRange(46, 2);
+            actor.rawFile.data.InsertRange(46, BitConverter.GetBytes((short)rotation.value.compiledRotation));
 
         }
 
@@ -490,8 +511,11 @@ namespace FCopParser {
 
         public void Compile() {
 
-            //actor.rawFile.data.RemoveRange(64, 2);
-            //actor.rawFile.data.InsertRange(64, BitConverter.GetBytes((short)headRotation.compiledRotation));
+            actor.rawFile.data.RemoveRange(64, 2);
+            actor.rawFile.data.InsertRange(64, BitConverter.GetBytes((short)headRotation.value.compiledRotation));
+
+            actor.rawFile.data.RemoveRange(78, 2);
+            actor.rawFile.data.InsertRange(78, BitConverter.GetBytes((short)headRotation.value.compiledRotation));
 
         }
 

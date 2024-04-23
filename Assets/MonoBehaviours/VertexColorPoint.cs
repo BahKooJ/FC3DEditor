@@ -180,6 +180,10 @@ public class VertexColorPoint : MonoBehaviour {
             tile.ChangeShader(originalType);
         }
 
+        if (tile.verticies.Count <= index) {
+            return;
+        }
+
         switch (originalType) {
             case VertexColorType.MonoChrome:
 

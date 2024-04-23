@@ -96,12 +96,6 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
     }
 
-    public void OnSwitchToSolidMonoChrome() {
-
-        ClearVertexColors();
-
-    }
-
     public void Update() {
 
         if (FreeMove.looking) {
@@ -207,13 +201,10 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
             MakeSelection(tile, column, section);
 
         }
-        else if (IsSameShape(tile)) {
+        else {
 
             MakeSelection(tile, column, section);
 
-        }
-        else {
-            return;
         }
 
         ClearSectionOverlays();
@@ -252,10 +243,6 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
                 RefeshTileOverlay();
 
                 if (!HasSelection) {
-
-                    if (view.activeShaderMapper != null) {
-                        view.CloseShaderMapper();
-                    }
 
                     ClearAllSelectedItems();
 
@@ -540,7 +527,7 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
             }
 
         }
-        if (!painting) {
+        if (!painting && !applyColorsOnClick) {
 
             if (FirstTile.shaders.type == VertexColorType.MonoChrome) {
                 return;
@@ -604,6 +591,20 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
         foreach (var vertexColorPoint in vertexColorPoints) {
             vertexColorPoint.RefreshColors();
+        }
+
+    }
+
+    public void RefreshVertexColors() {
+
+        if (painting) return;
+
+        if (colorPicker == null) return;
+
+        ClearVertexColors();
+
+        if (colorPicker.colorType != VertexColorType.MonoChrome) {
+            InitVertexColorCorners(selectedItems[0]);
         }
 
     }

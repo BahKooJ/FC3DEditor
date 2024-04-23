@@ -52,13 +52,6 @@ public class ShaderColorPickerView : MonoBehaviour {
     public TMP_InputField redInput;
     public TMP_InputField greenInput;
     public TMP_InputField blueInput;
-    public Transform colorPresetsList;
-
-    // Prefabs
-    public GameObject vertexColor;
-    public GameObject colorPresetItem;
-
-    public List<ColorPresetItemView> colorPresetItemViews = new();
 
     public VertexColorType colorType = VertexColorType.MonoChrome;
 
@@ -119,13 +112,7 @@ public class ShaderColorPickerView : MonoBehaviour {
 
         refuseCallbacks = true;
 
-        foreach (var obj in colorPresetItemViews) {
-            Destroy(obj.gameObject);
-        }
-
         shaderTypeDropdown.value = (int)colorType;
-
-        colorPresetItemViews.Clear();
 
         solidMonoUI.SetActive(false);
         monoUI.SetActive(false);
@@ -139,7 +126,6 @@ public class ShaderColorPickerView : MonoBehaviour {
             case VertexColorType.MonoChrome:
                 solidMonoUI.SetActive(true);
                 overrideWhiteUI.SetActive(false);
-                controller.OnSwitchToSolidMonoChrome();
                 break;
             case VertexColorType.DynamicMonoChrome:
                 monoUI.SetActive(true);
@@ -148,7 +134,6 @@ public class ShaderColorPickerView : MonoBehaviour {
             case VertexColorType.Color:
                 colorUI.SetActive(true);
                 overrideWhiteUI.SetActive(true);
-                InitColorView();
                 break;
             case VertexColorType.ColorAnimated:
                 overrideWhiteUI.SetActive(false);
@@ -160,42 +145,6 @@ public class ShaderColorPickerView : MonoBehaviour {
         RefreshOverrideWhiteImage();
 
         refuseCallbacks = false;
-
-    }
-
-    void InitColorView() {
-
-        foreach (var preset in Presets.colorPresets.presets) {
-
-            var obj = Instantiate(colorPresetItem);
-
-            var script = obj.GetComponent<ColorPresetItemView>();
-            script.view = this;
-            script.color = preset;
-
-            obj.transform.SetParent(colorPresetsList, false);
-
-            obj.SetActive(true);
-
-            colorPresetItemViews.Add(script);
-
-        }
-
-    }
-
-    void AddColorPreset() {
-
-        var obj = Instantiate(colorPresetItem);
-
-        var script = obj.GetComponent<ColorPresetItemView>();
-        script.view = this;
-        script.color = Presets.colorPresets.presets.Last();
-
-        obj.transform.SetParent(colorPresetsList, false);
-
-        obj.SetActive(true);
-
-        colorPresetItemViews.Add(script);
 
     }
 
@@ -379,9 +328,13 @@ public class ShaderColorPickerView : MonoBehaviour {
 
             tile.ChangeShader((VertexColorType)shaderTypeDropdown.value);
 
+            controller.RefreshTileOverlayShader();
+
         }
 
         colorType = (VertexColorType)shaderTypeDropdown.value;
+
+        controller.RefreshVertexColors();
 
         RefreshView();
 
@@ -574,21 +527,6 @@ public class ShaderColorPickerView : MonoBehaviour {
             OnChangeBlue();
 
         }
-
-    }
-
-    public void OnClickAddColorPresetButton() {
-
-        Presets.colorPresets.presets.Add(colorValue.Clone());
-
-        AddColorPreset();
-
-    }
-
-    public void OnClickClearColorPresetsButton() {
-        Presets.colorPresets.presets.Clear();
-
-        RefreshView();
 
     }
 
