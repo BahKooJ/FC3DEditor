@@ -53,6 +53,44 @@ public class ColorPresetViewItem : MonoBehaviour {
 
         }
 
+        switch (preset.type) {
+            case VertexColorType.MonoChrome:
+
+                var SolidMonoColor = preset.monoValue / MonoChromeShader.white;
+
+                if (SolidMonoColor > 1f) {
+                    colorPreview.color = new Color(SolidMonoColor - 1f, 1f, SolidMonoColor - 1f);
+                }
+                else {
+                    colorPreview.color = new Color(0f, SolidMonoColor, 0f);
+                }
+
+                break;
+            case VertexColorType.DynamicMonoChrome:
+
+                var monoColor = preset.monoValue / DynamicMonoChromeShader.white;
+
+                if (monoColor > 1f) {
+                    colorPreview.color = new Color(monoColor - 1f, 1f, monoColor - 1f);
+                }
+                else {
+                    colorPreview.color = new Color(0f, monoColor, 0f);
+                }
+
+
+                break;
+            case VertexColorType.Color:
+
+                var colors = preset.colorValue.ToColors();
+
+                colorPreview.color = new Color(colors[0], colors[1], colors[2]);
+
+                break;
+            case VertexColorType.ColorAnimated:
+                break;
+
+        }
+
     }
 
     void Rename() {
@@ -86,7 +124,7 @@ public class ColorPresetViewItem : MonoBehaviour {
         Main.ignoreAllInputs = false;
 
         if (nameTextField.text == "") {
-            preset.name = "Shader Preset";
+            preset.name = "Color Preset";
         }
         else {
             preset.name = nameTextField.text;
@@ -100,7 +138,9 @@ public class ColorPresetViewItem : MonoBehaviour {
 
     public void OnClick() {
 
-
+        if (controller.colorPicker != null) {
+            controller.colorPicker.SetColorFromPreset(preset);
+        }
 
     }
 

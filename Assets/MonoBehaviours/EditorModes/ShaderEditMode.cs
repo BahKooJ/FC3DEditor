@@ -157,6 +157,7 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
     public void OnCreateMode() {
         currentShaderPresets = Presets.shaderPresets;
+        currentColorPresets = Presets.colorPresets;
     }
 
     public void OnDestroy() {
@@ -599,6 +600,8 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
         if (colorPicker == null) return;
 
+        if (!HasSelection) return;
+
         ClearVertexColors();
 
         if (colorPicker.colorType != VertexColorType.MonoChrome) {
@@ -694,7 +697,7 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
                 preset = new ColorPreset("", VertexColorType.MonoChrome, colorPicker.solidMonoByteValue);
                 break;
             case VertexColorType.DynamicMonoChrome:
-                preset = new ColorPreset("", VertexColorType.DynamicMonoChrome, colorPicker.solidMonoByteValue);
+                preset = new ColorPreset("", VertexColorType.DynamicMonoChrome, colorPicker.dynamicMonoValue);
                 break;
             case VertexColorType.Color:
                 preset = new ColorPreset("", VertexColorType.Color, colorPicker.colorValue.Clone());

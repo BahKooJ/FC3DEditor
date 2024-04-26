@@ -544,40 +544,168 @@ public abstract class Presets {
 
         void ReadColorPresets() {
 
-            colorPresets = new ColorPresets();
-
             var startIndex = file.IndexOf(ColorPresets.tag);
 
             if (startIndex == -1) {
                 return;
             }
 
-            var openArray = false;
+            var opened = new List<ColorPresets>();
+
+            ColorPreset currentColorPreset = null;
+
             var value = "";
+
+            var nextProperty = new List<string> { "NAME", "TYPE", "VALUE" };
+            var lookingForValue = -1;
+            var isReadingValue = false;
+
             foreach (var i in Enumerable.Range(startIndex, file.Count())) {
 
                 var c = file[i];
 
-                if (c == '[') {
-                    openArray = true;
+                // The only thing the value is really used for is names
+                // If it's ever used for something else this might have problems...
+                if (c == '\"') {
+                    isReadingValue = !isReadingValue;
+
+                    if (!isReadingValue) {
+
+                        if (currentColorPreset == null) {
+
+                            opened.Last().directoryName = value;
+
+                            value = "";
+
+                        }
+
+
+                    }
+
+                    // Continue because " is a keyword and can't be used for anything else
                     continue;
                 }
 
-                if (openArray) {
+                // If reading value all it cares is grabing the character
+                if (isReadingValue) {
+                    value += c;
+                    continue;
+                }
 
-                    if (c == ',') {
-                        //colorPresets.presets.Add(new XRGB555(new BitArray(BitConverter.GetBytes(UInt16.Parse(value)))));
-                        value = "";
+                // Not equal to three because that's the count for all the data
+                if (currentColorPreset != null && lookingForValue != 3) {
 
-                    }
-                    else if (numbers.Contains(c)) {
-                        value += c;
+
+                    switch (nextProperty[lookingForValue]) {
+
+                        case "NAME":
+
+                            // Because the name is a string if we have data it's most likely the name
+                            if (value != "") {
+                                currentColorPreset.name = value;
+                                value = "";
+                                lookingForValue++;
+                            }
+
+                            break;
+                        case "TYPE":
+
+                            if (c == ',') {
+
+                                var type = (VertexColorType)Int32.Parse(value);
+
+                                currentColorPreset.type = type;
+
+                                value = "";
+                                lookingForValue++;
+                            }
+                            else if (numbers.Contains(c)) {
+                                value += c;
+                            }
+
+                            break;
+                        case "VALUE":
+
+                            if (c == ')') {
+                                
+                                switch (currentColorPreset.type) {
+                                    case VertexColorType.MonoChrome:
+                                        currentColorPreset.monoValue = Int32.Parse(value);
+                                        break;
+                                    case VertexColorType.DynamicMonoChrome:
+                                        currentColorPreset.monoValue = Int32.Parse(value);
+                                        break;
+                                    case VertexColorType.Color:
+                                        currentColorPreset.colorValue = new XRGB555(new BitArray(BitConverter.GetBytes(UInt16.Parse(value))));
+                                        break;
+                                    case VertexColorType.ColorAnimated:
+                                        break;
+
+                                }
+
+                                value = "";
+                                lookingForValue++;
+                            }
+                            else if (numbers.Contains(c)) {
+                                value += c;
+                            }
+
+                            break;
+
                     }
 
                 }
 
-                if (c == ']') {
-                    return;
+
+
+                if (c == '(') {
+
+                    if (currentColorPreset != null) {
+                        throw new Exception("Cannot open new shader Preset without closing the first");
+                    }
+
+                    currentColorPreset = new ColorPreset();
+                    lookingForValue = 0;
+
+                }
+                else if (c == ')') {
+
+                    opened.Last().presets.Add(currentColorPreset);
+
+                    currentColorPreset = null;
+
+                    lookingForValue = -1;
+
+                }
+
+                // Opens or closes a subfolder.
+                if (c == '{') {
+
+                    opened.Add(new ColorPresets());
+
+                }
+                else if (c == '}') {
+
+                    var last = opened.Last();
+
+                    if (opened.Count() > 1) {
+
+                        // Needs to add itself to the parent
+                        var beforeLast = opened[opened.Count - 2];
+
+                        beforeLast.subFolders.Add(last);
+
+                        last.parent = beforeLast;
+
+                        opened.Remove(last);
+
+                    }
+                    else if (opened.Count() == 1) {
+                        // Finished
+                        colorPresets = opened[0];
+                        return;
+                    }
+
                 }
 
             }

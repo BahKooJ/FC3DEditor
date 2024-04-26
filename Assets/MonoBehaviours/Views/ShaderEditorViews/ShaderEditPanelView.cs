@@ -12,6 +12,10 @@ public class ShaderEditPanelView : MonoBehaviour {
     // View refs
     public Image paintTool;
     public Image clickToggle;
+    public Image switchPresets;
+
+    public Sprite showShaderPresetsSprite;
+    public Sprite showColorPresetsSprite;
 
     public ShaderEditMode controller;
 
@@ -124,10 +128,12 @@ public class ShaderEditPanelView : MonoBehaviour {
         if (ShaderEditMode.showColorPresets) {
             shaderPresetsView.Clear();
             colorPresetsView.Init();
+            switchPresets.sprite = showColorPresetsSprite;
         }
         else {
             colorPresetsView.Clear();
             shaderPresetsView.Init();
+            switchPresets.sprite = showShaderPresetsSprite;
         }
 
     }

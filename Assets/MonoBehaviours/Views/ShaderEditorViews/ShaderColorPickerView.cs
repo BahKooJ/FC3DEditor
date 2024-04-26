@@ -4,6 +4,7 @@ using FCopParser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -118,9 +119,7 @@ public class ShaderColorPickerView : MonoBehaviour {
         monoUI.SetActive(false);
         colorUI.SetActive(false);
 
-        if (colorValue == null) {
-            colorValue = new XRGB555(false, 0, 0, 0);
-        }
+        colorValue ??= new XRGB555(false, 0, 0, 0);
 
         switch (colorType) {
             case VertexColorType.MonoChrome:
@@ -193,6 +192,39 @@ public class ShaderColorPickerView : MonoBehaviour {
                     SetColors(shader.values[colorDataTrianglesIndexes[index]]);
 
                 }
+
+                break;
+            case VertexColorType.ColorAnimated:
+                break;
+
+        }
+
+        RefreshView();
+
+    }
+
+    public void SetColorFromPreset(ColorPreset preset) {
+
+        switch (preset.type) {
+            case VertexColorType.MonoChrome:
+
+                colorType = VertexColorType.MonoChrome;
+
+                SetSolidMono((byte)preset.monoValue);
+
+                break;
+            case VertexColorType.DynamicMonoChrome:
+
+                colorType = VertexColorType.DynamicMonoChrome;
+                
+                SetMono(preset.monoValue);
+
+                break;
+            case VertexColorType.Color:
+
+                colorType = VertexColorType.Color;
+                
+                SetColors(preset.colorValue);
 
                 break;
             case VertexColorType.ColorAnimated:

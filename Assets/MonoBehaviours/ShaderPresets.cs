@@ -204,7 +204,91 @@ public class ColorPresets {
 
     public string Compile() {
 
-        return "";
+        if (parent != null) { return ""; }
+
+        string SavePreset(List<ColorPreset> presets) {
+
+            var total = "";
+
+            foreach (var preset in presets) {
+
+                // All Objects:
+                // (NAME(string), TYPE(int), ...
+
+                total += "(\"" + preset.name + "\",";
+
+                total += ((int)preset.type).ToString() + ",";
+
+                switch (preset.type) {
+                    case VertexColorType.MonoChrome:
+                        // VALUE(int))
+
+                        total += preset.monoValue.ToString() + "),";
+
+                        break;
+                    case VertexColorType.DynamicMonoChrome:
+                        // VALUE(int))
+
+                        total += preset.monoValue.ToString() + "),";
+
+                        break;
+                    case VertexColorType.Color:
+                        // VALUE(uShort))
+
+                        total += preset.colorValue.ToUShort().ToString() + "),";
+
+                        break;
+                    case VertexColorType.ColorAnimated:
+                        // This should never be the case
+
+                        break;
+                }
+
+            }
+
+            // Removes the access comma
+            if (total != "") {
+                total = total.Remove(total.Length - 1);
+            }
+
+            return total;
+
+        }
+
+        string SavePresets(ColorPresets presets) {
+
+            var total = "";
+
+            total += "{\"";
+
+            total += presets.directoryName + "\",[";
+
+            total += SavePreset(presets.presets);
+
+            total += "],[";
+
+            var comma = false;
+            foreach (var subPresets in presets.subFolders) {
+
+                if (comma) {
+                    total += ",";
+                }
+
+                total += SavePresets(subPresets);
+
+                comma = true;
+
+            }
+
+            total += "]}";
+
+            return total;
+
+        }
+
+        var total = SavePresets(this);
+
+        return total;
 
     }
 

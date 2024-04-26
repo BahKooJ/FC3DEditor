@@ -63,7 +63,7 @@ public class ColorPresetsDirectoryViewItem : MonoBehaviour {
         Main.ignoreAllInputs = false;
 
         if (nameTextField.text == "") {
-            presets.directoryName = "Shader Preset Folder";
+            presets.directoryName = "Color Preset Folder";
         }
         else {
             presets.directoryName = nameTextField.text;
