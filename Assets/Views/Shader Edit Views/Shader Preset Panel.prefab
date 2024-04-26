@@ -49,6 +49,7 @@ GameObject:
   - component: {fileID: 1369666686304929054}
   - component: {fileID: 1369666686304929055}
   - component: {fileID: 8752143832671473201}
+  - component: {fileID: 6521571199771915639}
   m_Layer: 6
   m_Name: Shader Preset Panel
   m_TagString: Untagged
@@ -134,6 +135,22 @@ MonoBehaviour:
   shaderPresetItem: {fileID: 367493372903785777, guid: 879f94caab7fc1545a9b729adb05dae1, type: 3}
   shaderPresetsDirectoryItem: {fileID: 367493372903785777, guid: 460122d78d8b0c0418994529b1a35584, type: 3}
   backShaderPresetsItem: {fileID: 367493372903785777, guid: 56e1c96d0550c48419b1554436dad862, type: 3}
+  presetListContent: {fileID: 1369666687501709775}
+--- !u!114 &6521571199771915639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1369666686304929049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6254a6f4c8aa7d44ae881cca2e12631, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorPresetItem: {fileID: 367493372903785777, guid: c2a959659f8e0b94ca17dbdb4aa20d82, type: 3}
+  colorPresetsDirectoryItem: {fileID: 367493372903785777, guid: 1d8a42bb4cd7b014890ef09ccb142145, type: 3}
+  backColorPresetsItem: {fileID: 367493372903785777, guid: 3f488932470b9de42b257494bddbf24d, type: 3}
   presetListContent: {fileID: 1369666687501709775}
 --- !u!1 &1369666686433322881
 GameObject:
@@ -750,6 +767,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 6521571199771915639}
+        m_TargetAssemblyTypeName: ColorPresetsView, Assembly-CSharp
+        m_MethodName: OnClickSavePresetsButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &4814808385384563151
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -888,6 +917,18 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 8752143832671473201}
         m_TargetAssemblyTypeName: ShaderPresetsView, Assembly-CSharp
+        m_MethodName: OnClickAddPresetButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 6521571199771915639}
+        m_TargetAssemblyTypeName: ColorPresetsView, Assembly-CSharp
         m_MethodName: OnClickAddPresetButton
         m_Mode: 1
         m_Arguments:
@@ -1046,6 +1087,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 6521571199771915639}
+        m_TargetAssemblyTypeName: ColorPresetsView, Assembly-CSharp
+        m_MethodName: OnClickAddDirectoryButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &4587594153475642901
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1184,6 +1237,18 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 8752143832671473201}
         m_TargetAssemblyTypeName: ShaderPresetsView, Assembly-CSharp
+        m_MethodName: OnClickOpenPresetsButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 6521571199771915639}
+        m_TargetAssemblyTypeName: ColorPresetsView, Assembly-CSharp
         m_MethodName: OnClickOpenPresetsButton
         m_Mode: 1
         m_Arguments:

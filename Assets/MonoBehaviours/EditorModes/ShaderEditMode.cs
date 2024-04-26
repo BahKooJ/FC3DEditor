@@ -2,18 +2,15 @@
 
 
 using FCopParser;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
     public static bool applyColorsOnClick = false;
+    public static bool showColorPresets = false;
 
     public Main main { get; set; }
 
@@ -25,6 +22,7 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
     public ShaderColorPickerView colorPicker;
 
     public ShaderPresets currentShaderPresets;
+    public ColorPresets currentColorPresets;
 
     public bool painting = false;
     public Tile previousPaintTile = null;
@@ -683,9 +681,41 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
     }
 
+    public bool AddColorPreset() {
+
+        if (colorPicker == null) return false;
+
+        if (colorPicker.colorType == VertexColorType.ColorAnimated) return false;
+
+        ColorPreset preset = null;
+
+        switch (colorPicker.colorType) {
+            case VertexColorType.MonoChrome:
+                preset = new ColorPreset("", VertexColorType.MonoChrome, colorPicker.solidMonoByteValue);
+                break;
+            case VertexColorType.DynamicMonoChrome:
+                preset = new ColorPreset("", VertexColorType.DynamicMonoChrome, colorPicker.solidMonoByteValue);
+                break;
+            case VertexColorType.Color:
+                preset = new ColorPreset("", VertexColorType.Color, colorPicker.colorValue.Clone());
+                break;
+        }
+
+        currentColorPresets.presets.Add(preset);
+
+        return true;
+
+    }
+
     public void AddPresetsDirectory() {
 
         currentShaderPresets.subFolders.Add(new ShaderPresets("", currentShaderPresets));
+
+    }
+
+    public void AddColorPresetsDirectory() {
+
+        currentColorPresets.subFolders.Add(new ColorPresets("", currentColorPresets));
 
     }
 

@@ -11,7 +11,7 @@ public abstract class Presets {
 
     public static UVPresets uvPresets = new UVPresets("Texture Presets", null);
     public static ShaderPresets shaderPresets = new ShaderPresets("Shader Presets", null);
-    public static ColorPresets colorPresets = new ColorPresets();
+    public static ColorPresets colorPresets = new ColorPresets("Color Presets", null);
 
     public static void ReadFile(string fileName) {
 
@@ -566,7 +566,7 @@ public abstract class Presets {
                 if (openArray) {
 
                     if (c == ',') {
-                        colorPresets.presets.Add(new XRGB555(new BitArray(BitConverter.GetBytes(UInt16.Parse(value)))));
+                        //colorPresets.presets.Add(new XRGB555(new BitArray(BitConverter.GetBytes(UInt16.Parse(value)))));
                         value = "";
 
                     }

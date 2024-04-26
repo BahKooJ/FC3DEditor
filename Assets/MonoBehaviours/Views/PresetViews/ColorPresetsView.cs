@@ -1,16 +1,16 @@
 ﻿
 
+
 using FCopParser;
 using System.Linq;
 using UnityEngine;
 
-// Yup... This is an exact copy of texture presets view with different types. What of it?
-public class ShaderPresetsView : MonoBehaviour {
+public class ColorPresetsView : MonoBehaviour {
 
     // Prefabs
-    public GameObject shaderPresetItem;
-    public GameObject shaderPresetsDirectoryItem;
-    public GameObject backShaderPresetsItem;
+    public GameObject colorPresetItem;
+    public GameObject colorPresetsDirectoryItem;
+    public GameObject backColorPresetsItem;
 
     // View refs
     public RectTransform presetListContent;
@@ -18,22 +18,26 @@ public class ShaderPresetsView : MonoBehaviour {
     public ShaderEditMode controller;
 
     void Start() {
-        Init();
+
+        if (ShaderEditMode.showColorPresets) {
+            Init();
+        }
+
     }
 
     public void Init() {
 
-        if (ShaderEditMode.showColorPresets) {
+        if (!ShaderEditMode.showColorPresets) {
             return;
         }
-
+        
         AddBackItem();
 
-        foreach (var folder in controller.currentShaderPresets.subFolders) {
+        foreach (var folder in controller.currentColorPresets.subFolders) {
             AddDirectoryListItem(folder);
         }
 
-        foreach (var preset in controller.currentShaderPresets.presets) {
+        foreach (var preset in controller.currentColorPresets.presets) {
             AddListItem(preset);
         }
 
@@ -55,11 +59,11 @@ public class ShaderPresetsView : MonoBehaviour {
 
         AddBackItem();
 
-        foreach (var folder in controller.currentShaderPresets.subFolders) {
+        foreach (var folder in controller.currentColorPresets.subFolders) {
             AddDirectoryListItem(folder);
         }
 
-        foreach (var preset in controller.currentShaderPresets.presets) {
+        foreach (var preset in controller.currentColorPresets.presets) {
             AddListItem(preset);
         }
 
@@ -67,11 +71,11 @@ public class ShaderPresetsView : MonoBehaviour {
 
     void AddBackItem() {
 
-        if (controller.currentShaderPresets.parent != null) {
+        if (controller.currentColorPresets.parent != null) {
 
-            var item = Instantiate(backShaderPresetsItem);
+            var item = Instantiate(backColorPresetsItem);
 
-            var script = item.GetComponent<BackShaderPresetsViewItem>();
+            var script = item.GetComponent<BackColorPresetsViewItem>();
 
             script.controller = controller;
             script.view = this;
@@ -82,11 +86,11 @@ public class ShaderPresetsView : MonoBehaviour {
 
     }
 
-    void AddListItem(ShaderPreset preset, bool forceNameChange = false) {
+    void AddListItem(ColorPreset preset, bool forceNameChange = false) {
 
-        var item = Instantiate(shaderPresetItem);
+        var item = Instantiate(colorPresetItem);
 
-        var script = item.GetComponent<ShaderPresetViewItem>();
+        var script = item.GetComponent<ColorPresetViewItem>();
 
         script.controller = controller;
         script.view = this;
@@ -97,11 +101,11 @@ public class ShaderPresetsView : MonoBehaviour {
 
     }
 
-    void AddDirectoryListItem(ShaderPresets presets, bool forceNameChange = false) {
+    void AddDirectoryListItem(ColorPresets presets, bool forceNameChange = false) {
 
-        var item = Instantiate(shaderPresetsDirectoryItem);
+        var item = Instantiate(colorPresetsDirectoryItem);
 
-        var script = item.GetComponent<ShaderPresetsDirectoryViewItem>();
+        var script = item.GetComponent<ColorPresetsDirectoryViewItem>();
 
         script.controller = controller;
         script.presets = presets;
@@ -117,11 +121,11 @@ public class ShaderPresetsView : MonoBehaviour {
 
     public void OnClickAddPresetButton() {
 
-        if (ShaderEditMode.showColorPresets) return;
+        if (!ShaderEditMode.showColorPresets) return;
 
-        if (controller.AddPreset()) {
+        if (controller.AddColorPreset()) {
 
-            AddListItem(controller.currentShaderPresets.presets.Last(), true);
+            AddListItem(controller.currentColorPresets.presets.Last(), true);
 
         }
 
@@ -129,17 +133,17 @@ public class ShaderPresetsView : MonoBehaviour {
 
     public void OnClickAddDirectoryButton() {
 
-        if (ShaderEditMode.showColorPresets) return;
+        if (!ShaderEditMode.showColorPresets) return;
 
-        controller.AddPresetsDirectory();
+        controller.AddColorPresetsDirectory();
 
-        AddDirectoryListItem(controller.currentShaderPresets.subFolders.Last(), true);
+        AddDirectoryListItem(controller.currentColorPresets.subFolders.Last(), true);
 
     }
 
     public void OnClickSavePresetsButton() {
 
-        if (ShaderEditMode.showColorPresets) return;
+        if (!ShaderEditMode.showColorPresets) return;
 
         OpenFileWindowUtil.SaveFile("Presets", "Presets", path => {
 
@@ -156,7 +160,7 @@ public class ShaderPresetsView : MonoBehaviour {
 
     public void OnClickOpenPresetsButton() {
 
-        if (ShaderEditMode.showColorPresets) return;
+        if (!ShaderEditMode.showColorPresets) return;
 
         OpenFileWindowUtil.OpenFile("Presets", "", path => {
 

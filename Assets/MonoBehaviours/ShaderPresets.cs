@@ -156,28 +156,55 @@ public class ShaderPreset {
 
 }
 
+public class ColorPreset {
+
+    public string name;
+    public VertexColorType type;
+    // This value is both solid mono and normal mono
+    public int monoValue;
+    public XRGB555 colorValue;
+
+    public ColorPreset(string name,VertexColorType type, int monoValue) {
+        this.name = name;
+        this.type = type;
+        this.monoValue = monoValue;
+    }
+
+    public ColorPreset(string name, VertexColorType type, XRGB555 colorValue) {
+        this.name = name;
+        this.type = type;
+        this.colorValue = colorValue;
+    }
+
+    public ColorPreset() {
+
+    }
+
+}
+
 public class ColorPresets {
 
     public static string tag = "COLOTAG";
 
-    public List<XRGB555> presets = new();
+    public string directoryName;
+
+    public ColorPresets parent = null;
+    public List<ColorPresets> subFolders = new();
+
+    public List<ColorPreset> presets = new();
+
+    public ColorPresets(string name, ColorPresets parent) {
+        directoryName = name;
+        this.parent = parent;
+    }
+
+    public ColorPresets() {
+        directoryName = "";
+    }
 
     public string Compile() {
 
-        var total = "[";
-
-        foreach (var preset in presets) {
-
-            total += preset.ToUShort().ToString() + ",";
-
-        }
-
-        // Removes the access comma
-        if (total != "[") {
-            total = total.Remove(total.Length - 1);
-        }
-
-        return total + "]";
+        return "";
 
     }
 

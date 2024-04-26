@@ -18,13 +18,20 @@ public class ShaderEditPanelView : MonoBehaviour {
     public GameObject activeShaderMapper = null;
     public GameObject activeShaderPresetPanel = null;
 
+    public ShaderPresetsView shaderPresetsView;
+    public ColorPresetsView colorPresetsView;
+
     void Start() {
 
         controller.view = this;
 
         activeShaderPresetPanel = Instantiate(shaderPresetPanel);
 
-        activeShaderPresetPanel.GetComponent<ShaderPresetsView>().controller = controller;
+        shaderPresetsView = activeShaderPresetPanel.GetComponent<ShaderPresetsView>();
+        colorPresetsView = activeShaderPresetPanel.GetComponent<ColorPresetsView>();
+
+        shaderPresetsView.controller = controller;
+        colorPresetsView.controller = controller;
 
         activeShaderPresetPanel.transform.SetParent(transform.parent, false);
 
@@ -106,6 +113,21 @@ public class ShaderEditPanelView : MonoBehaviour {
         }
         else {
             clickToggle.color = Color.white;
+        }
+
+    }
+
+    public void OnClickSwitchPresets() {
+
+        ShaderEditMode.showColorPresets = !ShaderEditMode.showColorPresets;
+
+        if (ShaderEditMode.showColorPresets) {
+            shaderPresetsView.Clear();
+            colorPresetsView.Init();
+        }
+        else {
+            colorPresetsView.Clear();
+            shaderPresetsView.Init();
         }
 
     }
