@@ -46,7 +46,7 @@ public class SectionEditMode : EditMode {
     public void Update() {
 
         if (FreeMove.looking) {
-            main.TestRayOnLevelMesh();
+           //main.TestRayOnLevelMesh();
         }
 
     }

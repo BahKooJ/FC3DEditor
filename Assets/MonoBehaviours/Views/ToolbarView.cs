@@ -4,8 +4,9 @@ using UnityEngine;
 
 class ToolbarView: MonoBehaviour {
 
-    public GameObject geometryEditorPanel;
-    public GameObject addGeometryPanel;
+    public GameObject heightMapEditPanel;
+    public GameObject tileEditPanel;
+    public GameObject tileAddPanel;
     public GameObject sectionEditPanel;
     public GameObject navMeshEditPanel;
     public GameObject actorEditPanel;
@@ -18,7 +19,7 @@ class ToolbarView: MonoBehaviour {
 
     void Start() {
 
-        SelectGeometryEditorTool();
+        SelectHeightMapEditMode();
 
     }
 
@@ -27,10 +28,10 @@ class ToolbarView: MonoBehaviour {
         if (Main.ignoreAllInputs) { return; }
 
         if (Controls.OnDown("GeometryEditingMode")) {
-            SelectGeometryEditorTool();
+            SelectHeightMapEditMode();
         }
         if (Controls.OnDown("TileBuildingMode")) {
-            AddGeometryPanel();
+            SelectTileEditMode();
         }
         if (Controls.OnDown("SectionEditingMode")) {
             SelectSectionEditMode();
@@ -47,13 +48,13 @@ class ToolbarView: MonoBehaviour {
 
     }
 
-    public void SelectGeometryEditorTool() {
+    public void SelectHeightMapEditMode() {
 
         Destroy(activePanel);
 
         var editMode = new HeightMapEditMode(controller);
 
-        var obj = Instantiate(geometryEditorPanel);
+        var obj = Instantiate(heightMapEditPanel);
 
         var script = obj.GetComponent<HeightMapEditPanelView>();
 
@@ -67,15 +68,34 @@ class ToolbarView: MonoBehaviour {
 
     }
 
-    public void AddGeometryPanel() {
+    public void SelectTileEditMode() {
 
         var editMode = new TileEditMode(controller);
 
         Destroy(activePanel);
 
-        var obj = Instantiate(addGeometryPanel);
+        var obj = Instantiate(tileEditPanel);
 
         var script = obj.GetComponent<TileEditPanel>();
+
+        script.controller = editMode;
+
+        obj.transform.SetParent(this.transform.parent, false);
+        activePanel = obj;
+
+        controller.ChangeEditMode(editMode);
+
+    }
+
+    public void SelectTileAddMode() {
+
+        var editMode = new TileAddMode(controller);
+
+        Destroy(activePanel);
+
+        var obj = Instantiate(tileAddPanel);
+
+        var script = obj.GetComponent<TileAddPanel>();
 
         script.controller = editMode;
 

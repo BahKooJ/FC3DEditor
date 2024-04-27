@@ -37,7 +37,7 @@ public class TextureEditMode : EditMode {
     public void Update() {
 
         if (FreeMove.looking) {
-            main.TestRayOnLevelMesh();
+            //main.TestRayOnLevelMesh();
         }
 
         if (Main.ignoreAllInputs) { return; }

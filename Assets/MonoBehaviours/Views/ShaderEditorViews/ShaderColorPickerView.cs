@@ -2,12 +2,9 @@
 
 using FCopParser;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class ShaderColorPickerView : MonoBehaviour {

@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class TileHeightMapChannelPoint : MonoBehaviour {
 
-    public TileEditMode controller;
     public HeightPoints heightPoints;
     public int channel;
     public VertexPosition corner;

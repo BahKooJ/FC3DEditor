@@ -113,70 +113,74 @@ public class Main : MonoBehaviour {
 
     }
 
-    public void TestRayOnLevelMesh(bool useCursor = false) {
+    //public void TestRayOnLevelMesh(bool useCursor = false) {
 
+    //    Ray ray;
+
+    //    if (useCursor) {
+    //        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+    //    } else {
+    //        ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+    //    }
+
+    //    RaycastHit hit;
+
+    //    if (Physics.Raycast(ray, out hit, Mathf.Infinity, 1)) {
+
+    //        foreach (var section in sectionMeshes) {
+
+    //            if (hit.colliderInstanceID == section.meshCollider.GetInstanceID()) {
+
+    //                int clickX = (int)Math.Floor(hit.point.x - section.x);
+    //                int clickY = (int)Math.Floor(Math.Abs(hit.point.z + section.y));
+
+    //                TileColumn column;
+
+    //                // This just sometimes doesn't work and I don't really understand why
+    //                try {
+    //                    column = section.section.tileColumns.First(tileColumn => {
+    //                        return tileColumn.x == clickX && tileColumn.y == clickY;
+    //                    });
+    //                } catch {
+    //                    return;
+    //                }
+
+
+
+    //                if (Controls.OnDown("Select")) {
+
+    //                    SelectTile(section.sortedTilesByTriangle[hit.triangleIndex], column, section);
+
+    //                    section.RefreshMesh();
+
+    //                } else {
+
+    //                    LookTile(section.sortedTilesByTriangle[hit.triangleIndex], column, section);
+
+    //                }
+
+    //            }
+
+
+    //        }
+
+    //    }
+
+    //}
+
+    public TileSelection GetTileOnLevelMesh(bool useCursor = true) {
         Ray ray;
 
         if (useCursor) {
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        } else {
+        }
+        else {
             ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f));
         }
 
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, 1)) {
-
-            foreach (var section in sectionMeshes) {
-
-                if (hit.colliderInstanceID == section.meshCollider.GetInstanceID()) {
-
-                    int clickX = (int)Math.Floor(hit.point.x - section.x);
-                    int clickY = (int)Math.Floor(Math.Abs(hit.point.z + section.y));
-
-                    TileColumn column;
-
-                    // This just sometimes doesn't work and I don't really understand why
-                    try {
-                        column = section.section.tileColumns.First(tileColumn => {
-                            return tileColumn.x == clickX && tileColumn.y == clickY;
-                        });
-                    } catch {
-                        return;
-                    }
-
-
-
-                    if (Controls.OnDown("Select")) {
-
-                        SelectTile(section.sortedTilesByTriangle[hit.triangleIndex], column, section);
-
-                        section.RefreshMesh();
-
-                    } else {
-
-                        LookTile(section.sortedTilesByTriangle[hit.triangleIndex], column, section);
-
-                    }
-
-                }
-
-
-            }
-
-        }
-
-    }
-
-    public TileSelection GetTileOnLevelMesh() {
-
-        Ray ray;
-        
-        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        RaycastHit hit;
-
-        if (IsMouseOverUI()) {
+        if (IsMouseOverUI() && useCursor) {
             return null;
         }
 
@@ -303,16 +307,6 @@ public class Main : MonoBehaviour {
 
         editMode = mode;
         editMode.OnCreateMode();
-
-    }
-
-    public void LookTile(Tile tile, TileColumn column, LevelMesh section) {
-        editMode.LookTile(tile, column, section);
-    }
-
-    public void SelectTile(Tile tile, TileColumn column, LevelMesh section) {
-
-        editMode.SelectTile(tile, column, section);
 
     }
 

@@ -32,11 +32,7 @@ public class TileEditMode : EditMode {
     public void Update() {
 
         if (FreeMove.looking) {
-            main.TestRayOnLevelMesh();
-        }
-
-        if (Controls.OnDown("ChangeModes")) {
-            SwitchModes();
+            //main.TestRayOnLevelMesh();
         }
 
         if (isBuildMode) {
@@ -73,24 +69,7 @@ public class TileEditMode : EditMode {
         }
     }
 
-    public void LookTile(Tile tile, TileColumn column, LevelMesh section) {
-
-        if (isBuildMode) {
-            PreviewTilePlacement(tile, column, section);
-        }
-
-    }
-
     public void SelectTile(Tile tile, TileColumn column, LevelMesh section) {
-
-        if (isBuildMode) {
-
-            if (selectedTilePreset != null) {
-                AddTile((TilePreset)selectedTilePreset, column, section);
-            }
-
-            return;
-        }
 
         var oldColumn = selectedColumn;
 
@@ -161,13 +140,6 @@ public class TileEditMode : EditMode {
 
         RefeshTileOverlay();
 
-    }
-
-    void SwitchModes() {
-        isBuildMode = !isBuildMode;
-        ClearAllSelectedItems();
-        selectedHeight = null;
-        view.ChangeTools();
     }
 
     void TestTileHeightSelection() {
@@ -384,8 +356,6 @@ public class TileEditMode : EditMode {
 
     void ClearAllGameObjects() {
 
-        ClearBuildingOverlay();
-
         ClearTileOverlays();
 
         foreach (var point in heightPointObjects) {
@@ -399,8 +369,6 @@ public class TileEditMode : EditMode {
     }
 
     void ClearAllSelectedItems() {
-
-        ClearBuildingOverlay();
 
         selectedTiles.Clear();
         ClearTileOverlays();
@@ -462,7 +430,6 @@ public class TileEditMode : EditMode {
         var point = Object.Instantiate(main.tileHeightMapChannelPoint, pos, Quaternion.identity);
         var script = point.GetComponent<TileHeightMapChannelPoint>();
         script.corner = corner;
-        script.controller = this;
         script.heightPoints = column.heights[(int)corner - 1];
         script.channel = channel;
         script.section = selectedSection;
@@ -470,116 +437,6 @@ public class TileEditMode : EditMode {
         heightPointObjects.Add(script);
 
     }
-
-    #region Building
-
-    public void RefreshTilePlacementOverlay() {
-
-        if (selectedColumn == null) { return; }
-
-        ClearBuildingOverlay();
-
-        if (selectedTilePreset != null) {
-
-            InitBuildTileOverlay(((TilePreset)selectedTilePreset).Create(false, selectedColumn, selectedSection.section));
-
-        }
-
-    }
-
-    void PreviewTilePlacement(Tile tile, TileColumn column, LevelMesh section) {
-
-        // Checks to see if a new column is being looked at, if so it clears the overlay for a new one to be added. Otherwise it returns.
-        if (column != selectedColumn && selectedColumn != null) {
-
-            ClearBuildingOverlay();
-
-            foreach (var point in heightPointObjects) {
-                Object.Destroy(point.gameObject);
-            }
-
-            heightPointObjects.Clear();
-
-        }
-        else if (column == selectedColumn) {
-            return;
-        }
-
-        selectedColumn = column;
-        selectedSection = section;
-
-        if (selectedTilePreset != null) {
-
-            InitBuildTileOverlay(((TilePreset)selectedTilePreset).Create(false, selectedColumn, selectedSection.section));
-
-            // Re-adds HeightMapChannelPoints (0 = top left, 1 = top right, 2 = bottom left, 3 = bottom right)
-            AddHeightObjects(VertexPosition.TopLeft);
-            AddHeightObjects(VertexPosition.TopRight);
-            AddHeightObjects(VertexPosition.BottomLeft);
-            AddHeightObjects(VertexPosition.BottomRight);
-
-        }
-
-    }
-
-    void ClearBuildingOverlay() {
-
-        if (buildTileOverlay != null) {
-            Object.Destroy(buildTileOverlay.gameObject);
-        }
-
-        buildTileOverlay = null;
-
-    }
-
-    void InitBuildTileOverlay(Tile tile) {
-
-        var overlay = Object.Instantiate(main.SelectedTileOverlay);
-        var script = overlay.GetComponent<SelectedTileOverlay>();
-        script.controller = main;
-        script.tile = tile;
-        buildTileOverlay = script;
-        overlay.transform.SetParent(selectedSection.transform);
-        overlay.transform.localPosition = Vector3.zero;
-
-    }
-
-    void AddTile(TilePreset preset, TileColumn column, LevelMesh section) {
-
-        if (selectedTilePreset == null) { return; }
-
-        selectedColumn = column;
-        selectedSection = section;
-
-        if (selectedColumn != null) {
-
-            foreach (var t in selectedColumn.tiles) {
-
-                // Checks to make sure the tile doesn't already exist
-                if (MeshType.IDFromVerticies(t.verticies) == preset.meshID) {
-                    return;
-                }
-
-            }
-
-            // Does this even do anything?
-            foreach (var t in selectedColumn.tiles) {
-                
-                t.isEndInColumnArray = false;
-
-            }
-
-            var tile = preset.Create(true, selectedColumn, selectedSection.section);
-
-            selectedColumn.tiles.Add(tile);
-
-        }
-
-        selectedSection.RefreshMesh();
-
-    }
-
-    #endregion
 
     #region Callbacks
 

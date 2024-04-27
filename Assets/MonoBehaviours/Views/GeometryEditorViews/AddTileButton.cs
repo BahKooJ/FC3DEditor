@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class AddTileButton : MonoBehaviour {
 
-    public TileEditPanel view;
+    public TileAddPanel view;
 
     public TilePreset preset;
 

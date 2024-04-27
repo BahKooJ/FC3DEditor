@@ -97,7 +97,7 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
     public void Update() {
 
         if (FreeMove.looking) {
-            main.TestRayOnLevelMesh();
+            //main.TestRayOnLevelMesh();
         }
 
         if (Main.ignoreAllInputs) { return; }

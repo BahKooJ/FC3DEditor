@@ -14,10 +14,6 @@ public interface EditMode {
 
     public void OnDestroy();
 
-    public void LookTile(Tile tile, TileColumn column, LevelMesh section);
-
-    public void SelectTile(Tile tile, TileColumn column, LevelMesh section);
-
 }
 
 public class TileMutatingEditMode {

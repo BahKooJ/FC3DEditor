@@ -1,9 +1,7 @@
 ﻿
 
 using FCopParser;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Timeline;
 
 public class VertexColorPoint : MonoBehaviour {
 
