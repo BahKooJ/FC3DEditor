@@ -25,7 +25,15 @@ public class TileAddMode : EditMode {
     }
 
     public void OnDestroy() {
-        
+
+        ClearBuildingOverlay();
+
+        foreach (var point in heightPointObjects) {
+            Object.Destroy(point.gameObject);
+        }
+
+        heightPointObjects.Clear();
+
     }
 
     public void Update() {

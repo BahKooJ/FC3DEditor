@@ -3,18 +3,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
+using static UnityEngine.ParticleSystem;
 using Object = UnityEngine.Object;
 
-public class TextureEditMode : EditMode {
+public class TextureEditMode : TileMutatingEditMode, EditMode {
 
     public static bool openUVMapperByDefault = true;
 
     public Main main { get; set; }
-    public List<Tile> selectedTiles = new();
-    public TileColumn selectedColumn = null;
-    public LevelMesh selectedSection = null;
+
     public List<TileTexturePreview> selectedTileOverlays = new();
-    public GameObject selectedSectionOverlay = null;
+    public List<GameObject> selectedSectionOverlays = new();
 
     public TextureEditView view;
 
@@ -36,8 +36,14 @@ public class TextureEditMode : EditMode {
 
     public void Update() {
 
-        if (FreeMove.looking) {
-            //main.TestRayOnLevelMesh();
+        if (Controls.OnDown("Select")) {
+
+            var selection = main.GetTileOnLevelMesh(!FreeMove.looking);
+
+            if (selection != null) {
+                SelectLevelItems(selection);
+            }
+
         }
 
         if (Main.ignoreAllInputs) { return; }
@@ -53,101 +59,77 @@ public class TextureEditMode : EditMode {
     
     }
 
-    public void LookTile(Tile tile, TileColumn column, LevelMesh section) {
-
-    }
-
-    public void SelectTile(Tile tile, TileColumn column, LevelMesh section) {
-
-        var oldColumn = selectedColumn;
+    void SelectLevelItems(TileSelection selection) {
 
         // If shift is held then multiple tiles can be selected
-        if (Controls.IsDown("ModifierMultiSelect")) {
-
-            // Checks if the new selected tile is inside the selected Section, if it is not this method cannot continue.
-            if (selectedSection != null) {
-                if (selectedSection != section) {
-                    return;
-                }
-            }
-
-        }
-        else {
+        if (!Controls.IsDown("ModifierMultiSelect")) {
 
             // Clears the selected tile(s).
-            selectedTiles.Clear();
+            selectedItems.Clear();
+            selectedSections.Clear();
 
         }
 
         // Since frame animated tiles are a little weird it will try to only have one animated tile selected
-        if (tile.GetFrameCount() > 0) {
-            selectedTiles.Clear();
+        if (selection.tile.GetFrameCount() > 0) {
+            selectedItems.Clear();
         }
 
-        if (selectedTiles.Count > 0) {
+        if (HasSelection) {
 
-            if (selectedTiles[0].GetFrameCount() > 0) {
-                selectedTiles.Clear();
+            if (FirstTile.GetFrameCount() > 0) {
+                selectedItems.Clear();
             }
 
         }
 
-        // Updates the remaining data
-        selectedColumn = column;
-        selectedSection = section;
-
         // Selects a range of tiles if the mutli-select modifier is held.
         if (Controls.IsDown("ModifierAltSelect") && Controls.IsDown("ModifierMultiSelect")) {
 
-            SelectRangeOfTiles(oldColumn, column);
+            if (HasSelection) {
+
+                SelectRangeOfTiles(selection);
+
+            }
 
         }
+        else {
 
-        // Checks to see if the tiles vertex count is the same as the first selected tile
-        // This needs to be done because there are many differences in triangle tiles and rect tiles 
-        else if (selectedTiles.Count == 0) {
+            MakeSelection(selection);
 
-            SelectTile(tile);
+            if (selectedItems.Count == 1) {
 
-            if (view.activeTextureUVMapper != null) {
-                view.activeTextureUVMapper.GetComponent<TextureUVMapper>().RefreshView();
-            } else {
+                if (view.activeTextureUVMapper != null) {
+                    view.activeTextureUVMapper.GetComponent<TextureUVMapper>().RefreshView();
+                }
+                else {
 
-                if (openUVMapperByDefault) {
-                    view.OpenUVMapper();
+                    if (openUVMapperByDefault) {
+                        view.OpenUVMapper();
+                    }
+
                 }
 
             }
 
         }
-        else if (selectedTiles[0].verticies.Count == tile.verticies.Count) {
 
-            SelectTile(tile);
-
-        }
-        else {
-            return;
-        }
-
-        if (selectedSectionOverlay != null) {
-            Object.Destroy(selectedSectionOverlay);
-        }
-
-        selectedSectionOverlay = Object.Instantiate(main.SectionBoarders, new Vector3(section.x, 0, -section.y), Quaternion.identity);
+        RefreshSectionOverlay();
 
         RefeshTileOverlay();
+        RefreshMeshes();
 
     }
 
-    void SelectTile(Tile tile, bool deSelectDuplicate = true) {
+    override public void MakeSelection(TileSelection selection, bool deSelectDuplicate = true) {
 
-        if (selectedTiles.Contains(tile)) {
+        if (IsTileAlreadySelected(selection.tile)) {
 
             if (deSelectDuplicate) {
-                selectedTiles.Remove(tile);
+                RemoveTile(selection.tile);
                 RefeshTileOverlay();
 
-                if (selectedTiles.Count == 0) {
+                if (!HasSelection) {
 
                     if (view.activeTextureUVMapper != null) {
                         view.CloseTextureUVMapper();
@@ -162,52 +144,8 @@ public class TextureEditMode : EditMode {
         }
         else {
 
-            selectedTiles.Add(tile);
-
-        }
-
-    }
-
-    void SelectRangeOfTiles(TileColumn oldColumn, TileColumn column) {
-
-        if (oldColumn == null) {
-            return;
-        }
-
-        if (selectedTiles.Count == 0) {
-            return;
-        }
-
-        var xDif = column.x - oldColumn.x;
-        var yDif = column.y - oldColumn.y;
-
-        var xOrigin = oldColumn.x;
-        var yOrigin = oldColumn.y;
-
-        if (xDif < 0) {
-            xOrigin = column.x;
-        }
-        if (yDif < 0) {
-            yOrigin = column.y;
-        }
-
-        foreach (var y in Enumerable.Range(yOrigin, Math.Abs(yDif) + 1)) {
-
-            foreach (var x in Enumerable.Range(xOrigin, Math.Abs(xDif) + 1)) {
-
-                var itColumn = selectedSection.section.GetTileColumn(x, y);
-
-                foreach (var itTile in itColumn.tiles) {
-
-                    if (selectedTiles[0].verticies.Count == itTile.verticies.Count) {
-
-                        SelectTile(itTile, false);
-
-                    }
-
-                }
-
-            }
+            selectedItems.Add(selection);
+            selectedSections.Add(selection.section);
 
         }
 
@@ -215,48 +153,44 @@ public class TextureEditMode : EditMode {
 
     public void DeselectAllButFirstTile() {
 
-        if (selectedTiles.Count <= 1) { return; }
+        if (selectedItems.Count <= 1) { return; }
 
-        var first = selectedTiles[0];
+        var first = FirstItem;
 
-        selectedTiles.Clear();
+        selectedItems.Clear();
+        selectedSections.Clear();
 
-        selectedTiles.Add(first);
+        MakeSelection(first);
 
         RefeshTileOverlay();
+        RefreshSectionOverlay();
 
     }
 
     public void DeselectAllButLastTile() {
 
-        if (selectedTiles.Count <= 1) { return; }
+        if (selectedItems.Count <= 1) { return; }
 
-        var last = selectedTiles.Last();
+        var last = selectedItems.Last();
 
-        selectedTiles.Clear();
+        selectedItems.Clear();
+        selectedSections.Clear();
 
-        selectedTiles.Add(last);
+        MakeSelection(last);
 
         RefeshTileOverlay();
+        RefreshSectionOverlay();
 
     }
 
     void ClearAllSelectedItems() {
 
-        if (selectedSection != null) {
-            selectedSection.RefreshMesh();
-        }
+        RefreshMeshes();
 
-        selectedTiles.Clear();
+        selectedItems.Clear();
+        selectedSections.Clear();
         ClearTileOverlays();
-
-        if (selectedSectionOverlay != null) {
-            Object.Destroy(selectedSectionOverlay);
-            selectedSectionOverlay = null;
-        }
-
-        selectedColumn = null;
-        selectedSection = null;
+        ClearSectionOverlays();
 
     }
 
@@ -264,23 +198,33 @@ public class TextureEditMode : EditMode {
 
         ClearTileOverlays();
 
-        foreach (var tile in selectedTiles) {
+        foreach (var item in selectedItems) {
 
-            InitTileOverlay(tile);
+            InitTileOverlay(item);
 
         }
 
     }
 
-    void InitTileOverlay(Tile tile) {
+    void RefreshSectionOverlay() {
+
+        ClearSectionOverlays();
+
+        foreach (var iSection in selectedSections) {
+            selectedSectionOverlays.Add(Object.Instantiate(main.SectionBoarders, new Vector3(iSection.x, 0, -iSection.y), Quaternion.identity));
+        }
+
+    }
+
+    void InitTileOverlay(TileSelection selection) {
 
         var overlay = Object.Instantiate(main.TileTexturePreview);
         var script = overlay.GetComponent<TileTexturePreview>();
         script.controller = main;
-        script.tile = tile;
-        script.section = selectedSection.section;
+        script.tile = selection.tile;
+        script.section = selection.section.section;
         selectedTileOverlays.Add(script);
-        overlay.transform.SetParent(selectedSection.transform);
+        overlay.transform.SetParent(selection.section.transform);
         overlay.transform.localPosition = Vector3.zero;
 
     }
@@ -311,6 +255,16 @@ public class TextureEditMode : EditMode {
 
     }
 
+    void ClearSectionOverlays() {
+
+        foreach (var selectedSectionOverlay in selectedSectionOverlays) {
+            Object.Destroy(selectedSectionOverlay);
+        }
+
+        selectedSectionOverlays.Clear();
+
+    }
+
     public void RefreshUVMapper() {
 
         if (view.activeTextureUVMapper != null) {
@@ -321,9 +275,9 @@ public class TextureEditMode : EditMode {
 
     public void ChangeTexturePallette(int palletteOffset) {
 
-        foreach (var tile in selectedTiles) {
+        foreach (var selection in selectedItems) {
 
-            tile.texturePalette = palletteOffset;
+            selection.tile.texturePalette = palletteOffset;
 
         }
 
@@ -331,18 +285,16 @@ public class TextureEditMode : EditMode {
 
     public void DuplicateTileGraphics() {
 
-        if (selectedTiles.Count < 2) return;
+        if (selectedItems.Count < 2) return;
 
-        var firstTile = selectedTiles[0];
+        foreach (var selection in selectedItems.Skip(1)) {
 
-        foreach (var tile in selectedTiles.Skip(1)) {
-
-            tile.uvs = new List<int>(firstTile.uvs);
-            tile.texturePalette = firstTile.texturePalette;
+            selection.tile.uvs = new List<int>(FirstTile.uvs);
+            selection.tile.texturePalette = FirstTile.texturePalette;
 
         }
 
-        selectedSection.RefreshMesh();
+        RefreshMeshes();
 
         RefreshUVMapper();
         RefreshTileOverlayTexture();
@@ -351,21 +303,21 @@ public class TextureEditMode : EditMode {
 
     public void MakeTilesOpaque() {
 
-        foreach (var tile in selectedTiles) {
-            tile.isSemiTransparent = false;
+        foreach (var selection in selectedItems) {
+            selection.tile.isSemiTransparent = false;
         }
 
-        selectedSection.RefreshMesh();
+        RefreshMeshes();
 
     }
 
     public void MakeTilesTransparent() {
 
-        foreach (var tile in selectedTiles) {
-            tile.isSemiTransparent = true;
+        foreach (var selection in selectedItems) {
+            selection.tile.isSemiTransparent = true;
         }
 
-        selectedSection.RefreshMesh();
+        RefreshMeshes();
 
     }
 
@@ -373,9 +325,9 @@ public class TextureEditMode : EditMode {
 
     public bool AddPreset() {
 
-        if (selectedTiles.Count == 0) { return false; }
+        if (!HasSelection) { return false; }
 
-        var firstTile = selectedTiles[0];
+        var firstTile = FirstTile;
 
         var potentialID = MeshType.IDFromVerticies(firstTile.verticies);
 

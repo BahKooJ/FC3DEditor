@@ -331,8 +331,4 @@ public class NavMeshEditMode : EditMode {
 
     }
 
-    public void LookTile(Tile tile, TileColumn column, LevelMesh section) { }
-
-    public void SelectTile(Tile tile, TileColumn column, LevelMesh section) { }
-
 }

@@ -24,7 +24,17 @@ public class HeightMapEditMode : EditMode {
     public void Update() {
         
         if (FreeMove.looking) {
-            //main.TestRayOnLevelMesh();
+
+            if (Controls.OnDown("Select")) {
+                
+                var selection = main.GetTileOnLevelMesh(false);
+
+                if (selection != null) {
+                    SelectLevel(selection.column, selection.section);
+                }
+
+            }
+
         }
 
         TestHeightMapChannelSelection();
@@ -54,11 +64,7 @@ public class HeightMapEditMode : EditMode {
         this.main = main;
     }
 
-    public void LookTile(Tile tile, TileColumn column, LevelMesh section) {
-        // TODO: Add overlay when looking at tile
-    }
-
-    public void SelectTile(Tile tile, TileColumn column, LevelMesh section) {
+    public void SelectLevel(TileColumn column, LevelMesh section) {
 
         var isDifferentSection = section != selectedSection;
 

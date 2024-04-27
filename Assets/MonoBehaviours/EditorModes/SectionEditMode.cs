@@ -14,10 +14,6 @@ public class SectionEditMode : EditMode {
         this.main = main;
     }
 
-    public void LookTile(Tile tile, TileColumn column, LevelMesh section) {
-        
-    }
-
     public void OnCreateMode() {
         
     }
@@ -31,7 +27,25 @@ public class SectionEditMode : EditMode {
 
     }
 
-    public void SelectTile(Tile tile, TileColumn column, LevelMesh section) {
+    public void Update() {
+
+        if (FreeMove.looking) {
+
+            if (Controls.OnDown("Select")) {
+
+                var selection = main.GetTileOnLevelMesh(!FreeMove.looking);
+
+                if (selection != null) {
+                    SelectSection(selection.section);
+                }
+
+            }
+
+        }
+
+    }
+
+    public void SelectSection(LevelMesh section) {
 
         selectedSection = section;
 
@@ -40,14 +54,6 @@ public class SectionEditMode : EditMode {
         }
 
         selectedSectionOverlay = Object.Instantiate(main.SectionBoarders, new Vector3(section.x, 0, -section.y), Quaternion.identity);
-
-    }
-
-    public void Update() {
-
-        if (FreeMove.looking) {
-           //main.TestRayOnLevelMesh();
-        }
 
     }
 

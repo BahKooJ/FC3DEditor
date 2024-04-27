@@ -63,9 +63,7 @@ public class TextureEditView: MonoBehaviour {
     public void CloseTextureUVMapper() {
         Destroy(activeTextureUVMapper);
 
-        if (controller.selectedSection != null) {
-            controller.selectedSection.RefreshMesh();
-        }
+        controller.RefreshMeshes();
 
     }
 

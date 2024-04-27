@@ -155,7 +155,7 @@ public class TextureUVMapper : MonoBehaviour {
             return;
         }
 
-        if (controller.selectedTiles.Count == 0) {
+        if (!controller.HasSelection) {
 
             var bmpID = texturePaletteDropdown.GetComponent<TMP_Dropdown>().value;
 
@@ -167,10 +167,10 @@ public class TextureUVMapper : MonoBehaviour {
         var sameTexture = true;
 
         // If multiple tiles are select this checks to see if they're all the same texture
-        bmpID = controller.selectedTiles[0].texturePalette;
-        foreach (var tile in controller.selectedTiles) {
+        bmpID = controller.FirstTile.texturePalette;
+        foreach (var selection in controller.selectedItems) {
 
-            if (bmpID != tile.texturePalette) {
+            if (bmpID != selection.tile.texturePalette) {
                 sameTexture = false;
                 bmpID = -1;
                 break;
@@ -180,7 +180,7 @@ public class TextureUVMapper : MonoBehaviour {
 
         if (sameTexture) {
 
-            var bmpID = controller.selectedTiles[0].texturePalette;
+            var bmpID = controller.FirstTile.texturePalette;
 
             texturePaletteDropdown.GetComponent<TMP_Dropdown>().value = bmpID;
 
@@ -196,10 +196,10 @@ public class TextureUVMapper : MonoBehaviour {
 
         InitTexturePallette();
 
-        uvMapperTools.SetActive(controller.selectedTiles.Count != 0);
+        uvMapperTools.SetActive(controller.HasSelection);
 
-        if (controller.selectedTiles.Count != 0) {
-            var tile = controller.selectedTiles[0];
+        if (controller.HasSelection) {
+            var tile = controller.FirstTile;
 
             if (tile.isVectorAnimated) {
                 textureTypeDropDown.value = (int)TextureType.VectorAnimated;
@@ -229,15 +229,15 @@ public class TextureUVMapper : MonoBehaviour {
 
         InitTexturePallette();
 
-        uvMapperTools.SetActive(controller.selectedTiles.Count != 0);
+        uvMapperTools.SetActive(controller.HasSelection);
 
-        textureLines.gameObject.SetActive(controller.selectedTiles.Count != 0);
+        textureLines.gameObject.SetActive(controller.HasSelection);
 
         EndEditingVectorAnimation();
         EndEditingFrameAnimation();
 
-        if (controller.selectedTiles.Count != 0) {
-            var tile = controller.selectedTiles[0];
+        if (controller.HasSelection) {
+            var tile = controller.FirstTile;
 
             if (tile.isVectorAnimated) {
                 textureTypeDropDown.value = (int)TextureType.VectorAnimated;
@@ -303,15 +303,17 @@ public class TextureUVMapper : MonoBehaviour {
 
         vectorAnimationProperties.SetActive(true);
 
-        xVectorSlider.value = controller.selectedSection.section.animationVector.x;
-        yVectorSlider.value = controller.selectedSection.section.animationVector.y;
-        xVectorText.text = controller.selectedSection.section.animationVector.x.ToString();
-        yVectorText.text = controller.selectedSection.section.animationVector.y.ToString();
+        var firstSection = controller.FirstItem.section;
 
-        if (controller.selectedSection.section.animationVector.x == 0) {
+        xVectorSlider.value = firstSection.section.animationVector.x;
+        yVectorSlider.value = firstSection.section.animationVector.y;
+        xVectorText.text = firstSection.section.animationVector.x.ToString();
+        yVectorText.text = firstSection.section.animationVector.y.ToString();
+
+        if (firstSection.section.animationVector.x == 0) {
             xVectorText.text = "Disabled";
         }
-        if (controller.selectedSection.section.animationVector.y == 0) {
+        if (firstSection.section.animationVector.y == 0) {
             yVectorText.text = "Disabled";
         }
 
@@ -329,13 +331,13 @@ public class TextureUVMapper : MonoBehaviour {
 
     void StartEditingFrameAnimation(int startingFrame = 0) {
 
-        if (controller.selectedTiles.Count == 0) {
+        if (!controller.HasSelection) {
             return;
         }
 
         frameSelected = startingFrame;
 
-        var tile = controller.selectedTiles[0];
+        var tile = controller.FirstTile;
 
         generageColorPaletteButton.SetActive(false);
         editPaletteButton.SetActive(false);
@@ -396,7 +398,7 @@ public class TextureUVMapper : MonoBehaviour {
 
         frameItems.Clear();
 
-        var tile = controller.selectedTiles[0];
+        var tile = controller.FirstTile;
 
         foreach (var i in Enumerable.Range(0, tile.animatedUVs.Count / 4)) {
             var obj = Instantiate(frameListItem);
@@ -423,26 +425,25 @@ public class TextureUVMapper : MonoBehaviour {
     // --Event Handlers--
 
     public void CloseWindow() {
-        controller.selectedSection.RefreshMesh();
+        controller.RefreshMeshes();
         Destroy(gameObject);
     }
 
     public void OnChangeTexturePalleteValue() {
 
-        if (editTransparency || controller.selectedTiles.Count == 0) {
+        if (editTransparency || !controller.HasSelection) {
             InitTexturePallette();
             return;
         }
 
         controller.ChangeTexturePallette(texturePaletteDropdown.GetComponent<TMP_Dropdown>().value);
 
-        texturePaletteDropdown.GetComponent<TMP_Dropdown>().value = controller.selectedTiles[0].texturePalette;
+        texturePaletteDropdown.GetComponent<TMP_Dropdown>().value = controller.FirstTile.texturePalette;
 
         InitTexturePallette();
 
         controller.RefreshTileOverlayTexture();
-
-        if (controller.selectedTiles[0].GetFrameCount() > 0) {
+        if (controller.FirstTile.GetFrameCount() > 0) {
             RefreshUVFrameItems();
         }
 
@@ -620,11 +621,11 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void FlipLastTwoUVs() {
 
-        if (controller.selectedTiles.Count == 0) {
+        if (!controller.HasSelection) {
             return;
         }
 
-        if (controller.selectedTiles[0].uvs.Count != 3) {
+        if (controller.FirstTile.uvs.Count != 3) {
             return;
         }
 
@@ -682,7 +683,7 @@ public class TextureUVMapper : MonoBehaviour {
             "Future Cop's color palettes are not fully understood yet and the method for creating them is still work in progress. " +
             "Textures might display low quality or incorrectly.", () => {
 
-            var bitmap = controller.main.level.textures[controller.selectedTiles[0].texturePalette];
+            var bitmap = controller.main.level.textures[controller.FirstTile.texturePalette];
 
             var counts = bitmap.CreateColorPalette();
 
@@ -715,11 +716,11 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void ExportTexture() {
 
-        if (controller.selectedTiles.Count == 0) { return; }
+        if (!controller.HasSelection) { return; }
 
         OpenFileWindowUtil.SaveFile("Textures", "Bitmap Texture", path => {
 
-            var bitmap = controller.main.level.textures[controller.selectedTiles[0].texturePalette].BitmapWithHeader();
+            var bitmap = controller.main.level.textures[controller.FirstTile.texturePalette].BitmapWithHeader();
 
             File.WriteAllBytes(Utils.RemoveExtensionFromFileName(path) + ".bmp", bitmap);
 
@@ -729,11 +730,11 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void ExportColorPalette() {
 
-        if (controller.selectedTiles.Count == 0) { return; }
+        if (!controller.HasSelection) { return; }
 
         OpenFileWindowUtil.SaveFile("Textures\\Color Palettes", "Color Palette", path => {
 
-            var data = controller.main.level.textures[controller.selectedTiles[0].texturePalette].CbmpColorPaletteData();
+            var data = controller.main.level.textures[controller.FirstTile.texturePalette].CbmpColorPaletteData();
 
             File.WriteAllBytes(Utils.RemoveExtensionFromFileName(path) + ".plut", data);
 
@@ -743,11 +744,11 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void ExportCbmp() {
 
-        if (controller.selectedTiles.Count == 0) { return; }
+        if (!controller.HasSelection) { return; }
 
         OpenFileWindowUtil.SaveFile("Textures\\Cbmp", "Cbmp", path => {
 
-            var data = controller.main.level.textures[controller.selectedTiles[0].texturePalette].rawFile.data;
+            var data = controller.main.level.textures[controller.FirstTile.texturePalette].rawFile.data;
 
             File.WriteAllBytes(Utils.RemoveExtensionFromFileName(path) + ".Cbmp", data.ToArray());
 
@@ -757,11 +758,11 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void ImportTexture() {
 
-        if (controller.selectedTiles.Count == 0) { return; }
+        if (!controller.HasSelection) { return; }
 
         OpenFileWindowUtil.OpenFile("Textures", "", path => {
 
-            var texture = controller.main.level.textures[controller.selectedTiles[0].texturePalette];
+            var texture = controller.main.level.textures[controller.FirstTile.texturePalette];
 
             texture.ImportBMP(File.ReadAllBytes(path));
 
@@ -782,11 +783,11 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void ImportColorPalette() {
 
-        if (controller.selectedTiles.Count == 0) { return; }
+        if (!controller.HasSelection) { return; }
 
         OpenFileWindowUtil.OpenFile("Textures\\Color Palettes", "", path => {
 
-            var texture = controller.main.level.textures[controller.selectedTiles[0].texturePalette];
+            var texture = controller.main.level.textures[controller.FirstTile.texturePalette];
 
             texture.ImportColorPaletteData(File.ReadAllBytes(path));
 
@@ -796,11 +797,11 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void ImportCbmp() {
 
-        if (controller.selectedTiles.Count == 0) { return; }
+        if (!controller.HasSelection) { return; }
 
         OpenFileWindowUtil.OpenFile("Textures\\Cbmp", "", path => {
 
-            var texture = controller.main.level.textures[controller.selectedTiles[0].texturePalette];
+            var texture = controller.main.level.textures[controller.FirstTile.texturePalette];
 
             texture.ImportCbmp(File.ReadAllBytes(path));
 
@@ -821,7 +822,7 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void OnChangeTextureType() {
 
-        if (controller.selectedTiles.Count == 0) {
+        if (!controller.HasSelection) {
             return;
         }
 
@@ -838,38 +839,38 @@ public class TextureUVMapper : MonoBehaviour {
 
             case TextureType.Static:
 
-                foreach (var tile in controller.selectedTiles) {
+                foreach (var selection in controller.selectedItems) {
 
-                    if (tile.GetFrameCount() > 0 || tile.isVectorAnimated) {
+                    if (selection.tile.GetFrameCount() > 0 || selection.tile.isVectorAnimated) {
                         refreshRequired = true;
                     }
 
-                    tile.isVectorAnimated = false;
-                    tile.animatedUVs.Clear();
+                    selection.tile.isVectorAnimated = false;
+                    selection.tile.animatedUVs.Clear();
 
                 }
 
                 if (refreshRequired) {
-                    controller.selectedSection.RefreshMesh();
+                    controller.RefreshMeshes();
                     controller.RefreshTileOverlayTexture();
                 }
 
                 break;
             case TextureType.VectorAnimated:
 
-                foreach (var tile in controller.selectedTiles) {
+                foreach (var selection in controller.selectedItems) {
 
-                    if (tile.GetFrameCount() > 0 || !tile.isVectorAnimated) {
+                    if (selection.tile.GetFrameCount() > 0 || !selection.tile.isVectorAnimated) {
                         refreshRequired = true;
                     }
 
-                    tile.isVectorAnimated = true;
-                    tile.animatedUVs.Clear();
+                    selection.tile.isVectorAnimated = true;
+                    selection.tile.animatedUVs.Clear();
 
                 }
 
                 if (refreshRequired) {
-                    controller.selectedSection.RefreshMesh();
+                    controller.RefreshMeshes();
                     controller.RefreshTileOverlayTexture();
                 }
 
@@ -879,7 +880,7 @@ public class TextureUVMapper : MonoBehaviour {
 
                 controller.DeselectAllButLastTile();
 
-                var firstTile = controller.selectedTiles[0];
+                var firstTile = controller.FirstTile;
 
                 if (firstTile.GetFrameCount() == 0) {
 
@@ -895,7 +896,7 @@ public class TextureUVMapper : MonoBehaviour {
                 firstTile.isVectorAnimated = false;
 
                 if (refreshRequired) {
-                    controller.selectedSection.RefreshMesh();
+                    controller.RefreshMeshes();
                     controller.RefreshTileOverlayTexture();
                 }
 
@@ -910,7 +911,7 @@ public class TextureUVMapper : MonoBehaviour {
 
         var value = (int)xVectorSlider.value;
 
-        controller.selectedSection.section.animationVector.x = value;
+        controller.FirstItem.section.section.animationVector.x = value;
         xVectorText.text = value.ToString();
 
         if (value == 0) {
@@ -925,7 +926,7 @@ public class TextureUVMapper : MonoBehaviour {
 
         var value = (int)yVectorSlider.value;
 
-        controller.selectedSection.section.animationVector.y = value;
+        controller.FirstItem.section.section.animationVector.y = value;
         yVectorText.text = value.ToString();
 
         if (value == 0) {
@@ -938,7 +939,7 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void OnClickAddFrame() {
 
-        var tile = controller.selectedTiles[0];
+        var tile = controller.FirstTile;
         var currentUVs = tile.animatedUVs.GetRange(frameSelected * 4, 4);
         tile.animatedUVs.AddRange(currentUVs);
 
@@ -948,7 +949,7 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void OnClickRemoveFrame() {
 
-        var tile = controller.selectedTiles[0];
+        var tile = controller.FirstTile;
 
         if (tile.GetFrameCount() == 2) {
             return;
@@ -962,7 +963,7 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void OnChangeAnimationSpeedSlide() {
 
-        var tile = controller.selectedTiles[0];
+        var tile = controller.FirstTile;
 
         tile.animationSpeed = (int)frameAnimationSpeedSlider.value;
 

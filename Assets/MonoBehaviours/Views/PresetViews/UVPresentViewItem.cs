@@ -241,7 +241,9 @@ public class UVPresentViewItem : MonoBehaviour {
 
     public void OnClick() {
 
-        foreach (var tile in controller.selectedTiles) {
+        foreach (var selection in controller.selectedItems) {
+
+            var tile = selection.tile;
 
             if (preset.animatedUVs.Count > 0) {
 

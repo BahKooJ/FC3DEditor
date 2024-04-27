@@ -205,7 +205,9 @@ public class Main : MonoBehaviour {
                         return null;
                     }
 
-                    return new TileSelection(section.sortedTilesByTriangle[hit.triangleIndex], column, section);
+                    var selection = new TileSelection(section.sortedTilesByTriangle[hit.triangleIndex], column, section);
+
+                    return selection;
 
                 }
 

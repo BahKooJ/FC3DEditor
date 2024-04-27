@@ -40,7 +40,7 @@ class TextureCoordinatePoint : MonoBehaviour {
 
         if (view.frameSelected != -1) {
 
-            var tile = view.controller.selectedTiles[0];
+            var tile = view.controller.FirstTile;
 
             tile.animatedUVs[(view.frameSelected * 4) + uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
 
@@ -51,8 +51,8 @@ class TextureCoordinatePoint : MonoBehaviour {
         }
         else {
 
-            foreach (var tile in view.controller.selectedTiles) {
-                tile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
+            foreach (var selection in view.controller.selectedItems) {
+                selection.tile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
             }
 
         }
@@ -84,7 +84,7 @@ class TextureCoordinatePoint : MonoBehaviour {
 
         if (view.frameSelected != -1) {
 
-            var tile = view.controller.selectedTiles[0];
+            var tile = view.controller.FirstTile;
 
             tile.animatedUVs[(view.frameSelected * 4) + uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
 
@@ -98,8 +98,8 @@ class TextureCoordinatePoint : MonoBehaviour {
 
         } else {
 
-            foreach (var tile in view.controller.selectedTiles) {
-                tile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
+            foreach (var selection in view.controller.selectedItems) {
+                selection.tile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
             }
 
         }
@@ -113,26 +113,24 @@ class TextureCoordinatePoint : MonoBehaviour {
     public void ChangeGhostPos() {
 
         var ghostPos = ghostPoint.transform.localPosition;
-        if (view.controller.selectedSection.section.animationVector.x != 0) {
+        if (view.controller.FirstItem.section.section.animationVector.x != 0) {
             
 
-            if (view.controller.selectedSection.section.animationVector.x > 0) {
+            if (view.controller.FirstItem.section.section.animationVector.x > 0) {
                 ghostPos.x = 27;
             }
             else {
                 ghostPos.x = -27;
             }
 
-            
-
         } else {
             ghostPos.x = 0;
         }
 
-        if (view.controller.selectedSection.section.animationVector.y != 0) {
+        if (view.controller.FirstItem.section.section.animationVector.y != 0) {
 
 
-            if (view.controller.selectedSection.section.animationVector.y > 0) {
+            if (view.controller.FirstItem.section.section.animationVector.y > 0) {
                 ghostPos.y = 27;
             }
             else {
@@ -163,7 +161,7 @@ class TextureCoordinatePoint : MonoBehaviour {
 
     void Start() {
         
-        if (view.controller.selectedTiles[0].isVectorAnimated) {
+        if (view.controller.FirstTile.isVectorAnimated) {
             ShowGhostPos();
         }
 

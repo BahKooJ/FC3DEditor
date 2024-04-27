@@ -52,7 +52,6 @@ public class DebugTilePanelView : MonoBehaviour {
                 tile.verticies = verticies;
 
                 Refresh();
-                TileEditMode.selectedSection.RefreshMesh();
 
             }
             if (Input.GetKeyUp(KeyCode.UpArrow)) {

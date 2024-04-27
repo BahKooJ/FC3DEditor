@@ -15,16 +15,6 @@ public class TileEditPanel : MonoBehaviour {
     void Start() {
         controller.view = this;
 
-        if (Main.debug) {
-
-            debugTilePanelView = Instantiate(debugTilePanel);
-
-            debugTilePanelView.GetComponent<ShaderDebug>().controller = controller;
-
-            debugTilePanelView.transform.SetParent(transform.parent, false);
-
-        }
-
     }
 
     // Editing

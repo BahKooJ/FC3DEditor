@@ -25,6 +25,10 @@ public class TileMutatingEditMode {
         get => _FirstTile();
     }
 
+    public TileSelection FirstItem {
+        get => _FristItem();
+    }
+
     public bool HasSelection {
         get => _HasSelection();
     }
@@ -33,7 +37,7 @@ public class TileMutatingEditMode {
         get => _IsFirstTileQuad();
     }
 
-    virtual public void MakeSelection(Tile tile, TileColumn column, LevelMesh section, bool deSelectDuplicate = true) { }
+    virtual public void MakeSelection(TileSelection selection, bool deSelectDuplicate = true) { }
 
     public void SelectRangeOfTiles(TileSelection tile) {
 
@@ -67,14 +71,14 @@ public class TileMutatingEditMode {
 
                             if (itTile.verticies.SequenceEqual(firstSelection.tile.verticies)) {
 
-                                MakeSelection(itTile, itColumn, tile.section, false);
+                                MakeSelection(new TileSelection(itTile, itColumn, tile.section), false);
 
                             }
 
                         }
                         else {
 
-                            MakeSelection(itTile, itColumn, tile.section, false);
+                            MakeSelection(new TileSelection(itTile, itColumn, tile.section), false);
 
                         }
 
@@ -164,6 +168,14 @@ public class TileMutatingEditMode {
     public void RemoveTile(Tile tile) {
 
         selectedItems.RemoveAll(s => s.tile == tile);
+
+    }
+
+    TileSelection _FristItem() {
+
+        if (selectedItems.Count == 0) { return null; }
+
+        return selectedItems[0];
 
     }
 

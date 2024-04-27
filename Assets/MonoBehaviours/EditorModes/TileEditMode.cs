@@ -6,24 +6,20 @@ using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-public class TileEditMode : EditMode {
+public class TileEditMode : TileMutatingEditMode, EditMode {
+
+    // This won't cause a memory leak... right?
+    static List<TileSelection> savedSelections = new();
+    static HashSet<LevelMesh> savedSectionSelections = new();
 
     public Main main { get; set; }
     public TileEditPanel view;
 
-    public TilePreset? selectedTilePreset = null;
-
-    static public List<Tile> selectedTiles = new();
-    static public TileColumn selectedColumn = null;
-    static public LevelMesh selectedSection = null;
-    public SelectedTileOverlay buildTileOverlay = null;
     public List<SelectedTileOverlay> selectedTileOverlays = new();
-    public GameObject selectedSectionOverlay = null;
+    public List<GameObject> selectedSectionOverlays = new();
 
     public List<TileHeightMapChannelPoint> heightPointObjects = new();
     public TileHeightMapChannelPoint selectedHeight = null;
-
-    public bool isBuildMode = false;
 
     public TileEditMode(Main main) {
         this.main = main;
@@ -31,19 +27,25 @@ public class TileEditMode : EditMode {
 
     public void Update() {
 
-        if (FreeMove.looking) {
-            //main.TestRayOnLevelMesh();
-        }
-
-        if (isBuildMode) {
-            return;
-        }
-
         if (Controls.OnUp("Select")) {
             selectedHeight = null;
         }
 
-        TestTileHeightSelection();
+        var didHitHeight = TestTileHeightSelection();
+
+        if (!didHitHeight) {
+
+            if (Controls.OnDown("Select")) {
+                
+                var selection = main.GetTileOnLevelMesh(!FreeMove.looking);
+
+                if (selection != null) { 
+                    SelectLevelItems(selection);
+                }
+
+            }
+
+        }
 
         if (Controls.OnDown("Unselect")) {
             
@@ -57,10 +59,15 @@ public class TileEditMode : EditMode {
     }
 
     public void OnCreateMode() {
+        selectedItems = savedSelections;
+        selectedSections = savedSectionSelections;
         ReinitExistingSelectedItems();
     }
 
     public void OnDestroy() {
+
+        savedSelections = selectedItems;
+        savedSectionSelections = selectedSections;
 
         ClearAllGameObjects();
 
@@ -69,60 +76,38 @@ public class TileEditMode : EditMode {
         }
     }
 
-    public void SelectTile(Tile tile, TileColumn column, LevelMesh section) {
-
-        var oldColumn = selectedColumn;
+    void SelectLevelItems(TileSelection selection) {
 
         // If shift is held then multiple tiles can be selected
-        if (Controls.IsDown("ModifierMultiSelect")) {
+        if (!Controls.IsDown("ModifierMultiSelect")) {
 
-            // Checks if the new selected tile is inside the selected Section, if it is not this method cannot continue.
-            if (selectedSection != null) {
-                if (selectedSection != section) {
-                    return;
-                }
+            // Clears the selected tile(s).
+            selectedItems.Clear();
+            selectedSections.Clear();
+
+        }
+
+        // Selects a range of tiles if the mutli-select modifier is held.
+        if (Controls.IsDown("ModifierAltSelect") && Controls.IsDown("ModifierMultiSelect")) {
+
+            if (HasSelection) {
+
+                SelectRangeOfTiles(selection);
+
             }
 
         }
         else {
 
-            // Clears the selected tile(s).
-            selectedTiles.Clear();
+            MakeSelection(selection);
 
         }
 
-        // Updates the remaining data
-        selectedColumn = column;
-        selectedSection = section;
+        ClearSectionOverlays();
 
-        // Selects a range of tiles if the mutli-select modifier is held.
-        if (Controls.IsDown("ModifierAltSelect") && Controls.IsDown("ModifierMultiSelect")) {
-
-            SelectRangeOfTiles(oldColumn, column);
-
+        foreach (var iSection in selectedSections) {
+            selectedSectionOverlays.Add(Object.Instantiate(main.SectionBoarders, new Vector3(iSection.x, 0, -iSection.y), Quaternion.identity));
         }
-
-        // Checks to see if the tiles vertex count is the same as the first selected tile
-        // This needs to be done because there are many differences in triangle tiles and rect tiles 
-        else if (selectedTiles.Count == 0) {
-
-            SelectTile(tile);
-
-        }
-        else if (selectedTiles[0].verticies.Count == tile.verticies.Count) {
-
-            SelectTile(tile);
-
-        }
-        else {
-            return;
-        }
-
-        if (selectedSectionOverlay != null) {
-            Object.Destroy(selectedSectionOverlay);
-        }
-
-        selectedSectionOverlay = Object.Instantiate(main.SectionBoarders, new Vector3(section.x, 0, -section.y), Quaternion.identity);
 
         foreach (var obj in heightPointObjects) {
             
@@ -142,14 +127,14 @@ public class TileEditMode : EditMode {
 
     }
 
-    void TestTileHeightSelection() {
+    bool TestTileHeightSelection() {
 
         if (FreeMove.looking) {
-            return;
+            return false;
         }
 
         if (!Controls.IsDown("Select")) {
-            return;
+            return false;
         }
 
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -165,7 +150,7 @@ public class TileEditMode : EditMode {
 
                         if (selectedHeight == null) {
 
-                            var index = selectedTiles[0].verticies.FindIndex(vertex => {
+                            var index = FirstTile.verticies.FindIndex(vertex => {
                                 return vertex.vertexPosition == channel.corner && vertex.heightChannel == channel.channel;
                             });
 
@@ -173,34 +158,34 @@ public class TileEditMode : EditMode {
                                 selectedHeight = channel;
                             }
 
-                            return;
+                            return true;
                         }
 
                         if (channel.heightPoints != selectedHeight.heightPoints) {
-                            return;
+                            return true;
                         }
 
-                        foreach (var tile in selectedTiles) {
+                        foreach (var item in selectedItems) {
 
-                            var index = tile.verticies.FindIndex(vertex => {
+                            var index = item.tile.verticies.FindIndex(vertex => {
                                 return vertex.vertexPosition == selectedHeight.corner && vertex.heightChannel == selectedHeight.channel;
                             });
 
-                            var existingVert = tile.verticies.FindIndex(vertex => {
+                            var existingVert = item.tile.verticies.FindIndex(vertex => {
                                 return vertex.vertexPosition == channel.corner && vertex.heightChannel == channel.channel;
                             });
 
                             if (index == -1 || existingVert != -1) {
-                                return;
+                                return true;
                             }
 
-                            var vertex = tile.verticies[index];
-                            tile.verticies[index] = new TileVertex(channel.channel, vertex.vertexPosition);
+                            var vertex = item.tile.verticies[index];
+                            item.tile.verticies[index] = new TileVertex(channel.channel, vertex.vertexPosition);
                             
                         }
                         selectedHeight = channel;
 
-                        selectedSection.RefreshMesh();
+                        RefreshMeshes();
                         RefeshTileOverlay();
 
                     }
@@ -209,20 +194,23 @@ public class TileEditMode : EditMode {
 
             }
 
-
         }
+
+        return false;
 
     }
 
     void ReinitExistingSelectedItems() {
 
-        if (selectedTiles.Count == 0) {
+        if (savedSelections.Count == 0) {
             return;
         }
 
         RefeshTileOverlay();
 
-        selectedSectionOverlay = Object.Instantiate(main.SectionBoarders, new Vector3(selectedSection.x, 0, -selectedSection.y), Quaternion.identity);
+        foreach (var iSection in selectedSections) {
+            selectedSectionOverlays.Add(Object.Instantiate(main.SectionBoarders, new Vector3(iSection.x, 0, -iSection.y), Quaternion.identity));
+        }
 
         AddHeightObjects(VertexPosition.TopLeft);
         AddHeightObjects(VertexPosition.TopRight);
@@ -231,75 +219,40 @@ public class TileEditMode : EditMode {
 
     }
 
-    void SelectTile(Tile tile, bool deSelectDuplicate = true) {
+    override public void MakeSelection(TileSelection selection, bool deSelectDuplicate = true) {
 
-        if (selectedTiles.Contains(tile)) {
+        if (IsTileAlreadySelected(selection.tile)) {
 
             if (deSelectDuplicate) {
-                selectedTiles.Remove(tile);
+                RemoveTile(selection.tile);
                 RefeshTileOverlay();
-            }
 
-        }
-        else {
+                if (!HasSelection) {
 
-            selectedTiles.Add(tile);
-
-        }
-
-        if (view.debugTilePanelView != null) {
-            view.debugTilePanelView.GetComponent<ShaderDebug>().Refresh();
-        }
-
-    }
-
-    void SelectRangeOfTiles(TileColumn oldColumn, TileColumn column) {
-
-        if (oldColumn == null) { return; }
-
-        var xDif = column.x - oldColumn.x;
-        var yDif = column.y - oldColumn.y;
-
-        var xOrigin = oldColumn.x;
-        var yOrigin = oldColumn.y;
-
-        if (xDif < 0) {
-            xOrigin = column.x;
-        }
-        if (yDif < 0) {
-            yOrigin = column.y;
-        }
-
-        foreach (var y in Enumerable.Range(yOrigin, Math.Abs(yDif) + 1)) {
-
-            foreach (var x in Enumerable.Range(xOrigin, Math.Abs(xDif) + 1)) {
-
-                var itColumn = selectedSection.section.GetTileColumn(x, y);
-
-                foreach (var itTile in itColumn.tiles) {
-
-                    if (selectedTiles[0].verticies.Count == itTile.verticies.Count) {
-
-                        SelectTile(itTile, false);
-
-                    }
+                    ClearAllSelectedItems();
 
                 }
 
             }
 
         }
+        else {
+
+            selectedItems.Add(selection);
+            selectedSections.Add(selection.section);
+
+        }
 
     }
 
-    void InitTileOverlay(Tile tile) {
+    void InitTileOverlay(TileSelection tile) {
 
         var overlay = Object.Instantiate(main.SelectedTileOverlay);
         var script = overlay.GetComponent<SelectedTileOverlay>();
         script.controller = main;
-        script.tile = tile;
+        script.tile = tile.tile;
         selectedTileOverlays.Add(script);
-        overlay.transform.SetParent(selectedSection.transform);
+        overlay.transform.SetParent(tile.section.transform);
         overlay.transform.localPosition = Vector3.zero;
 
     }
@@ -312,9 +265,9 @@ public class TileEditMode : EditMode {
 
         ClearTileOverlays();
 
-        foreach (var tile in selectedTiles) {
+        foreach (var item in selectedItems) {
 
-            InitTileOverlay(tile);
+            InitTileOverlay(item);
 
         }
 
@@ -330,24 +283,37 @@ public class TileEditMode : EditMode {
 
     }
 
+    void ClearSectionOverlays() {
+
+        foreach (var selectedSectionOverlay in selectedSectionOverlays) {
+            Object.Destroy(selectedSectionOverlay);
+        }
+
+        selectedSectionOverlays.Clear();
+
+    }
+
     void RemoveSelectedTiles() {
 
-        if (selectedTiles.Count == 0) { return; }
+        if (!HasSelection) { return; }
 
-        if (selectedColumn.tiles.Count == 1) {
+        var showDialog = false;
+        foreach (var item in selectedItems) {
+
+            if (item.column.tiles.Count == 1) {
+                showDialog = true;
+                continue;
+            }
+
+            item.column.tiles.Remove(item.tile);
+
+        }
+
+        if (showDialog) {
             DialogWindowUtil.Dialog("Cannot Remove Tile", "At least one tile must be present in a tile column");
-            return;
         }
 
-        foreach (var tile in selectedTiles) {
-
-            selectedColumn.tiles.Remove(tile);
-
-        }
-
-        selectedTiles.Clear();
-
-        selectedSection.RefreshMesh();
+        RefreshMeshes();
 
         ClearAllSelectedItems();
 
@@ -362,7 +328,7 @@ public class TileEditMode : EditMode {
             Object.Destroy(point.gameObject);
         }
 
-        if (selectedSectionOverlay != null) {
+        foreach (var selectedSectionOverlay in selectedSectionOverlays) {
             Object.Destroy(selectedSectionOverlay);
         }
 
@@ -370,7 +336,8 @@ public class TileEditMode : EditMode {
 
     void ClearAllSelectedItems() {
 
-        selectedTiles.Clear();
+        selectedItems.Clear();
+        selectedSections.Clear();
         ClearTileOverlays();
 
         foreach (var point in heightPointObjects) {
@@ -379,21 +346,15 @@ public class TileEditMode : EditMode {
 
         heightPointObjects.Clear();
 
-        if (selectedSectionOverlay != null) {
-            Object.Destroy(selectedSectionOverlay);
-            selectedSectionOverlay = null;
-        }
-
-        selectedColumn = null;
-        selectedSection = null;
+        ClearSectionOverlays();
 
     }
 
     void AddHeightObjects(VertexPosition corner) {
 
-        AddSingleHeightChannelObject(corner, 1, selectedColumn);
-        AddSingleHeightChannelObject(corner, 2, selectedColumn);
-        AddSingleHeightChannelObject(corner, 3, selectedColumn);
+        AddSingleHeightChannelObject(corner, 1, FirstItem.column);
+        AddSingleHeightChannelObject(corner, 2, FirstItem.column);
+        AddSingleHeightChannelObject(corner, 3, FirstItem.column);
 
     }
 
@@ -407,8 +368,8 @@ public class TileEditMode : EditMode {
             return;
         }
 
-        var worldX = selectedSection.x + column.x;
-        var worldY = -(selectedSection.y + column.y);
+        var worldX = FirstItem.section.x + column.x;
+        var worldY = -(FirstItem.section.y + column.y);
 
         switch (corner) {
             case VertexPosition.TopRight:
@@ -432,7 +393,7 @@ public class TileEditMode : EditMode {
         script.corner = corner;
         script.heightPoints = column.heights[(int)corner - 1];
         script.channel = channel;
-        script.section = selectedSection;
+        script.section = FirstItem.section;
 
         heightPointObjects.Add(script);
 
@@ -442,16 +403,16 @@ public class TileEditMode : EditMode {
 
     public void ShiftTilesHeightUp() {
 
-        if (selectedTiles.Count == 0) { return; }
+        if (!HasSelection) { return; }
 
-        foreach (var tile in selectedTiles) {
+        foreach (var item in selectedItems) {
 
-            var previousVerticies = new List<TileVertex>(tile.verticies);
+            var previousVerticies = new List<TileVertex>(item.tile.verticies);
             var newVerticies = new HashSet<TileVertex>();
 
-            foreach (var index in Enumerable.Range(0, tile.verticies.Count)) {
+            foreach (var index in Enumerable.Range(0, item.tile.verticies.Count)) {
 
-                var vertex = tile.verticies[index];
+                var vertex = item.tile.verticies[index];
 
                 if (vertex.heightChannel < 3) {
 
@@ -462,14 +423,14 @@ public class TileEditMode : EditMode {
                 }
 
                 if (newVerticies.Count == previousVerticies.Count) {
-                    tile.verticies = newVerticies.ToList();
+                    item.tile.verticies = newVerticies.ToList();
                 }
 
             }
 
         }
 
-        selectedSection.RefreshMesh();
+        RefreshMeshes();
 
         RefeshTileOverlay();
 
@@ -477,16 +438,16 @@ public class TileEditMode : EditMode {
 
     public void ShiftTilesHeightDown() {
 
-        if (selectedTiles.Count == 0) { return; }
+        if (!HasSelection) { return; }
 
-        foreach (var tile in selectedTiles) {
+        foreach (var item in selectedItems) {
 
-            var previousVerticies = new List<TileVertex>(tile.verticies);
+            var previousVerticies = new List<TileVertex>(item.tile.verticies);
             var newVerticies = new HashSet<TileVertex>();
 
-            foreach (var index in Enumerable.Range(0, tile.verticies.Count)) {
+            foreach (var index in Enumerable.Range(0, item.tile.verticies.Count)) {
 
-                var vertex = tile.verticies[index];
+                var vertex = item.tile.verticies[index];
 
                 if (vertex.heightChannel > 1) {
 
@@ -497,14 +458,14 @@ public class TileEditMode : EditMode {
                 }
 
                 if (newVerticies.Count == previousVerticies.Count) {
-                    tile.verticies = newVerticies.ToList();
+                    item.tile.verticies = newVerticies.ToList();
                 }
 
             }
 
         }
 
-        selectedSection.RefreshMesh();
+        RefreshMeshes();
 
         RefeshTileOverlay();
 

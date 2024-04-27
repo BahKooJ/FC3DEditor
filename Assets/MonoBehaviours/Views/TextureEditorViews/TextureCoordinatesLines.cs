@@ -36,13 +36,13 @@ public class TextureCoordinatesLines : MonoBehaviour {
 
         points.Clear();
 
-        if (view.controller.selectedTiles.Count == 0 || view.editTransparency) { return; }
+        if (!view.controller.HasSelection || view.editTransparency) { return; }
 
         GrabTextureCoords();
 
         if (textureCoords.Count == 0) { return; }
 
-        lineRenderer.positionCount = view.controller.selectedTiles[0].verticies.Count + 1;
+        lineRenderer.positionCount = view.controller.FirstTile.verticies.Count + 1;
 
         int it = 0;
         foreach (var coord in textureCoords) {
@@ -88,7 +88,7 @@ public class TextureCoordinatesLines : MonoBehaviour {
 
         }
 
-        lineRenderer.SetPosition(view.controller.selectedTiles[0].verticies.Count, new Vector3(
+        lineRenderer.SetPosition(view.controller.FirstTile.verticies.Count, new Vector3(
             TextureCoordinate.GetXPixel(textureCoords[0]),
             TextureCoordinate.GetYPixel(textureCoords[0]), -1));
 
@@ -110,7 +110,7 @@ public class TextureCoordinatesLines : MonoBehaviour {
             it++;
         }
 
-        lineRenderer.SetPosition(view.controller.selectedTiles[0].verticies.Count, new Vector3(
+        lineRenderer.SetPosition(view.controller.FirstTile.verticies.Count, new Vector3(
             TextureCoordinate.GetXPixel(textureCoords[0]),
             TextureCoordinate.GetYPixel(textureCoords[0]), -1));
 
@@ -128,20 +128,21 @@ public class TextureCoordinatesLines : MonoBehaviour {
         textureCoords.Clear();
 
         if (view.frameSelected != -1) {
-            var animatedUVs = view.controller.selectedTiles[0].animatedUVs.GetRange(view.frameSelected * 4, 4);
+            var animatedUVs = view.controller.FirstTile.animatedUVs.GetRange(view.frameSelected * 4, 4);
             textureCoords = new List<int>(animatedUVs);
             return;
         }
 
-        var uvs = view.controller.selectedTiles[0].uvs;
-        if (view.controller.selectedTiles.Count > 1) {
+        var uvs = view.controller.FirstTile.uvs;
+        if (view.controller.selectedItems.Count > 1) {
 
-            foreach (var tile in view.controller.selectedTiles) {
+            foreach (var selection in view.controller.selectedItems) {
 
-                if (!uvs.Equals(tile.uvs)) {
+                if (!uvs.Equals(selection.tile.uvs)) {
 
-                    //TODO: This isn't the best way of doing things because it overwrites immediately. 
-                    tile.uvs = new List<int>(uvs);
+                    //TODO: This isn't the best way of doing things because it overwrites immediately.
+                    //FIXME: This will make triangle tiles have quad UVs and visversa!
+                    selection.tile.uvs = new List<int>(uvs);
 
                 }
 

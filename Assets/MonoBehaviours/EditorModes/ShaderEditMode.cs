@@ -4,7 +4,9 @@
 using FCopParser;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 public class ShaderEditMode : TileMutatingEditMode, EditMode {
@@ -96,26 +98,28 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
     public void Update() {
 
-        if (FreeMove.looking) {
-            //main.TestRayOnLevelMesh();
-        }
-
         if (Main.ignoreAllInputs) { return; }
+
+        var testForSelection = true;
+
+        var hover = main.GetTileOnLevelMesh(!FreeMove.looking);
 
         if (colorPicker != null) {
 
             if (colorPicker.colorType == VertexColorType.MonoChrome) {
+                
+                var didMonoHit = TestSolidMonoTileSelection();
 
-                TestTileSelection();
+                testForSelection = !didMonoHit;
 
             }
             else {
 
-                TestVertexColorCornerSelection();
+                var didHitCorner = TestVertexColorCornerSelection();
+
+                testForSelection = didHitCorner ? false : testForSelection;
 
                 if (painting) {
-
-                    var hover = main.GetTileOnLevelMesh();
 
                     if (hover == null) {
                         ClearVertexColors();
@@ -134,7 +138,29 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
                         }
 
                     }
+                
+                }
 
+            }
+
+        }
+
+        // This is here after it's tested all other raycasts
+        // That way there isn't unintentinal tile selection
+        if (testForSelection && hover != null) {
+
+            if (painting) {
+                if (FreeMove.looking && Controls.OnDown("Select")) {
+                    SelectLevelItems(hover);
+                }
+                else if (Controls.OnDown("Select") && Controls.IsDown("ModifierAltSelect")) {
+                    SelectLevelItems(hover);
+                }
+            }
+            else {
+
+                if (Controls.OnDown("Select")) {
+                    SelectLevelItems(hover);
                 }
 
             }
@@ -166,11 +192,7 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
         ClearAllSelectedItems();
     }
 
-    public void LookTile(Tile tile, TileColumn column, LevelMesh section) {
-
-    }
-
-    public void SelectTile(Tile tile, TileColumn column, LevelMesh section) {
+    public void SelectLevelItems(TileSelection selection) {
 
         // If shift is held then multiple tiles can be selected
         if (!Controls.IsDown("ModifierMultiSelect")) {
@@ -182,27 +204,18 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
         }
 
         // Selects a range of tiles if the mutli-select modifier is held.
-        if (Controls.IsDown("ModifierAltSelect") && Controls.IsDown("ModifierMultiSelect")) {
+        if (Controls.IsDown("ModifierAltSelect") && Controls.IsDown("ModifierMultiSelect") && !painting) {
 
             if (HasSelection) {
 
-                SelectRangeOfTiles(new TileSelection(tile, column, section));
+                SelectRangeOfTiles(selection);
 
             }
 
         }
-
-        // Checks to see if the tiles vertex count is the same as the first selected tile
-        // This needs to be done because there are many differences in triangle tiles and rect tiles
-        // TODO: Make it so it doesn't matter
-        else if (selectedItems.Count == 0) {
-
-            MakeSelection(tile, column, section);
-
-        }
         else {
 
-            MakeSelection(tile, column, section);
+            MakeSelection(selection);
 
         }
 
@@ -230,15 +243,16 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
         }
 
         RefeshTileOverlay();
+        selection.section.RefreshMesh();
 
     }
 
-    override public void MakeSelection(Tile tile, TileColumn column, LevelMesh section, bool deSelectDuplicate = true) {
+    override public void MakeSelection(TileSelection selection, bool deSelectDuplicate = true) {
 
-        if (IsTileAlreadySelected(tile)) {
+        if (IsTileAlreadySelected(selection.tile)) {
 
             if (deSelectDuplicate) {
-                RemoveTile(tile);
+                RemoveTile(selection.tile);
                 RefeshTileOverlay();
 
                 if (!HasSelection) {
@@ -252,8 +266,8 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
         }
         else {
 
-            selectedItems.Add(new TileSelection(tile, column, section));
-            selectedSections.Add(section);
+            selectedItems.Add(selection);
+            selectedSections.Add(selection.section);
 
         }
 
@@ -273,19 +287,21 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
     }
 
-    void TestVertexColorCornerSelection() {
+    bool TestVertexColorCornerSelection() {
 
         if (FreeMove.looking) {
-            return;
+            return false;
         }
 
         if (vertexColorPoints.Count == 0) {
-            return;
+            return false;
         }
 
         if (!Controls.OnDown("Select") && !Controls.OnDown("Interact") && !painting) {
-            return;
+            return false;
         }
+
+        var didHit = false;
 
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -296,6 +312,8 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
             foreach (var vertex in vertexColorPoints) {
 
                 if (hit.colliderInstanceID == vertex.boxCollider.GetInstanceID()) {
+
+                    didHit = true;
 
                     if (painting) {
 
@@ -370,13 +388,15 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
         }
 
+        return didHit;
+
     }
 
     // This is for solid monochrome
-    void TestTileSelection() {
+    bool TestSolidMonoTileSelection() {
 
         if (FreeMove.looking) {
-            return;
+            return false;
         }
 
         var hover = main.GetTileOnLevelMesh();
@@ -398,7 +418,7 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
 
         if (hover == null) {
-            return;
+            return false;
         }
         if (painting) {
 
@@ -407,6 +427,7 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
                 ClearAllSelectedItems();
                 selectedSections.Add(hover.section);
                 RefreshMeshes();
+                return true;
             }
 
         }
@@ -414,9 +435,9 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
             if (Controls.OnDown("Select")) {
                 PaintTile();
-                SelectTile(hover.tile, hover.column, hover.section);
+                SelectLevelItems(hover);
                 RefreshMeshes();
-
+                return true;
             }
 
         }
@@ -424,11 +445,14 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
             if (Controls.OnDown("Select")) {
 
-                SelectTile(hover.tile, hover.column, hover.section);
+                SelectLevelItems(hover);
+                return true;
 
             }
 
         }
+
+        return false;
 
     }
 
