@@ -84,7 +84,7 @@ public class TileAddMode : EditMode {
 
         if (selectedTilePreset != null) {
 
-            InitBuildTileOverlay(((TilePreset)selectedTilePreset).Create(false, hoverSelection.column, hoverSelection.section.section));
+            InitBuildTileOverlay(((TilePreset)selectedTilePreset).Create(false, hoverSelection.column));
 
         }
 
@@ -102,7 +102,7 @@ public class TileAddMode : EditMode {
 
         if (selectedTilePreset != null) {
 
-            InitBuildTileOverlay(((TilePreset)selectedTilePreset).Create(false, hoverSelection.column, hoverSelection.section.section));
+            InitBuildTileOverlay(((TilePreset)selectedTilePreset).Create(false, hoverSelection.column));
 
             // Re-adds HeightMapChannelPoints (0 = top left, 1 = top right, 2 = bottom left, 3 = bottom right)
             AddHeightObjects(VertexPosition.TopLeft);
@@ -151,7 +151,7 @@ public class TileAddMode : EditMode {
 
             }
 
-            var tile = preset.Create(true, hoverSelection.column, hoverSelection.section.section);
+            var tile = preset.Create(true, hoverSelection.column);
 
             hoverSelection.column.tiles.Add(tile);
 

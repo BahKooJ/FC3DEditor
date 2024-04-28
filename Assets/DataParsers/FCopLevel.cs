@@ -1473,6 +1473,22 @@ namespace FCopParser {
 
         }
 
+        public Tile(TileColumn column, int meshID, int culling) {
+
+            this.column = column;
+            verticies = MeshType.VerticiesFromID(meshID);
+            this.culling = culling;
+            this.uvs = new() { 57200, 57228, 50060, 50032 };
+            this.texturePalette = 6;
+
+            isVectorAnimated = false;
+            isSemiTransparent = false;
+            effectIndex = 0;
+
+            shaders = new MonoChromeShader(116, verticies.Count == 4);
+
+        }
+
         public int GetFrameCount() {
             return animatedUVs.Count / 4;
         }

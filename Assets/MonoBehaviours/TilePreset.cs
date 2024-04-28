@@ -19,9 +19,9 @@ public struct TilePreset {
     }
 
     //TODO: This should not need to section
-    public Tile Create(bool isStart, TileColumn column, FCopLevelSection section) {
+    public Tile Create(bool isStart, TileColumn column) {
 
-        return new Tile(new TileBitfield(isStart ? 1 : 0, textureIndex, culling, 0, meshID, graphicsIndex), column, section.parser);
+        return new Tile(column, meshID, culling);
 
     }
 
