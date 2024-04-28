@@ -55,8 +55,6 @@ class SetHeightValueTextField: MonoBehaviour {
                         controller.UnselectHeights();
                         HeightMapEditMode.selectedSection.RefreshMesh();
 
-                        controller.RefreshSelectedOverlays();
-
                         Destroy(this.gameObject);
 
                         return;
@@ -76,8 +74,6 @@ class SetHeightValueTextField: MonoBehaviour {
 
         //controller.UnselectAndRefreshHeightPoints();
         HeightMapEditMode.selectedSection.RefreshMesh();
-
-        controller.RefreshSelectedOverlays();
 
         Destroy(this.gameObject);
 

@@ -3,7 +3,15 @@ using UnityEngine;
 
 public class HeightMapChannelPoint : MonoBehaviour {
 
+    // Prefabs
     public GameObject setHeightTextField;
+
+    // View refs
+    public Material boxMaterial;
+    public Material sphereMaterial;
+    public MeshRenderer boxRender;
+    public MeshRenderer sphereRender;
+    public BoxCollider boxCollider;
 
     public int x;
     public int y;
@@ -15,23 +23,22 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
     public bool isSelected = false;
 
-    public BoxCollider boxCollider;
-    Material material;
-
     public bool preInitSelect = false;
 
     SetHeightValueTextField dragField = null;
+
     bool click = false;
+
     Vector3 previousMousePosition;
 
     void Start() {
 
-        boxCollider = GetComponent<BoxCollider>();
-
-        material = GetComponent<MeshRenderer>().material;
+        boxMaterial = boxRender.material;
+        sphereMaterial = sphereRender.material;
 
         if (preInitSelect) {
-            material.color = Color.white;
+            boxMaterial.color = Color.white;
+            sphereMaterial.color = Color.white;
         } else {
             ResetColors();
         }
@@ -54,9 +61,11 @@ public class HeightMapChannelPoint : MonoBehaviour {
                     dragField = null;
                 }
 
+                boxRender.enabled = false;
+                sphereRender.enabled = true;
+
                 click = false;
                 section.RefreshMesh();
-                controller.RefreshSelectedOverlays();
 
             }
 
@@ -96,13 +105,16 @@ public class HeightMapChannelPoint : MonoBehaviour {
     public void ResetColors() {
         switch (channel) {
             case 1:
-                material.color = Color.blue;
+                boxMaterial.color = Color.blue;
+                sphereMaterial.color = Color.blue;
                 break;
             case 2:
-                material.color = Color.green;
+                boxMaterial.color = Color.green;
+                sphereMaterial.color = Color.green;
                 break;
             case 3:
-                material.color = Color.red;
+                boxMaterial.color = Color.red;
+                sphereMaterial.color = Color.red;
                 break;
         }
     }
@@ -158,14 +170,12 @@ public class HeightMapChannelPoint : MonoBehaviour {
     public void Select() {
 
         isSelected = true;
+        
+        boxMaterial.color = Color.white;
+        sphereMaterial.color = Color.white;
 
-        if (material == null) {
-            preInitSelect = true;
-        } else {
-            material.color = Color.white;
-        }
-
-        controller.lastSelectedHeightChannel = this;
+        boxRender.enabled = true;
+        sphereRender.enabled = false;
 
     }
 
@@ -173,11 +183,10 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
         isSelected = false;
 
-        if (material == null) {
-            preInitSelect = false;
-        } else {
-            ResetColors();
-        }
+        boxRender.enabled = false;
+        sphereRender.enabled = true;
+
+        ResetColors();
 
     }
 
@@ -196,6 +205,9 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
         click = true;
         previousMousePosition = Input.mousePosition;
+
+        boxRender.enabled = true;
+        sphereRender.enabled = false;
 
     }
 

@@ -14,12 +14,11 @@ public class HeightMapEditMode : EditMode {
     static public TileColumn selectedColumn = null;
     static public LevelMesh selectedSection = null;
     public List<HeightMapChannelPoint> heightPointObjects = new();
-    public List<SelectedTileOverlay> selectedTileOverlays = new();
     public GameObject selectedSectionOverlay = null;
 
     public HeightMapEditPanelView view;
 
-    public HeightMapChannelPoint lastSelectedHeightChannel = null;
+    HeightMapChannelPoint lastSelectedHeightChannel = null;
 
     public void Update() {
         
@@ -137,10 +136,18 @@ public class HeightMapEditMode : EditMode {
                     if (Controls.OnDown("Select") && Controls.IsDown("ModifierMultiSelect")) {
 
                         if (Controls.IsDown("ModifierAltSelect")) {
-                            SelectAllHeightChannelsInSection(channel.channel);
+                            RangeSelect(channel);
                             return;
                         } else {
                             channel.SelectOrDeSelect();
+
+                            if (channel.isSelected) {
+                                lastSelectedHeightChannel = channel;
+                            }
+                            else {
+                                lastSelectedHeightChannel = null;
+                            }
+
                         }
 
                     } else if (Controls.OnDown("Select")) {
@@ -186,6 +193,49 @@ public class HeightMapEditMode : EditMode {
             }
 
         }
+    }
+
+    void RangeSelect(HeightMapChannelPoint heightVertex) {
+
+        if (lastSelectedHeightChannel == null) return;
+
+        var firstClickX = lastSelectedHeightChannel.x;
+        var firstClickY = lastSelectedHeightChannel.y;
+
+        var firstClickChannel = lastSelectedHeightChannel.channel;
+
+        var lastClickX = heightVertex.x;
+        var lastClickY = heightVertex.y;
+
+        var lastClickChannel = heightVertex.channel;
+
+        var startX = firstClickX < lastClickX ? firstClickX : lastClickX;
+        var startY = firstClickY < lastClickY ? firstClickY : lastClickY;
+
+        var endX = firstClickX > lastClickX ? firstClickX : lastClickX;
+        var endY = firstClickY > lastClickY ? firstClickY : lastClickY;
+
+        var startChannel = firstClickChannel < lastClickChannel ? firstClickChannel : lastClickChannel;
+        var endChannel = firstClickChannel > lastClickChannel ? firstClickChannel : lastClickChannel;
+
+        foreach (var y in Enumerable.Range(startY, endY - startY + 1)) {
+
+            foreach (var x in Enumerable.Range(startX, endX - startX + 1)) {
+
+                var heights = heightPointObjects.Where(point => { return point.x == x && point.y == y; });
+
+                foreach (var height in heights) {
+
+                    if (height.channel >= startChannel && height.channel <= endChannel) {
+                        height.Select();
+                    }
+
+                }
+
+            }
+
+        }
+
     }
 
     void ReinitExistingSelectedItems() {
@@ -327,16 +377,6 @@ public class HeightMapEditMode : EditMode {
         foreach (var height in heightPointObjects) {
 
             height.DeSelect();
-
-        }
-
-    }
-
-    public void RefreshSelectedOverlays() {
-
-        foreach (var overlay in selectedTileOverlays) {
-
-            overlay.Refresh();
 
         }
 
