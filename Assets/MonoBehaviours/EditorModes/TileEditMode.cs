@@ -176,6 +176,11 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
                             });
 
                             if (index == -1 || existingVert != -1) {
+
+                                selectedHeight = channel;
+
+                                RefreshMeshes();
+                                RefeshTileOverlay();
                                 return true;
                             }
 

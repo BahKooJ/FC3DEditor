@@ -51,12 +51,11 @@ class TextureCoordinatePoint : MonoBehaviour {
         }
         else {
 
-            foreach (var selection in view.controller.selectedItems) {
-                selection.tile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
-            }
+            view.controller.FirstTile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
 
         }
 
+        controller.DuplicateTileUVs(false);
         controller.RefreshTileOverlayTexture();
 
     }
@@ -98,15 +97,12 @@ class TextureCoordinatePoint : MonoBehaviour {
 
         } else {
 
-            foreach (var selection in view.controller.selectedItems) {
-                selection.tile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
-            }
+            view.controller.FirstTile.uvs[uvOffset] = TextureCoordinate.SetPixel((int)transform.localPosition.x, (int)transform.localPosition.y);
 
         }
 
+        controller.DuplicateTileUVs(false);
         controller.RefreshTileOverlayTexture();
-
-        
 
     }
 

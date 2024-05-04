@@ -283,21 +283,36 @@ public class TextureEditMode : TileMutatingEditMode, EditMode {
 
     }
 
-    public void DuplicateTileGraphics() {
+    public void DuplicateTileUVs(bool refresh = true) {
 
         if (selectedItems.Count < 2) return;
 
         foreach (var selection in selectedItems.Skip(1)) {
 
-            selection.tile.uvs = new List<int>(FirstTile.uvs);
-            selection.tile.texturePalette = FirstTile.texturePalette;
+            if (!IsSameShape(selection.tile)) {
+
+                // If orginal tile is 4 uvs and next tile is 3 uvs
+                // If the origianl tile has 3 uvs it can't set them to a tile with 4
+                if (selection.tile.uvs.Count == 3) {
+                    selection.tile.uvs = new List<int>(FirstTile.uvs.GetRange(0,3));
+                }
+
+            }
+            else {
+
+                selection.tile.uvs = new List<int>(FirstTile.uvs);
+                selection.tile.texturePalette = FirstTile.texturePalette;
+
+            }
 
         }
 
-        RefreshMeshes();
 
-        RefreshUVMapper();
-        RefreshTileOverlayTexture();
+        if (refresh) {
+            RefreshMeshes();
+            RefreshUVMapper();
+            RefreshTileOverlayTexture();
+        }
 
     }
 

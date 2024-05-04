@@ -134,21 +134,6 @@ public class TextureCoordinatesLines : MonoBehaviour {
         }
 
         var uvs = view.controller.FirstTile.uvs;
-        if (view.controller.selectedItems.Count > 1) {
-
-            foreach (var selection in view.controller.selectedItems) {
-
-                if (!uvs.Equals(selection.tile.uvs)) {
-
-                    //TODO: This isn't the best way of doing things because it overwrites immediately.
-                    //FIXME: This will make triangle tiles have quad UVs and visversa!
-                    selection.tile.uvs = new List<int>(uvs);
-
-                }
-
-            }
-
-        }
 
         textureCoords = new List<int>(uvs);
 

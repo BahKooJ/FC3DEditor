@@ -227,6 +227,8 @@ public class TextureUVMapper : MonoBehaviour {
             return;
         }
 
+        frameSelected = -1;
+
         InitTexturePallette();
 
         uvMapperTools.SetActive(controller.HasSelection);

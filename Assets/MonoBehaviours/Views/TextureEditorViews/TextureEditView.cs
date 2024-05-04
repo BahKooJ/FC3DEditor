@@ -73,7 +73,7 @@ public class TextureEditView: MonoBehaviour {
 
     public void OnClickDuplicateTileTextures() {
 
-        controller.DuplicateTileGraphics();
+        controller.DuplicateTileUVs();
 
     }
 
