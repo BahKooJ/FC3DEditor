@@ -39,6 +39,10 @@ public class HeightMapChannelPoint : MonoBehaviour {
         if (preInitSelect) {
             boxMaterial.color = Color.white;
             sphereMaterial.color = Color.white;
+
+            boxRender.enabled = true;
+            sphereRender.enabled = false;
+
         } else {
             ResetColors();
         }
@@ -61,8 +65,10 @@ public class HeightMapChannelPoint : MonoBehaviour {
                     dragField = null;
                 }
 
-                boxRender.enabled = false;
-                sphereRender.enabled = true;
+                if (!isSelected) {
+                    boxRender.enabled = false;
+                    sphereRender.enabled = true;
+                }
 
                 click = false;
                 section.RefreshMesh();
@@ -170,6 +176,11 @@ public class HeightMapChannelPoint : MonoBehaviour {
     public void Select() {
 
         isSelected = true;
+
+        if (boxMaterial == null) {
+            preInitSelect = true;
+            return;
+        }
         
         boxMaterial.color = Color.white;
         sphereMaterial.color = Color.white;

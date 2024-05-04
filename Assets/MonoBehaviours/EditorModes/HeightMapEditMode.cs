@@ -124,6 +124,10 @@ public class HeightMapEditMode : EditMode {
             return;
         }
 
+        if (Main.IsMouseOverUI()) {
+            return;
+        }
+
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 

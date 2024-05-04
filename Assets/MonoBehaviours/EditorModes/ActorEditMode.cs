@@ -78,7 +78,7 @@ public class ActorEditMode : EditMode {
 
         }
 
-        if (Controls.OnDown("Select")) {
+        if (Controls.OnDown("Select") && !Main.IsMouseOverUI()) {
 
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 

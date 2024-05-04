@@ -167,6 +167,10 @@ public class Main : MonoBehaviour {
 
     public Vector3? CursorOnLevelMesh() {
 
+        if (IsMouseOverUI()) {
+            return null;
+        }
+
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         RaycastHit hit;
