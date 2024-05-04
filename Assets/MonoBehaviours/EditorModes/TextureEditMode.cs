@@ -1,10 +1,7 @@
 ﻿using FCopParser;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEngine.ParticleSystem;
 using Object = UnityEngine.Object;
 
 public class TextureEditMode : TileMutatingEditMode, EditMode {
@@ -14,6 +11,7 @@ public class TextureEditMode : TileMutatingEditMode, EditMode {
     public Main main { get; set; }
 
     public List<TileTexturePreview> selectedTileOverlays = new();
+    public TileTexturePreview previewSelectionOverlay = null;
     public List<GameObject> selectedSectionOverlays = new();
 
     public TextureEditView view;
@@ -42,6 +40,20 @@ public class TextureEditMode : TileMutatingEditMode, EditMode {
 
             if (selection != null) {
                 SelectLevelItems(selection);
+            }
+
+        }
+        else {
+
+            var previewSelection = main.GetTileOnLevelMesh(!FreeMove.looking);
+
+            if (previewSelection != null) {
+                PreviewSelection(previewSelection);
+            }
+            else if (previewSelectionOverlay != null) {
+
+                ClearPreviewOverlay();
+
             }
 
         }
@@ -121,6 +133,29 @@ public class TextureEditMode : TileMutatingEditMode, EditMode {
 
     }
 
+    void PreviewSelection(TileSelection selection) {
+
+        if (previewSelectionOverlay != null) {
+
+            if (previewSelectionOverlay.tile == selection.tile) {
+                return;
+            }
+
+            ClearPreviewOverlay();
+
+        }
+
+        var overlay = Object.Instantiate(main.TileTexturePreview);
+        var script = overlay.GetComponent<TileTexturePreview>();
+        script.controller = main;
+        script.tile = selection.tile;
+        script.section = selection.section.section;
+        previewSelectionOverlay = script;
+        overlay.transform.SetParent(selection.section.transform);
+        overlay.transform.localPosition = Vector3.zero;
+
+    }
+
     override public void MakeSelection(TileSelection selection, bool deSelectDuplicate = true) {
 
         if (IsTileAlreadySelected(selection.tile)) {
@@ -191,6 +226,7 @@ public class TextureEditMode : TileMutatingEditMode, EditMode {
         selectedSections.Clear();
         ClearTileOverlays();
         ClearSectionOverlays();
+        ClearPreviewOverlay();
 
     }
 
@@ -252,6 +288,15 @@ public class TextureEditMode : TileMutatingEditMode, EditMode {
         }
 
         selectedTileOverlays.Clear();
+
+    }
+
+    void ClearPreviewOverlay() {
+
+        if (previewSelectionOverlay != null) {
+            Object.Destroy(previewSelectionOverlay.gameObject);
+            previewSelectionOverlay = null;
+        }
 
     }
 

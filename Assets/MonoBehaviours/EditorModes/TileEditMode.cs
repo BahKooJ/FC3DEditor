@@ -18,6 +18,8 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
     public List<SelectedTileOverlay> selectedTileOverlays = new();
     public List<GameObject> selectedSectionOverlays = new();
 
+    public SelectedTileOverlay previewSelectionOverlay = null;
+
     public List<TileHeightMapChannelPoint> heightPointObjects = new();
     public TileHeightMapChannelPoint selectedHeight = null;
 
@@ -44,6 +46,25 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
                 }
 
             }
+            else {
+
+                var previewSelection = main.GetTileOnLevelMesh(!FreeMove.looking);
+
+                if (previewSelection != null) {
+                    PreviewSelection(previewSelection);
+                }
+                else if (previewSelectionOverlay != null) {
+
+                    ClearPreviewOverlay();
+
+                }
+
+            }
+
+        }
+        else if (previewSelectionOverlay != null) {
+
+            ClearPreviewOverlay();
 
         }
 
@@ -127,13 +148,31 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
+    void PreviewSelection(TileSelection selection) {
+
+        if (previewSelectionOverlay != null) {
+
+            if (previewSelectionOverlay.tile == selection.tile) {
+                return;
+            }
+
+            ClearPreviewOverlay();
+
+        }
+
+        var overlay = Object.Instantiate(main.SelectedTileOverlay);
+        var script = overlay.GetComponent<SelectedTileOverlay>();
+        script.controller = main;
+        script.tile = selection.tile;
+        previewSelectionOverlay = script;
+        overlay.transform.SetParent(selection.section.transform);
+        overlay.transform.localPosition = Vector3.zero;
+
+    }
+
     bool TestTileHeightSelection() {
 
         if (FreeMove.looking) {
-            return false;
-        }
-
-        if (!Controls.IsDown("Select")) {
             return false;
         }
 
@@ -193,6 +232,9 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
                         RefreshMeshes();
                         RefeshTileOverlay();
 
+                    }
+                    else {
+                        return true;
                     }
 
                 }
@@ -288,6 +330,15 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
+    void ClearPreviewOverlay() {
+
+        if (previewSelectionOverlay != null) {
+            Object.Destroy(previewSelectionOverlay.gameObject);
+            previewSelectionOverlay = null;
+        }
+
+    }
+
     void ClearSectionOverlays() {
 
         foreach (var selectedSectionOverlay in selectedSectionOverlays) {
@@ -329,6 +380,8 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
         ClearTileOverlays();
 
+        ClearPreviewOverlay();
+
         foreach (var point in heightPointObjects) {
             Object.Destroy(point.gameObject);
         }
@@ -352,6 +405,8 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
         heightPointObjects.Clear();
 
         ClearSectionOverlays();
+
+        ClearPreviewOverlay();
 
     }
 

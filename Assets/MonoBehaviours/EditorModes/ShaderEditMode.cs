@@ -17,6 +17,7 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
     public Main main { get; set; }
 
     public List<TileTexturePreview> selectedTileOverlays = new();
+    public TileTexturePreview previewSelectionOverlay = null;
     public List<GameObject> selectedSectionOverlays = new();
     public List<VertexColorPoint> vertexColorPoints = new();
 
@@ -162,10 +163,23 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
                 if (Controls.OnDown("Select")) {
                     SelectLevelItems(hover);
                 }
+                else {
+                    
+                    PreviewSelection(hover);
+
+                }
 
             }
 
         }
+        else if (previewSelectionOverlay != null) {
+
+            ClearPreviewOverlay();
+
+        }
+
+
+        if (Main.ignoreAllInputs) { return; }
 
         if (Controls.OnDown("Save")) {
             if (view.activeShaderMapper != null) {
@@ -244,6 +258,29 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
         RefeshTileOverlay();
         selection.section.RefreshMesh();
+
+    }
+
+    void PreviewSelection(TileSelection selection) {
+
+        if (previewSelectionOverlay != null) {
+
+            if (previewSelectionOverlay.tile == selection.tile) {
+                return;
+            }
+
+            ClearPreviewOverlay();
+
+        }
+
+        var overlay = Object.Instantiate(main.TileTexturePreview);
+        var script = overlay.GetComponent<TileTexturePreview>();
+        script.controller = main;
+        script.tile = selection.tile;
+        script.showShaders = true;
+        previewSelectionOverlay = script;
+        overlay.transform.SetParent(selection.section.transform);
+        overlay.transform.localPosition = Vector3.zero;
 
     }
 
@@ -418,6 +455,7 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
 
         if (hover == null) {
+            ClearPreviewOverlay();
             return false;
         }
         if (painting) {
@@ -428,6 +466,9 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
                 selectedSections.Add(hover.section);
                 RefreshMeshes();
                 return true;
+            }
+            else {
+                PreviewSelection(hover);
             }
 
         }
@@ -463,6 +504,7 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
         selectedItems.Clear();
         selectedSections.Clear();
         ClearTileOverlays();
+        ClearPreviewOverlay();
 
         ClearSectionOverlays();
         ClearVertexColors();
@@ -651,6 +693,16 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
         selectedTileOverlays.Clear();
 
     }
+
+    void ClearPreviewOverlay() {
+
+        if (previewSelectionOverlay != null) {
+            Object.Destroy(previewSelectionOverlay.gameObject);
+            previewSelectionOverlay = null;
+        }
+
+    }
+
 
     void ClearSectionOverlays() {
 
