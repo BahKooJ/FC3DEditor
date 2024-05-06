@@ -228,14 +228,14 @@ public abstract class Controls {
             
             if (keyStrings.Last()[0] == '#') {
 
-                return Input.GetMouseButtonDown(Int32.Parse(keyStrings.Last()[1].ToString()));
+                return Input.GetMouseButtonUp(Int32.Parse(keyStrings.Last()[1].ToString()));
 
             }
             else {
 
                 var keyCode = (KeyCode)Enum.Parse(typeof(KeyCode), keyStrings.Last(), true);
 
-                return Input.GetKeyDown(keyCode);
+                return Input.GetKeyUp(keyCode);
 
             }
 

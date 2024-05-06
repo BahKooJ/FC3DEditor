@@ -68,6 +68,8 @@ public class TileAddMode : EditMode {
 
             heightPointObjects.Clear();
 
+            hoverSelection = null;
+
         }
 
         if (Controls.OnDown("Select") && selectedTilePreset != null) {
@@ -140,22 +142,20 @@ public class TileAddMode : EditMode {
 
         if (selectedTilePreset == null) { return; }
 
-        if (hoverSelection != null) {
+        if (hoverSelection == null) { return; }
 
-            foreach (var t in hoverSelection.column.tiles) {
+        foreach (var t in hoverSelection.column.tiles) {
 
-                // Checks to make sure the tile doesn't already exist
-                if (MeshType.IDFromVerticies(t.verticies) == preset.meshID) {
-                    return;
-                }
-
+            // Checks to make sure the tile doesn't already exist
+            if (MeshType.IDFromVerticies(t.verticies) == preset.meshID) {
+                return;
             }
 
-            var tile = preset.Create(true, hoverSelection.column);
-
-            hoverSelection.column.tiles.Add(tile);
-
         }
+
+        var tile = preset.Create(true, hoverSelection.column);
+
+        hoverSelection.column.tiles.Add(tile);
 
         hoverSelection.section.RefreshMesh();
 

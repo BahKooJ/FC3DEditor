@@ -120,7 +120,7 @@ public class HeightMapEditMode : EditMode {
             return;
         }
 
-        if (!Controls.OnDown("Select") && !Controls.OnDown("Interact") && Input.GetAxis("Mouse ScrollWheel") == 0) {
+        if (!Controls.OnDown("Select") && !Controls.OnDown("Interact")) {
             return;
         }
 
@@ -151,7 +151,8 @@ public class HeightMapEditMode : EditMode {
                             lastSelectedHeightChannel = null;
                         }
 
-                    } else if (Controls.OnDown("Select")) {
+                    } 
+                    else if (Controls.OnDown("Select")) {
 
                         channel.Click();
 
