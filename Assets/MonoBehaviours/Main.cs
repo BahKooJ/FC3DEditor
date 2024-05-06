@@ -113,6 +113,12 @@ public class Main : MonoBehaviour {
 
     }
 
+    public LevelMesh GetLevelMesh(int x, int y) {
+
+        return sectionMeshes.First(mesh => { return mesh.arrayX == x && mesh.arrayY == y; });
+
+    }
+
     public TileSelection GetTileOnLevelMesh(bool useCursor = true) {
         Ray ray;
 
@@ -332,6 +338,10 @@ public class Main : MonoBehaviour {
 
         var x = 0;
         var y = 0;
+
+        var itx = 0;
+        var ity = 0;
+
         foreach (var row in level.layout) {
 
             foreach (var column in row) {
@@ -344,13 +354,17 @@ public class Main : MonoBehaviour {
                     script.controller = this;
                     script.x = x;
                     script.y = y;
+                    script.arrayX = itx; 
+                    script.arrayY = ity;
                     sectionMeshes.Add(script);
                 }
-
+                itx++;
                 x += 16;
             }
+            itx = 0;
             x = 0;
             y += 16;
+            ity++;
 
         }
 

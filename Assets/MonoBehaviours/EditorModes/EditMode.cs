@@ -16,7 +16,7 @@ public interface EditMode {
 
 }
 
-public class TileMutatingEditMode {
+public abstract class TileMutatingEditMode : EditMode {
 
     public HashSet<LevelMesh> selectedSections = new();
     public List<TileSelection> selectedItems = new();
@@ -36,6 +36,7 @@ public class TileMutatingEditMode {
     public bool IsFirstTileQuad {
         get => _IsFirstTileQuad();
     }
+    public abstract Main main { get; set; }
 
     virtual public void MakeSelection(TileSelection selection, bool deSelectDuplicate = true) { }
 
@@ -89,10 +90,49 @@ public class TileMutatingEditMode {
             }
 
         }
-
         else {
 
+            var firstClickColumnSectionX = firstSelection.column.x + firstSelection.section.arrayX * 16;
+            var firstClickColumnSectionY = firstSelection.column.y + firstSelection.section.arrayY * 16;
 
+            var lastClickColumnSectionX = tile.column.x + tile.section.arrayX * 16;
+            var lastClickColumnSectionY = tile.column.y + tile.section.arrayY * 16;
+
+            var startSectionX = firstClickColumnSectionX < lastClickColumnSectionX ? firstClickColumnSectionX : lastClickColumnSectionX;
+            var startSectionY = firstClickColumnSectionY < lastClickColumnSectionY ? firstClickColumnSectionY : lastClickColumnSectionY;
+
+            var endSectionX = firstClickColumnSectionX > lastClickColumnSectionX ? firstClickColumnSectionX : lastClickColumnSectionX;
+            var endSectionY = firstClickColumnSectionY > lastClickColumnSectionY ? firstClickColumnSectionY : lastClickColumnSectionY;
+
+            foreach (var y in Enumerable.Range(startSectionY, endSectionY - startSectionY + 1)) {
+
+                foreach (var x in Enumerable.Range(startSectionX, endSectionX - startSectionX + 1)) {
+
+                    var itSection = main.GetLevelMesh(x / 16, y / 16);
+                    var itColumn = itSection.section.GetTileColumn(x % 16, y % 16);
+
+                    foreach (var itTile in itColumn.tiles) {
+
+                        if (sameMesh) {
+
+                            if (itTile.verticies.SequenceEqual(firstSelection.tile.verticies)) {
+
+                                MakeSelection(new TileSelection(itTile, itColumn, itSection), false);
+
+                            }
+
+                        }
+                        else {
+
+                            MakeSelection(new TileSelection(itTile, itColumn, itSection), false);
+
+                        }
+
+                    }
+
+                }
+
+            }
 
         }
 
@@ -198,6 +238,10 @@ public class TileMutatingEditMode {
         return selectedItems[0].tile.verticies.Count == 4;
 
     }
+
+    public abstract void Update();
+    public abstract void OnCreateMode();
+    public abstract void OnDestroy();
 
 }
 

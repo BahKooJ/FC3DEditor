@@ -33,6 +33,9 @@ public class LevelMesh : MonoBehaviour {
     public float x = 0;
     public float y = 0;
 
+    public int arrayX = 0;
+    public int arrayY = 0;
+
     // Start is called before the first frame update
     void Start() {
 

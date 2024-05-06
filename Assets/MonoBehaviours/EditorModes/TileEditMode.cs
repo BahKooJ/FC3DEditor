@@ -12,7 +12,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
     static List<TileSelection> savedSelections = new();
     static HashSet<LevelMesh> savedSectionSelections = new();
 
-    public Main main { get; set; }
+    override public Main main { get; set; }
     public TileEditPanel view;
 
     public List<SelectedTileOverlay> selectedTileOverlays = new();
@@ -27,7 +27,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
         this.main = main;
     }
 
-    public void Update() {
+    override public void Update() {
 
         if (Controls.OnUp("Select")) {
             selectedHeight = null;
@@ -79,13 +79,13 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
-    public void OnCreateMode() {
+    override public void OnCreateMode() {
         selectedItems = savedSelections;
         selectedSections = savedSectionSelections;
         ReinitExistingSelectedItems();
     }
 
-    public void OnDestroy() {
+    override public void OnDestroy() {
 
         savedSelections = selectedItems;
         savedSectionSelections = selectedSections;

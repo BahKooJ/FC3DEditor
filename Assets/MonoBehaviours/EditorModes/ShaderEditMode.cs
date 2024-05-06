@@ -9,12 +9,12 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-public class ShaderEditMode : TileMutatingEditMode, EditMode {
+public class ShaderEditMode : TileMutatingEditMode {
 
     public static bool applyColorsOnClick = false;
     public static bool showColorPresets = false;
 
-    public Main main { get; set; }
+    override public Main main { get; set; }
 
     public List<TileTexturePreview> selectedTileOverlays = new();
     public TileTexturePreview previewSelectionOverlay = null;
@@ -97,7 +97,7 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
     }
 
-    public void Update() {
+    override public void Update() {
 
         if (Main.ignoreAllInputs) { return; }
 
@@ -195,12 +195,12 @@ public class ShaderEditMode : TileMutatingEditMode, EditMode {
 
     }
 
-    public void OnCreateMode() {
+    override public void OnCreateMode() {
         currentShaderPresets = Presets.shaderPresets;
         currentColorPresets = Presets.colorPresets;
     }
 
-    public void OnDestroy() {
+    override public void OnDestroy() {
         view.CloseShaderMapper();
         view.ClosePresetPanel();
         ClearAllSelectedItems();

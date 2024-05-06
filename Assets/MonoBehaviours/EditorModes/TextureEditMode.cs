@@ -4,11 +4,11 @@ using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-public class TextureEditMode : TileMutatingEditMode, EditMode {
+public class TextureEditMode : TileMutatingEditMode {
 
     public static bool openUVMapperByDefault = true;
 
-    public Main main { get; set; }
+    override public Main main { get; set; }
 
     public List<TileTexturePreview> selectedTileOverlays = new();
     public TileTexturePreview previewSelectionOverlay = null;
@@ -22,17 +22,17 @@ public class TextureEditMode : TileMutatingEditMode, EditMode {
         this.main = main;
     }
 
-    public void OnCreateMode() {
+    override public void OnCreateMode() {
         currentUVPresets = Presets.uvPresets;
     }
 
-    public void OnDestroy() {
+    override public void OnDestroy() {
         view.CloseTextureUVMapper();
         view.CloseTexturePresetPanel();
         ClearAllSelectedItems();
     }
 
-    public void Update() {
+    override public void Update() {
 
         if (Controls.OnDown("Select")) {
 
