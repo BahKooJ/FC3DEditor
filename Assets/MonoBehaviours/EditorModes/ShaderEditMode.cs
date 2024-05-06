@@ -99,8 +99,6 @@ public class ShaderEditMode : TileMutatingEditMode {
 
     override public void Update() {
 
-        if (Main.ignoreAllInputs) { return; }
-
         var testForSelection = true;
 
         var hover = main.GetTileOnLevelMesh(!FreeMove.looking);
@@ -154,7 +152,7 @@ public class ShaderEditMode : TileMutatingEditMode {
                 if (FreeMove.looking && Controls.OnDown("Select")) {
                     SelectLevelItems(hover);
                 }
-                else if (Controls.OnDown("Select") && Controls.IsDown("ModifierAltSelect")) {
+                else if (Controls.OnDown("SelectWhilePainting")) {
                     SelectLevelItems(hover);
                 }
             }
@@ -209,7 +207,7 @@ public class ShaderEditMode : TileMutatingEditMode {
     public void SelectLevelItems(TileSelection selection) {
 
         // If shift is held then multiple tiles can be selected
-        if (!Controls.IsDown("ModifierMultiSelect")) {
+        if (!Controls.IsDown("MultiSelect")) {
 
             // Clears the selected tile(s).
             selectedItems.Clear();
@@ -218,7 +216,7 @@ public class ShaderEditMode : TileMutatingEditMode {
         }
 
         // Selects a range of tiles if the mutli-select modifier is held.
-        if (Controls.IsDown("ModifierAltSelect") && Controls.IsDown("ModifierMultiSelect") && !painting) {
+        if (Controls.OnDown("RangeSelect") && !painting) {
 
             if (HasSelection) {
 
@@ -402,7 +400,7 @@ public class ShaderEditMode : TileMutatingEditMode {
                         }
                         else {
 
-                            if (Controls.IsDown("ModifierMultiSelect")) {
+                            if (Controls.IsDown("MultiSelect")) {
                                 vertex.SelectOrDeselect();
                             }
                             else {

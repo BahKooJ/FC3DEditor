@@ -7,8 +7,8 @@ using UnityEngine;
 
 public abstract class SettingsManager {
 
-    public static Dictionary<string, string> keyBinds = new();
-
+    public static Dictionary<string, string[]> keyBinds = new();
+    public static float mouseSensitivity = 3f;
     public static RenderType renderMode = RenderType.Smooth;
     public static bool showShaders = true;
     public static bool showTransparency = true;
@@ -32,11 +32,15 @@ public abstract class SettingsManager {
 
                 if (property == "Inputs") {
 
-                    foreach (var i in Enumerable.Range(0,values.Count / 2)) {
+                    var offset = 0;
 
-                        var offset = i * 2;
+                    while (offset < values.Count) {
 
-                        keyBinds.Add(values[offset], values[offset + 1]);
+                        var bindCount = Int32.Parse(values[offset + 1]);
+
+                        keyBinds.Add(values[offset], values.GetRange(offset + 2, bindCount).ToArray());
+
+                        offset += bindCount + 2;
 
                     }
 
@@ -56,6 +60,9 @@ public abstract class SettingsManager {
                             break;
                     }
 
+                }
+                if (property == "MouseSensitivity") {
+                    mouseSensitivity = Single.Parse(values[0]);
                 }
 
             }
@@ -129,12 +136,20 @@ public abstract class SettingsManager {
         total += "Inputs = { \n";
 
         foreach (var binds in keyBinds) {
-            total += "\"" + binds.Key + "\":\"" + binds.Value + "\"\n";
+            total += "\"" + binds.Key + "\":\"" + binds.Value.Count().ToString() + "\" ";
+
+            foreach (var key in binds.Value) {
+                total += "\"" + key + "\"";
+            }
+
+            total += "\n";
+
         }
 
         total += "}\n";
 
-        total += "RenderMode = \"" + renderMode.ToString() + "\";";
+        total += "RenderMode = \"" + renderMode.ToString() + "\";\n";
+        total += "MouseSensitivity = \"" + mouseSensitivity.ToString() + "\";";
 
         File.WriteAllText("Settings.txt", total);
 
@@ -144,20 +159,50 @@ public abstract class SettingsManager {
 
 public abstract class Controls {
 
+    static bool IsSingleKeyDown(string input) {
+
+        if (input[0] == '#') {
+
+            return Input.GetMouseButton(Int32.Parse(input[1].ToString()));
+
+        }
+        else {
+
+            var keyCode = (KeyCode)Enum.Parse(typeof(KeyCode), input, true);
+
+            return Input.GetKey(keyCode);
+
+        }
+
+    }
+
     public static bool OnDown(string input) {
 
         try {
 
-            var keyString = SettingsManager.keyBinds[input];
+            var keyStrings = SettingsManager.keyBinds[input];
 
-            if (keyString[0] == '#') {
+            // Tests to see if the modifiers are held down (if applicable)
+            if (keyStrings.Length > 1) {
 
-                return Input.GetMouseButtonDown(Int32.Parse(keyString[1].ToString()));
+                foreach (var key in keyStrings.SkipLast(1)) {
+
+                    if (!IsSingleKeyDown(key)) {
+                        return false;
+                    }
+
+                }
+
+            }
+
+            if (keyStrings.Last()[0] == '#') {
+
+                return Input.GetMouseButtonDown(Int32.Parse(keyStrings.Last()[1].ToString()));
 
             }
             else {
 
-                var keyCode = (KeyCode)Enum.Parse(typeof(KeyCode), keyString, true);
+                var keyCode = (KeyCode)Enum.Parse(typeof(KeyCode), keyStrings.Last(), true);
 
                 return Input.GetKeyDown(keyCode);
 
@@ -175,18 +220,22 @@ public abstract class Controls {
 
         try {
 
-            var keyString = SettingsManager.keyBinds[input];
+            var keyStrings = SettingsManager.keyBinds[input];
 
-            if (keyString[0] == '#') {
+            if (keyStrings.Length > 1) {
+                Debug.Log("Modifiers will not work on OnUp! Input: " + input);
+            }
+            
+            if (keyStrings.Last()[0] == '#') {
 
-                return Input.GetMouseButtonUp(Int32.Parse(keyString[1].ToString()));
+                return Input.GetMouseButtonDown(Int32.Parse(keyStrings.Last()[1].ToString()));
 
             }
             else {
 
-                var keyCode = (KeyCode)Enum.Parse(typeof(KeyCode), keyString, true);
+                var keyCode = (KeyCode)Enum.Parse(typeof(KeyCode), keyStrings.Last(), true);
 
-                return Input.GetKeyUp(keyCode);
+                return Input.GetKeyDown(keyCode);
 
             }
 
@@ -202,20 +251,16 @@ public abstract class Controls {
 
         try {
 
-            var keyString = SettingsManager.keyBinds[input];
+            var keyStrings = SettingsManager.keyBinds[input];
 
-            if (keyString[0] == '#') {
+            foreach (var key in keyStrings) {
 
-                return Input.GetMouseButton(Int32.Parse(keyString[1].ToString()));
-
-            }
-            else {
-
-                var keyCode = (KeyCode)Enum.Parse(typeof(KeyCode), keyString, true);
-
-                return Input.GetKey(keyCode);
+                if (!IsSingleKeyDown(key)) {
+                    return false;
+                }
 
             }
+            return true;
 
         }
         catch {

@@ -603,6 +603,24 @@ namespace FCopParser {
             return new XRGB555(x, r, g, b);
         }
 
+        public void SetFromRGB32(int r, int g, int b) {
+
+            double max8BitValue = 255;
+
+            double redPercent = r / max8BitValue;
+            double greenPercent = g / max8BitValue;
+            double bluePercent = b / max8BitValue;
+
+            var calculatedRed = (int)Math.Round(redPercent * maxChannelValue);
+            var calculatedGreen = (int)Math.Round(greenPercent * maxChannelValue);
+            var calculatedBlue = (int)Math.Round(bluePercent * maxChannelValue);
+
+            this.r = calculatedRed;
+            this.g = calculatedGreen;
+            this.b = calculatedBlue;
+
+        }
+
         public byte[] ToRGB565() {
 
             int max6bitValue = 63;

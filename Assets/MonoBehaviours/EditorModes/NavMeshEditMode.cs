@@ -122,7 +122,7 @@ public class NavMeshEditMode : EditMode {
 
         if (selectedNavNode != null) {
 
-            if (Controls.IsDown("ModifierMoveToCursor")) {
+            if (Controls.IsDown("MoveToCursor")) {
 
                 var hitPos = main.CursorOnLevelMesh();
 

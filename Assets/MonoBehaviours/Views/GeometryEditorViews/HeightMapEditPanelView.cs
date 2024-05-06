@@ -18,6 +18,14 @@ public class HeightMapEditPanelView: MonoBehaviour {
 
     }
 
+    void Update() {
+        
+        if (Controls.OnDown("KeepVerticesOnTop")) {
+            OnClickKeepVerticiesOnTopToggle();
+        }
+
+    }
+
     void ChangeToggleColor(Image image, bool toggle) {
 
         if (toggle) {

@@ -177,7 +177,7 @@ class TextureCoordinatePoint : MonoBehaviour {
         var y = Mathf.Floor(pointOnPallete.y);
 
         // Moves all points
-        if (Controls.IsDown("ModifierMultiSelect")) {
+        if (Controls.IsDown("MultiSelect")) {
 
             int difX = (int)(x - transform.localPosition.x);
             int difY = (int)(y - transform.localPosition.y);

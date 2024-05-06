@@ -137,21 +137,18 @@ public class HeightMapEditMode : EditMode {
 
                 if (hit.colliderInstanceID == channel.boxCollider.GetInstanceID()) {
 
-                    if (Controls.OnDown("Select") && Controls.IsDown("ModifierMultiSelect")) {
+                    if (Controls.OnDown("RangeSelect")) {
+                        RangeSelect(channel);
+                    }
+                    else if (Controls.OnDown("MultiSelect")) {
 
-                        if (Controls.IsDown("ModifierAltSelect")) {
-                            RangeSelect(channel);
-                            return;
-                        } else {
-                            channel.SelectOrDeSelect();
+                        channel.SelectOrDeSelect();
 
-                            if (channel.isSelected) {
-                                lastSelectedHeightChannel = channel;
-                            }
-                            else {
-                                lastSelectedHeightChannel = null;
-                            }
-
+                        if (channel.isSelected) {
+                            lastSelectedHeightChannel = channel;
+                        }
+                        else {
+                            lastSelectedHeightChannel = null;
                         }
 
                     } else if (Controls.OnDown("Select")) {
@@ -169,7 +166,6 @@ public class HeightMapEditMode : EditMode {
                 }
 
             }
-
 
         }
 

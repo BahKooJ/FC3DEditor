@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -10,6 +11,7 @@ class ControlRebindItem : MonoBehaviour {
     public TMP_Text keyText;
 
     bool listen = false;
+    List<string> pressedKeys = new();
 
     void Start() {
 
@@ -25,18 +27,28 @@ class ControlRebindItem : MonoBehaviour {
 
         if (listen) {
 
+            if (!Input.anyKey && pressedKeys.Count != 0) {
+
+                SettingsManager.keyBinds[controlStringKey] = pressedKeys.ToArray();
+
+                FinishListening();
+
+            }
+
             if (Input.anyKeyDown) {
 
                 var key = TestKey();
                 var mouse = TestMouse();
 
                 if (mouse != null) {
-                    SettingsManager.keyBinds[controlStringKey] = "#" + mouse.ToString();
-                    FinishListening();
+
+                    pressedKeys.Add("#" + mouse.ToString());
+
                 }
                 else if (key != null) {
-                    SettingsManager.keyBinds[controlStringKey] = key.ToString();
-                    FinishListening();
+
+                    pressedKeys.Add(key.ToString());
+
                 }
 
             }
@@ -83,11 +95,24 @@ class ControlRebindItem : MonoBehaviour {
 
     void SetKeyText() {
 
-        if (SettingsManager.keyBinds[controlStringKey][0] == '#') {
-            keyText.text = MouseName(SettingsManager.keyBinds[controlStringKey][1]);
-        } else {
-            keyText.text = SettingsManager.keyBinds[controlStringKey];
+        var total = "";
+
+        foreach (var bind in SettingsManager.keyBinds[controlStringKey]) {
+
+            if (bind[0] == '#') {
+                total += MouseName(bind[1]);
+            }
+            else {
+                total += bind;
+            }
+
+            total += " + ";
+
         }
+
+        total = total.Remove(total.Length - 3, 3);
+
+        keyText.text = total;
 
     }
 

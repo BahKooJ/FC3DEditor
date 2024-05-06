@@ -55,6 +55,26 @@ public class ShaderEditPanelView : MonoBehaviour {
 
     }
 
+    void Update() {
+        
+        if (Controls.OnDown("DuplicateTileShaders")) {
+            OnClickDuplicateShader();
+        }
+        if (Controls.OnDown("OpenCloseColorPicker")) {
+            OpenShaderMapper();
+        }
+        if (Controls.OnDown("PaintTool")) {
+            PaintToolButton();
+        }
+        if (Controls.OnDown("ApplyColorOnClick")) {
+            OnClickApplyColorOnClickToggle();
+        }
+        if (Controls.OnDown("SwitchPresets")) {
+            OnClickSwitchPresets();
+        }
+
+    }
+
     public void OpenShaderMapper() {
 
         if (activeShaderMapper != null) {

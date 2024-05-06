@@ -62,7 +62,7 @@ public class ActorEditMode : EditMode {
         if (selectedActorObject != null) {
 
             // Moves object to cursor
-            if (Controls.IsDown("ModifierMoveToCursor")) {
+            if (Controls.IsDown("MoveToCursor")) {
 
                 var hitPos = main.CursorOnLevelMesh();
 

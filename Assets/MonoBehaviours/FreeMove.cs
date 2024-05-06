@@ -25,11 +25,6 @@ public class FreeMove : MonoBehaviour {
     public float fastMovementSpeed = 100f;
 
     /// <summary>
-    /// Sensitivity for free look.
-    /// </summary>
-    public float freeLookSensitivity = 3f;
-
-    /// <summary>
     /// Amount to zoom the camera when using the mouse wheel.
     /// </summary>
     public float zoomSensitivity = 10f;
@@ -75,17 +70,17 @@ public class FreeMove : MonoBehaviour {
             transform.position = transform.position + (-transform.up * movementSpeed * Time.deltaTime);
         }
 
-        if (Controls.IsDown("CameraWorldUp")) {
-            transform.position = transform.position + (Vector3.up * movementSpeed * Time.deltaTime);
-        }
+        //if (Controls.IsDown("CameraWorldUp")) {
+        //    transform.position = transform.position + (Vector3.up * movementSpeed * Time.deltaTime);
+        //}
 
-        if (Controls.IsDown("CameraWorldDown")) {
-            transform.position = transform.position + (-Vector3.up * movementSpeed * Time.deltaTime);
-        }
+        //if (Controls.IsDown("CameraWorldDown")) {
+        //    transform.position = transform.position + (-Vector3.up * movementSpeed * Time.deltaTime);
+        //}
 
         if (looking) {
-            float newRotationX = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * freeLookSensitivity;
-            float newRotationY = transform.localEulerAngles.x - Input.GetAxis("Mouse Y") * freeLookSensitivity;
+            float newRotationX = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * SettingsManager.mouseSensitivity;
+            float newRotationY = transform.localEulerAngles.x - Input.GetAxis("Mouse Y") * SettingsManager.mouseSensitivity;
 
             if (newRotationY > 90f && newRotationY < 180) {
                 newRotationY = 90f;

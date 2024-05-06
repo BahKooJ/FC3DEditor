@@ -39,6 +39,13 @@ public class TextureEditView: MonoBehaviour {
 
         }
 
+        if (Controls.OnDown("DuplicateTileTextures")) {
+            OnClickDuplicateTileTextures();
+        }
+        if (Controls.OnDown("OpenCloseUVMapper")) {
+            OpenUVMapper();
+        }
+
     }
 
     public void OpenUVMapper() {

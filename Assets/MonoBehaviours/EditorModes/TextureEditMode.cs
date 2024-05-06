@@ -74,7 +74,7 @@ public class TextureEditMode : TileMutatingEditMode {
     void SelectLevelItems(TileSelection selection) {
 
         // If shift is held then multiple tiles can be selected
-        if (!Controls.IsDown("ModifierMultiSelect")) {
+        if (!Controls.IsDown("MultiSelect")) {
 
             // Clears the selected tile(s).
             selectedItems.Clear();
@@ -96,7 +96,7 @@ public class TextureEditMode : TileMutatingEditMode {
         }
 
         // Selects a range of tiles if the mutli-select modifier is held.
-        if (Controls.IsDown("ModifierAltSelect") && Controls.IsDown("ModifierMultiSelect")) {
+        if (Controls.OnDown("RangeSelect")) {
 
             if (HasSelection) {
 

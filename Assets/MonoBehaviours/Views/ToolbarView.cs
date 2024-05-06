@@ -27,22 +27,28 @@ class ToolbarView: MonoBehaviour {
 
         if (Main.ignoreAllInputs) { return; }
 
-        if (Controls.OnDown("GeometryEditingMode")) {
+        if (Controls.OnDown("HeightMapEditMode")) {
             SelectHeightMapEditMode();
         }
-        if (Controls.OnDown("TileBuildingMode")) {
+        if (Controls.OnDown("TileEditMode")) {
             SelectTileEditMode();
         }
-        if (Controls.OnDown("SectionEditingMode")) {
-            SelectSectionEditMode();
+        if (Controls.OnDown("TileAddMode")) {
+            SelectTileAddMode();
         }
-        if (Controls.OnDown("TextureEditingMode")) {
+        if (Controls.OnDown("TextureEditMode")) {
             SelectTextureEditMode();
         }
-        if (Controls.OnDown("NavMeshEditingMode")) {
+        if (Controls.OnDown("SectionEditMode")) {
+            SelectSectionEditMode();
+        }
+        if (Controls.OnDown("ShaderEditMode")) {
+            SelectShaderEditMode();
+        }
+        if (Controls.OnDown("NavMeshEditMode")) {
             SelectNavMeshEdit();
         }
-        if (Controls.OnDown("ActorEditingMode")) {
+        if (Controls.OnDown("ActorEditMode")) {
             SelectActorEditMode();
         }
 

@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class ShaderColorPickerView : MonoBehaviour {
@@ -50,6 +51,7 @@ public class ShaderColorPickerView : MonoBehaviour {
     public TMP_InputField redInput;
     public TMP_InputField greenInput;
     public TMP_InputField blueInput;
+    public TMP_InputField hexValueInput;
 
     public VertexColorType colorType = VertexColorType.MonoChrome;
 
@@ -248,6 +250,8 @@ public class ShaderColorPickerView : MonoBehaviour {
 
         RefreshColorPreview();
 
+        SetHexInput();
+
         refuseCallbacks = false;
 
     }
@@ -344,6 +348,51 @@ public class ShaderColorPickerView : MonoBehaviour {
 
     }
 
+    void ParseHexString() {
+
+        var hex = hexValueInput.text;
+
+        if (hex[0] != '#') {
+            SetHexInput();
+            return;
+        }
+
+        if (hex.Count() != 7) {
+            SetHexInput();
+            return;
+        }
+
+        var r = Convert.ToInt32(hex.Substring(1, 2).ToUpper(), 16);
+        var g = Convert.ToInt32(hex.Substring(3, 2).ToUpper(), 16);
+        var b = Convert.ToInt32(hex.Substring(5, 2).ToUpper(), 16);
+
+        colorValue.SetFromRGB32(r, g, b);
+
+        SetColors(colorValue);
+
+    }
+
+    void SetHexInput() {
+
+        var argb32 = colorValue.ToARGB32();
+
+        var r = argb32[3].ToString("X");
+        var g = argb32[2].ToString("X");
+        var b = argb32[1].ToString("X");
+
+        if (r.Length == 1) {
+            r += "0";
+        }
+        if (g.Length == 1) {
+            g += "0";
+        }
+        if (b.Length == 1) {
+            b += "0";
+        }
+
+        hexValueInput.text = "#" + r + g + b;
+
+    }
 
     // Callbacks
 
@@ -446,6 +495,8 @@ public class ShaderColorPickerView : MonoBehaviour {
 
         redInput.text = ((int)redSlider.value).ToString();
 
+        SetHexInput();
+
         controller.ApplyColorsToVertexColorCorners();
 
         RefreshColorPreview();
@@ -467,6 +518,8 @@ public class ShaderColorPickerView : MonoBehaviour {
 
             colorValue.r = value;
             redSlider.value = value;
+            SetHexInput();
+
             controller.ApplyColorsToVertexColorCorners();
 
         }
@@ -485,6 +538,8 @@ public class ShaderColorPickerView : MonoBehaviour {
         colorValue.g = (int)greenSlider.value;
 
         greenInput.text = ((int)greenSlider.value).ToString();
+
+        SetHexInput();
 
         controller.ApplyColorsToVertexColorCorners();
 
@@ -507,6 +562,7 @@ public class ShaderColorPickerView : MonoBehaviour {
 
             colorValue.g = value;
             greenSlider.value = value;
+            SetHexInput();
 
             controller.ApplyColorsToVertexColorCorners();
 
@@ -526,6 +582,8 @@ public class ShaderColorPickerView : MonoBehaviour {
         colorValue.b = (int)blueSlider.value;
 
         blueInput.text = ((int)blueSlider.value).ToString();
+
+        SetHexInput();
 
         controller.ApplyColorsToVertexColorCorners();
 
@@ -548,6 +606,8 @@ public class ShaderColorPickerView : MonoBehaviour {
 
             colorValue.b = value;
             blueSlider.value = value;
+            SetHexInput();
+
             controller.ApplyColorsToVertexColorCorners();
 
         }
@@ -556,6 +616,19 @@ public class ShaderColorPickerView : MonoBehaviour {
             OnChangeBlue();
 
         }
+
+    }
+
+    public void OnStartHexType() {
+        Main.ignoreAllInputs = true;
+    }
+
+    public void OnFinishHexType() {
+
+        Main.ignoreAllInputs = false;
+
+        ParseHexString();
+        controller.ApplyColorsToVertexColorCorners();
 
     }
 
