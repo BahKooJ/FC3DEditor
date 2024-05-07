@@ -39,11 +39,15 @@ public class Main : MonoBehaviour {
     public GameObject BlankActor;
     public GameObject ObjectMesh;
 
+    public GameObject playerCamera;
+    public GameObject playModePlayer;
 
     public GameObject line3d;
     public GameObject axisControl;
 
+    // --View Refs--
     public GameObject canvas;
+    public GameObject mainCamera;
 
     IFFParser iffFile;
     public FCopLevel level;
@@ -103,6 +107,14 @@ public class Main : MonoBehaviour {
             RefreshLevel();
         }
 
+    }
+
+    public void DisableMainCamera() {
+        mainCamera.SetActive(false);
+    }
+
+    public void EnableMainCamera() {
+        mainCamera.SetActive(true);
     }
 
     public void RefreshLevel() {

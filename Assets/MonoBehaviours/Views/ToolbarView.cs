@@ -214,4 +214,14 @@ class ToolbarView: MonoBehaviour {
 
     }
 
+    public void SelectPlayMode() {
+
+        var editMode = new PlayMode(controller);
+
+        Destroy(activePanel);
+
+        controller.ChangeEditMode(editMode);
+
+    }
+
 }
