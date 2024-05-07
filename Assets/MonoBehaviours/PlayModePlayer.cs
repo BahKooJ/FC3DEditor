@@ -7,7 +7,7 @@ public class PlayModePlayer : MonoBehaviour {
     public PlayMode controller;
 
     float moveSpeed = 8f;
-    float turnSpeed = 75f;
+    float turnSpeed = 90f;
 
     void Update() {
 
@@ -24,6 +24,12 @@ public class PlayModePlayer : MonoBehaviour {
         if (Controls.IsDown("CameraRight")) {
             float newRotationX = transform.localEulerAngles.y + turnSpeed * Time.deltaTime;
             transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, newRotationX, 0f);
+        }
+        if (Controls.IsDown("CameraUp")) {
+            transform.position += moveSpeed * Time.deltaTime * transform.right;
+        }
+        if (Controls.IsDown("CameraDown")) {
+            transform.position -= moveSpeed * Time.deltaTime * transform.right;
         }
 
         transform.position = new Vector3(transform.position.x, 100f, transform.position.z);
