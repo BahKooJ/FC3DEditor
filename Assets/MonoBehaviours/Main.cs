@@ -45,6 +45,9 @@ public class Main : MonoBehaviour {
     public GameObject line3d;
     public GameObject axisControl;
 
+    // Temp
+    public GameObject boundsPrefab;
+
     // --View Refs--
     public GameObject canvas;
     public GameObject mainCamera;

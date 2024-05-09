@@ -55,6 +55,54 @@ public class SectionEditMode : EditMode {
 
         selectedSectionOverlay = Object.Instantiate(main.SectionBoarders, new Vector3(section.x, 0, -section.y), Quaternion.identity);
 
+        //var obj = Object.Instantiate(main.boundsPrefab);
+        //obj.GetComponent<CullingSectionBounds>().controller = this;
+
+        LogCulling();
+
+    }
+
+    void LogCulling() {
+
+        var total = "";
+
+        total += selectedSection.section.culling.sectionCulling.radius.ToString() + " ";
+        total += selectedSection.section.culling.sectionCulling.height.ToString() + "\n\n";
+
+        foreach (var culling in selectedSection.section.culling.chunkCulling8) {
+            total += culling.radius.ToString() + " ";
+            total += culling.height.ToString() + "\n";
+        }
+
+        total += "\n";
+
+        foreach (var culling in selectedSection.section.culling.chunkCulling4) {
+            total += culling.radius.ToString() + " ";
+            total += culling.height.ToString() + "\n";
+        }
+
+        total += "\n";
+
+        selectedSection.section.culling.CalculateCulling(selectedSection.section);
+
+        total += selectedSection.section.culling.sectionCulling.radius.ToString() + " ";
+        total += selectedSection.section.culling.sectionCulling.height.ToString() + "\n\n";
+
+        foreach (var culling in selectedSection.section.culling.chunkCulling8) {
+            total += culling.radius.ToString() + " ";
+            total += culling.height.ToString() + "\n";
+        }
+
+        total += "\n";
+
+        foreach (var culling in selectedSection.section.culling.chunkCulling4) {
+            total += culling.radius.ToString() + " ";
+            total += culling.height.ToString() + "\n";
+        }
+
+        Debug.Log(total);
+
+
     }
 
     public void CopySectionData() {

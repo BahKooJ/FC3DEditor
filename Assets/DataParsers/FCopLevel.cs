@@ -268,6 +268,8 @@ namespace FCopParser {
         List<XRGB555> colors = new List<XRGB555>();
         public AnimationVector animationVector;
 
+        public LevelCulling culling;
+
         // Until the file can be fully parsed, we need to have the parser
         public FCopLevelSectionParser parser;
 
@@ -275,6 +277,7 @@ namespace FCopParser {
 
             this.parser = parser;
             this.colors = parser.colors;
+            this.culling = parser.culling;
 
             animationVector = new AnimationVector(parser.animationVector);
 
@@ -362,6 +365,8 @@ namespace FCopParser {
         // Takes all the higher parsed data and puts them back into their basic data form found in Ctil.
         // This method does all the indexing and compression to allow for FCopLevelParser to convert the data back into binary.
         public void Compile() {
+
+            culling.CalculateCulling(this);
 
             List<HeightPoint3> heightPoints = new List<HeightPoint3>();
             List<ThirdSectionBitfield> thirdSectionBitfields = new List<ThirdSectionBitfield>();
@@ -719,6 +724,7 @@ namespace FCopParser {
             }
 
             parser.heightPoints = heightPoints;
+            parser.culling = culling;
             parser.thirdSectionBitfields = thirdSectionBitfields;
             parser.tiles = tiles;
             parser.textureCoordinates = textureCoordinates;

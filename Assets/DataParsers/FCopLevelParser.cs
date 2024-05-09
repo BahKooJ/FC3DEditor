@@ -4,6 +4,7 @@ using System.Collections;
 using System.Linq;
 using System;
 using System.Text;
+using System.Drawing;
 
 namespace FCopParser {
 
@@ -16,8 +17,10 @@ namespace FCopParser {
         const int heightMapOffset = 12;
         const int heightMapLength = 867;
 
-        const int renderDistanceOffset = 880;
-        const int rednerDistanceLength = 88;
+        const int specialTileTypeOffset = 880;
+
+        const int renderDistanceOffset = 884;
+        const int rednerDistanceLength = 84;
 
         const int animationVectorOffset = 968;
         const int tileCountOffset = 970;
@@ -41,6 +44,7 @@ namespace FCopParser {
 
         // Sect
         public List<HeightPoint3> heightPoints = new();
+        public LevelCulling culling;
         public List<ThirdSectionBitfield> thirdSectionBitfields = new();
         public List<byte> animationVector = new();
         public List<TileBitfield> tiles = new();
@@ -55,7 +59,7 @@ namespace FCopParser {
         // SLFX
         public List<byte> slfxData;
 
-        List<ChunkHeader> offsets = new List<ChunkHeader>();
+        public List<ChunkHeader> offsets = new List<ChunkHeader>();
 
         int offset = 0;
 
@@ -68,6 +72,8 @@ namespace FCopParser {
             textureCordCount = Utils.BytesToShort(rawFile.data.ToArray(), textureCordCountOffset);
 
             ParseHeightPoints();
+
+            culling = new LevelCulling(rawFile.data.GetRange(renderDistanceOffset, rednerDistanceLength));
 
             tileCount = Utils.BytesToShort(rawFile.data.ToArray(), tileCountOffset);
 
@@ -215,8 +221,10 @@ namespace FCopParser {
             CompileHeights();
 
             compiledFile.AddRange(
-                rawFile.data.GetRange(renderDistanceOffset, rednerDistanceLength)
+                rawFile.data.GetRange(specialTileTypeOffset, 4)
                 );
+
+            compiledFile.AddRange(culling.Compile());
 
             compiledFile.AddRange(animationVector);
 
@@ -415,11 +423,13 @@ namespace FCopParser {
 
                 if (graphic.graphicsType == 1) {
                     additionalDataCount = 1;
-                } else if (graphic.graphicsType == 2) {
+                }
+                else if (graphic.graphicsType == 2) {
 
                     if (graphic.isRect == 1) {
                         additionalDataCount = 2;
-                    } else {
+                    }
+                    else {
                         additionalDataCount = 1;
                     }
 
@@ -549,7 +559,7 @@ namespace FCopParser {
             return layout;
 
         }
-        
+
         public static void Compile(List<List<int>> parsedData, IFFDataFile rawFile) {
 
             var total = new List<byte>();
@@ -609,6 +619,179 @@ namespace FCopParser {
             this.height1 = height1;
             this.height2 = height2;
             this.height3 = height3;
+        }
+
+    }
+
+    public class LevelCulling {
+
+        const int chunkCulling8Size = 4;
+        const int chunkCulling4Size = 16;
+
+        public ChunkCulling sectionCulling;
+        public List<ChunkCulling> chunkCulling8 = new();
+        public List<ChunkCulling> chunkCulling4 = new();
+
+        public LevelCulling(List<byte> data) {
+
+            var offset = 0;
+
+            sectionCulling = new ChunkCulling(data.GetRange(offset, 4));
+
+            offset += 4;
+
+            foreach (var i in Enumerable.Range(0, chunkCulling8Size)) {
+                chunkCulling8.Add(new ChunkCulling(data.GetRange(offset, 4)));
+                offset += 4;
+            }
+
+            foreach (var i in Enumerable.Range(0, chunkCulling4Size)) {
+                chunkCulling4.Add(new ChunkCulling(data.GetRange(offset, 4)));
+                offset += 4;
+            }
+
+        }
+
+        public List<byte> Compile() {
+
+            var total = new List<byte>();
+
+            total.AddRange(BitConverter.GetBytes((short)sectionCulling.radius));
+            total.AddRange(BitConverter.GetBytes((short)sectionCulling.height));
+
+            foreach (var culling in chunkCulling8) {
+                total.AddRange(BitConverter.GetBytes((short)culling.radius));
+                total.AddRange(BitConverter.GetBytes((short)culling.height));
+            }
+
+            foreach (var culling in chunkCulling4) {
+                total.AddRange(BitConverter.GetBytes((short)culling.radius));
+                total.AddRange(BitConverter.GetBytes((short)culling.height));
+            }
+
+            return total;
+
+        }
+
+        public void CalculateCulling(FCopLevelSection section) {
+
+            sectionCulling.CalculateCulling(section, 0, 0, 16);
+
+            var x8 = 0;
+            var y8 = 0;
+
+            foreach (var culling in chunkCulling8) {
+
+                culling.CalculateCulling(section, x8 * 8, y8 * 8, 8);
+
+                foreach (var y4 in Enumerable.Range(y8 * 2, 2)) {
+
+                    foreach (var x4 in Enumerable.Range(x8 * 2, 2)) {
+
+                        var chunk4 = chunkCulling4[(y4 * 2) + x4];
+
+                        chunk4.CalculateCulling(section, x4 * 4, y4 * 4, 4);
+
+                    }
+
+                }
+
+                x8++;
+                if (x8 == 2) {
+                    y8++;
+                    x8 = 0;
+                }
+
+            }
+
+
+        }
+
+    }
+
+    public class ChunkCulling {
+
+        public int radius;
+        public int height;
+
+        public ChunkCulling(List<byte> data) {
+
+            radius = BitConverter.ToInt16(data.GetRange(0, 2).ToArray());
+            height = BitConverter.ToInt16(data.GetRange(2, 2).ToArray());
+
+        }
+
+        public ChunkCulling(int radius, int height) {
+            this.radius = radius;
+            this.height = height;
+        }
+
+        public void CalculateCulling(FCopLevelSection section, int x, int y, int size) {
+
+            const int cullingUnitPerTile = 724;
+
+            float minHeight = 128;
+            float maxHeight = -128;
+
+            List<TileColumn> columns = new();
+
+            if (size == 16) {
+                columns = section.tileColumns;
+            }
+            else {
+
+                foreach (var ty in Enumerable.Range(y, size)) {
+
+                    foreach (var tx in Enumerable.Range(x, size)) {
+
+                        columns.Add(section.GetTileColumn(tx, ty));
+
+                    }
+
+                }
+
+            }
+
+
+            foreach (var column in columns) {
+
+                foreach (var tile in column.tiles) {
+
+                    foreach (var vert in tile.verticies) {
+
+                        var hx = column.x;
+                        var hy = column.y;
+
+                        if (vert.vertexPosition == VertexPosition.TopRight || vert.vertexPosition == VertexPosition.BottomRight) {
+                            hx++;
+                        }
+                        if (vert.vertexPosition == VertexPosition.BottomRight || vert.vertexPosition == VertexPosition.BottomLeft) {
+                            hy++;
+                        }
+
+                        var height = section.GetHeightPoint(hx, hy);
+
+                        var value = height.GetTruePoint(vert.heightChannel);
+
+                        if (value < minHeight) {
+
+                            minHeight = value;
+                        }
+                        if (value > maxHeight) { 
+                            maxHeight = value;
+                        }
+
+                    }
+
+                }
+
+            }
+
+            var difference = maxHeight - minHeight;
+
+            height = (int)((minHeight + maxHeight) / 2f * 16f);
+            radius = (int)((cullingUnitPerTile * size / 2) + (MathF.Abs(difference) * 2));
+
         }
 
     }
@@ -677,7 +860,7 @@ namespace FCopParser {
 
         }
 
-        static public int SetPixel(int x, int y) { 
+        static public int SetPixel(int x, int y) {
             return (y * 256) + x;
         }
 
@@ -708,7 +891,7 @@ namespace FCopParser {
         }
 
         public static bool operator ==(TileGraphics tg1, TileGraphics tg2) {
-            return tg1.lightingInfo == tg2.lightingInfo && 
+            return tg1.lightingInfo == tg2.lightingInfo &&
                 tg1.cbmpID == tg2.cbmpID &&
                 tg1.isAnimated == tg2.isAnimated &&
                 tg1.isSemiTransparent == tg2.isSemiTransparent &&
@@ -730,7 +913,7 @@ namespace FCopParser {
     public struct TileGraphicsMetaData: TileGraphicsItem {
 
         public List<byte> data;
-         
+
         public TileGraphicsMetaData(List<byte> data) {
             this.data = data;
         }
