@@ -680,21 +680,24 @@ namespace FCopParser {
             var x8 = 0;
             var y8 = 0;
 
+            var chunkCulling4Offset = 0;
+
             foreach (var culling in chunkCulling8) {
 
                 culling.CalculateCulling(section, x8 * 8, y8 * 8, 8);
 
-                foreach (var y4 in Enumerable.Range(y8 * 2, 2)) {
+                foreach (var i in Enumerable.Range(0, 4)) {
 
-                    foreach (var x4 in Enumerable.Range(x8 * 2, 2)) {
+                    var chunk4 = chunkCulling4[i + chunkCulling4Offset];
 
-                        var chunk4 = chunkCulling4[(y4 * 2) + x4];
+                    var x4 = (x8 * 8) + ((i % 2) * 4);
+                    var y4 = (y8 * 8) + ((i / 2) * 4);
 
-                        chunk4.CalculateCulling(section, x4 * 4, y4 * 4, 4);
-
-                    }
+                    chunk4.CalculateCulling(section, x4, y4, 4);
 
                 }
+
+                chunkCulling4Offset += 4;
 
                 x8++;
                 if (x8 == 2) {

@@ -304,6 +304,13 @@ namespace FCopParser {
 
         }
 
+        public void Compile() {
+
+            actor.rawFile.data.RemoveRange(32, 2);
+            actor.rawFile.data.InsertRange(32, BitConverter.GetBytes((short)playerHealth.value));
+
+        }
+
     }
 
     public class FCopBehavior5 : FCopActorBehavior {

@@ -58,7 +58,7 @@ public class SectionEditMode : EditMode {
         //var obj = Object.Instantiate(main.boundsPrefab);
         //obj.GetComponent<CullingSectionBounds>().controller = this;
 
-        LogCulling();
+        //LogCulling();
 
     }
 
