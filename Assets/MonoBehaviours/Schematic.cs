@@ -19,8 +19,8 @@ public class Schematic {
 
         sortedSelectedItems = sortedSelectedItems.OrderBy(item => item.columnWorldX).ThenBy(item => item.columnWorldY).ToList();
 
-        width = (sortedSelectedItems.Last().columnWorldX - sortedSelectedItems.First().columnWorldX) + 1;
-        height = (sortedSelectedItems.Last().columnWorldY - sortedSelectedItems.First().columnWorldY) + 1;
+        width = (sortedSelectedItems.Max(item => item.columnWorldX) - sortedSelectedItems.Min(item => item.columnWorldX)) + 1;
+        height = (sortedSelectedItems.Max(item => item.columnWorldY) - sortedSelectedItems.Min(item => item.columnWorldY)) + 1;
 
         HeightPoints GetHeightPoint(int x, int y) {
             return heightMap[(y * (width + 1)) + x];
@@ -57,8 +57,8 @@ public class Schematic {
 
         }
 
-        var startingX = sortedSelectedItems.First().columnWorldX;
-        var startingY = sortedSelectedItems.First().columnWorldY;
+        var startingX = sortedSelectedItems.Min(item => item.columnWorldX);
+        var startingY = sortedSelectedItems.Min(item => item.columnWorldY);
 
         foreach (var item in sortedSelectedItems) {
 

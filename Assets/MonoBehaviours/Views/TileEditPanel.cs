@@ -42,7 +42,9 @@ public class TileEditPanel : MonoBehaviour {
 
         var foo = new Schematic(controller.selectedItems);
 
-        foo.width = 2;
+        TileAddMode.selectedSchematic = foo;
+
+
 
     }
 

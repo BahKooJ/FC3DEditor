@@ -153,7 +153,7 @@ public abstract class MeshUtils {
 
 }
 
-class SubMesh {
+public class SubMesh {
 
     public Mesh mesh = new Mesh();
     public MeshRenderer meshRenderer;

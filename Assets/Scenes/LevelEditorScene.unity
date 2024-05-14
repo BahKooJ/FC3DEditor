@@ -2322,6 +2322,7 @@ MonoBehaviour:
   TileTexturePreview: {fileID: 3982175839306991789, guid: 2759ef5779e33c643944bdeae490ddfa, type: 3}
   SectionBoarders: {fileID: 2168547336867362444, guid: 9ea2ba9bd14a6d84f92bbce323964dbf, type: 3}
   NavMeshPoint: {fileID: 6317055660841323228, guid: d716506ed78901d468e87343a95f5955, type: 3}
+  schematicMesh: {fileID: 8880727385032815715, guid: c707b823d86afb840b8711c3b2f06131, type: 3}
   BlankActor: {fileID: 1640186847095666650, guid: 49bee21158884a8459dfdc42e65ffd06, type: 3}
   ObjectMesh: {fileID: 3982175839306991789, guid: 8d9aa84093398e5458aa180203865e97, type: 3}
   playerCamera: {fileID: 3980026059195325994, guid: fd18efa683a2f574cb71981049afecfd, type: 3}

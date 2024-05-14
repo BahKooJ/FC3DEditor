@@ -495,7 +495,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
         RefeshTileOverlay();
 
     }
-
+    
     public void ShiftTilesHeightDown() {
 
         if (!HasSelection) { return; }

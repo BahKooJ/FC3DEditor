@@ -8,12 +8,23 @@ public class TileAddMode : EditMode {
 
     public Main main { get; set; }
 
+    // =Settings=
+    public enum SchematicPlacementSetting {
+        Exact = 0,
+        Relative = 1,
+        Keep = 2
+    }
+    public static SchematicPlacementSetting placementSetting;
+
+
     public static TilePreset? selectedTilePreset = null;
+    public static Schematic selectedSchematic = null;
 
     public TileSelection hoverSelection;
 
     public List<TileHeightMapChannelPoint> heightPointObjects = new();
     public SelectedTileOverlay buildTileOverlay = null;
+    public SchematicMesh schematicBuildOverlay = null;
 
 
     public TileAddMode(Main main) {
@@ -22,6 +33,10 @@ public class TileAddMode : EditMode {
 
     public void OnCreateMode() {
         
+        if (selectedSchematic != null) {
+            InitSchematicMeshOverlay();
+        }
+
     }
 
     public void OnDestroy() {
@@ -92,6 +107,16 @@ public class TileAddMode : EditMode {
 
     }
 
+    void InitSchematicMeshOverlay() {
+
+        var obj = Object.Instantiate(main.schematicMesh);
+        var schematicMesh = obj.GetComponent<SchematicMesh>();
+        schematicMesh.controller = this;
+        schematicMesh.schematic = selectedSchematic;
+        schematicBuildOverlay = schematicMesh;
+
+    }
+
     void PreviewTilePlacement() {
 
         ClearBuildingOverlay();
@@ -123,6 +148,13 @@ public class TileAddMode : EditMode {
         }
 
         buildTileOverlay = null;
+
+        if (schematicBuildOverlay != null) {
+            Object.Destroy(schematicBuildOverlay.gameObject);
+        }
+
+        schematicBuildOverlay = null;
+
 
     }
 

@@ -35,6 +35,7 @@ public class Main : MonoBehaviour {
     public GameObject TileTexturePreview;
     public GameObject SectionBoarders;
     public GameObject NavMeshPoint;
+    public GameObject schematicMesh;
 
     public GameObject BlankActor;
     public GameObject ObjectMesh;
