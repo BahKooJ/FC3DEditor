@@ -17,6 +17,14 @@ public class TileEditPanel : MonoBehaviour {
 
     }
 
+    void Update() {
+
+        if (Input.GetKeyDown(KeyCode.Alpha0)) {
+            OnClickSaveSchematic();
+        }
+
+    }
+
     // Editing
     public void OnClickShiftHeightUpButton() {
 
@@ -27,6 +35,14 @@ public class TileEditPanel : MonoBehaviour {
     public void OnClickShiftHeightDownButton() {
 
         controller.ShiftTilesHeightDown();
+
+    }
+
+    public void OnClickSaveSchematic() {
+
+        var foo = new Schematic(controller.selectedItems);
+
+        foo.width = 2;
 
     }
 

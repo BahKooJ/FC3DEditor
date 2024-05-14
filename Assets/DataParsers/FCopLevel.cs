@@ -1163,6 +1163,7 @@ namespace FCopParser {
         public const float maxValue = SByte.MaxValue / multiplyer;
         public const float minValue = SByte.MinValue / multiplyer;
 
+        // Man why did I make these floats way back when :(
         public float height1;
         public float height2;
         public float height3;
@@ -1177,6 +1178,12 @@ namespace FCopParser {
             this.height1 = parsedHeightPoint3.height1 / multiplyer;
             this.height2 = parsedHeightPoint3.height2 / multiplyer;
             this.height3 = parsedHeightPoint3.height3 / multiplyer;
+        }
+
+        public HeightPoints(int height1, int height2, int height3) {
+            this.height1 = height1 / multiplyer;
+            this.height2 = height2 / multiplyer;
+            this.height3 = height3 / multiplyer;
         }
 
         public float GetPoint(int channel) {

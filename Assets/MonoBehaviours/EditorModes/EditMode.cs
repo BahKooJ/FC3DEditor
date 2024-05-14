@@ -136,45 +136,6 @@ public abstract class TileMutatingEditMode : EditMode {
 
         }
 
-
-
-        //if (oldColumn == null) {
-        //    return;
-        //}
-
-        //var xDif = column.x - oldColumn.x;
-        //var yDif = column.y - oldColumn.y;
-
-        //var xOrigin = oldColumn.x;
-        //var yOrigin = oldColumn.y;
-
-        //if (xDif < 0) {
-        //    xOrigin = column.x;
-        //}
-        //if (yDif < 0) {
-        //    yOrigin = column.y;
-        //}
-
-        //foreach (var y in Enumerable.Range(yOrigin, Math.Abs(yDif) + 1)) {
-
-        //    foreach (var x in Enumerable.Range(xOrigin, Math.Abs(xDif) + 1)) {
-
-        //        var itColumn = selectedSection.section.GetTileColumn(x, y);
-
-        //        foreach (var itTile in itColumn.tiles) {
-
-        //            if (selectedTiles[0].verticies.Count == itTile.verticies.Count) {
-
-        //                SelectTile(itTile, false);
-
-        //            }
-
-        //        }
-
-        //    }
-
-        //}
-
     }
 
     public void RefreshMeshes() {
@@ -246,6 +207,13 @@ public abstract class TileMutatingEditMode : EditMode {
 }
 
 public class TileSelection {
+
+    public int columnWorldX {
+        get => column.x + (section.arrayX * 16);
+    }
+    public int columnWorldY {
+        get => column.y + (section.arrayY * 16);
+    }
 
     public Tile tile;
     public TileColumn column;
