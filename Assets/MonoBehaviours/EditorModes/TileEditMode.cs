@@ -465,6 +465,15 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
         if (!HasSelection) { return; }
 
+        // Add to Undo stack
+        Main.counterActions.Add(new MultiTileSaveStateCounterAction(selectedItems, () => {
+
+            RefreshMeshes();
+
+            RefeshTileOverlay();
+
+        }));
+
         foreach (var item in selectedItems) {
 
             var previousVerticies = new List<TileVertex>(item.tile.verticies);
@@ -500,6 +509,15 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
         if (!HasSelection) { return; }
 
+        // Add to Undo stack
+        Main.counterActions.Add(new MultiTileSaveStateCounterAction(selectedItems, () => {
+
+            RefreshMeshes();
+
+            RefeshTileOverlay();
+
+        }));
+
         foreach (var item in selectedItems) {
 
             var previousVerticies = new List<TileVertex>(item.tile.verticies);
@@ -532,4 +550,5 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
     }
 
     #endregion
+
 }

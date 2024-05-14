@@ -1502,6 +1502,35 @@ namespace FCopParser {
 
         }
 
+        public void ReceiveData(Tile tile) {
+
+            this.column = tile.column;
+
+            isEndInColumnArray = tile.isEndInColumnArray;
+
+            verticies = new List<TileVertex>(tile.verticies);
+            uvs = new List<int>(tile.uvs);
+            shaders = tile.shaders.Clone();
+            animatedUVs = new List<int>(tile.animatedUVs);
+            animationSpeed = tile.animationSpeed;
+
+            culling = tile.culling;
+            texturePalette = tile.texturePalette;
+            isVectorAnimated = tile.isVectorAnimated;
+            isSemiTransparent = tile.isSemiTransparent;
+            effectIndex = tile.effectIndex;
+
+            graphics = tile.graphics;
+            graphicsMetaData = new(tile.graphicsMetaData);
+            uvAnimationData = tile.uvAnimationData;
+            this.parsedTile = tile.parsedTile;
+
+        }
+
+        public Tile Clone() {
+            return new Tile(this, column, null);
+        }
+
         public int GetFrameCount() {
             return animatedUVs.Count / 4;
         }

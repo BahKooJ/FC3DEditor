@@ -14,6 +14,9 @@ public class Main : MonoBehaviour {
     public static bool ignoreAllInputs = false;
     public static bool debug = false;
 
+    // Undos
+    public static List<CounterAction> counterActions = new();
+
     public static bool IsMouseOverUI() {
 
         PointerEventData pointerData = new PointerEventData(EventSystem.current);
@@ -109,6 +112,18 @@ public class Main : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.L)) {
             SettingsManager.showAnimations = !SettingsManager.showAnimations;
             RefreshLevel();
+        }
+        if (Controls.OnDown("Undo")) {
+            Undo();
+        }
+
+    }
+
+    public void Undo() {
+
+        if (counterActions.Count > 0) {
+            counterActions.Last().Action();
+            counterActions.RemoveAt(counterActions.Count - 1);
         }
 
     }
