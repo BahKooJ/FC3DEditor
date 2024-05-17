@@ -93,6 +93,8 @@ public class TileAddMode : EditMode {
 
     }
 
+    #region GameObject Managment
+
     public void RefreshTilePlacementOverlay() {
 
         if (hoverSelection == null) { return; }
@@ -170,29 +172,6 @@ public class TileAddMode : EditMode {
 
     }
 
-    void AddTile(TilePreset preset) {
-
-        if (selectedTilePreset == null) { return; }
-
-        if (hoverSelection == null) { return; }
-
-        foreach (var t in hoverSelection.column.tiles) {
-
-            // Checks to make sure the tile doesn't already exist
-            if (MeshType.IDFromVerticies(t.verticies) == preset.meshID) {
-                return;
-            }
-
-        }
-
-        var tile = preset.Create(true, hoverSelection.column);
-
-        hoverSelection.column.tiles.Add(tile);
-
-        hoverSelection.section.RefreshMesh();
-
-    }
-
     void AddHeightObjects(VertexPosition corner) {
 
         AddSingleHeightChannelObject(corner, 1, hoverSelection.column);
@@ -241,5 +220,62 @@ public class TileAddMode : EditMode {
         heightPointObjects.Add(script);
 
     }
+
+    #endregion
+
+    #region Model Mutating
+
+    void AddTile(TilePreset preset) {
+
+        if (selectedTilePreset == null) { return; }
+
+        if (hoverSelection == null) { return; }
+
+        foreach (var t in hoverSelection.column.tiles) {
+
+            // Checks to make sure the tile doesn't already exist
+            if (MeshType.IDFromVerticies(t.verticies) == preset.meshID) {
+                return;
+            }
+
+        }
+
+        var tile = preset.Create(true, hoverSelection.column);
+
+        Main.counterActions.Add(new AddTileCounterAction(tile, hoverSelection.column, hoverSelection.section));
+
+        hoverSelection.column.tiles.Add(tile);
+
+        hoverSelection.section.RefreshMesh();
+
+    }
+
+    #endregion
+
+    #region Counter-Action
+
+    public class AddTileCounterAction : CounterAction {
+
+        Tile addedTile;
+        TileColumn columnAddedTo;
+        LevelMesh sectionAddedTo;
+
+        public AddTileCounterAction(Tile addedTile, TileColumn columnAddedTo, LevelMesh section) {
+            this.addedTile = addedTile;
+            this.columnAddedTo = columnAddedTo;
+            this.sectionAddedTo = section;
+        }
+
+        public void Action() {
+
+            columnAddedTo.tiles.Remove(addedTile);
+
+            sectionAddedTo.RefreshMesh();
+
+        }
+
+    }
+
+    #endregion
 
 }

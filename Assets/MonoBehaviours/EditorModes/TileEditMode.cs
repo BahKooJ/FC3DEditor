@@ -262,33 +262,6 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
-    void RemoveSelectedTiles() {
-
-        if (!HasSelection) { return; }
-
-        var showDialog = false;
-        foreach (var item in selectedItems) {
-
-            if (item.column.tiles.Count == 1) {
-                showDialog = true;
-                continue;
-            }
-
-            item.column.tiles.Remove(item.tile);
-
-        }
-
-        if (showDialog) {
-            DialogWindowUtil.Dialog("Cannot Remove Tile", "At least one tile must be present in a tile column");
-        }
-
-        RefreshMeshes();
-
-        ClearAllSelectedItems();
-
-
-    }
-
     void ClearAllSelectedItems() {
 
         if (HasSelection) {
@@ -507,6 +480,42 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
+    void RemoveSelectedTiles() {
+
+        if (!HasSelection) { return; }
+
+        var removedItems = new List<TileSelection>();
+
+        var showDialog = false;
+        foreach (var item in selectedItems) {
+
+            if (item.column.tiles.Count == 1) {
+                showDialog = true;
+                continue;
+            }
+
+            removedItems.Add(item);
+
+            item.column.tiles.Remove(item.tile);
+
+        }
+
+        if (removedItems.Count > 0) {
+            AddRemoveTileCounterAction(removedItems);
+        }
+
+        if (showDialog) {
+            DialogWindowUtil.Dialog("Cannot Remove Tile", "At least one tile must be present in a tile column");
+        }
+
+        RefreshMeshes();
+
+        ClearAllSelectedItems();
+
+
+    }
+
+
     #endregion
 
     #region Callbacks
@@ -592,6 +601,70 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     // Counter-Action methods must be static
     // This is to avoid memory leaks.
+
+    public class RemoveTileCounterAction : CounterAction {
+
+        Tile removedTile;
+        TileColumn column;
+
+        public RemoveTileCounterAction(Tile removedTile, TileColumn column) {
+            this.removedTile = removedTile;
+            this.column = column;
+        }
+
+        public void Action() {
+
+            column.tiles.Add(removedTile);
+
+        }
+
+
+    }
+
+    public class MultiRemoveTileCounterAction : CounterAction {
+
+        List<RemoveTileCounterAction> removedTileCounterActions = new();
+
+        public MultiRemoveTileCounterAction(List<TileSelection> items) {
+
+            foreach (var item in items) {
+
+                removedTileCounterActions.Add(new RemoveTileCounterAction(item.tile, item.column));
+
+            }
+
+        }
+
+        public void Action() {
+            
+            foreach (var counterAction in removedTileCounterActions) {
+                counterAction.Action();
+            }
+
+            if (Main.editMode is not TileEditMode) {
+                return;
+            }
+
+            var editMode = (TileEditMode)Main.editMode;
+
+            editMode.RefreshMeshes();
+
+            editMode.ClearAllGameObjects();
+
+            editMode.ReinitExistingSelectedItems();
+
+            editMode.RefreshPreviewOverlay();
+
+        }
+
+
+    }
+
+    void AddRemoveTileCounterAction(List<TileSelection> removedItems) {
+
+        Main.counterActions.Add(new MultiRemoveTileCounterAction(removedItems));
+
+    }
 
     static void AddSelectionStateCounterAction() {
 
