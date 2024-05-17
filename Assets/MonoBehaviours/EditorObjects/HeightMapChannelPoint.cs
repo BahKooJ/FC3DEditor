@@ -89,25 +89,6 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
     }
 
-    public void MoveHeight(float distance) {
-
-        heightPoints.AddToPoint(distance, channel);
-
-        transform.position = new Vector3(transform.position.x, heightPoints.GetPoint(channel), transform.position.z);
-
-        if (HeightMapEditMode.keepHeightsOnTop) {
-
-            KeepHigherChannelsOnTop();
-
-        }
-
-        if (dragField != null) {
-            dragField.field.text = heightPoints.GetTruePoint(channel).ToString();
-            ((RectTransform)dragField.transform).anchoredPosition = Camera.main.WorldToScreenPoint(transform.position);
-        }
-
-    }
-
     public void ResetColors() {
         switch (channel) {
             case 1:
@@ -127,40 +108,6 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
     public void RefreshHeight() {
         transform.position = new Vector3(transform.position.x, heightPoints.GetPoint(channel), transform.position.z);
-    }
-
-    public void KeepHigherChannelsOnTop() {
-
-        var padding = 8;
-        var gameCoordsPadding = padding / HeightPoints.multiplyer;
-
-        if (channel == 3) {
-            return;
-        }
-
-        if (channel == 1) {
-
-            if (heightPoints.GetPoint(channel) + gameCoordsPadding > heightPoints.GetPoint(2)) {
-                heightPoints.SetPoint(heightPoints.GetTruePoint(channel) + padding, 2);
-            }
-
-            if (heightPoints.GetPoint(2) + gameCoordsPadding > heightPoints.GetPoint(3)) {
-                heightPoints.SetPoint(heightPoints.GetTruePoint(2) + padding, 3);
-            }
-
-        }
-        if (channel == 2) {
-
-            if (heightPoints.GetPoint(channel) + gameCoordsPadding > heightPoints.GetPoint(3)) {
-                heightPoints.SetPoint(heightPoints.GetTruePoint(channel) + padding, 3);
-            }
-
-        }
-
-        foreach (var point in controller.heightPointObjects) {
-            point.RefreshHeight();
-        }
-
     }
 
     public void SelectOrDeSelect() {
@@ -203,6 +150,8 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
     public void Click() {
 
+        controller.AddHeightMapSaveStateCounterActionFromClick(this);
+
         var obj = Instantiate(setHeightTextField);
 
         obj.transform.SetParent(controller.main.canvas.transform, false);
@@ -239,5 +188,62 @@ public class HeightMapChannelPoint : MonoBehaviour {
         script.selelctedHeightObject = this;
 
     }
+
+    #region Model Mutating
+
+    public void MoveHeight(float distance) {
+
+        heightPoints.AddToPoint(distance, channel);
+
+        transform.position = new Vector3(transform.position.x, heightPoints.GetPoint(channel), transform.position.z);
+
+        if (HeightMapEditMode.keepHeightsOnTop) {
+
+            KeepHigherChannelsOnTop();
+
+        }
+
+        if (dragField != null) {
+            dragField.field.text = heightPoints.GetTruePoint(channel).ToString();
+            ((RectTransform)dragField.transform).anchoredPosition = Camera.main.WorldToScreenPoint(transform.position);
+        }
+
+    }
+
+    public void KeepHigherChannelsOnTop() {
+
+        var padding = 8;
+        var gameCoordsPadding = padding / HeightPoints.multiplyer;
+
+        if (channel == 3) {
+            return;
+        }
+
+        if (channel == 1) {
+
+            if (heightPoints.GetPoint(channel) + gameCoordsPadding > heightPoints.GetPoint(2)) {
+                heightPoints.SetPoint(heightPoints.GetTruePoint(channel) + padding, 2);
+            }
+
+            if (heightPoints.GetPoint(2) + gameCoordsPadding > heightPoints.GetPoint(3)) {
+                heightPoints.SetPoint(heightPoints.GetTruePoint(2) + padding, 3);
+            }
+
+        }
+        if (channel == 2) {
+
+            if (heightPoints.GetPoint(channel) + gameCoordsPadding > heightPoints.GetPoint(3)) {
+                heightPoints.SetPoint(heightPoints.GetTruePoint(channel) + padding, 3);
+            }
+
+        }
+
+        foreach (var point in controller.heightPointObjects) {
+            point.RefreshHeight();
+        }
+
+    }
+
+    #endregion
 
 }

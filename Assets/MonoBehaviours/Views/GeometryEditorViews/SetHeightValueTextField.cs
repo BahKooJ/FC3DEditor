@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Drawing;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -26,7 +27,7 @@ class SetHeightValueTextField: MonoBehaviour {
 
     public void Update() {
 
-        if (controller.main.editMode != controller) {
+        if (Main.editMode != controller) {
             Destroy(this.gameObject);
         }
 
@@ -44,29 +45,16 @@ class SetHeightValueTextField: MonoBehaviour {
 
         if (field.text.Count() != 0) {
 
-            foreach (var point in controller.heightPointObjects) {
+            try {
+                controller.SetHeightsWithValue(Int32.Parse(field.text));
+            } catch (FormatException) {
 
-                if (point.isSelected) {
+                controller.UnselectHeights();
+                HeightMapEditMode.selectedSection.RefreshMesh();
 
-                    try {
-                        point.heightPoints.SetPoint(Int32.Parse(field.text), point.channel);
-                    } catch (FormatException) {
+                Destroy(this.gameObject);
 
-                        controller.UnselectHeights();
-                        HeightMapEditMode.selectedSection.RefreshMesh();
-
-                        Destroy(this.gameObject);
-
-                        return;
-                    }
-
-                    point.RefreshHeight();
-
-                    if (HeightMapEditMode.keepHeightsOnTop) {
-                        point.KeepHigherChannelsOnTop();
-                    }
-
-                }
+                return;
 
             }
 

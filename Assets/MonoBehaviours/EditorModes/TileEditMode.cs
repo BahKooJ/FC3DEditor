@@ -97,7 +97,11 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
         }
     }
 
+    #region Selection
+
     void SelectLevelItems(TileSelection selection) {
+
+        AddSelectionStateCounterAction();
 
         // If shift is held then multiple tiles can be selected
         if (!Controls.IsDown("MultiSelect")) {
@@ -170,6 +174,31 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
+    override public void MakeSelection(TileSelection selection, bool deSelectDuplicate = true) {
+
+        if (IsTileAlreadySelected(selection.tile)) {
+
+            if (deSelectDuplicate) {
+                RemoveTile(selection.tile);
+                RefeshTileOverlay();
+
+                if (!HasSelection) {
+
+                    ClearAllSelectedItems();
+
+                }
+
+            }
+
+        } else {
+
+            selectedItems.Add(selection);
+            selectedSections.Add(selection.section);
+
+        }
+
+    }
+
     bool TestTileHeightSelection() {
 
         if (FreeMove.looking) {
@@ -204,29 +233,13 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
                             return true;
                         }
 
-                        foreach (var item in selectedItems) {
 
-                            var index = item.tile.verticies.FindIndex(vertex => {
-                                return vertex.vertexPosition == selectedHeight.corner && vertex.heightChannel == selectedHeight.channel;
-                            });
+                        var didBreak = ChangeTileCornerChannel(channel);
 
-                            var existingVert = item.tile.verticies.FindIndex(vertex => {
-                                return vertex.vertexPosition == channel.corner && vertex.heightChannel == channel.channel;
-                            });
-
-                            if (index == -1 || existingVert != -1) {
-
-                                selectedHeight = channel;
-
-                                RefreshMeshes();
-                                RefeshTileOverlay();
-                                return true;
-                            }
-
-                            var vertex = item.tile.verticies[index];
-                            item.tile.verticies[index] = new TileVertex(channel.channel, vertex.vertexPosition);
-                            
+                        if (didBreak) {
+                            return true;
                         }
+
                         selectedHeight = channel;
 
                         RefreshMeshes();
@@ -234,7 +247,9 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
                     }
                     else {
+
                         return true;
+
                     }
 
                 }
@@ -247,9 +262,62 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
+    void RemoveSelectedTiles() {
+
+        if (!HasSelection) { return; }
+
+        var showDialog = false;
+        foreach (var item in selectedItems) {
+
+            if (item.column.tiles.Count == 1) {
+                showDialog = true;
+                continue;
+            }
+
+            item.column.tiles.Remove(item.tile);
+
+        }
+
+        if (showDialog) {
+            DialogWindowUtil.Dialog("Cannot Remove Tile", "At least one tile must be present in a tile column");
+        }
+
+        RefreshMeshes();
+
+        ClearAllSelectedItems();
+
+
+    }
+
+    void ClearAllSelectedItems() {
+
+        if (HasSelection) {
+            AddSelectionStateCounterAction();
+        }
+
+        selectedItems.Clear();
+        selectedSections.Clear();
+        ClearTileOverlays();
+
+        foreach (var point in heightPointObjects) {
+            Object.Destroy(point.gameObject);
+        }
+
+        heightPointObjects.Clear();
+
+        ClearSectionOverlays();
+
+        ClearPreviewOverlay();
+
+    }
+
+    #endregion
+
+    #region GameObject Managment
+
     void ReinitExistingSelectedItems() {
 
-        if (savedSelections.Count == 0) {
+        if (selectedItems.Count == 0) {
             return;
         }
 
@@ -263,32 +331,6 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
         AddHeightObjects(VertexPosition.TopRight);
         AddHeightObjects(VertexPosition.BottomLeft);
         AddHeightObjects(VertexPosition.BottomRight);
-
-    }
-
-    override public void MakeSelection(TileSelection selection, bool deSelectDuplicate = true) {
-
-        if (IsTileAlreadySelected(selection.tile)) {
-
-            if (deSelectDuplicate) {
-                RemoveTile(selection.tile);
-                RefeshTileOverlay();
-
-                if (!HasSelection) {
-
-                    ClearAllSelectedItems();
-
-                }
-
-            }
-
-        }
-        else {
-
-            selectedItems.Add(selection);
-            selectedSections.Add(selection.section);
-
-        }
 
     }
 
@@ -316,6 +358,14 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
             InitTileOverlay(item);
 
+        }
+
+    }
+
+    void RefreshPreviewOverlay() {
+
+        if (previewSelectionOverlay != null) {
+            previewSelectionOverlay.Refresh();
         }
 
     }
@@ -349,33 +399,6 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
-    void RemoveSelectedTiles() {
-
-        if (!HasSelection) { return; }
-
-        var showDialog = false;
-        foreach (var item in selectedItems) {
-
-            if (item.column.tiles.Count == 1) {
-                showDialog = true;
-                continue;
-            }
-
-            item.column.tiles.Remove(item.tile);
-
-        }
-
-        if (showDialog) {
-            DialogWindowUtil.Dialog("Cannot Remove Tile", "At least one tile must be present in a tile column");
-        }
-
-        RefreshMeshes();
-
-        ClearAllSelectedItems();
-
-
-    }
-
     void ClearAllGameObjects() {
 
         ClearTileOverlays();
@@ -386,27 +409,9 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
             Object.Destroy(point.gameObject);
         }
 
-        foreach (var selectedSectionOverlay in selectedSectionOverlays) {
-            Object.Destroy(selectedSectionOverlay);
-        }
-
-    }
-
-    void ClearAllSelectedItems() {
-
-        selectedItems.Clear();
-        selectedSections.Clear();
-        ClearTileOverlays();
-
-        foreach (var point in heightPointObjects) {
-            Object.Destroy(point.gameObject);
-        }
-
         heightPointObjects.Clear();
 
         ClearSectionOverlays();
-
-        ClearPreviewOverlay();
 
     }
 
@@ -459,6 +464,51 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
+    #endregion
+
+    #region Model Mutating
+
+    bool ChangeTileCornerChannel(TileHeightMapChannelPoint channel) {
+
+        var didCreateCounterAction = false;
+
+        foreach (var item in selectedItems) {
+
+            var index = item.tile.verticies.FindIndex(vertex => {
+                return vertex.vertexPosition == selectedHeight.corner && vertex.heightChannel == selectedHeight.channel;
+            });
+
+            var existingVert = item.tile.verticies.FindIndex(vertex => {
+                return vertex.vertexPosition == channel.corner && vertex.heightChannel == channel.channel;
+            });
+
+            if (index == -1 || existingVert != -1) {
+
+                selectedHeight = channel;
+
+                RefreshMeshes();
+                RefeshTileOverlay();
+                return true;
+            }
+
+            if (!didCreateCounterAction) {
+
+                AddTileStateCounterAction();
+
+                didCreateCounterAction = true;
+            }
+
+            var vertex = item.tile.verticies[index];
+            item.tile.verticies[index] = new TileVertex(channel.channel, vertex.vertexPosition);
+
+        }
+
+        return false;
+
+    }
+
+    #endregion
+
     #region Callbacks
 
     public void ShiftTilesHeightUp() {
@@ -466,13 +516,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
         if (!HasSelection) { return; }
 
         // Add to Undo stack
-        Main.counterActions.Add(new MultiTileSaveStateCounterAction(selectedItems, () => {
-
-            RefreshMeshes();
-
-            RefeshTileOverlay();
-
-        }));
+        AddTileStateCounterAction();
 
         foreach (var item in selectedItems) {
 
@@ -509,14 +553,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
         if (!HasSelection) { return; }
 
-        // Add to Undo stack
-        Main.counterActions.Add(new MultiTileSaveStateCounterAction(selectedItems, () => {
-
-            RefreshMeshes();
-
-            RefeshTileOverlay();
-
-        }));
+        AddTileStateCounterAction();
 
         foreach (var item in selectedItems) {
 
@@ -546,6 +583,53 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
         RefreshMeshes();
 
         RefeshTileOverlay();
+
+    }
+
+    #endregion
+
+    #region Counter-Actions
+
+    // Counter-Action methods must be static
+    // This is to avoid memory leaks.
+
+    static void AddSelectionStateCounterAction() {
+
+        Main.counterActions.Add(new SelectionSaveStateCounterAction(((TileEditMode)Main.editMode), () => {
+
+            if (Main.editMode is not TileEditMode) {
+                return;
+            }
+
+            var editMode = (TileEditMode)Main.editMode;
+
+            editMode.ClearAllGameObjects();
+
+            editMode.ReinitExistingSelectedItems();
+
+            editMode.RefreshPreviewOverlay();
+
+        }));
+
+    }
+
+    static void AddTileStateCounterAction() {
+
+        Main.counterActions.Add(new MultiTileSaveStateCounterAction(((TileEditMode)Main.editMode).selectedItems, () => {
+
+            if (Main.editMode is not TileEditMode) {
+                return;
+            }
+
+            var editMode = (TileEditMode)Main.editMode;
+
+            editMode.RefreshMeshes();
+
+            editMode.RefeshTileOverlay();
+
+            editMode.RefreshPreviewOverlay();
+
+        }));
 
     }
 

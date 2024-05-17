@@ -65,7 +65,7 @@ public class Main : MonoBehaviour {
 
     public List<Sprite> bmpTextures = new();
 
-    public EditMode editMode;
+    public static EditMode editMode;
 
     void Start() {
 

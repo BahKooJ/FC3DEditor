@@ -3,6 +3,7 @@ using FCopParser;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static HeightMapEditMode.HeightSelectionSaveStateCounterAction;
 using Object = UnityEngine.Object;
 
 public class HeightMapEditMode : EditMode {
@@ -40,11 +41,7 @@ public class HeightMapEditMode : EditMode {
 
         if (Controls.OnDown("Unselect")) {
 
-            foreach (var height in heightPointObjects) {
-                
-                height.DeSelect();
-
-            }
+            DeselectAllHeights();
 
         } 
 
@@ -63,11 +60,15 @@ public class HeightMapEditMode : EditMode {
         this.main = main;
     }
 
+    #region Selection
+
     public void SelectLevel(TileColumn column, LevelMesh section) {
 
         var isDifferentSection = section != selectedSection;
 
         if (isDifferentSection) {
+
+            AddSectionSelectionSaveStateCounterAction();
 
             foreach (var obj in heightPointObjects) {
                 Object.Destroy(obj.gameObject);
@@ -79,10 +80,15 @@ public class HeightMapEditMode : EditMode {
                 Object.Destroy(selectedSectionOverlay);
             }
 
+            if (section == null) {
+                selectedSection = null;
+                return;
+            }
+
             selectedSectionOverlay = Object.Instantiate(main.SectionBoarders, new Vector3(section.x, 0, -section.y), Quaternion.identity);
 
         }
-        
+
         // Updates the remaining data
         selectedColumn = column;
         selectedSection = section;
@@ -97,14 +103,12 @@ public class HeightMapEditMode : EditMode {
 
             SelectAllInColumn(1);
 
-        } 
-        else if (Controls.IsDown("ModifierChannelSelect2")) {
+        } else if (Controls.IsDown("ModifierChannelSelect2")) {
 
             SelectAllInColumn(2);
 
 
-        }
-        else if (Controls.IsDown("ModifierChannelSelect3")) {
+        } else if (Controls.IsDown("ModifierChannelSelect3")) {
 
             SelectAllInColumn(3);
 
@@ -112,71 +116,13 @@ public class HeightMapEditMode : EditMode {
 
     }
 
-    #region Local Methods
-
-    void TestHeightMapChannelSelection() {
-
-        if (FreeMove.looking) {
-            return;
-        }
-
-        if (!Controls.OnDown("Select") && !Controls.OnDown("Interact")) {
-            return;
-        }
-
-        if (Main.IsMouseOverUI()) {
-            return;
-        }
-
-        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, 8)) {
-
-            foreach (var channel in heightPointObjects) {
-
-                if (hit.colliderInstanceID == channel.boxCollider.GetInstanceID()) {
-
-                    if (Controls.OnDown("RangeSelect")) {
-                        RangeSelect(channel);
-                    }
-                    else if (Controls.OnDown("MultiSelect")) {
-
-                        channel.SelectOrDeSelect();
-
-                        if (channel.isSelected) {
-                            lastSelectedHeightChannel = channel;
-                        }
-                        else {
-                            lastSelectedHeightChannel = null;
-                        }
-
-                    } 
-                    else if (Controls.OnDown("Select")) {
-
-                        channel.Click();
-
-                    }
-
-                    if (Controls.OnDown("Interact")) {
-
-                        channel.ChangeExactHeight();
-
-                    }
-                
-                }
-
-            }
-
-        }
-
-    }
-
     void SelectAllInColumn(int channel) {
-        
+
+        AddHeightSelectionSaveStateCounterAction();
+
         foreach (var height in selectedColumn.heights) {
 
-            var heightobj = heightPointObjects.First( obj => {
+            var heightobj = heightPointObjects.First(obj => {
                 return obj.heightPoints == height && obj.channel == channel;
             });
             heightobj.Select();
@@ -185,20 +131,11 @@ public class HeightMapEditMode : EditMode {
 
     }
 
-    void SelectAllHeightChannelsInSection(int channel) {
-
-        foreach (var heightObj in heightPointObjects) {
-
-            if (heightObj.channel == channel) {
-                heightObj.Select();
-            }
-
-        }
-    }
-
     void RangeSelect(HeightMapChannelPoint heightVertex) {
 
         if (lastSelectedHeightChannel == null) return;
+
+        AddHeightSelectionSaveStateCounterAction();
 
         var firstClickX = lastSelectedHeightChannel.x;
         var firstClickY = lastSelectedHeightChannel.y;
@@ -239,15 +176,188 @@ public class HeightMapEditMode : EditMode {
 
     }
 
+    void SelectAllHeightChannelsInSection(int channel) {
+
+        AddHeightSelectionSaveStateCounterAction();
+
+        foreach (var heightObj in heightPointObjects) {
+
+            if (heightObj.channel == channel) {
+                heightObj.Select();
+            }
+
+        }
+    }
+
+    void TestHeightMapChannelSelection() {
+
+        if (FreeMove.looking) {
+            return;
+        }
+
+        if (!Controls.OnDown("Select") && !Controls.OnDown("Interact")) {
+            return;
+        }
+
+        if (Main.IsMouseOverUI()) {
+            return;
+        }
+
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, 8)) {
+
+            foreach (var channel in heightPointObjects) {
+
+                if (hit.colliderInstanceID == channel.boxCollider.GetInstanceID()) {
+
+                    if (Controls.OnDown("RangeSelect")) {
+                        RangeSelect(channel);
+                    } else if (Controls.OnDown("MultiSelect")) {
+
+                        AddHeightSelectionSaveStateCounterAction();
+
+                        channel.SelectOrDeSelect();
+
+                        if (channel.isSelected) {
+                            lastSelectedHeightChannel = channel;
+                        } else {
+                            lastSelectedHeightChannel = null;
+                        }
+
+                    } else if (Controls.OnDown("Select")) {
+
+                        channel.Click();
+
+                    }
+
+                    if (Controls.OnDown("Interact")) {
+
+                        AddHeightSelectionSaveStateCounterAction();
+
+                        channel.ChangeExactHeight();
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+    #endregion
+
+    #region GameObject Managment
+
+    public void RefreshHeights() {
+
+        foreach (var obj in heightPointObjects) {
+            obj.RefreshHeight();
+        }
+
+    }
+
     void ReinitExistingSelectedItems() {
 
         if (selectedColumn == null) {
             return;
         }
 
+        if (selectedSection == null) {
+            return;
+        }
+
         AddAllHeights();
 
         selectedSectionOverlay = Object.Instantiate(main.SectionBoarders, new Vector3(selectedSection.x, 0, -selectedSection.y), Quaternion.identity);
+
+    }
+
+    void AddAllHeights() {
+
+        foreach (var y in Enumerable.Range(0, 16)) {
+
+            foreach (var x in Enumerable.Range(0, 16)) {
+
+                var itColumn = selectedSection.section.GetTileColumn(x, y);
+
+                AddSingleHeightChannelObject(VertexPosition.TopLeft, 1, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.TopRight, 1, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.BottomLeft, 1, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.BottomRight, 1, itColumn, x, y);
+
+                AddSingleHeightChannelObject(VertexPosition.TopLeft, 2, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.TopRight, 2, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.BottomLeft, 2, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.BottomRight, 2, itColumn, x, y);
+
+                AddSingleHeightChannelObject(VertexPosition.TopLeft, 3, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.TopRight, 3, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.BottomLeft, 3, itColumn, x, y);
+                AddSingleHeightChannelObject(VertexPosition.BottomRight, 3, itColumn, x, y);
+
+
+            }
+
+        }
+
+    }
+
+    void AddSingleHeightChannelObject(VertexPosition corner, int channel, TileColumn column, int x, int y) {
+
+        var existingHeightChannel = heightPointObjects.Find(obj => {
+            return obj.heightPoints == column.heights[(int)corner - 1] && obj.channel == channel;
+        });
+
+        if (existingHeightChannel != null) {
+            return;
+        }
+
+        var worldX = selectedSection.x + column.x;
+        var worldY = -(selectedSection.y + column.y);
+
+        switch (corner) {
+            case VertexPosition.TopRight:
+                worldX += 1;
+                break;
+            case VertexPosition.BottomLeft:
+                worldY -= 1;
+                break;
+            case VertexPosition.BottomRight:
+                worldX += 1;
+                worldY -= 1;
+                break;
+            default:
+                break;
+        }
+
+        var pos = new Vector3(worldX, column.heights[(int)corner - 1].GetPoint(channel), worldY);
+
+        var point = Object.Instantiate(main.heightMapChannelPoint, pos, Quaternion.identity);
+        var script = point.GetComponent<HeightMapChannelPoint>();
+        script.x = x;
+        script.y = y;
+        script.heightPoints = column.heights[(int)corner - 1];
+        script.controller = this;
+        script.channel = channel;
+        script.section = selectedSection;
+
+        heightPointObjects.Add(script);
+
+    }
+
+    void DeselectAllHeights() {
+
+        AddHeightSelectionSaveStateCounterAction();
+
+        foreach (var height in heightPointObjects) {
+
+            height.DeSelect();
+
+        }
 
     }
 
@@ -284,29 +394,25 @@ public class HeightMapEditMode : EditMode {
 
     }
 
-    void AddAllHeights() {
+    #endregion
 
-        foreach (var y in Enumerable.Range(0, 16)) {
+    #region Model Mutating
 
-            foreach (var x in Enumerable.Range(0, 16)) {
+    public void SetHeightsWithValue(int value) {
 
-                var itColumn = selectedSection.section.GetTileColumn(x, y);
+        AddHeightMapSaveStateCounterAction();
 
-                AddSingleHeightChannelObject(VertexPosition.TopLeft, 1, itColumn, x, y);
-                AddSingleHeightChannelObject(VertexPosition.TopRight, 1, itColumn, x, y);
-                AddSingleHeightChannelObject(VertexPosition.BottomLeft, 1, itColumn, x, y);
-                AddSingleHeightChannelObject(VertexPosition.BottomRight, 1, itColumn, x, y);
+        foreach (var point in heightPointObjects) {
 
-                AddSingleHeightChannelObject(VertexPosition.TopLeft, 2, itColumn, x, y);
-                AddSingleHeightChannelObject(VertexPosition.TopRight, 2, itColumn, x, y);
-                AddSingleHeightChannelObject(VertexPosition.BottomLeft, 2, itColumn, x, y);
-                AddSingleHeightChannelObject(VertexPosition.BottomRight, 2, itColumn, x, y);
+            if (point.isSelected) {
 
-                AddSingleHeightChannelObject(VertexPosition.TopLeft, 3, itColumn, x, y);
-                AddSingleHeightChannelObject(VertexPosition.TopRight, 3, itColumn, x, y);
-                AddSingleHeightChannelObject(VertexPosition.BottomLeft, 3, itColumn, x, y);
-                AddSingleHeightChannelObject(VertexPosition.BottomRight, 3, itColumn, x, y);
+                point.heightPoints.SetPoint(value, point.channel);
 
+                point.RefreshHeight();
+
+                if (keepHeightsOnTop) {
+                    point.KeepHigherChannelsOnTop();
+                }
 
             }
 
@@ -314,52 +420,9 @@ public class HeightMapEditMode : EditMode {
 
     }
 
-    void AddSingleHeightChannelObject(VertexPosition corner, int channel, TileColumn column, int x, int y) {
-
-        var existingHeightChannel = heightPointObjects.Find(obj => { 
-            return obj.heightPoints == column.heights[(int)corner - 1] && obj.channel == channel;
-        });
-
-        if (existingHeightChannel != null) {
-            return;
-        }
-
-        var worldX = selectedSection.x + column.x;
-        var worldY = -(selectedSection.y + column.y);
-
-        switch (corner) {
-            case VertexPosition.TopRight:
-                worldX += 1;
-                break;
-            case VertexPosition.BottomLeft:
-                worldY -= 1;
-                break;
-            case VertexPosition.BottomRight:
-                worldX += 1;
-                worldY -= 1;
-                break;
-            default:
-                break;
-        }
-
-        var pos = new Vector3(worldX, column.heights[(int)corner - 1].GetPoint(channel), worldY);
-
-        var point = Object.Instantiate(main.heightMapChannelPoint, pos, Quaternion.identity);
-        var script = point.GetComponent<HeightMapChannelPoint>();
-        script.x = x; 
-        script.y = y;
-        script.heightPoints = column.heights[(int)corner - 1];
-        script.controller = this;
-        script.channel = channel;
-        script.section = selectedSection;
-
-        heightPointObjects.Add(script);
-
-    }
-
     #endregion
 
-    #region Public and Callback Methods
+    #region Callbacks
 
     public void MoveAllHeights(float distance) {
 
@@ -380,6 +443,169 @@ public class HeightMapEditMode : EditMode {
             height.DeSelect();
 
         }
+
+    }
+
+    #endregion
+
+    #region Counter-Actions
+
+    public class HeightSelectionSaveStateCounterAction : CounterAction {
+
+        public class HeightPointSaveState {
+
+            public HeightPoints heightPoints;
+            public int channel;
+
+            public HeightPointSaveState(HeightPoints heightPoints, int channel) {
+                this.heightPoints = heightPoints;
+                this.channel = channel;
+            }
+
+        }
+
+        List<HeightPointSaveState> selectedPoints;
+
+        public HeightSelectionSaveStateCounterAction(List<HeightPointSaveState> selectedPoints) {
+
+            this.selectedPoints = new(selectedPoints);
+
+        }
+        
+        public void Action() {
+
+            if (Main.editMode is not HeightMapEditMode) {
+                return;
+            }
+
+            var editMode = (HeightMapEditMode)Main.editMode;
+
+            foreach (var heightObj in editMode.heightPointObjects) {
+
+                var found = false;
+                foreach (var saveState in selectedPoints) {
+
+                    if (saveState.heightPoints == heightObj.heightPoints && saveState.channel == heightObj.channel) {
+
+                        heightObj.Select();
+                        found = true;
+
+                        break;
+
+                    }
+
+                }
+
+                if (!found) {
+                    heightObj.DeSelect();
+                }
+
+            }
+
+        }
+
+    }
+
+    public class SectionSelectionSaveStateCounterAction : CounterAction {
+
+        LevelMesh selectedLevelMesh;
+
+        public SectionSelectionSaveStateCounterAction(LevelMesh selectedLevelMesh) {
+            this.selectedLevelMesh = selectedLevelMesh;
+        }
+
+        public void Action() {
+
+            if (Main.editMode is not HeightMapEditMode) {
+                return;
+            }
+
+            var editMode = (HeightMapEditMode)Main.editMode;
+
+            editMode.SelectLevel(null, selectedLevelMesh);
+
+            // This is here because the methods adds the same counter action
+            Main.counterActions.RemoveAt(Main.counterActions.Count - 1);
+
+        }
+
+    }
+
+    public void AddHeightSelectionSaveStateCounterAction() {
+
+        var total = new List<HeightPointSaveState>();
+
+        foreach (var heightObj in heightPointObjects) {
+
+            if (heightObj.isSelected) {
+                total.Add(new HeightPointSaveState(heightObj.heightPoints, heightObj.channel));
+            }
+
+        }
+
+        Main.counterActions.Add(new HeightSelectionSaveStateCounterAction(new(total)));
+
+    }
+
+    public void AddHeightMapSaveStateCounterActionFromClick(HeightMapChannelPoint point) {
+
+        if (point.isSelected) {
+
+            AddHeightMapSaveStateCounterAction();
+
+        } else {
+
+            Main.counterActions.Add(new HeightMapSaveStateCounterAction(point.heightPoints, () => {
+
+                if (Main.editMode is not HeightMapEditMode) {
+                    return;
+                }
+
+                var editMode = (HeightMapEditMode)Main.editMode;
+
+                editMode.RefreshHeights();
+
+                HeightMapEditMode.selectedSection.RefreshMesh();
+
+
+            }));
+
+        }
+
+    }
+
+    public void AddHeightMapSaveStateCounterAction() {
+
+        var affectedHeights = new List<HeightPoints>();
+
+        foreach (var heightObj in heightPointObjects) {
+
+            if (heightObj.isSelected) {
+                affectedHeights.Add(heightObj.heightPoints);
+            }
+
+        }
+
+        Main.counterActions.Add(new MultiHeightMapSaveStateCounterAction(new(affectedHeights), () => {
+
+            if (Main.editMode is not HeightMapEditMode) {
+                return;
+            }
+
+            var editMode = (HeightMapEditMode)Main.editMode;
+
+            editMode.RefreshHeights();
+
+            HeightMapEditMode.selectedSection.RefreshMesh();
+
+
+        }));
+
+    }
+
+    public void AddSectionSelectionSaveStateCounterAction() {
+
+        Main.counterActions.Add(new SectionSelectionSaveStateCounterAction(selectedSection));
 
     }
 

@@ -1,4 +1,5 @@
 ﻿
+using System;
 using UnityEngine;
 
 
@@ -56,6 +57,17 @@ class ToolbarView: MonoBehaviour {
 
     public void SelectHeightMapEditMode() {
 
+        if (Main.editMode == null) {
+
+            Main.counterActions.Add(new ChangeEditModeCounterAction(this, typeof(HeightMapEditMode)));
+
+        }
+        else {
+
+            Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
+
+        }
+
         Destroy(activePanel);
 
         var editMode = new HeightMapEditMode(controller);
@@ -76,6 +88,8 @@ class ToolbarView: MonoBehaviour {
 
     public void SelectTileEditMode() {
 
+        Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
+
         var editMode = new TileEditMode(controller);
 
         Destroy(activePanel);
@@ -95,6 +109,8 @@ class ToolbarView: MonoBehaviour {
 
     public void SelectTileAddMode() {
 
+        Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
+
         var editMode = new TileAddMode(controller);
 
         Destroy(activePanel);
@@ -113,6 +129,8 @@ class ToolbarView: MonoBehaviour {
     }
 
     public void SelectNavMeshEdit() {
+
+        Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new NavMeshEditMode(controller);
 
@@ -136,6 +154,8 @@ class ToolbarView: MonoBehaviour {
 
     public void SelectActorEditMode() {
 
+        Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
+
         var editMode = new ActorEditMode(controller);
 
         Destroy(activePanel);
@@ -155,6 +175,8 @@ class ToolbarView: MonoBehaviour {
     }
 
     public void SelectSectionEditMode() {
+
+        Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new SectionEditMode(controller);
 
@@ -176,6 +198,8 @@ class ToolbarView: MonoBehaviour {
 
     public void SelectTextureEditMode() {
 
+        Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
+
         var editMode = new TextureEditMode(controller);
 
         Destroy(activePanel);
@@ -195,6 +219,8 @@ class ToolbarView: MonoBehaviour {
     }
 
     public void SelectShaderEditMode() {
+
+        Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new ShaderEditMode(controller);
 
@@ -216,11 +242,53 @@ class ToolbarView: MonoBehaviour {
 
     public void SelectPlayMode() {
 
+        Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
+
         var editMode = new PlayMode(controller);
 
         Destroy(activePanel);
 
         controller.ChangeEditMode(editMode);
+
+    }
+
+    public class ChangeEditModeCounterAction : CounterAction {
+
+        Type editModeType;
+        ToolbarView toolbar;
+
+        public ChangeEditModeCounterAction(ToolbarView toolbar, Type type) {
+
+            editModeType = type;
+            this.toolbar = toolbar;
+
+        }
+
+        public void Action() {
+
+            // typeof doesn't work with switch statements soooo...
+            if (editModeType == typeof(HeightMapEditMode)) {
+                toolbar.SelectHeightMapEditMode();
+            } else if (editModeType == typeof(TileEditMode)) {
+                toolbar.SelectTileEditMode();
+            } else if (editModeType == typeof(TileAddMode)) {
+                toolbar.SelectTileAddMode();
+            } else if (editModeType == typeof(TextureEditMode)) {
+                toolbar.SelectTextureEditMode();
+            } else if (editModeType == typeof(ShaderEditMode)) {
+                toolbar.SelectShaderEditMode();
+            } else if (editModeType == typeof(SectionEditMode)) {
+                toolbar.SelectSectionEditMode();
+            } else if (editModeType == typeof(NavMeshEditMode)) {
+                toolbar.SelectNavMeshEdit();
+            } else if (editModeType == typeof(ActorEditMode)) {
+                toolbar.SelectActorEditMode();
+            }
+
+            // This is here because the methods add a counter action
+            Main.counterActions.RemoveAt(Main.counterActions.Count - 1);
+
+        }
 
     }
 

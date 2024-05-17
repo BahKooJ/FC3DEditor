@@ -4,7 +4,10 @@ using FCopParser;
 using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditorInternal;
 
+// WARNING: FOR ADDITIONAL ACTIONS DO NOT REFERENCE ANYTHING IN THE CLASS,
+// THIS WILL CAUSE MEMEORY LEAKS AND DOUBLE EDITMODES!
 public interface CounterAction {
 
     public void Action();
@@ -55,3 +58,83 @@ public class MultiTileSaveStateCounterAction : CounterAction {
     }
 
 }
+
+public class SelectionSaveStateCounterAction : CounterAction {
+
+    HashSet<LevelMesh> selectedSections = new();
+    List<TileSelection> selectedItems = new();
+    Action additionalAction;
+
+    public SelectionSaveStateCounterAction(TileMutatingEditMode editMode, Action additionalAction) {
+
+        this.selectedSections = new(editMode.selectedSections);
+        this.selectedItems = new(editMode.selectedItems);
+        this.additionalAction = additionalAction;
+
+    }
+
+    public void Action() {
+
+        if (Main.editMode is TileMutatingEditMode) {
+
+            var editMode = (TileMutatingEditMode)Main.editMode;
+
+            editMode.selectedItems = this.selectedItems;
+            editMode.selectedSections = this.selectedSections;
+
+            additionalAction();
+
+        }
+        
+    }
+
+}
+
+public class HeightMapSaveStateCounterAction : CounterAction {
+
+    HeightPoints savedHeights;
+    HeightPoints heights;
+    Action additionalAction;
+
+    public HeightMapSaveStateCounterAction(HeightPoints heights, Action additionalAction) {
+
+        savedHeights = heights.Clone();
+        this.heights = heights;
+        this.additionalAction = additionalAction;
+
+    }
+
+    public void Action() {
+
+        heights.ReceiveData(savedHeights);
+        additionalAction();
+
+    }
+
+}
+
+public class MultiHeightMapSaveStateCounterAction : CounterAction {
+
+    List<HeightMapSaveStateCounterAction> saveStateHeights = new();
+    Action additionalAction;
+
+    public MultiHeightMapSaveStateCounterAction(List<HeightPoints> multiHeights, Action additionalAction) {
+
+        foreach (var heights in multiHeights) {
+            saveStateHeights.Add(new HeightMapSaveStateCounterAction(heights, () => { }));
+        }
+
+        this.additionalAction = additionalAction;
+    }
+
+    public void Action() {
+
+        foreach (var state in saveStateHeights) {
+            state.Action();
+        }
+
+        additionalAction();
+    }
+
+}
+

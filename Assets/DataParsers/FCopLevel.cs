@@ -1302,6 +1302,20 @@ namespace FCopParser {
 
         }
 
+        public HeightPoints Clone() {
+
+            return new HeightPoints(height1, height2, height3);
+
+        }
+
+        public void ReceiveData(HeightPoints heights) {
+
+            height1 = heights.height1;
+            height2 = heights.height2;
+            height3 = heights.height3;
+
+        }
+
     }
 
     // Columns form form left to right
