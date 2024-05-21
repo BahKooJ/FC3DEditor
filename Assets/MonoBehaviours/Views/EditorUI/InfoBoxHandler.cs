@@ -32,6 +32,15 @@ public class InfoBoxHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     }
 
+    public void OnDisable() {
+
+        if (infoBox != null) {
+            Destroy(infoBox);
+            infoBox = null;
+        }
+
+    }
+
     public void OnDestroy() {
 
         if (infoBox != null) {

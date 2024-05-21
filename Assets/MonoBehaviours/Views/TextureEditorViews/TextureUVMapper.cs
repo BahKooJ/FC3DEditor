@@ -135,6 +135,12 @@ public class TextureUVMapper : MonoBehaviour {
 
     }
 
+    void OnDestroy() {
+
+        transparentMapper.GarbageCollectDrawCounterActions();
+
+    }
+
     public bool IsCursorInTexturePallete() {
 
         Vector2 pointOnPallete = Vector2.zero;
@@ -264,6 +270,8 @@ public class TextureUVMapper : MonoBehaviour {
     void EditTransparency() {
 
         if (editTransparency) {
+
+            transparentMapper.GarbageCollectDrawCounterActions();
 
             editTransparency = false;
 
@@ -424,7 +432,7 @@ public class TextureUVMapper : MonoBehaviour {
         textureLines.ReInit();
     }
 
-    // --Event Handlers--
+    #region Unity Event Handlers
 
     public void CloseWindow() {
         controller.RefreshMeshes();
@@ -437,6 +445,8 @@ public class TextureUVMapper : MonoBehaviour {
             InitTexturePallette();
             return;
         }
+
+        TextureEditMode.AddTileStateCounterAction();
 
         controller.ChangeTexturePallette(texturePaletteDropdown.GetComponent<TMP_Dropdown>().value);
 
@@ -452,6 +462,8 @@ public class TextureUVMapper : MonoBehaviour {
     }
 
     public void OnClickRotateClockwise() {
+
+        TextureEditMode.AddTileStateCounterAction();
 
         List<Vector2> oldPoints = new();
 
@@ -491,6 +503,8 @@ public class TextureUVMapper : MonoBehaviour {
     // This is misnamed
     public void OnFlipTextureCoordsVertically() {
 
+        TextureEditMode.AddTileStateCounterAction();
+
         var minX = textureLines.points.Min(obj => {
             return obj.transform.localPosition.x;
         });
@@ -527,6 +541,8 @@ public class TextureUVMapper : MonoBehaviour {
     // Same with this
     public void OnFlipTextureCoordsHorizontally() {
 
+        TextureEditMode.AddTileStateCounterAction();
+
         var minY = textureLines.points.Min(obj => {
             return obj.transform.localPosition.y;
         });
@@ -562,6 +578,8 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void OnClickFlipUVOrderVertically() {
 
+        TextureEditMode.AddTileStateCounterAction();
+
         List<Vector2> oldPoints = new();
 
         foreach (var point in textureLines.points) {
@@ -591,6 +609,8 @@ public class TextureUVMapper : MonoBehaviour {
     }
 
     public void OnClickFlipUVOrderHorizontally() {
+
+        TextureEditMode.AddTileStateCounterAction();
 
         List<Vector2> oldPoints = new();
 
@@ -631,6 +651,8 @@ public class TextureUVMapper : MonoBehaviour {
             return;
         }
 
+        TextureEditMode.AddTileStateCounterAction();
+
         var secondPoint = textureLines.points[1].transform.localPosition;
         var thirdPoint = textureLines.points[2].transform.localPosition;
 
@@ -640,6 +662,8 @@ public class TextureUVMapper : MonoBehaviour {
     }
 
     public void OnClickRotateCounterClockwise() {
+
+        TextureEditMode.AddTileStateCounterAction();
 
         List<Vector2> oldPoints = new();
 
@@ -694,9 +718,6 @@ public class TextureUVMapper : MonoBehaviour {
             return true;
 
         });
-
-
-        
 
     }
 
@@ -837,6 +858,8 @@ public class TextureUVMapper : MonoBehaviour {
 
         var refreshRequired = false;
 
+        TextureEditMode.AddTileStateCounterAction();
+
         switch ((TextureType)textureTypeDropDown.value) {
 
             case TextureType.Static:
@@ -911,6 +934,10 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void OnChangeVectorXSlider() {
 
+        if (Input.GetMouseButtonDown(0)) {
+            controller.AddVectorAnimationCounterAction();
+        }
+
         var value = (int)xVectorSlider.value;
 
         controller.FirstItem.section.section.animationVector.x = value;
@@ -925,6 +952,10 @@ public class TextureUVMapper : MonoBehaviour {
     }
 
     public void OnChangeVectorYSlider() {
+
+        if (Input.GetMouseButtonDown(0)) {
+            controller.AddVectorAnimationCounterAction();
+        }
 
         var value = (int)yVectorSlider.value;
 
@@ -941,6 +972,8 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void OnClickAddFrame() {
 
+        TextureEditMode.AddTileStateCounterAction();
+
         var tile = controller.FirstTile;
         var currentUVs = tile.animatedUVs.GetRange(frameSelected * 4, 4);
         tile.animatedUVs.AddRange(currentUVs);
@@ -950,6 +983,8 @@ public class TextureUVMapper : MonoBehaviour {
     }
 
     public void OnClickRemoveFrame() {
+
+        TextureEditMode.AddTileStateCounterAction();
 
         var tile = controller.FirstTile;
 
@@ -965,6 +1000,8 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void OnChangeAnimationSpeedSlide() {
 
+        TextureEditMode.AddTileStateCounterAction();
+
         var tile = controller.FirstTile;
 
         tile.animationSpeed = (int)frameAnimationSpeedSlider.value;
@@ -972,6 +1009,8 @@ public class TextureUVMapper : MonoBehaviour {
         frameAnimationSpeedText.text = tile.animationSpeed.ToString();
 
     }
+
+    #endregion
 
     enum TextureType {
         Static = 0,

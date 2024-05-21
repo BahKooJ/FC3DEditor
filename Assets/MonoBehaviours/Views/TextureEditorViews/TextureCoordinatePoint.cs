@@ -202,6 +202,7 @@ class TextureCoordinatePoint : MonoBehaviour {
     public void MouseDown() {
 
         if (Input.GetMouseButton(0)) {
+            TextureEditMode.AddTileStateCounterAction();
             drag = true;
         }
 

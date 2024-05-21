@@ -121,6 +121,12 @@ public class Main : MonoBehaviour {
 
     public void Undo() {
 
+        // This is here because if mouse 0 is held down it most likely means something is being modified.
+        // If so it wants to wait for the action to be done before allowing undoing.
+        if (Input.GetMouseButton(0)) {
+            return;
+        }
+
         if (counterActions.Count > 0) {
             counterActions.Last().Action();
             counterActions.RemoveAt(counterActions.Count - 1);

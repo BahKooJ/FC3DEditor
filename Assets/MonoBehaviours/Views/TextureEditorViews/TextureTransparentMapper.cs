@@ -2,6 +2,7 @@
 
 using FCopParser;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -79,6 +80,10 @@ public class TextureTransparentMapper : MonoBehaviour {
             drawingCursor.anchoredPosition = offsetPoint;
         } else {
             drawingCursor.anchoredPosition = pointOnPallete;
+        }
+
+        if (Input.GetMouseButtonDown(0)) {
+            AddDrawCounterAction();
         }
 
         if (Input.GetMouseButton(0)) {
@@ -211,6 +216,46 @@ public class TextureTransparentMapper : MonoBehaviour {
     public void OnClickShowRGBButton() {
 
 
+
+    }
+
+    public class TransparencyDrawCounterAction : CounterAction {
+
+        Texture2D savedTextureState;
+        Texture2D originalTexture;
+
+        public TransparencyDrawCounterAction(Texture2D originalTexture) {
+
+            this.originalTexture = originalTexture;
+
+            savedTextureState = new Texture2D(originalTexture.width, originalTexture.height);
+            savedTextureState.SetPixels(originalTexture.GetPixels());
+            savedTextureState.Apply();
+
+        }
+
+        public void Action() {
+
+            originalTexture.SetPixels(savedTextureState.GetPixels());
+            originalTexture.Apply();
+
+        }
+
+    }
+
+    void AddDrawCounterAction() {
+        Main.counterActions.Add(new TransparencyDrawCounterAction(transparentMap.texture));
+    }
+
+    public void GarbageCollectDrawCounterActions() {
+
+        foreach (var counterAction in new List<CounterAction>(Main.counterActions)) {
+
+            if (counterAction is TransparencyDrawCounterAction) {
+                Main.counterActions.Remove(counterAction);
+            }
+
+        }
 
     }
 

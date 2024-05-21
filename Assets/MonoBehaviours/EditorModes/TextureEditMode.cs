@@ -71,7 +71,11 @@ public class TextureEditMode : TileMutatingEditMode {
     
     }
 
+    #region Selection
+
     void SelectLevelItems(TileSelection selection) {
+
+        AddSelectionStateCounterAction();
 
         // If shift is held then multiple tiles can be selected
         if (!Controls.IsDown("MultiSelect")) {
@@ -104,8 +108,7 @@ public class TextureEditMode : TileMutatingEditMode {
 
             }
 
-        }
-        else {
+        } else {
 
             MakeSelection(selection);
 
@@ -113,8 +116,7 @@ public class TextureEditMode : TileMutatingEditMode {
 
                 if (view.activeTextureUVMapper != null) {
                     view.activeTextureUVMapper.GetComponent<TextureUVMapper>().RefreshView();
-                }
-                else {
+                } else {
 
                     if (openUVMapperByDefault) {
                         view.OpenUVMapper();
@@ -130,29 +132,6 @@ public class TextureEditMode : TileMutatingEditMode {
 
         RefeshTileOverlay();
         RefreshMeshes();
-
-    }
-
-    void PreviewSelection(TileSelection selection) {
-
-        if (previewSelectionOverlay != null) {
-
-            if (previewSelectionOverlay.tile == selection.tile) {
-                return;
-            }
-
-            ClearPreviewOverlay();
-
-        }
-
-        var overlay = Object.Instantiate(main.TileTexturePreview);
-        var script = overlay.GetComponent<TileTexturePreview>();
-        script.controller = main;
-        script.tile = selection.tile;
-        script.section = selection.section.section;
-        previewSelectionOverlay = script;
-        overlay.transform.SetParent(selection.section.transform);
-        overlay.transform.localPosition = Vector3.zero;
 
     }
 
@@ -176,8 +155,7 @@ public class TextureEditMode : TileMutatingEditMode {
 
             }
 
-        }
-        else {
+        } else {
 
             selectedItems.Add(selection);
             selectedSections.Add(selection.section);
@@ -206,6 +184,8 @@ public class TextureEditMode : TileMutatingEditMode {
 
         if (selectedItems.Count <= 1) { return; }
 
+        AddSelectionStateCounterAction();
+
         var last = selectedItems.Last();
 
         selectedItems.Clear();
@@ -220,6 +200,10 @@ public class TextureEditMode : TileMutatingEditMode {
 
     void ClearAllSelectedItems() {
 
+        if (selectedItems.Count != 0) {
+            AddSelectionStateCounterAction();
+        }
+
         RefreshMeshes();
 
         selectedItems.Clear();
@@ -227,6 +211,33 @@ public class TextureEditMode : TileMutatingEditMode {
         ClearTileOverlays();
         ClearSectionOverlays();
         ClearPreviewOverlay();
+
+    }
+
+    #endregion
+
+    #region GameObject Management
+
+    void PreviewSelection(TileSelection selection) {
+
+        if (previewSelectionOverlay != null) {
+
+            if (previewSelectionOverlay.tile == selection.tile) {
+                return;
+            }
+
+            ClearPreviewOverlay();
+
+        }
+
+        var overlay = Object.Instantiate(main.TileTexturePreview);
+        var script = overlay.GetComponent<TileTexturePreview>();
+        script.controller = main;
+        script.tile = selection.tile;
+        script.section = selection.section.section;
+        previewSelectionOverlay = script;
+        overlay.transform.SetParent(selection.section.transform);
+        overlay.transform.localPosition = Vector3.zero;
 
     }
 
@@ -310,13 +321,24 @@ public class TextureEditMode : TileMutatingEditMode {
 
     }
 
-    public void RefreshUVMapper() {
+    void ClearAllGameObjects() {
 
-        if (view.activeTextureUVMapper != null) {
-            view.activeTextureUVMapper.GetComponent<TextureUVMapper>().RefreshView();
-        }
+        ClearTileOverlays();
+        ClearSectionOverlays();
+        ClearPreviewOverlay();
 
     }
+
+    void ReInitGameObjects() {
+
+        RefeshTileOverlay();
+        RefreshSectionOverlay();
+
+    }
+
+    #endregion
+
+    #region Model Mutating
 
     public void ChangeTexturePallette(int palletteOffset) {
 
@@ -332,6 +354,10 @@ public class TextureEditMode : TileMutatingEditMode {
 
         if (selectedItems.Count < 2) return;
 
+        if (refresh) {
+            AddTileStateCounterAction();
+        }
+
         foreach (var selection in selectedItems.Skip(1)) {
 
             if (!IsSameShape(selection.tile)) {
@@ -339,11 +365,10 @@ public class TextureEditMode : TileMutatingEditMode {
                 // If orginal tile is 4 uvs and next tile is 3 uvs
                 // If the origianl tile has 3 uvs it can't set them to a tile with 4
                 if (selection.tile.uvs.Count == 3) {
-                    selection.tile.uvs = new List<int>(FirstTile.uvs.GetRange(0,3));
+                    selection.tile.uvs = new List<int>(FirstTile.uvs.GetRange(0, 3));
                 }
 
-            }
-            else {
+            } else {
 
                 selection.tile.uvs = new List<int>(FirstTile.uvs);
                 selection.tile.texturePalette = FirstTile.texturePalette;
@@ -363,6 +388,8 @@ public class TextureEditMode : TileMutatingEditMode {
 
     public void MakeTilesOpaque() {
 
+        AddTileStateCounterAction();
+
         foreach (var selection in selectedItems) {
             selection.tile.isSemiTransparent = false;
         }
@@ -373,6 +400,8 @@ public class TextureEditMode : TileMutatingEditMode {
 
     public void MakeTilesTransparent() {
 
+        AddTileStateCounterAction();
+
         foreach (var selection in selectedItems) {
             selection.tile.isSemiTransparent = true;
         }
@@ -381,7 +410,17 @@ public class TextureEditMode : TileMutatingEditMode {
 
     }
 
-    // UV Presets
+    #endregion
+
+    #region View Management
+
+    public void RefreshUVMapper() {
+
+        if (view.activeTextureUVMapper != null) {
+            view.activeTextureUVMapper.GetComponent<TextureUVMapper>().RefreshView();
+        }
+
+    }
 
     public bool AddPreset() {
 
@@ -397,13 +436,13 @@ public class TextureEditMode : TileMutatingEditMode {
         }
 
         var uvPreset = new UVPreset(
-            firstTile.uvs, 
-            firstTile.texturePalette, 
-            "", 
+            firstTile.uvs,
+            firstTile.texturePalette,
+            "",
             (int)potentialID,
             firstTile.isSemiTransparent,
             firstTile.isVectorAnimated,
-            firstTile.animationSpeed, 
+            firstTile.animationSpeed,
             firstTile.animatedUVs
             );
 
@@ -418,5 +457,87 @@ public class TextureEditMode : TileMutatingEditMode {
         currentUVPresets.subFolders.Add(new UVPresets("", currentUVPresets));
 
     }
+
+    #endregion
+
+    #region Counter-Actions
+
+    public class VectorAnimationCounterAction : CounterAction {
+
+        List<LevelMesh> modifiedSections;
+        int saveX;
+        int saveY;
+
+        public VectorAnimationCounterAction(HashSet<LevelMesh> modifiedSections, int saveX, int saveY) {
+            this.modifiedSections = modifiedSections.ToList();
+            this.saveX = saveX;
+            this.saveY = saveY;
+        }
+
+        public void Action() {
+
+            if (Main.editMode is not TextureEditMode) {
+                return;
+            }
+
+            foreach (var modifiedSection in modifiedSections) {
+
+                modifiedSection.section.animationVector.x = saveX;
+                modifiedSection.section.animationVector.y = saveY;
+
+            }
+
+            var editMode = (TextureEditMode)Main.editMode;
+
+            editMode.RefreshMeshes();
+            editMode.RefreshTileOverlayTexture();
+            editMode.RefreshUVMapper();
+
+        }
+
+    }
+
+    public void AddVectorAnimationCounterAction() {
+        Main.counterActions.Add(new VectorAnimationCounterAction(selectedSections, FirstItem.section.section.animationVector.x, FirstItem.section.section.animationVector.y));
+    }
+
+    public static void AddTileStateCounterAction() {
+
+        Main.counterActions.Add(new MultiTileSaveStateCounterAction(((TextureEditMode)Main.editMode).selectedItems, () => {
+
+            if (Main.editMode is not TextureEditMode) {
+                return;
+            }
+
+            var editMode = (TextureEditMode)Main.editMode;
+
+            editMode.RefreshMeshes();
+            editMode.RefreshTileOverlayTexture();
+            editMode.RefreshUVMapper();
+
+        }));
+
+    }
+
+    static void AddSelectionStateCounterAction() {
+
+        Main.counterActions.Add(new SelectionSaveStateCounterAction(((TextureEditMode)Main.editMode), () => {
+
+            if (Main.editMode is not TextureEditMode) {
+                return;
+            }
+
+            var editMode = (TextureEditMode)Main.editMode;
+
+            editMode.ClearAllGameObjects();
+            editMode.ReInitGameObjects();
+            editMode.RefreshUVMapper();
+
+        }));
+
+    }
+
+
+    #endregion
 
 }

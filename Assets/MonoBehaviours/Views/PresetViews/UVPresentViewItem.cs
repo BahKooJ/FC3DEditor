@@ -239,7 +239,14 @@ public class UVPresentViewItem : MonoBehaviour {
 
     }
 
+    // This should really be in the edit mode
     public void OnClick() {
+
+        if (controller.selectedItems.Count == 0) {
+            return;
+        }
+
+        TextureEditMode.AddTileStateCounterAction();
 
         foreach (var selection in controller.selectedItems) {
 
