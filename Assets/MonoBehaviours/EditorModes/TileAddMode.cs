@@ -242,7 +242,7 @@ public class TileAddMode : EditMode {
 
         var tile = preset.Create(true, hoverSelection.column);
 
-        Main.counterActions.Add(new AddTileCounterAction(tile, hoverSelection.column, hoverSelection.section));
+        Main.AddCounterAction(new AddTileCounterAction(tile, hoverSelection.column, hoverSelection.section));
 
         hoverSelection.column.tiles.Add(tile);
 

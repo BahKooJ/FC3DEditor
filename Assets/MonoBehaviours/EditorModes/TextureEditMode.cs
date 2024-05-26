@@ -498,12 +498,12 @@ public class TextureEditMode : TileMutatingEditMode {
     }
 
     public void AddVectorAnimationCounterAction() {
-        Main.counterActions.Add(new VectorAnimationCounterAction(selectedSections, FirstItem.section.section.animationVector.x, FirstItem.section.section.animationVector.y));
+        Main.AddCounterAction(new VectorAnimationCounterAction(selectedSections, FirstItem.section.section.animationVector.x, FirstItem.section.section.animationVector.y));
     }
 
     public static void AddTileStateCounterAction() {
 
-        Main.counterActions.Add(new MultiTileSaveStateCounterAction(((TextureEditMode)Main.editMode).selectedItems, () => {
+        Main.AddCounterAction(new MultiTileSaveStateCounterAction(((TextureEditMode)Main.editMode).selectedItems, () => {
 
             if (Main.editMode is not TextureEditMode) {
                 return;
@@ -521,7 +521,7 @@ public class TextureEditMode : TileMutatingEditMode {
 
     static void AddSelectionStateCounterAction() {
 
-        Main.counterActions.Add(new SelectionSaveStateCounterAction(((TextureEditMode)Main.editMode), () => {
+        Main.AddCounterAction(new SelectionSaveStateCounterAction(((TextureEditMode)Main.editMode), () => {
 
             if (Main.editMode is not TextureEditMode) {
                 return;

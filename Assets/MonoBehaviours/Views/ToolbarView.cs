@@ -59,12 +59,12 @@ class ToolbarView: MonoBehaviour {
 
         if (Main.editMode == null) {
 
-            Main.counterActions.Add(new ChangeEditModeCounterAction(this, typeof(HeightMapEditMode)));
+            Main.AddCounterAction(new ChangeEditModeCounterAction(this, typeof(HeightMapEditMode)));
 
         }
         else {
 
-            Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
+            Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         }
 
@@ -88,7 +88,7 @@ class ToolbarView: MonoBehaviour {
 
     public void SelectTileEditMode() {
 
-        Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
+        Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new TileEditMode(controller);
 
@@ -109,7 +109,7 @@ class ToolbarView: MonoBehaviour {
 
     public void SelectTileAddMode() {
 
-        Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
+        Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new TileAddMode(controller);
 
@@ -130,7 +130,7 @@ class ToolbarView: MonoBehaviour {
 
     public void SelectNavMeshEdit() {
 
-        Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
+        Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new NavMeshEditMode(controller);
 
@@ -154,7 +154,7 @@ class ToolbarView: MonoBehaviour {
 
     public void SelectActorEditMode() {
 
-        Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
+        Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new ActorEditMode(controller);
 
@@ -176,7 +176,7 @@ class ToolbarView: MonoBehaviour {
 
     public void SelectSectionEditMode() {
 
-        Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
+        Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new SectionEditMode(controller);
 
@@ -198,7 +198,7 @@ class ToolbarView: MonoBehaviour {
 
     public void SelectTextureEditMode() {
 
-        Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
+        Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new TextureEditMode(controller);
 
@@ -220,7 +220,7 @@ class ToolbarView: MonoBehaviour {
 
     public void SelectShaderEditMode() {
 
-        Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
+        Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new ShaderEditMode(controller);
 
@@ -242,7 +242,7 @@ class ToolbarView: MonoBehaviour {
 
     public void SelectPlayMode() {
 
-        Main.counterActions.Add(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
+        Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new PlayMode(controller);
 
@@ -286,7 +286,7 @@ class ToolbarView: MonoBehaviour {
             }
 
             // This is here because the methods add a counter action
-            Main.counterActions.RemoveAt(Main.counterActions.Count - 1);
+            Main.PopCounterAction();
 
         }
 

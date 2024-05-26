@@ -662,13 +662,13 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     void AddRemoveTileCounterAction(List<TileSelection> removedItems) {
 
-        Main.counterActions.Add(new MultiRemoveTileCounterAction(removedItems));
+        Main.AddCounterAction(new MultiRemoveTileCounterAction(removedItems));
 
     }
 
     static void AddSelectionStateCounterAction() {
 
-        Main.counterActions.Add(new SelectionSaveStateCounterAction(((TileEditMode)Main.editMode), () => {
+        Main.AddCounterAction(new SelectionSaveStateCounterAction(((TileEditMode)Main.editMode), () => {
 
             if (Main.editMode is not TileEditMode) {
                 return;
@@ -688,7 +688,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     static void AddTileStateCounterAction() {
 
-        Main.counterActions.Add(new MultiTileSaveStateCounterAction(((TileEditMode)Main.editMode).selectedItems, () => {
+        Main.AddCounterAction(new MultiTileSaveStateCounterAction(((TileEditMode)Main.editMode).selectedItems, () => {
 
             if (Main.editMode is not TileEditMode) {
                 return;

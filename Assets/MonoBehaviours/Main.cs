@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using static TextureTransparentMapper;
 
 public class Main : MonoBehaviour {
 
@@ -16,6 +17,39 @@ public class Main : MonoBehaviour {
 
     // Undos
     public static List<CounterAction> counterActions = new();
+    public static bool counterActionAddedOnCurrentSelectHold = false;
+
+    public static void AddCounterAction(CounterAction counterAction) {
+        
+        if (counterActionAddedOnCurrentSelectHold) {
+            return;
+        }
+
+        if (Controls.IsDown("Undo")) {
+            return;
+        }
+
+        counterActionAddedOnCurrentSelectHold = Input.GetMouseButton(0) || Controls.IsDown("Select");
+
+        counterActions.Add(counterAction);
+
+    }
+
+    public static void PopCounterAction() {
+        counterActions.RemoveAt(counterActions.Count - 1);
+    }
+
+    public static void GarbageCollectCounterActions(Type type) {
+
+        foreach (var counterAction in new List<CounterAction>(counterActions)) {
+
+            if (counterAction.GetType() == type) {
+                counterActions.Remove(counterAction);
+            }
+
+        }
+
+    }
 
     public static bool IsMouseOverUI() {
 
@@ -116,6 +150,9 @@ public class Main : MonoBehaviour {
         if (Controls.OnDown("Undo")) {
             Undo();
         }
+        if (!(Controls.IsDown("Select") && Input.GetMouseButton(0))) {
+            counterActionAddedOnCurrentSelectHold = false;
+        }
 
     }
 
@@ -129,7 +166,15 @@ public class Main : MonoBehaviour {
 
         if (counterActions.Count > 0) {
             counterActions.Last().Action();
-            counterActions.RemoveAt(counterActions.Count - 1);
+
+            // Some counter actions account for them double adding counter actions.
+            // Sinse the method also tests to make sure undo isn't pressed before adding a counter actions-
+            // problems can arise.
+            if (counterActions.Count > 0) {
+                counterActions.RemoveAt(counterActions.Count - 1);
+
+            }
+
         }
 
     }

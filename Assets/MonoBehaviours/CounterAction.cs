@@ -3,6 +3,7 @@
 using FCopParser;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEditorInternal;
 
@@ -17,7 +18,7 @@ public interface CounterAction {
 public class TileSaveStateCounterAction : CounterAction {
 
     Tile saveStateTile;
-    Tile tile;
+    public Tile tile;
     Action additionalAction;
 
     public TileSaveStateCounterAction(Tile tile, Action additionalAction) {
@@ -134,6 +135,60 @@ public class MultiHeightMapSaveStateCounterAction : CounterAction {
         }
 
         additionalAction();
+    }
+
+}
+
+public class NonSelectiveMultiTileSaveStateCounterAction : CounterAction {
+
+    HashSet<LevelMesh> levelMeshes = new HashSet<LevelMesh>();
+    List<TileSaveStateCounterAction> saveStateTiles = new();
+    Action additionalAction;
+
+    public NonSelectiveMultiTileSaveStateCounterAction(List<TileSelection> items, Action additionalAction) {
+
+        foreach (var item in items) {
+            saveStateTiles.Add(new TileSaveStateCounterAction(item.tile, () => { }));
+            levelMeshes.Add(item.section);
+        }
+
+        this.additionalAction = additionalAction;
+    }
+
+    public NonSelectiveMultiTileSaveStateCounterAction(TileSelection item, Action additionalAction) {
+
+        saveStateTiles.Add(new TileSaveStateCounterAction(item.tile, () => { }));
+        levelMeshes.Add(item.section);
+
+
+        this.additionalAction = additionalAction;
+
+    }
+
+    public void Action() {
+
+        foreach (var state in saveStateTiles) {
+            state.Action();
+        }
+
+        foreach (var mesh in levelMeshes) {
+            mesh.RefreshMesh();
+        }
+
+        additionalAction();
+    }
+
+    public void AddTileSaveState(TileSelection item) {
+
+        var doesExist = saveStateTiles.FirstOrDefault(itItem => { return itItem.tile == item.tile; });
+
+        if (doesExist == null) {
+
+            saveStateTiles.Add(new TileSaveStateCounterAction(item.tile, () => { }));
+            levelMeshes.Add(item.section);
+
+        }
+
     }
 
 }

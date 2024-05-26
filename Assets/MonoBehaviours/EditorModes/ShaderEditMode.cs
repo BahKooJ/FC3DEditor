@@ -34,69 +34,6 @@ public class ShaderEditMode : TileMutatingEditMode {
         this.main = main;
     }
 
-    public void StartPainting() {
-
-        painting = !painting;
-
-        if (!painting) {
-            ClearVertexColors();
-        }
-
-    }
-
-    public void ChangeClickToggle() {
-
-        applyColorsOnClick = !applyColorsOnClick;
-
-        foreach (var vertex in vertexColorPoints) {
-            vertex.Deselect();
-        }
-
-    }
-
-    public void ApplyColorsToVertexColorCorners() {
-
-        if (applyColorsOnClick) {
-            return;
-        }
-
-        if (painting) {
-            return;
-        }
-
-        foreach (var colorPoint in vertexColorPoints) {
-
-            if (colorPoint.isSelected) {
-                colorPoint.ChangeValue();
-            }
-
-        }
-        RefreshTileOverlayShader();
-
-    }
-
-    public void ApplySolidMonoToTile() {
-
-        foreach (var item in selectedItems) {
-
-            var tile = item.tile;
-
-            if (tile.shaders.type != colorPicker.colorType) {
-                tile.ChangeShader(colorPicker.colorType);
-            }
-
-            var shaderSolid = (MonoChromeShader)tile.shaders;
-
-            shaderSolid.value = colorPicker.solidMonoByteValue;
-
-            shaderSolid.Apply();
-
-        }
-
-        RefreshTileOverlayShader();
-
-    }
-
     override public void Update() {
 
         var testForSelection = true;
@@ -106,13 +43,12 @@ public class ShaderEditMode : TileMutatingEditMode {
         if (colorPicker != null) {
 
             if (colorPicker.colorType == VertexColorType.MonoChrome) {
-                
+
                 var didMonoHit = TestSolidMonoTileSelection();
 
                 testForSelection = !didMonoHit;
 
-            }
-            else {
+            } else {
 
                 var didHitCorner = TestVertexColorCornerSelection();
 
@@ -122,22 +58,20 @@ public class ShaderEditMode : TileMutatingEditMode {
 
                     if (hover == null) {
                         ClearVertexColors();
-                    }
-                    else {
+                    } else {
 
                         if (vertexColorPoints.Count == 0) {
                             ClearVertexColors();
                             InitPaintVertexColorCorners(hover);
                             previousPaintTile = hover.tile;
-                        }
-                        else if (previousPaintTile != hover.tile) {
+                        } else if (previousPaintTile != hover.tile) {
                             ClearVertexColors();
                             InitPaintVertexColorCorners(hover);
                             previousPaintTile = hover.tile;
                         }
 
                     }
-                
+
                 }
 
             }
@@ -151,26 +85,22 @@ public class ShaderEditMode : TileMutatingEditMode {
             if (painting) {
                 if (FreeMove.looking && Controls.OnDown("Select")) {
                     SelectLevelItems(hover);
-                }
-                else if (Controls.OnDown("SelectWhilePainting")) {
+                } else if (Controls.OnDown("SelectWhilePainting")) {
                     SelectLevelItems(hover);
                 }
-            }
-            else {
+            } else {
 
                 if (Controls.OnDown("Select")) {
                     SelectLevelItems(hover);
-                }
-                else {
-                    
+                } else {
+
                     PreviewSelection(hover);
 
                 }
 
             }
 
-        }
-        else if (previewSelectionOverlay != null) {
+        } else if (previewSelectionOverlay != null) {
 
             ClearPreviewOverlay();
 
@@ -204,7 +134,11 @@ public class ShaderEditMode : TileMutatingEditMode {
         ClearAllSelectedItems();
     }
 
+    #region Selection
+
     public void SelectLevelItems(TileSelection selection) {
+
+        AddSelectionStateCounterAction();
 
         // If shift is held then multiple tiles can be selected
         if (!Controls.IsDown("MultiSelect")) {
@@ -224,18 +158,13 @@ public class ShaderEditMode : TileMutatingEditMode {
 
             }
 
-        }
-        else {
+        } else {
 
             MakeSelection(selection);
 
         }
 
-        ClearSectionOverlays();
-
-        foreach (var iSection in selectedSections) {
-            selectedSectionOverlays.Add(Object.Instantiate(main.SectionBoarders, new Vector3(iSection.x, 0, -iSection.y), Quaternion.identity));
-        }
+        RefreshSectionOverlay();
 
         if (colorPicker != null && !applyColorsOnClick && !painting && HasSelection) {
 
@@ -256,6 +185,31 @@ public class ShaderEditMode : TileMutatingEditMode {
 
         RefeshTileOverlay();
         selection.section.RefreshMesh();
+
+    }
+
+    override public void MakeSelection(TileSelection selection, bool deSelectDuplicate = true) {
+
+        if (IsTileAlreadySelected(selection.tile)) {
+
+            if (deSelectDuplicate) {
+                RemoveTile(selection.tile);
+                RefeshTileOverlay();
+
+                if (!HasSelection) {
+
+                    ClearAllSelectedItems();
+
+                }
+
+            }
+
+        } else {
+
+            selectedItems.Add(selection);
+            selectedSections.Add(selection.section);
+
+        }
 
     }
 
@@ -282,220 +236,9 @@ public class ShaderEditMode : TileMutatingEditMode {
 
     }
 
-    override public void MakeSelection(TileSelection selection, bool deSelectDuplicate = true) {
-
-        if (IsTileAlreadySelected(selection.tile)) {
-
-            if (deSelectDuplicate) {
-                RemoveTile(selection.tile);
-                RefeshTileOverlay();
-
-                if (!HasSelection) {
-
-                    ClearAllSelectedItems();
-
-                }
-
-            }
-
-        }
-        else {
-
-            selectedItems.Add(selection);
-            selectedSections.Add(selection.section);
-
-        }
-
-    }
-
-    void OverrideWhite() {
-
-        if (!ShaderColorPickerView.overrideWhite) {
-            return;
-        }
-
-        foreach (var point in vertexColorPoints) {
-
-            point.OverrideWhite();
-
-        }
-
-    }
-
-    bool TestVertexColorCornerSelection() {
-
-        if (FreeMove.looking) {
-            return false;
-        }
-
-        if (vertexColorPoints.Count == 0) {
-            return false;
-        }
-
-        if (!Controls.OnDown("Select") && !Controls.OnDown("Interact") && !painting) {
-            return false;
-        }
-
-        var didHit = false;
-
-        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        var hits = Physics.RaycastAll(ray, Mathf.Infinity, 8);
-
-        foreach (var hit in hits) {
-
-            foreach (var vertex in vertexColorPoints) {
-
-                if (hit.colliderInstanceID == vertex.boxCollider.GetInstanceID()) {
-
-                    didHit = true;
-
-                    if (painting) {
-
-                        if (Controls.IsDown("Select")) {
-
-                            if (HasSelection) {
-
-                                var index = selectedItems.FindIndex(item => {
-                                    return item.tile == vertex.selectedItem.tile;
-                                });
-
-                                if (index != -1) {
-
-                                    vertex.ChangeValue();
-
-                                    OverrideWhite();
-
-                                    RefreshTileOverlayShader();
-
-
-                                }
-
-                            } else {
-
-                                vertex.ChangeValue();
-
-                                OverrideWhite();
-
-                            }
-
-                        }
-
-                        continue;
-
-                    }
-
-                    else if (Controls.OnDown("Select")) {
-
-                        if (applyColorsOnClick) {
-
-                            vertex.ChangeValue();
-
-                            OverrideWhite();
-
-                            RefreshTileOverlayShader();
-                            RefreshVertexColorCorners();
-
-
-                        }
-                        else {
-
-                            if (Controls.IsDown("MultiSelect")) {
-                                vertex.SelectOrDeselect();
-                            }
-                            else {
-
-                                foreach (var vert in vertexColorPoints) {
-                                    vert.Deselect();
-                                }
-
-                                vertex.Select();
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-            }
-
-        }
-
-        return didHit;
-
-    }
-
-    // This is for solid monochrome
-    bool TestSolidMonoTileSelection() {
-
-        if (FreeMove.looking) {
-            return false;
-        }
-
-        var hover = main.GetTileOnLevelMesh();
-
-        void PaintTile() {
-
-            var tile = hover.tile;
-
-            if (tile.shaders.type != colorPicker.colorType) {
-                tile.ChangeShader(colorPicker.colorType);
-            }
-
-            var shaderSolid = (MonoChromeShader)tile.shaders;
-
-            shaderSolid.value = colorPicker.solidMonoByteValue;
-
-            shaderSolid.Apply();
-        }
-
-
-        if (hover == null) {
-            ClearPreviewOverlay();
-            return false;
-        }
-        if (painting) {
-
-            if (Controls.IsDown("Select")) {
-                PaintTile();
-                ClearAllSelectedItems();
-                selectedSections.Add(hover.section);
-                RefreshMeshes();
-                return true;
-            }
-            else {
-                PreviewSelection(hover);
-            }
-
-        }
-        else if (applyColorsOnClick) {
-
-            if (Controls.OnDown("Select")) {
-                PaintTile();
-                SelectLevelItems(hover);
-                RefreshMeshes();
-                return true;
-            }
-
-        }
-        else {
-
-            if (Controls.OnDown("Select")) {
-
-                SelectLevelItems(hover);
-                return true;
-
-            }
-
-        }
-
-        return false;
-
-    }
-
     void ClearAllSelectedItems() {
+
+        AddSelectionStateCounterAction();
 
         RefreshMeshes();
 
@@ -509,6 +252,34 @@ public class ShaderEditMode : TileMutatingEditMode {
 
     }
 
+    #endregion
+
+    #region Tool Management
+
+    public void StartPainting() {
+
+        painting = !painting;
+
+        if (!painting) {
+            ClearVertexColors();
+        }
+
+    }
+
+    public void ChangeClickToggle() {
+
+        applyColorsOnClick = !applyColorsOnClick;
+
+        foreach (var vertex in vertexColorPoints) {
+            vertex.Deselect();
+        }
+
+    }
+
+    #endregion
+
+    #region GameObject Management
+
     void RefeshTileOverlay() {
 
         ClearTileOverlays();
@@ -517,6 +288,16 @@ public class ShaderEditMode : TileMutatingEditMode {
 
             InitTileOverlay(tile);
 
+        }
+
+    }
+
+    void RefreshSectionOverlay() {
+
+        ClearSectionOverlays();
+
+        foreach (var iSection in selectedSections) {
+            selectedSectionOverlays.Add(Object.Instantiate(main.SectionBoarders, new Vector3(iSection.x, 0, -iSection.y), Quaternion.identity));
         }
 
     }
@@ -701,7 +482,6 @@ public class ShaderEditMode : TileMutatingEditMode {
 
     }
 
-
     void ClearSectionOverlays() {
 
         foreach (var selectedSectionOverlay in selectedSectionOverlays) {
@@ -720,9 +500,253 @@ public class ShaderEditMode : TileMutatingEditMode {
 
     }
 
+    #endregion
+
+    #region Model Mutating
+
+    bool TestVertexColorCornerSelection() {
+
+        if (FreeMove.looking) {
+            return false;
+        }
+
+        if (vertexColorPoints.Count == 0) {
+            return false;
+        }
+
+        if (!Controls.OnDown("Select") && !Controls.OnDown("Interact") && !painting) {
+            return false;
+        }
+
+        var didHit = false;
+
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        var hits = Physics.RaycastAll(ray, Mathf.Infinity, 8);
+
+        foreach (var hit in hits) {
+
+            foreach (var vertex in vertexColorPoints) {
+
+                if (hit.colliderInstanceID == vertex.boxCollider.GetInstanceID()) {
+
+                    didHit = true;
+
+                    if (painting) {
+
+                        if (Controls.IsDown("Select")) {
+
+                            if (HasSelection) {
+
+                                var index = selectedItems.FindIndex(item => {
+                                    return item.tile == vertex.selectedItem.tile;
+                                });
+
+                                if (index != -1) {
+
+                                    vertex.ChangeValue();
+
+                                    OverrideWhite();
+
+                                    RefreshTileOverlayShader();
+
+
+                                }
+
+                            } else {
+
+                                vertex.ChangeValue();
+
+                                OverrideWhite();
+
+                            }
+
+                        }
+
+                        continue;
+
+                    } else if (Controls.OnDown("Select")) {
+
+                        if (applyColorsOnClick) {
+
+                            AddTileStateCounterAction();
+
+                            vertex.ChangeValue();
+
+                            OverrideWhite();
+
+                            RefreshTileOverlayShader();
+                            RefreshVertexColorCorners();
+
+
+                        } else {
+
+                            if (Controls.IsDown("MultiSelect")) {
+                                vertex.SelectOrDeselect();
+                            } else {
+
+                                foreach (var vert in vertexColorPoints) {
+                                    vert.Deselect();
+                                }
+
+                                vertex.Select();
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        return didHit;
+
+    }
+
+    // This is for solid monochrome
+    bool TestSolidMonoTileSelection() {
+
+        if (FreeMove.looking) {
+            return false;
+        }
+
+        var hover = main.GetTileOnLevelMesh();
+
+        void PaintTile() {
+
+            var tile = hover.tile;
+
+            if (tile.shaders.type != colorPicker.colorType) {
+                tile.ChangeShader(colorPicker.colorType);
+            }
+
+            var shaderSolid = (MonoChromeShader)tile.shaders;
+
+            shaderSolid.value = colorPicker.solidMonoByteValue;
+
+            shaderSolid.Apply();
+        }
+
+
+        if (hover == null) {
+            ClearPreviewOverlay();
+            return false;
+        }
+        if (painting) {
+
+            if (Controls.IsDown("Select")) {
+                PaintTile();
+                ClearAllSelectedItems();
+                selectedSections.Add(hover.section);
+                RefreshMeshes();
+                return true;
+            } else {
+                PreviewSelection(hover);
+            }
+
+        } else if (applyColorsOnClick) {
+
+            if (Controls.OnDown("Select")) {
+
+                SelectLevelItems(hover);
+
+                AddTileStateCounterAction();
+
+                PaintTile();
+                RefreshMeshes();
+                return true;
+            }
+
+        } else {
+
+            if (Controls.OnDown("Select")) {
+
+                SelectLevelItems(hover);
+                return true;
+
+            }
+
+        }
+
+        return false;
+
+    }
+
+    public void ApplyColorsToVertexColorCorners() {
+
+        if (applyColorsOnClick) {
+            return;
+        }
+
+        if (painting) {
+            return;
+        }
+        
+        // Remember that this method checks for mouse inputs so nothing is mutli-added.
+        AddTileStateCounterAction();
+
+        foreach (var colorPoint in vertexColorPoints) {
+
+            if (colorPoint.isSelected) {
+                colorPoint.ChangeValue();
+            }
+
+        }
+        RefreshTileOverlayShader();
+
+    }
+
+    public void ApplySolidMonoToTile() {
+
+        if (selectedItems.Count > 0) {
+            
+            AddTileStateCounterAction();
+
+        }
+
+        foreach (var item in selectedItems) {
+
+            var tile = item.tile;
+
+            if (tile.shaders.type != colorPicker.colorType) {
+                tile.ChangeShader(colorPicker.colorType);
+            }
+
+            var shaderSolid = (MonoChromeShader)tile.shaders;
+
+            shaderSolid.value = colorPicker.solidMonoByteValue;
+
+            shaderSolid.Apply();
+
+        }
+
+        RefreshTileOverlayShader();
+
+    }
+
+    void OverrideWhite() {
+
+        if (!ShaderColorPickerView.overrideWhite) {
+            return;
+        }
+
+        foreach (var point in vertexColorPoints) {
+
+            point.OverrideWhite();
+
+        }
+
+    }
+
     public void DuplicateTileShader() {
 
         if (selectedItems.Count < 2) return;
+
+        AddTileStateCounterAction();
 
         foreach (var selection in selectedItems.Skip(1)) {
 
@@ -737,6 +761,10 @@ public class ShaderEditMode : TileMutatingEditMode {
 
     }
 
+    #endregion
+
+    #region Presets
+
     public bool AddPreset() {
 
         if (selectedItems.Count == 0) { return false; }
@@ -747,7 +775,7 @@ public class ShaderEditMode : TileMutatingEditMode {
 
         if (potentialID == null) {
             DialogWindowUtil.Dialog("Cannot Save Preset", "Cannot save shader preset, tile mesh is invalid!");
-            return false; 
+            return false;
         }
 
         var shaderPreset = new ShaderPreset(FirstTile.shaders, "", (int)potentialID);
@@ -795,5 +823,79 @@ public class ShaderEditMode : TileMutatingEditMode {
         currentColorPresets.subFolders.Add(new ColorPresets("", currentColorPresets));
 
     }
+
+    #endregion
+
+    #region Counter-Actions
+
+    public static void AddNonSelectiveTileStateOrTileStateCounterAction(TileSelection item) {
+
+        if (Main.counterActionAddedOnCurrentSelectHold) {
+
+            var last = Main.counterActions.Last();
+
+            var tileCounterAction = (NonSelectiveMultiTileSaveStateCounterAction)last;
+
+            tileCounterAction.AddTileSaveState(item);
+
+        }
+        else {
+
+            // No need to refresh meshes as the class already does that.
+            Main.AddCounterAction(new NonSelectiveMultiTileSaveStateCounterAction(item, () => {
+
+                if (Main.editMode is not ShaderEditMode) {
+                    return;
+                }
+
+                var editMode = (ShaderEditMode)Main.editMode;
+
+                editMode.RefeshTileOverlay();
+                editMode.RefreshVertexColors();
+
+            }));
+
+        }
+
+    }
+
+    public static void AddTileStateCounterAction() {
+
+        Main.AddCounterAction(new MultiTileSaveStateCounterAction(((ShaderEditMode)Main.editMode).selectedItems, () => {
+
+            if (Main.editMode is not ShaderEditMode) {
+                return;
+            }
+
+            var editMode = (ShaderEditMode)Main.editMode;
+
+            editMode.RefreshMeshes();
+            editMode.RefeshTileOverlay();
+            editMode.RefreshVertexColors();
+
+        }));
+
+    }
+
+    static void AddSelectionStateCounterAction() {
+
+        Main.AddCounterAction(new SelectionSaveStateCounterAction(((ShaderEditMode)Main.editMode), () => {
+
+            if (Main.editMode is not ShaderEditMode) {
+                return;
+            }
+
+            var editMode = (ShaderEditMode)Main.editMode;
+
+            editMode.RefeshTileOverlay();
+            editMode.RefreshSectionOverlay();
+            editMode.ClearVertexColors();
+            editMode.RefreshVertexColors();
+
+        }));
+
+    }
+
+    #endregion
 
 }

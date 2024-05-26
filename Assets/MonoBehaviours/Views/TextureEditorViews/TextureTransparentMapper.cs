@@ -244,18 +244,12 @@ public class TextureTransparentMapper : MonoBehaviour {
     }
 
     void AddDrawCounterAction() {
-        Main.counterActions.Add(new TransparencyDrawCounterAction(transparentMap.texture));
+        Main.AddCounterAction(new TransparencyDrawCounterAction(transparentMap.texture));
     }
 
     public void GarbageCollectDrawCounterActions() {
 
-        foreach (var counterAction in new List<CounterAction>(Main.counterActions)) {
-
-            if (counterAction is TransparencyDrawCounterAction) {
-                Main.counterActions.Remove(counterAction);
-            }
-
-        }
+        Main.GarbageCollectCounterActions(typeof(TransparencyDrawCounterAction));
 
     }
 

@@ -933,10 +933,8 @@ public class TextureUVMapper : MonoBehaviour {
     }
 
     public void OnChangeVectorXSlider() {
-
-        if (Input.GetMouseButtonDown(0)) {
-            controller.AddVectorAnimationCounterAction();
-        }
+        
+        controller.AddVectorAnimationCounterAction();
 
         var value = (int)xVectorSlider.value;
 
@@ -952,10 +950,8 @@ public class TextureUVMapper : MonoBehaviour {
     }
 
     public void OnChangeVectorYSlider() {
-
-        if (Input.GetMouseButtonDown(0)) {
-            controller.AddVectorAnimationCounterAction();
-        }
+        
+        controller.AddVectorAnimationCounterAction();
 
         var value = (int)yVectorSlider.value;
 

@@ -525,7 +525,7 @@ public class HeightMapEditMode : EditMode {
             editMode.SelectLevel(null, selectedLevelMesh);
 
             // This is here because the methods adds the same counter action
-            Main.counterActions.RemoveAt(Main.counterActions.Count - 1);
+            Main.PopCounterAction();
 
         }
 
@@ -543,7 +543,7 @@ public class HeightMapEditMode : EditMode {
 
         }
 
-        Main.counterActions.Add(new HeightSelectionSaveStateCounterAction(new(total)));
+        Main.AddCounterAction(new HeightSelectionSaveStateCounterAction(new(total)));
 
     }
 
@@ -555,7 +555,7 @@ public class HeightMapEditMode : EditMode {
 
         } else {
 
-            Main.counterActions.Add(new HeightMapSaveStateCounterAction(point.heightPoints, () => {
+            Main.AddCounterAction(new HeightMapSaveStateCounterAction(point.heightPoints, () => {
 
                 if (Main.editMode is not HeightMapEditMode) {
                     return;
@@ -586,7 +586,7 @@ public class HeightMapEditMode : EditMode {
 
         }
 
-        Main.counterActions.Add(new MultiHeightMapSaveStateCounterAction(new(affectedHeights), () => {
+        Main.AddCounterAction(new MultiHeightMapSaveStateCounterAction(new(affectedHeights), () => {
 
             if (Main.editMode is not HeightMapEditMode) {
                 return;
@@ -605,7 +605,7 @@ public class HeightMapEditMode : EditMode {
 
     public void AddSectionSelectionSaveStateCounterAction() {
 
-        Main.counterActions.Add(new SectionSelectionSaveStateCounterAction(selectedSection));
+        Main.AddCounterAction(new SectionSelectionSaveStateCounterAction(selectedSection));
 
     }
 
