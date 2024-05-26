@@ -326,6 +326,10 @@ namespace FCopParser {
 
         }
 
+        FCopLevelSection() {
+            
+        }
+
         public HeightPoints GetHeightPoint(int x, int y) {
             return heightMap[(y * heightMapWdith) + x];
         }
@@ -1152,6 +1156,16 @@ namespace FCopParser {
                 colors.Add(new XRGB555(newColor.x, newColor.r, newColor.g, newColor.b));
 
             }
+
+        }
+
+        public FCopLevelSection Clone() {
+
+            var clone = new FCopLevelSection();
+
+            clone.Overwrite(this);
+
+            return clone;
 
         }
 

@@ -118,6 +118,7 @@ public class SectionEditMode : EditMode {
         DialogWindowUtil.Dialog("Warning", "This will overwrite all current map data, are you sure you want to continue?", () => {
 
             if (selectedSection != null && copySection != null) {
+                AddSectionSaveStateCounterAction();
                 selectedSection.section.Overwrite(copySection);
                 selectedSection.RefreshMesh();
             }
@@ -134,6 +135,7 @@ public class SectionEditMode : EditMode {
             () => {
 
                 if (selectedSection != null) {
+                    AddSectionSaveStateCounterAction();
                     selectedSection.section.MirrorVertically();
                     selectedSection.RefreshMesh();
                 }
@@ -151,6 +153,7 @@ public class SectionEditMode : EditMode {
             () => {
 
                 if (selectedSection != null) {
+                    AddSectionSaveStateCounterAction();
                     selectedSection.section.MirrorHorizontally();
                     selectedSection.RefreshMesh();
                 }
@@ -168,6 +171,7 @@ public class SectionEditMode : EditMode {
             () => {
 
                 if (selectedSection != null) {
+                    AddSectionSaveStateCounterAction();
                     selectedSection.section.MirrorDiagonally();
                     selectedSection.RefreshMesh();
                 }
@@ -186,6 +190,8 @@ public class SectionEditMode : EditMode {
 
         if (selectedSection != null) {
 
+                AddSectionSaveStateCounterAction();
+
                 foreach (var column in selectedSection.section.tileColumns) {
 
                     foreach (var tile in column.tiles) {
@@ -201,6 +207,12 @@ public class SectionEditMode : EditMode {
 
         });
 
+
+    }
+
+    void AddSectionSaveStateCounterAction() {
+
+        Main.AddCounterAction(new SectionSaveStateCounterAction(selectedSection));
 
     }
 

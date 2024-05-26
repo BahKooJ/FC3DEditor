@@ -193,3 +193,24 @@ public class NonSelectiveMultiTileSaveStateCounterAction : CounterAction {
 
 }
 
+public class SectionSaveStateCounterAction : CounterAction {
+
+    FCopLevelSection sectionSaveState;
+    LevelMesh section;
+
+    public SectionSaveStateCounterAction(LevelMesh section) {
+
+        sectionSaveState = section.section.Clone();
+        this.section = section;
+
+    }
+
+    public void Action() {
+
+        section.section.Overwrite(sectionSaveState);
+
+        section.RefreshMesh();
+
+    }
+
+}
