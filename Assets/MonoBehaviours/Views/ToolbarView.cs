@@ -285,9 +285,6 @@ class ToolbarView: MonoBehaviour {
                 toolbar.SelectActorEditMode();
             }
 
-            // This is here because the methods add a counter action
-            Main.PopCounterAction();
-
         }
 
     }
