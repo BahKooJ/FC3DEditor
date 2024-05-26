@@ -19,9 +19,9 @@ public class Main : MonoBehaviour {
     public static List<CounterAction> counterActions = new();
     public static bool counterActionAddedOnCurrentSelectHold = false;
 
-    public static void AddCounterAction(CounterAction counterAction) {
+    public static void AddCounterAction(CounterAction counterAction, bool ignoreSelectionCheck = false) {
         
-        if (counterActionAddedOnCurrentSelectHold) {
+        if (counterActionAddedOnCurrentSelectHold && !ignoreSelectionCheck) {
             return;
         }
 

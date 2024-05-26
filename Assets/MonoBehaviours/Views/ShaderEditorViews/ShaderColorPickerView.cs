@@ -402,6 +402,8 @@ public class ShaderColorPickerView : MonoBehaviour {
 
         if (!ShaderEditMode.applyColorsOnClick && controller.HasSelection) {
 
+            ShaderEditMode.AddTileStateCounterAction();
+
             var tile = controller.FirstTile;
 
             tile.ChangeShader((VertexColorType)shaderTypeDropdown.value);

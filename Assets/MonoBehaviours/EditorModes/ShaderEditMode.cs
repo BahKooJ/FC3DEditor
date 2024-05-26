@@ -544,9 +544,11 @@ public class ShaderEditMode : TileMutatingEditMode {
 
                                 if (index != -1) {
 
+                                    AddNonSelectiveTileStateOrTileStateCounterAction(vertex.selectedItem);
+
                                     vertex.ChangeValue();
 
-                                    OverrideWhite();
+                                    OverrideWhite(vertex.selectedItem);
 
                                     RefreshTileOverlayShader();
 
@@ -555,9 +557,11 @@ public class ShaderEditMode : TileMutatingEditMode {
 
                             } else {
 
+                                AddNonSelectiveTileStateOrTileStateCounterAction(vertex.selectedItem);
+
                                 vertex.ChangeValue();
 
-                                OverrideWhite();
+                                OverrideWhite(vertex.selectedItem);
 
                             }
 
@@ -573,7 +577,7 @@ public class ShaderEditMode : TileMutatingEditMode {
 
                             vertex.ChangeValue();
 
-                            OverrideWhite();
+                            OverrideWhite(vertex.selectedItem);
 
                             RefreshTileOverlayShader();
                             RefreshVertexColorCorners();
@@ -639,6 +643,9 @@ public class ShaderEditMode : TileMutatingEditMode {
         if (painting) {
 
             if (Controls.IsDown("Select")) {
+
+                AddNonSelectiveTileStateOrTileStateCounterAction(hover);
+
                 PaintTile();
                 ClearAllSelectedItems();
                 selectedSections.Add(hover.section);
@@ -654,7 +661,7 @@ public class ShaderEditMode : TileMutatingEditMode {
 
                 SelectLevelItems(hover);
 
-                AddTileStateCounterAction();
+                AddTileStateCounterAction(true);
 
                 PaintTile();
                 RefreshMeshes();
@@ -728,7 +735,7 @@ public class ShaderEditMode : TileMutatingEditMode {
 
     }
 
-    void OverrideWhite() {
+    void OverrideWhite(TileSelection selection) {
 
         if (!ShaderColorPickerView.overrideWhite) {
             return;
@@ -736,7 +743,9 @@ public class ShaderEditMode : TileMutatingEditMode {
 
         foreach (var point in vertexColorPoints) {
 
-            point.OverrideWhite();
+            if (point.selectedItem.tile == selection.tile) {
+                point.OverrideWhite();
+            }
 
         }
 
@@ -859,7 +868,7 @@ public class ShaderEditMode : TileMutatingEditMode {
 
     }
 
-    public static void AddTileStateCounterAction() {
+    public static void AddTileStateCounterAction(bool ignoreSelectionCheck = false) {
 
         Main.AddCounterAction(new MultiTileSaveStateCounterAction(((ShaderEditMode)Main.editMode).selectedItems, () => {
 
@@ -873,7 +882,7 @@ public class ShaderEditMode : TileMutatingEditMode {
             editMode.RefeshTileOverlay();
             editMode.RefreshVertexColors();
 
-        }));
+        }), ignoreSelectionCheck);
 
     }
 
