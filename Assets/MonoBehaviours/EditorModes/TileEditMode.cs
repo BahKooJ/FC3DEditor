@@ -1,4 +1,5 @@
 ﻿
+
 using FCopParser;
 using System;
 using System.Collections.Generic;
@@ -127,6 +128,8 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
             MakeSelection(selection);
 
         }
+
+        view.RefreshTileEffectsPanel();
 
         ClearSectionOverlays();
 
@@ -515,6 +518,21 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
+    public void ChangeTileEffectIndex(int index) {
+
+        foreach (var item in selectedItems) {
+            item.tile.effectIndex = index;
+        }
+
+    }
+
+    public void ChaneTileEffect(int channel, int value) {
+
+        foreach (var section in selectedSections) {
+            section.section.parser.tileEffects[channel] = (byte)value;
+        }
+
+    }
 
     #endregion
 

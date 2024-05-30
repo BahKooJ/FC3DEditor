@@ -45,6 +45,7 @@ namespace FCopParser {
         // Sect
         public List<HeightPoint3> heightPoints = new();
         public LevelCulling culling;
+        public List<byte> tileEffects;
         public List<ThirdSectionBitfield> thirdSectionBitfields = new();
         public List<byte> animationVector = new();
         public List<TileBitfield> tiles = new();
@@ -74,6 +75,8 @@ namespace FCopParser {
             ParseHeightPoints();
 
             culling = new LevelCulling(rawFile.data.GetRange(renderDistanceOffset, rednerDistanceLength));
+
+            tileEffects = rawFile.data.GetRange(specialTileTypeOffset, 4);
 
             tileCount = Utils.BytesToShort(rawFile.data.ToArray(), tileCountOffset);
 
@@ -220,9 +223,7 @@ namespace FCopParser {
 
             CompileHeights();
 
-            compiledFile.AddRange(
-                rawFile.data.GetRange(specialTileTypeOffset, 4)
-                );
+            compiledFile.AddRange(tileEffects);
 
             compiledFile.AddRange(culling.Compile());
 
