@@ -1,19 +1,25 @@
 ﻿
 using FCopParser;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SelectedTileOverlay : MonoBehaviour {
 
     public Main controller;
 
     public Tile tile;
+    public FCopLevelSection section;
+
+    public TileEffectType? effectType = null;
 
     Mesh mesh;
     Material material;
 
     List<Vector3> vertices = new();
     List<int> triangles = new();
+    List<Vector2> textureCords = new();
 
     void Start() {
 
@@ -21,18 +27,7 @@ public class SelectedTileOverlay : MonoBehaviour {
         GetComponent<MeshFilter>().mesh = mesh;
         material = GetComponent<MeshRenderer>().material;
 
-        if (MeshType.IDFromVerticies(tile.verticies) == null) {
-            material.color = Color.red;
-        } else {
-            material.color = new Color(0.0f, 0.4f, 0.0f);
-        }
-
-        Generate();
-
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
-
-        mesh.RecalculateNormals();
+        Refresh();
 
     }
 
@@ -46,16 +41,47 @@ public class SelectedTileOverlay : MonoBehaviour {
         vertices.Clear();
         triangles.Clear();
 
+        if (section != null) {
+
+            var doesCaseExist = Enum.IsDefined(typeof(TileEffectType), (int)section.tileEffects[tile.effectIndex]);
+
+            if (doesCaseExist) {
+
+                var effectType = (TileEffectType)section.tileEffects[tile.effectIndex];
+
+                if (effectType != TileEffectType.Normal) {
+                    this.effectType = effectType;
+                }
+
+            } else {
+
+                effectType = TileEffectType.Other;
+
+            }
+
+        }
+
         if (MeshType.IDFromVerticies(tile.verticies) == null) {
             material.color = Color.red;
         } else {
-            material.color = new Color(0.0f, 0.4f, 0.0f);
+
+            if (effectType != null) {
+                material.mainTexture = controller.tileEffectTexture;
+                material.color = Color.white;
+            } else {
+                material.color = new Color(0.0f, 0.4f, 0.0f);
+            }
+
         }
 
         Generate();
 
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
+
+        if (effectType != null) {
+            mesh.uv = textureCords.ToArray();
+        }
 
         mesh.RecalculateNormals();
 
@@ -109,6 +135,12 @@ public class SelectedTileOverlay : MonoBehaviour {
         void GenerateSquare(Tile tile) {
 
             AddVerticies(tile);
+
+            textureCords.Add(new Vector2(0f, 0f));
+            textureCords.Add(new Vector2(1f, 0f));
+            textureCords.Add(new Vector2(0f, 1f));
+            textureCords.Add(new Vector2(1f, 1f));
+
 
             triangles.Add(vertexIndex);
             triangles.Add(vertexIndex + 2);

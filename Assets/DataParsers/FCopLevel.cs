@@ -267,6 +267,7 @@ namespace FCopParser {
         public List<TileColumn> tileColumns = new List<TileColumn>();
         List<XRGB555> colors = new List<XRGB555>();
         public AnimationVector animationVector;
+        public List<byte> tileEffects;
 
         public LevelCulling culling;
 
@@ -280,6 +281,7 @@ namespace FCopParser {
             this.culling = parser.culling;
 
             animationVector = new AnimationVector(parser.animationVector);
+            tileEffects = parser.tileEffects;
 
             foreach (var parsePoint in parser.heightPoints) {
                 heightMap.Add(new HeightPoints(parsePoint));
@@ -2191,6 +2193,43 @@ namespace FCopParser {
         BottomRight = 4
     }
 
+    public enum TileEffectType {
 
+        Normal = 0,
+        Liquid = 1,
+        InstantKill = 2,
+        Slipper0 = 3,
+        Slipper1 = 4,
+        Slipper2 = 5,
+        Damage_Both_Medium = 6,
+        Damage_Both_High = 7,
+        Damage_Walker_Medium_Hover_Low = 8,
+        Damage_Walker_High_Hover_Medium  = 9,
+        Damage_Walker_Instant_Hover_Low = 10,
+        Damage_Walker_Instant_Hover_Medium = 11,
+        Damage_Walker_Low_Hover_None = 12,
+        Damage_Walker_Medium_Hover_None = 13,
+        Damage_Red = 14,
+        Damage_Blue = 15,
+        Move_PosX_Medium = 32,
+        Move_PosX_High = 33,
+        Move_NegX_Medium = 34,
+        Move_NegX_High = 35,
+        Move_PosY_Medium = 36,
+        Move_PosY_High = 37,
+        Move_NegY_Medium = 38,
+        Move_NegY_High = 39,
+        Move_PosX_Low = 40,
+        Move_NegX_Low = 41,
+        Move_PosY_Low = 42,
+        Move_NegY_Low = 43,
+        Dupe_Move_PosX_Low = 44,
+        Dupe_Move_NegX_Low = 45,
+        Dupe_Move_PosY_Low = 46,
+        Dupe_Move_NegY_Low = 47,
+        No_Collision = 64,
+        Other = 255
+
+    }
 
 }

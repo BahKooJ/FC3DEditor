@@ -31,7 +31,7 @@ public class TileEffectsView : MonoBehaviour {
 
             item.UnCheck();
 
-            item.dropdown.value = controller.FirstItem.section.section.parser.tileEffects[item.channel];
+            item.SetDropdown(controller.FirstItem.section.section.parser.tileEffects[item.channel]);
 
         }
 

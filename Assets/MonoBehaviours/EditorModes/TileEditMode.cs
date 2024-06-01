@@ -129,6 +129,10 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
         }
 
+        if (!HasSelection) {
+            return;
+        }
+
         view.RefreshTileEffectsPanel();
 
         ClearSectionOverlays();
@@ -188,6 +192,8 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
                 if (!HasSelection) {
 
                     ClearAllSelectedItems();
+
+                    view.CloseTileEffectsPanel();
 
                 }
 
@@ -285,6 +291,8 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
         ClearPreviewOverlay();
 
+        view.CloseTileEffectsPanel();
+
     }
 
     #endregion
@@ -316,6 +324,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
         var script = overlay.GetComponent<SelectedTileOverlay>();
         script.controller = main;
         script.tile = tile.tile;
+        script.section = tile.section.section;
         selectedTileOverlays.Add(script);
         overlay.transform.SetParent(tile.section.transform);
         overlay.transform.localPosition = Vector3.zero;

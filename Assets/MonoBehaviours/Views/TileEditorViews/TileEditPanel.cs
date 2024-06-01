@@ -22,8 +22,7 @@ public class TileEditPanel : MonoBehaviour {
     void Update() {
 
         if (Input.GetKeyDown(KeyCode.Alpha0)) {
-            //OnClickSaveSchematic();
-            OpenTileEffectsPanel();
+            OnClickSaveSchematic();
         }
 
     }
@@ -44,6 +43,10 @@ public class TileEditPanel : MonoBehaviour {
 
         CloseTileEffectsPanel();
 
+        if (!controller.HasSelection) {
+            return;
+        }
+
         var obj = Instantiate(tileEffectsView);
         obj.transform.SetParent(transform.parent, false);
         activeTileEffectsView = obj.GetComponent<TileEffectsView>();
@@ -51,7 +54,7 @@ public class TileEditPanel : MonoBehaviour {
 
     }
 
-    void CloseTileEffectsPanel() {
+    public void CloseTileEffectsPanel() {
 
         if (activeTileEffectsView != null) {
 
@@ -72,6 +75,17 @@ public class TileEditPanel : MonoBehaviour {
     public void OnClickShiftHeightDownButton() {
 
         controller.ShiftTilesHeightDown();
+
+    }
+
+    public void OnClickOpenTileEffectWindowButton() {
+
+        if (activeTileEffectsView != null) {
+            CloseTileEffectsPanel();
+        }
+        else {
+            OpenTileEffectsPanel();
+        }
 
     }
 

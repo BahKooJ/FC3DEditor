@@ -39,6 +39,10 @@ public class TextureEditView: MonoBehaviour {
 
         }
 
+        if (Main.ignoreAllInputs) {
+            return;
+        }
+
         if (Controls.OnDown("DuplicateTileTextures")) {
             OnClickDuplicateTileTextures();
         }

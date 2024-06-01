@@ -90,6 +90,9 @@ public class Main : MonoBehaviour {
     public GameObject canvas;
     public GameObject mainCamera;
 
+    // -Unity Asset Refs-
+    public Texture2D tileEffectTexture;
+
     IFFParser iffFile;
     public FCopLevel level;
 

@@ -4,8 +4,6 @@ using FCopParser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
-using UnityEditorInternal;
 
 // WARNING: FOR ADDITIONAL ACTIONS DO NOT REFERENCE ANYTHING IN THE CLASS,
 // THIS WILL CAUSE MEMEORY LEAKS AND DOUBLE EDITMODES!

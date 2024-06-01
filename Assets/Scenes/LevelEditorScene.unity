@@ -2332,6 +2332,7 @@ MonoBehaviour:
   boundsPrefab: {fileID: 2168547336867362444, guid: 3bf9d4dd0b8dcba45a785d81b4f85e0b, type: 3}
   canvas: {fileID: 494504592}
   mainCamera: {fileID: 963194225}
+  tileEffectTexture: {fileID: 2800000, guid: ca11707c759caf54ca3cfd588e4f12a9, type: 3}
   sectionMeshes: []
   levelTexturePallet: {fileID: 0}
   bmpTextures: []
