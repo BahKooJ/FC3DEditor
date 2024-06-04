@@ -151,6 +151,50 @@ public abstract class MeshUtils {
 
     }
 
+    // This doesn't account for walls... ehh- oh well
+    public static MeshShape GetTileMeshShape(List<TileVertex> tileVertices) {
+
+        if (tileVertices.Count == 4) {
+            return MeshShape.Quad;
+        }
+
+        var positions = new List<VertexPosition>();
+
+        foreach (var vert in tileVertices) {
+            positions.Add(vert.vertexPosition);
+        }
+
+        if (!positions.Contains(VertexPosition.BottomRight)) {
+            return MeshShape.TopLeftTriangle;
+        }
+
+        if (!positions.Contains(VertexPosition.BottomLeft)) {
+            return MeshShape.TopRightTriangle;
+        }
+
+        if (!positions.Contains(VertexPosition.TopRight)) {
+            return MeshShape.BottomLeftTriangle;
+        }
+
+        if (!positions.Contains(VertexPosition.TopLeft)) {
+            return MeshShape.BottomRightTriangle;
+        }
+
+        return MeshShape.All;
+
+    }
+
+}
+
+public enum MeshShape {
+
+    All,
+    Quad,
+    TopLeftTriangle,
+    TopRightTriangle,
+    BottomLeftTriangle,
+    BottomRightTriangle
+
 }
 
 public class SubMesh {

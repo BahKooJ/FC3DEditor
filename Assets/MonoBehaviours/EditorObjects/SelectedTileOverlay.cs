@@ -124,6 +124,29 @@ public class SelectedTileOverlay : MonoBehaviour {
 
             AddVerticies(tile);
 
+            if (effectType != null) {
+
+                var universalTexture = EditorTextures.tileEffectTextures[(TileEffectType)effectType];
+
+                List<int> uvs = universalTexture.UVsFromtVertices(tile.verticies);
+
+                textureCords.Add(new Vector2(
+                    TextureCoordinate.GetX(uvs[0]),
+                    TextureCoordinate.GetY(uvs[0], 256, 256)
+                ));
+
+                textureCords.Add(new Vector2(
+                    TextureCoordinate.GetX(uvs[2]),
+                    TextureCoordinate.GetY(uvs[2], 256, 256)
+                ));
+
+                textureCords.Add(new Vector2(
+                    TextureCoordinate.GetX(uvs[1]),
+                    TextureCoordinate.GetY(uvs[1], 256, 256)
+                ));
+
+            }
+
             triangles.Add(vertexIndex);
             triangles.Add(vertexIndex + 1);
             triangles.Add(vertexIndex + 2);
@@ -136,11 +159,33 @@ public class SelectedTileOverlay : MonoBehaviour {
 
             AddVerticies(tile);
 
-            textureCords.Add(new Vector2(0f, 0f));
-            textureCords.Add(new Vector2(1f, 0f));
-            textureCords.Add(new Vector2(0f, 1f));
-            textureCords.Add(new Vector2(1f, 1f));
+            if (effectType != null) {
 
+                var universalTexture = EditorTextures.tileEffectTextures[(TileEffectType)effectType];
+
+                List<int> uvs = universalTexture.UVsFromtVertices(tile.verticies);
+
+                textureCords.Add(new Vector2(
+                    TextureCoordinate.GetX(uvs[0]),
+                    TextureCoordinate.GetY(uvs[0], 256, 256)
+                ));
+
+                textureCords.Add(new Vector2(
+                    TextureCoordinate.GetX(uvs[1]),
+                    TextureCoordinate.GetY(uvs[1], 256, 256)
+                ));
+
+                textureCords.Add(new Vector2(
+                    TextureCoordinate.GetX(uvs[3]),
+                    TextureCoordinate.GetY(uvs[3], 256, 256)
+                ));
+
+                textureCords.Add(new Vector2(
+                    TextureCoordinate.GetX(uvs[2]),
+                    TextureCoordinate.GetY(uvs[2], 256, 256)
+                ));
+
+            }
 
             triangles.Add(vertexIndex);
             triangles.Add(vertexIndex + 2);

@@ -135,6 +135,7 @@ public class Main : MonoBehaviour {
 
         if (Controls.OnDown("Save")) {
             Compile();
+            counterActions.Clear();
         }
 
         if (Input.GetKeyDown(KeyCode.I)) {

@@ -27,6 +27,11 @@ public class TileEffectsView : MonoBehaviour {
 
         refuseCallbacks = true;
 
+        if (!controller.HasSelection) {
+            controller.view.CloseTileEffectsPanel();
+            return;
+        }
+
         foreach (var item in channelViewItems) {
 
             item.UnCheck();

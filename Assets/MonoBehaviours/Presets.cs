@@ -13,256 +13,248 @@ public abstract class Presets {
     public static ShaderPresets shaderPresets = new ShaderPresets("Shader Presets", null);
     public static ColorPresets colorPresets = new ColorPresets("Color Presets", null);
 
-    public static void ReadFile(string fileName) {
+    static List<char> numbers = new List<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
-        var numbers = new List<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+
+    public static UVPresets ReadUVPresets(string fileName) {
 
         var file = File.ReadAllText(fileName);
 
-        void ReadUVPresets() {
 
-            var startIndex = file.IndexOf(UVPresets.tag);
+        var startIndex = file.IndexOf(UVPresets.tag);
 
-            // This most likely means its the old file format
-            if (startIndex == -1) {
-                uvPresets = UVPresets.ReadFileOld(fileName);
-                return;
+        // This most likely means its the old file format
+        if (startIndex == -1) {
+            return UVPresets.ReadFileOld(fileName);
+        }
+
+        var opened = new List<UVPresets>();
+
+        UVPreset currentUVPreset = null;
+
+        var value = "";
+
+        var isReadingValue = false;
+        var openArray = false;
+        var nextProperty = new List<string> { "NAME", "CBMP", "TRANSPARENT", "VECTOR", "MESH", "UV", "SPEED", "AUV" };
+        var lookingForValue = -1;
+
+        foreach (var i in Enumerable.Range(startIndex, file.Count())) {
+
+            var c = file[i];
+
+            // The only thing the value is really used for is names
+            // If it's ever used for something else this might have problems...
+            if (c == '\"') {
+                isReadingValue = !isReadingValue;
+
+                if (!isReadingValue) {
+
+                    if (currentUVPreset == null) {
+
+                        opened.Last().directoryName = value;
+
+                        value = "";
+
+                    }
+
+
+                }
+
+                // Continue because " is a keyword and can't be used for anything else
+                continue;
             }
 
-            var opened = new List<UVPresets>();
+            // If reading value all it cares is grabing the character
+            if (isReadingValue) {
+                value += c;
+                continue;
+            }
 
-            UVPreset currentUVPreset = null;
+            // If the lookingForValue is equal to the count that means it found everything it needs.
+            if (currentUVPreset != null && nextProperty.Count != lookingForValue) {
 
-            var value = "";
+                // Tells the next checks that an array was just opened.
+                // Continue because of keyword.
+                if (c == '[') {
+                    openArray = true;
+                    continue;
+                } else if (c == ']') {
+                    openArray = false;
+                    continue;
+                }
 
-            var isReadingValue = false;
-            var openArray = false;
-            var nextProperty = new List<string> { "NAME", "CBMP", "TRANSPARENT", "VECTOR", "MESH", "UV", "SPEED", "AUV" };
-            var lookingForValue = -1;
+                switch (nextProperty[lookingForValue]) {
 
-            foreach (var i in Enumerable.Range(startIndex, file.Count())) {
+                    case "NAME":
 
-                var c = file[i];
-
-                // The only thing the value is really used for is names
-                // If it's ever used for something else this might have problems...
-                if (c == '\"') {
-                    isReadingValue = !isReadingValue;
-
-                    if (!isReadingValue) {
-
-                        if (currentUVPreset == null) {
-
-                            opened.Last().directoryName = value;
-
+                        // Because the name is a string if we have data it's most likely the name
+                        if (value != "") {
+                            currentUVPreset.name = value;
                             value = "";
-
+                            lookingForValue++;
                         }
 
 
-                    }
+                        break;
+                    case "CBMP":
 
-                    // Continue because " is a keyword and can't be used for anything else
-                    continue;
-                }
+                        if (c == ',') {
+                            currentUVPreset.texturePalette = Int32.Parse(value);
+                            value = "";
+                            lookingForValue++;
+                        } else if (numbers.Contains(c)) {
+                            value += c;
+                        }
 
-                // If reading value all it cares is grabing the character
-                if (isReadingValue) {
-                    value += c;
-                    continue;
-                }
+                        break;
+                    case "TRANSPARENT":
 
-                // If the lookingForValue is equal to the count that means it found everything it needs.
-                if (currentUVPreset != null && nextProperty.Count != lookingForValue) {
+                        if (c == ',') {
+                            currentUVPreset.isSemiTransparent = value == "1";
+                            value = "";
+                            lookingForValue++;
+                        } else if (numbers.Contains(c)) {
+                            value += c;
+                        }
 
-                    // Tells the next checks that an array was just opened.
-                    // Continue because of keyword.
-                    if (c == '[') {
-                        openArray = true;
-                        continue;
-                    }
-                    else if (c == ']') {
-                        openArray = false;
-                        continue;
-                    }
+                        break;
+                    case "VECTOR":
 
-                    switch (nextProperty[lookingForValue]) {
+                        if (c == ',') {
+                            currentUVPreset.isVectorAnimated = value == "1";
+                            value = "";
+                            lookingForValue++;
+                        } else if (numbers.Contains(c)) {
+                            value += c;
+                        }
 
-                        case "NAME":
+                        break;
+                    case "MESH":
 
-                            // Because the name is a string if we have data it's most likely the name
-                            if (value != "") {
-                                currentUVPreset.name = value;
-                                value = "";
-                                lookingForValue++;
-                            }
+                        if (c == ',') {
+                            currentUVPreset.meshID = Int32.Parse(value);
+                            value = "";
+                            lookingForValue++;
+                        } else if (numbers.Contains(c)) {
+                            value += c;
+                        }
 
+                        break;
+                    case "UV":
 
-                            break;
-                        case "CBMP": 
-
-                            if (c == ',') {
-                                currentUVPreset.texturePalette = Int32.Parse(value);
-                                value = "";
-                                lookingForValue++;
-                            }
-                            else if (numbers.Contains(c)) {
-                                value += c;
-                            }
-
-                            break;
-                        case "TRANSPARENT":
+                        if (openArray) {
 
                             if (c == ',') {
-                                currentUVPreset.isSemiTransparent = value == "1";
-                                value = "";
-                                lookingForValue++;
-                            }
-                            else if (numbers.Contains(c)) {
-                                value += c;
-                            }
-
-                            break;
-                        case "VECTOR":
-
-                            if (c == ',') {
-                                currentUVPreset.isVectorAnimated = value == "1";
-                                value = "";
-                                lookingForValue++;
-                            }
-                            else if (numbers.Contains(c)) {
-                                value += c;
-                            }
-
-                            break;
-                        case "MESH":
-
-                            if (c == ',') {
-                                currentUVPreset.meshID = Int32.Parse(value);
-                                value = "";
-                                lookingForValue++;
-                            }
-                            else if (numbers.Contains(c)) {
-                                value += c;
-                            }
-
-                            break;
-                        case "UV": 
-
-                            if (openArray) {
-
-                                if (c == ',') {
-                                    currentUVPreset.uvs.Add(Int32.Parse(value));
-                                    value = "";
-
-                                }
-                                else if (numbers.Contains(c)) {
-                                    value += c;
-                                }
-
-                            } 
-                            else {
-                                
                                 currentUVPreset.uvs.Add(Int32.Parse(value));
                                 value = "";
-                                lookingForValue++;
 
-                            }
-
-                            break;
-                        case "SPEED":
-
-                            if (c == ',') {
-                                currentUVPreset.animationSpeed = Int32.Parse(value);
-                                value = "";
-                                lookingForValue++;
-                            }
-                            else if (numbers.Contains(c)) {
+                            } else if (numbers.Contains(c)) {
                                 value += c;
                             }
 
-                            break;
-                        case "AUV":
+                        } else {
 
-                            if (openArray) {
+                            currentUVPreset.uvs.Add(Int32.Parse(value));
+                            value = "";
+                            lookingForValue++;
 
-                                if (c == ',') {
-                                    currentUVPreset.animatedUVs.Add(Int32.Parse(value));
-                                    value = "";
+                        }
 
-                                }
-                                else if (numbers.Contains(c)) {
-                                    value += c;
-                                }
+                        break;
+                    case "SPEED":
 
-                            }
-                            else {
+                        if (c == ',') {
+                            currentUVPreset.animationSpeed = Int32.Parse(value);
+                            value = "";
+                            lookingForValue++;
+                        } else if (numbers.Contains(c)) {
+                            value += c;
+                        }
 
+                        break;
+                    case "AUV":
+
+                        if (openArray) {
+
+                            if (c == ',') {
                                 currentUVPreset.animatedUVs.Add(Int32.Parse(value));
                                 value = "";
-                                lookingForValue++;
 
+                            } else if (numbers.Contains(c)) {
+                                value += c;
                             }
 
-                            break;
+                        } else {
 
-                    }
+                            currentUVPreset.animatedUVs.Add(Int32.Parse(value));
+                            value = "";
+                            lookingForValue++;
 
-                }
+                        }
 
-                if (c == '(') {
-
-                    if (currentUVPreset != null) {
-                        throw new TexturePresetsParseException("Cannot open new UV Preset without closing the first");
-                    }
-
-                    currentUVPreset = new UVPreset();
-                    lookingForValue = 0;
-
-                } 
-                else if (c == ')') {
-
-                    opened.Last().presets.Add(currentUVPreset);
-
-                    currentUVPreset = null;
-
-                    lookingForValue = -1;
+                        break;
 
                 }
 
-                // Opens or closes a subfolder.
-                if (c == '{') {
+            }
 
-                    opened.Add(new UVPresets());
+            if (c == '(') {
 
+                if (currentUVPreset != null) {
+                    throw new TexturePresetsParseException("Cannot open new UV Preset without closing the first");
                 }
-                else if (c == '}') {
 
-                    var last = opened.Last();
+                currentUVPreset = new UVPreset();
+                lookingForValue = 0;
 
-                    if (opened.Count() > 1) {
+            } else if (c == ')') {
 
-                        // Needs to add itself to the parent
-                        var beforeLast = opened[opened.Count - 2];
+                opened.Last().presets.Add(currentUVPreset);
 
-                        beforeLast.subFolders.Add(last);
+                currentUVPreset = null;
 
-                        last.parent = beforeLast;
+                lookingForValue = -1;
 
-                        opened.Remove(last);
+            }
 
-                    }
-                    else if (opened.Count() == 1) {
-                        // Finished
-                        uvPresets = opened[0];
-                        return;
-                    }
+            // Opens or closes a subfolder.
+            if (c == '{') {
 
+                opened.Add(new UVPresets());
+
+            } else if (c == '}') {
+
+                var last = opened.Last();
+
+                if (opened.Count() > 1) {
+
+                    // Needs to add itself to the parent
+                    var beforeLast = opened[opened.Count - 2];
+
+                    beforeLast.subFolders.Add(last);
+
+                    last.parent = beforeLast;
+
+                    opened.Remove(last);
+
+                } else if (opened.Count() == 1) {
+                    // Finished
+                    return opened[0];
                 }
 
             }
 
         }
+
+        return null;
+
+    }
+
+    public static void ReadFile(string fileName) {
+
+
+        var file = File.ReadAllText(fileName);
 
         void ReadShaderPresets() {
 
@@ -712,7 +704,7 @@ public abstract class Presets {
 
         }
 
-        ReadUVPresets();
+        uvPresets = ReadUVPresets(fileName);
         ReadShaderPresets();
         ReadColorPresets();
 

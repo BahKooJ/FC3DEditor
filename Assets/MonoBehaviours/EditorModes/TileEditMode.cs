@@ -1,7 +1,6 @@
 ﻿
 
 using FCopParser;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -175,6 +174,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
         var script = overlay.GetComponent<SelectedTileOverlay>();
         script.controller = main;
         script.tile = selection.tile;
+        script.section = selection.section.section;
         previewSelectionOverlay = script;
         overlay.transform.SetParent(selection.section.transform);
         overlay.transform.localPosition = Vector3.zero;
@@ -529,17 +529,25 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     public void ChangeTileEffectIndex(int index) {
 
+        AddTileStateCounterAction();
+
         foreach (var item in selectedItems) {
             item.tile.effectIndex = index;
         }
+
+        RefeshTileOverlay();
 
     }
 
     public void ChaneTileEffect(int channel, int value) {
 
+        AddTileEffectChangeCounterAction(channel);
+
         foreach (var section in selectedSections) {
             section.section.parser.tileEffects[channel] = (byte)value;
         }
+
+        RefeshTileOverlay();
 
     }
 
@@ -629,6 +637,69 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
     // Counter-Action methods must be static
     // This is to avoid memory leaks.
 
+    public class TileEffectChangeCounterAction : CounterAction {
+
+        FCopLevelSection modifiedSection;
+        byte value;
+        int index;
+
+        public TileEffectChangeCounterAction(FCopLevelSection modifiedSection, byte value, int index) {
+            this.modifiedSection = modifiedSection;
+            this.value = value;
+            this.index = index;
+        }
+
+        public void Action() {
+
+            modifiedSection.tileEffects[index] = value;
+
+        }
+
+    }
+
+    public class MultiTileEffectChangeCounterAction : CounterAction {
+
+        List<TileEffectChangeCounterAction> counterActions = new();
+
+        public MultiTileEffectChangeCounterAction(HashSet<LevelMesh> changedSections, int index) {
+
+            foreach (var sectionMesh in changedSections) {
+
+                counterActions.Add(new TileEffectChangeCounterAction(
+                    sectionMesh.section,
+                    sectionMesh.section.tileEffects[index],
+                    index
+                    ));
+
+            }
+
+        }
+        public void Action() {
+
+            foreach (var counterAction in counterActions) {
+                counterAction.Action();
+            }
+
+            if (Main.editMode is not TileEditMode) {
+                return;
+            }
+
+            var editMode = (TileEditMode)Main.editMode;
+
+            editMode.RefreshMeshes();
+
+            editMode.ClearAllGameObjects();
+
+            editMode.ReinitExistingSelectedItems();
+
+            editMode.RefreshPreviewOverlay();
+
+            editMode.view.RefreshTileEffectsPanel();
+
+        }
+
+    }
+
     public class RemoveTileCounterAction : CounterAction {
 
         Tile removedTile;
@@ -682,8 +753,15 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
             editMode.RefreshPreviewOverlay();
 
+            editMode.view.RefreshTileEffectsPanel();
+
         }
 
+    }
+
+    void AddTileEffectChangeCounterAction(int index) {
+
+        Main.AddCounterAction(new MultiTileEffectChangeCounterAction(selectedSections, index));
 
     }
 
@@ -709,6 +787,8 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
             editMode.RefreshPreviewOverlay();
 
+            editMode.view.RefreshTileEffectsPanel();
+
         }));
 
     }
@@ -728,6 +808,8 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
             editMode.RefeshTileOverlay();
 
             editMode.RefreshPreviewOverlay();
+
+            editMode.view.RefreshTileEffectsPanel();
 
         }));
 

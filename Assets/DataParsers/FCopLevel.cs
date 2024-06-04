@@ -1521,7 +1521,14 @@ namespace FCopParser {
             this.column = column;
             verticies = MeshType.VerticiesFromID(meshID);
             this.culling = culling;
-            this.uvs = new() { 57200, 57228, 50060, 50032 };
+
+            if (verticies.Count == 4) {
+                this.uvs = new() { 57200, 57228, 50060, 50032 };
+            }
+            else {
+                this.uvs = new() { 57200, 57228, 50060 };
+            }
+
             this.texturePalette = 6;
 
             isVectorAnimated = false;
