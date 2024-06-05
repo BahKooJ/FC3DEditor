@@ -32,11 +32,25 @@ public class SchematicMesh : MonoBehaviour {
 
     void Update() {
 
-        var pos = controller.main.CursorOnLevelMesh();
+        //var pos = controller.main.CursorOnLevelMesh();
 
-        if (pos != null) {
-            transform.position = (Vector3)pos;
-        }
+        //if (pos != null) {
+        //    transform.position = (Vector3)pos;
+        //}
+
+    }
+
+    public void ForceMake() {
+
+        subMesh = new() {
+            meshRenderer = meshRenderer
+        };
+
+        meshRenderer.material.mainTexture = controller.main.levelTexturePallet;
+
+        meshFilter.mesh = subMesh.mesh;
+
+        RefreshMesh();
 
     }
 

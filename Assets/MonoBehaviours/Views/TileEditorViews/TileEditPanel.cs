@@ -93,7 +93,9 @@ public class TileEditPanel : MonoBehaviour {
 
         var foo = new Schematic(controller.selectedItems);
 
-        TileAddMode.selectedSchematic = foo;
+        Presets.levelSchematics.Add(foo);
+
+        //TileAddMode.selectedSchematic = foo;
 
     }
 

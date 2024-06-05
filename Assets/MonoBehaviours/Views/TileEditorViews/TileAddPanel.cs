@@ -11,10 +11,11 @@ public class TileAddPanel : MonoBehaviour {
 
     public TileAddMode controller;
 
-    // Prefabs
+    // - Prefabs -
     public GameObject tilePresetPrefab;
+    public GameObject schematicPanelPrefab;
 
-    // View refs
+    // - View refs -
     public RectTransform presetList;
     public TMP_Dropdown presetCatagory;
 
@@ -73,6 +74,8 @@ public class TileAddPanel : MonoBehaviour {
         }
     };
 
+    public SchematicMeshPresetsView activeSchematicView = null;
+
     void Start() {
 
         var presets = defaultPresets[selectedPresetCatagory];
@@ -91,6 +94,28 @@ public class TileAddPanel : MonoBehaviour {
             image.sprite = Resources.Load<Sprite>(preset.previewImagePath);
 
             presetButton.transform.SetParent(presetList.transform, false);
+
+        }
+
+    }
+
+    public void OpenSchematicsPanel() {
+
+        var obj = Instantiate(schematicPanelPrefab);
+        obj.transform.SetParent(transform.parent, false);
+        activeSchematicView = obj.GetComponent<SchematicMeshPresetsView>();
+        activeSchematicView.controller = controller;
+        activeSchematicView.view = this;
+
+    }
+
+    public void CloseTileEffectsPanel() {
+
+        if (activeSchematicView != null) {
+
+            Destroy(activeSchematicView.gameObject);
+
+            activeSchematicView = null;
 
         }
 
