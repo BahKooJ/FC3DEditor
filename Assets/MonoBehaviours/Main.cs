@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using static TextureTransparentMapper;
+using UnityEngine.SceneManagement;
 
 public class Main : MonoBehaviour {
 
@@ -14,6 +14,7 @@ public class Main : MonoBehaviour {
 
     public static bool ignoreAllInputs = false;
     public static bool debug = false;
+    public bool isEscMenuOpen = false;
 
     // Undos
     public static List<CounterAction> counterActions = new();
@@ -83,14 +84,16 @@ public class Main : MonoBehaviour {
     public GameObject line3d;
     public GameObject axisControl;
 
+    public GameObject escMenuPrefab;
+
     // Temp
     public GameObject boundsPrefab;
 
-    // --View Refs--
+    // - View Refs -
     public GameObject canvas;
     public GameObject mainCamera;
 
-    // -Unity Asset Refs-
+    // - Unity Asset Refs -
     public Texture2D tileEffectTexture;
 
     IFFParser iffFile;
@@ -121,6 +124,8 @@ public class Main : MonoBehaviour {
 
         RenderFullMap();
 
+        ApplySettings();
+
         //RenderSection(3);
 
     }
@@ -128,6 +133,15 @@ public class Main : MonoBehaviour {
     void Update() {
 
         //TestSphereRayOnLevelMesh();
+
+        if (Input.GetKeyDown(KeyCode.Escape) && !isEscMenuOpen) {
+            OpenEscMenu();
+        }
+
+        // If the edit mode is null that most likely means unity is transitioning scenes.
+        if (editMode == null) {
+            return;
+        }
 
         editMode.Update();
 
@@ -138,25 +152,19 @@ public class Main : MonoBehaviour {
             counterActions.Clear();
         }
 
-        if (Input.GetKeyDown(KeyCode.I)) {
-            SettingsManager.showShaders = !SettingsManager.showShaders;
-            RefreshLevel();
-        }
-        if (Input.GetKeyDown(KeyCode.K)) {
-            SettingsManager.showTransparency = !SettingsManager.showTransparency;
-            SettingsManager.clipBlack = !SettingsManager.clipBlack;
-            RefreshLevel();
-        }
-        if (Input.GetKeyDown(KeyCode.L)) {
-            SettingsManager.showAnimations = !SettingsManager.showAnimations;
-            RefreshLevel();
-        }
         if (Controls.OnDown("Undo")) {
             Undo();
         }
         if (!(Controls.IsDown("Select") && Input.GetMouseButton(0))) {
             counterActionAddedOnCurrentSelectHold = false;
         }
+
+    }
+
+    public void ApplySettings() {
+
+        mainCamera.GetComponent<Camera>().fieldOfView = SettingsManager.fov;
+        mainCamera.GetComponentInChildren<Camera>().fieldOfView = SettingsManager.fov;
 
     }
 
@@ -180,6 +188,46 @@ public class Main : MonoBehaviour {
             }
 
         }
+
+    }
+
+    public void OpenEscMenu() {
+
+        var obj = Instantiate(escMenuPrefab);
+        obj.transform.SetParent(canvas.transform, false);
+        var script = obj.GetComponent<EscMenu>();
+        script.main = this;
+
+        isEscMenuOpen = true;
+
+    }
+
+    public void BackToMainMenu() {
+
+        editMode = null;
+
+        FileManagerMain.iffFile = null;
+        FileManagerMain.level = null;
+
+        HeightMapEditMode.selectedColumn = null;
+        HeightMapEditMode.selectedSection = null;
+
+        TileAddMode.selectedTilePreset = null;
+        TileAddMode.selectedSchematic = null;
+
+        TileEditMode.savedSelections = new();
+        TileEditMode.savedSectionSelections = new();
+
+        Presets.uvPresets = new UVPresets("Texture Presets", null);
+        Presets.shaderPresets = new ShaderPresets("Shader Presets", null);
+        Presets.colorPresets = new ColorPresets("Color Presets", null);
+        Presets.levelSchematics = new();
+
+        ignoreAllInputs = false;
+        counterActions.Clear();
+        counterActionAddedOnCurrentSelectHold = false;
+
+        SceneManager.LoadScene("Scenes/FileManagerScene", LoadSceneMode.Single);
 
     }
 

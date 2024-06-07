@@ -9,8 +9,8 @@ using Object = UnityEngine.Object;
 public class TileEditMode : TileMutatingEditMode, EditMode {
 
     // This won't cause a memory leak... right?
-    static List<TileSelection> savedSelections = new();
-    static HashSet<LevelMesh> savedSectionSelections = new();
+    public static List<TileSelection> savedSelections = new();
+    public static HashSet<LevelMesh> savedSectionSelections = new();
 
     override public Main main { get; set; }
     public TileEditPanel view;

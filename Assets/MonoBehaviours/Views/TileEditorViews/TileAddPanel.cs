@@ -101,6 +101,8 @@ public class TileAddPanel : MonoBehaviour {
 
     public void OpenSchematicsPanel() {
 
+        CloseTileEffectsPanel();
+
         var obj = Instantiate(schematicPanelPrefab);
         obj.transform.SetParent(transform.parent, false);
         activeSchematicView = obj.GetComponent<SchematicMeshPresetsView>();

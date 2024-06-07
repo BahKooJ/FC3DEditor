@@ -10,6 +10,8 @@ public class SettingsView : MonoBehaviour {
     public TMP_Dropdown renderTypeDropdown;
     public Slider mouseSensSlider;
     public TMP_InputField mouseSensInput;
+    public Slider fovSlider;
+    public TMP_InputField fovInput;
 
     public FileManagerMain main;
 
@@ -20,6 +22,8 @@ public class SettingsView : MonoBehaviour {
         renderTypeDropdown.value = (int)SettingsManager.renderMode;
         mouseSensSlider.value = SettingsManager.mouseSensitivity;
         mouseSensInput.text = SettingsManager.mouseSensitivity.ToString();
+        fovSlider.value = SettingsManager.fov;
+        fovInput.text = SettingsManager.fov.ToString();
         refuseCallbacks = false;
     }
 
@@ -27,7 +31,11 @@ public class SettingsView : MonoBehaviour {
 
         SettingsManager.SaveToFile();
 
-        main.OpenHome();
+        if (main != null) {
+            main.OpenHome();
+        } else {
+            Destroy(this.gameObject);
+        }
 
     }
 
@@ -67,6 +75,38 @@ public class SettingsView : MonoBehaviour {
         catch {
 
             OnChangeMouseSlider();
+
+        }
+
+    }
+
+    public void OnChangeFOVSlider() {
+
+        if (refuseCallbacks) { return; }
+
+        var sliderValue = fovSlider.value;
+
+        sliderValue = (float)Math.Round(sliderValue, 2);
+
+        SettingsManager.fov = sliderValue;
+        fovInput.text = sliderValue.ToString();
+
+    }
+
+    public void OnFinishFOVType() {
+
+        if (refuseCallbacks) { return; }
+
+        try {
+
+            var value = Single.Parse(fovInput.text);
+
+            SettingsManager.fov = value;
+            fovSlider.value = value;
+
+        } catch {
+
+            OnChangeFOVSlider();
 
         }
 
