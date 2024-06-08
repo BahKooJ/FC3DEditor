@@ -221,6 +221,8 @@ public class ShaderPresetViewItem : MonoBehaviour {
 
     public void OnClick() {
 
+        ShaderEditMode.AddTileStateCounterAction();
+
         foreach (var selection in controller.selectedItems) {
 
             var tile = selection.tile;

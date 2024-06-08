@@ -52,7 +52,7 @@ namespace FCopParser {
 
                 ParseLookUp();
 
-            }
+            } 
             catch {
 
                 var pdat = offsets.First(chunkHeader => {
@@ -429,6 +429,12 @@ namespace FCopParser {
 
             foreach (var pixel in opaqueColors) {
                 colorPaletteData.AddRange(new byte[] { pixel.Item1, pixel.Item2 });
+            }
+
+            while (colorPaletteData.Count < 512) {
+
+                colorPaletteData.AddRange(new byte[] { 0, 0 });
+
             }
 
             ReinitColorPalette();

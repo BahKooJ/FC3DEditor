@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -164,7 +163,10 @@ public class Main : MonoBehaviour {
     public void ApplySettings() {
 
         mainCamera.GetComponent<Camera>().fieldOfView = SettingsManager.fov;
-        mainCamera.GetComponentInChildren<Camera>().fieldOfView = SettingsManager.fov;
+
+        foreach (Transform trans in mainCamera.transform) {
+            trans.GetComponent<Camera>().fieldOfView = SettingsManager.fov;
+        }
 
     }
 
@@ -228,6 +230,8 @@ public class Main : MonoBehaviour {
         counterActionAddedOnCurrentSelectHold = false;
 
         SceneManager.LoadScene("Scenes/FileManagerScene", LoadSceneMode.Single);
+
+        System.GC.Collect();
 
     }
 
