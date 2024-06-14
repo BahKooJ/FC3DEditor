@@ -13,6 +13,35 @@ public class Schematic {
     public List<HeightPoints> heightMap = new List<HeightPoints>();
     public List<TileColumn> tileColumns = new List<TileColumn>();
 
+    public HeightPoints GetHeightPoint(int x, int y) {
+        return heightMap[(y * (width + 1)) + x];
+    }
+
+    public TileColumn GetTileColumn(int x, int y) {
+        return tileColumns[(y * width) + x];
+    }
+
+    public int LowestHeight() {
+
+        var lowestValue = 128;
+        
+        foreach (var heights in heightMap) {
+
+            foreach (var i in Enumerable.Range(1,3)) {
+
+                if (heights.GetTruePoint(i) < lowestValue && heights.GetTruePoint(i) != -128) {
+                    lowestValue = heights.GetTruePoint(i);
+                }
+
+            }
+
+            
+        }
+
+        return lowestValue;
+
+    }
+
     public Schematic(List<TileSelection> selectedItems) {
 
         var sortedSelectedItems = new List<TileSelection>(selectedItems);
@@ -21,14 +50,6 @@ public class Schematic {
 
         width = (sortedSelectedItems.Max(item => item.columnWorldX) - sortedSelectedItems.Min(item => item.columnWorldX)) + 1;
         height = (sortedSelectedItems.Max(item => item.columnWorldY) - sortedSelectedItems.Min(item => item.columnWorldY)) + 1;
-
-        HeightPoints GetHeightPoint(int x, int y) {
-            return heightMap[(y * (width + 1)) + x];
-        }
-
-        TileColumn GetTileColumn(int x, int y) {
-            return tileColumns[(y * width) + x];
-        }
 
         foreach (var y in Enumerable.Range(0, height + 1)) {
 

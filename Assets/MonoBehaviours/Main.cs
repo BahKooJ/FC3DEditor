@@ -149,6 +149,7 @@ public class Main : MonoBehaviour {
         if (Controls.OnDown("Save")) {
             Compile();
             counterActions.Clear();
+            System.GC.Collect();
         }
 
         if (Controls.OnDown("Undo")) {

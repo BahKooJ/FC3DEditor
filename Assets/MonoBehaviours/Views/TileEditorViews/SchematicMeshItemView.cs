@@ -34,6 +34,7 @@ public class SchematicMeshItemView : MonoBehaviour {
         var schematicMesh = obj.GetComponent<SchematicMesh>();
         schematicMesh.controller = controller;
         schematicMesh.schematic = schematic;
+        schematicMesh.meshRenderer.material.color = Color.white;
         schematicMesh.ForceMake();
         meshObj = schematicMesh;
 
@@ -60,6 +61,12 @@ public class SchematicMeshItemView : MonoBehaviour {
         DestroyImmediate(meshObj.gameObject);
         DestroyImmediate(camera);
 
+    }
+
+    // - Unity Callbacks -
+    
+    public void OnClick() {
+        controller.SelectSchematic(schematic);
     }
 
 

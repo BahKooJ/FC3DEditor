@@ -2,6 +2,7 @@
 
 using FCopParser;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class SchematicMesh : MonoBehaviour {
@@ -13,6 +14,8 @@ public class SchematicMesh : MonoBehaviour {
     public TileAddMode controller;
 
     public Schematic schematic;
+
+    public List<TileColumn> previewColumns = new List<TileColumn>();
 
     SubMesh subMesh;
 
@@ -26,17 +29,9 @@ public class SchematicMesh : MonoBehaviour {
 
         meshFilter.mesh = subMesh.mesh;
 
+        RefreshPreviewColumns();
+
         RefreshMesh();
-
-    }
-
-    void Update() {
-
-        //var pos = controller.main.CursorOnLevelMesh();
-
-        //if (pos != null) {
-        //    transform.position = (Vector3)pos;
-        //}
 
     }
 
@@ -50,8 +45,14 @@ public class SchematicMesh : MonoBehaviour {
 
         meshFilter.mesh = subMesh.mesh;
 
+        RefreshPreviewColumns();
+
         RefreshMesh();
 
+    }
+
+    public TileColumn GetTileColumn(int x, int y) {
+        return previewColumns[(y * schematic.width) + x];
     }
 
     public void RefreshMesh() {
@@ -68,6 +69,17 @@ public class SchematicMesh : MonoBehaviour {
             subMesh.meshRenderer.material.SetFloat("_ClipBlack", 0f);
         }
 
+    }
+
+    public void RefreshPreviewColumns() {
+
+        previewColumns.Clear();
+
+        foreach (var column in schematic.tileColumns) {
+
+            previewColumns.Add(column.CloneWithHeights());
+
+        }
 
     }
 
@@ -75,7 +87,7 @@ public class SchematicMesh : MonoBehaviour {
 
         var vertexIndex = 0;
         var index = 0;
-        foreach (var column in schematic.tileColumns) {
+        foreach (var column in previewColumns) {
 
             List<Vector3> AddVerticies(Tile tile) {
 

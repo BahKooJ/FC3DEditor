@@ -154,11 +154,7 @@ public class TileAddPanel : MonoBehaviour {
 
     public void Select(TilePreset preset) {
 
-        var geometryAddMode = controller;
-
-        TileAddMode.selectedTilePreset = preset;
-
-        geometryAddMode.RefreshTilePlacementOverlay();
+        controller.SelectTilePreset(preset);
 
     }
 

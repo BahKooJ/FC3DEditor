@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using static System.Collections.Specialized.BitVector32;
 
 namespace FCopParser {
 
@@ -1351,6 +1352,19 @@ namespace FCopParser {
             this.heights = heights;
         }
 
+        // Note that tiles are NOT cloned
+        public TileColumn CloneWithHeights() {
+
+            var newHeights = new List<HeightPoints>();
+
+            foreach (var height in heights) {
+                newHeights.Add(height.Clone());
+            }
+
+            return new TileColumn(x, y, new(tiles), newHeights);
+
+        }
+
     }
 
     // Tiles are sorted into 4x4 chunks
@@ -1539,9 +1553,11 @@ namespace FCopParser {
 
         }
 
-        public void ReceiveData(Tile tile) {
+        public void ReceiveData(Tile tile, bool updateColumn = true) {
 
-            this.column = tile.column;
+            if (updateColumn) {
+                this.column = tile.column;
+            }
 
             isEndInColumnArray = tile.isEndInColumnArray;
 
@@ -1566,6 +1582,30 @@ namespace FCopParser {
 
         public Tile Clone() {
             return new Tile(this, column, null);
+        }
+
+        public int GetMaxHeight() {
+
+            int minHeight = 128;
+            int maxHeight = -128;
+
+            foreach (var vert in verticies) {
+
+                var height = column.heights[((int)vert.vertexPosition) - 1];
+
+                var value = height.GetTruePoint(vert.heightChannel);
+
+                if (value < minHeight) {
+                    minHeight = value;
+                }
+                if (value > maxHeight) {
+                    maxHeight = value;
+                }
+
+            }
+
+            return maxHeight;
+
         }
 
         public int GetFrameCount() {
