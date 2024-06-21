@@ -1,5 +1,6 @@
 ﻿
 
+using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
@@ -15,6 +16,8 @@ public class SchematicMeshItemView : MonoBehaviour {
     public TileAddPanel view;
     public TileAddMode controller;
     public Schematic schematic;
+    public ContextMenuHandler contextMenu;
+    public InfoBoxHandler infoBoxHandler;
 
     // - View Refs -
     public RawImage meshPreview;
@@ -24,6 +27,13 @@ public class SchematicMeshItemView : MonoBehaviour {
     void Start() {
         InitSchematicMeshOverlay();
         RenderMesh();
+
+        infoBoxHandler.message = schematic.name;
+
+        contextMenu.items = new() {
+            ("Rename", Rename), ("Delete", Delete)
+        };
+
     }
 
     void InitSchematicMeshOverlay() {
@@ -60,6 +70,14 @@ public class SchematicMeshItemView : MonoBehaviour {
 
         DestroyImmediate(meshObj.gameObject);
         DestroyImmediate(camera);
+
+    }
+
+    void Rename() {
+
+    }
+
+    void Delete() {
 
     }
 

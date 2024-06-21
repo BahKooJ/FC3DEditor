@@ -21,10 +21,6 @@ public class TileEditPanel : MonoBehaviour {
 
     void Update() {
 
-        if (Input.GetKeyDown(KeyCode.Alpha0)) {
-            OnClickSaveSchematic();
-        }
-
     }
 
     void OnDestroy() {
@@ -92,11 +88,18 @@ public class TileEditPanel : MonoBehaviour {
 
     public void OnClickSaveSchematic() {
 
-        var foo = new Schematic(controller.selectedItems);
+        if (controller.HasSelection) {
 
-        Presets.levelSchematics.Add(foo);
+            Presets.levelSchematics.Add(new Schematic(controller.selectedItems, "Level Schematic #" + Presets.levelSchematics.Count.ToString()));
 
-        //TileAddMode.selectedSchematic = foo;
+            QuickLogHandler.Log("Selection saved to level schematics", LogSeverity.Success);
+
+        } else {
+
+            QuickLogHandler.Log("No tiles are selected!", LogSeverity.Error);
+
+        }
+
 
     }
 

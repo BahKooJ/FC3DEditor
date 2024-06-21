@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class Schematic {
 
+    public string name;
+
     public int width;
     public int height;
 
@@ -42,7 +44,7 @@ public class Schematic {
 
     }
 
-    public Schematic(List<TileSelection> selectedItems) {
+    public Schematic(List<TileSelection> selectedItems, string name) {
 
         var sortedSelectedItems = new List<TileSelection>(selectedItems);
 
@@ -96,6 +98,7 @@ public class Schematic {
 
         }
 
+        this.name = name;
     }
 
 }
