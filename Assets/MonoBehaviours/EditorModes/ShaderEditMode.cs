@@ -753,7 +753,12 @@ public class ShaderEditMode : TileMutatingEditMode {
 
     public void DuplicateTileShader() {
 
-        if (selectedItems.Count < 2) return;
+        if (selectedItems.Count < 2) {
+
+            QuickLogHandler.Log("At least two tiles need to be selected to duplicate textures", LogSeverity.Info);
+
+            return;
+        }
 
         AddTileStateCounterAction();
 

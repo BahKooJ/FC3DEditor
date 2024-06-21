@@ -709,13 +709,17 @@ public class TextureUVMapper : MonoBehaviour {
             "Future Cop's color palettes are not fully understood yet and the method for creating them is still work in progress. " +
             "Textures might display low quality or incorrectly.", () => {
 
-            var bitmap = controller.main.level.textures[controller.FirstTile.texturePalette];
+                var bmpID = texturePaletteDropdown.GetComponent<TMP_Dropdown>().value;
 
-            var counts = bitmap.CreateColorPalette();
+                var bitmap = controller.main.level.textures[bmpID];
 
-            bitmap.ClearLookUpData(counts.Item1, counts.Item2);
+                var counts = bitmap.CreateColorPalette();
 
-            return true;
+                bitmap.ClearLookUpData(counts.Item1, counts.Item2);
+
+                QuickLogHandler.Log("Color palette created for bitmap " + (bmpID + 1).ToString(), LogSeverity.Success);
+
+                return true;
 
         });
 
@@ -902,6 +906,8 @@ public class TextureUVMapper : MonoBehaviour {
                 StartEditingVectorAnimation();
                 break;
             case TextureType.FrameAnimated:
+
+                QuickLogHandler.Log("Only one animated tile can be selected (Use presets)", LogSeverity.Info);
 
                 controller.DeselectAllButLastTile();
 

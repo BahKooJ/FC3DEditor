@@ -517,7 +517,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
         }
 
         if (showDialog) {
-            DialogWindowUtil.Dialog("Cannot Remove Tile", "At least one tile must be present in a tile column");
+            QuickLogHandler.Log("At least one tile must be present in a tile column", LogSeverity.Error);
         }
 
         RefreshMeshes();
@@ -557,7 +557,10 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     public void ShiftTilesHeightUp() {
 
-        if (!HasSelection) { return; }
+        if (!HasSelection) {
+            QuickLogHandler.Log("No tiles are selected", LogSeverity.Info);
+            return;
+        }
 
         // Add to Undo stack
         AddTileStateCounterAction();
@@ -579,10 +582,12 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
                 }
 
-                if (newVerticies.Count == previousVerticies.Count) {
-                    item.tile.verticies = newVerticies.ToList();
-                }
+            }
 
+            if (newVerticies.Count == previousVerticies.Count) {
+                item.tile.verticies = newVerticies.ToList();
+            } else {
+                QuickLogHandler.Log("Tile is already attatched to highest channels", LogSeverity.Error);
             }
 
         }
@@ -595,7 +600,10 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
     
     public void ShiftTilesHeightDown() {
 
-        if (!HasSelection) { return; }
+        if (!HasSelection) {
+            QuickLogHandler.Log("No tiles are selected", LogSeverity.Info);
+            return;
+        }
 
         AddTileStateCounterAction();
 
@@ -616,10 +624,12 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
                 }
 
-                if (newVerticies.Count == previousVerticies.Count) {
-                    item.tile.verticies = newVerticies.ToList();
-                }
+            }
 
+            if (newVerticies.Count == previousVerticies.Count) {
+                item.tile.verticies = newVerticies.ToList();
+            } else {
+                QuickLogHandler.Log("Tile is already attatched to lowest channels", LogSeverity.Error);
             }
 
         }

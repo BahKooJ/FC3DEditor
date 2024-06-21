@@ -321,6 +321,7 @@ public class TileAddMode : EditMode {
 
             // Checks to make sure the tile doesn't already exist
             if (MeshType.IDFromVerticies(t.verticies) == preset.meshID) {
+                QuickLogHandler.Log("Tile already exists!", LogSeverity.Error);
                 return;
             }
 

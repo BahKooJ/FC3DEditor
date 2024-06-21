@@ -37,3 +37,12 @@ public class DialogWindowUtil {
     }
 
 }
+
+public enum LogSeverity {
+
+    Error,
+    Warning,
+    Info,
+    Success
+
+}

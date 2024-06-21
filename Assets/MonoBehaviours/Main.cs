@@ -180,15 +180,11 @@ public class Main : MonoBehaviour {
         }
 
         if (counterActions.Count > 0) {
+
             counterActions.Last().Action();
+            counterActions.RemoveAt(counterActions.Count - 1);
 
-            // Some counter actions account for them double adding counter actions.
-            // Sinse the method also tests to make sure undo isn't pressed before adding a counter actions-
-            // problems can arise.
-            if (counterActions.Count > 0) {
-                counterActions.RemoveAt(counterActions.Count - 1);
-
-            }
+            QuickLogHandler.Log("Undo", LogSeverity.Success);
 
         }
 

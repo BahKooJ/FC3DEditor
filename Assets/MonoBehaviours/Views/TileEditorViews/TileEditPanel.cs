@@ -44,6 +44,7 @@ public class TileEditPanel : MonoBehaviour {
         CloseTileEffectsPanel();
 
         if (!controller.HasSelection) {
+            QuickLogHandler.Log("No tiles are selected", LogSeverity.Info);
             return;
         }
 

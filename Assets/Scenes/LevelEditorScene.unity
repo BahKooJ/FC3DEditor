@@ -894,6 +894,7 @@ RectTransform:
   - {fileID: 1604260517}
   - {fileID: 2224966}
   - {fileID: 1449646061}
+  - {fileID: 1046902733}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1599,6 +1600,109 @@ MonoBehaviour:
   fastMovementSpeed: 100
   zoomSensitivity: 10
   fastZoomSensitivity: 50
+--- !u!1 &1046902732
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1046902733}
+  - component: {fileID: 1046902737}
+  - component: {fileID: 1046902736}
+  - component: {fileID: 1046902735}
+  - component: {fileID: 1046902734}
+  m_Layer: 6
+  m_Name: Quick Log Panel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1046902733
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046902732}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 494504596}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 40, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0}
+--- !u!114 &1046902734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046902732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 504405398eae9d641bcef56c73c653a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  QuickLogItemPrefab: {fileID: 2190095483067195216, guid: 84b2a5e76ecf9a349bfaf6923e3759c0, type: 3}
+  content: {fileID: 1046902733}
+  main: {fileID: 1522062004}
+--- !u!114 &1046902735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046902732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
+--- !u!114 &1046902736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046902732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 2
+  m_VerticalFit: 2
+--- !u!222 &1046902737
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046902732}
+  m_CullTransparentMesh: 1
 --- !u!1 &1137386959
 GameObject:
   m_ObjectHideFlags: 0
@@ -2314,6 +2418,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a32705c59ddcd84282f2caa9d399d92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isEscMenuOpen: 0
   meshSection: {fileID: 3982175839306991789, guid: d2f3b92a7ae38644b87000c94b6447b4, type: 3}
   heightMapChannelPoint: {fileID: 1298310605505145416, guid: 804d2b1c507598948a3e68434291bfc0, type: 3}
   tileHeightMapChannelPoint: {fileID: 1298310605505145416, guid: f51c5e561cc50c441a5a06599292ebdc, type: 3}

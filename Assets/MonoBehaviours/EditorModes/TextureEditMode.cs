@@ -88,6 +88,7 @@ public class TextureEditMode : TileMutatingEditMode {
 
         // Since frame animated tiles are a little weird it will try to only have one animated tile selected
         if (selection.tile.GetFrameCount() > 0) {
+            QuickLogHandler.Log("Only one animated tile can be selected (Use presets)", LogSeverity.Info);
             selectedItems.Clear();
         }
 
@@ -352,7 +353,15 @@ public class TextureEditMode : TileMutatingEditMode {
 
     public void DuplicateTileUVs(bool refresh = true) {
 
-        if (selectedItems.Count < 2) return;
+        if (selectedItems.Count < 2) {
+
+            if (refresh) {
+                QuickLogHandler.Log("At least two tiles need to be selected to duplicate textures", LogSeverity.Info);
+            }
+
+
+            return; 
+        }
 
         if (refresh) {
             AddTileStateCounterAction();
@@ -388,6 +397,12 @@ public class TextureEditMode : TileMutatingEditMode {
 
     public void MakeTilesOpaque() {
 
+        if (!HasSelection) {
+            QuickLogHandler.Log("No tiles are selected", LogSeverity.Info);
+
+            return;
+        }
+
         AddTileStateCounterAction();
 
         foreach (var selection in selectedItems) {
@@ -396,9 +411,17 @@ public class TextureEditMode : TileMutatingEditMode {
 
         RefreshMeshes();
 
+        QuickLogHandler.Log("Selected tiles made opaque", LogSeverity.Success);
+
+
     }
 
     public void MakeTilesTransparent() {
+
+        if (!HasSelection) {
+            QuickLogHandler.Log("No tiles are selected", LogSeverity.Info);
+            return;
+        }
 
         AddTileStateCounterAction();
 
@@ -407,6 +430,9 @@ public class TextureEditMode : TileMutatingEditMode {
         }
 
         RefreshMeshes();
+
+        QuickLogHandler.Log("Selected tiles made transparent", LogSeverity.Success);
+
 
     }
 
@@ -431,7 +457,7 @@ public class TextureEditMode : TileMutatingEditMode {
         var potentialID = MeshType.IDFromVerticies(firstTile.verticies);
 
         if (potentialID == null) {
-            DialogWindowUtil.Dialog("Cannot Save Preset", "Cannot save shader preset, tile mesh is invalid!");
+            DialogWindowUtil.Dialog("Cannot Save Preset", "Cannot save preset, tile mesh is invalid!");
             return false;
         }
 
