@@ -22,6 +22,14 @@ public class SchematicMeshPresetsView : MonoBehaviour {
 
     void Start() {
 
+        RefreshView();
+
+    }
+
+    public void RefreshView() {
+
+        Clear();
+
         foreach (var scem in Presets.levelSchematics) {
 
             var obj = Instantiate(SchematicItem);
@@ -40,6 +48,17 @@ public class SchematicMeshPresetsView : MonoBehaviour {
 
         overwriteTilesToggle.isOn = TileAddMode.removeAllTilesOnSchematicPlacement;
         settingsDropdown.value = (int)TileAddMode.placementSetting;
+
+    }
+
+    void Clear() {
+
+        foreach (var item in schematicListItems) {
+            Destroy(item.gameObject);
+        }
+
+        schematicListItems.Clear();
+
     }
 
     // - Unity Callbacks -

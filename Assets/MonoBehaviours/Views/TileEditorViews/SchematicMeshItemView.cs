@@ -18,9 +18,11 @@ public class SchematicMeshItemView : MonoBehaviour {
     public Schematic schematic;
     public ContextMenuHandler contextMenu;
     public InfoBoxHandler infoBoxHandler;
+    public TextFieldPopupHandler textFieldPopupHandler;
 
     // - View Refs -
     public RawImage meshPreview;
+    public Image background;
 
     SchematicMesh meshObj;
 
@@ -33,6 +35,18 @@ public class SchematicMeshItemView : MonoBehaviour {
         contextMenu.items = new() {
             ("Rename", Rename), ("Delete", Delete)
         };
+
+        textFieldPopupHandler.finishCallback = text => {
+
+            schematic.name = text;
+
+            infoBoxHandler.message = schematic.name;
+
+        };
+
+        if (TileAddMode.selectedSchematic == schematic) {
+            background.color = new Color(0.08f, 0.20f, 0.08f);
+        }
 
     }
 
@@ -55,7 +69,7 @@ public class SchematicMeshItemView : MonoBehaviour {
         var padding = 2;
 
         var camera = Instantiate(schematicPreviewCamera);
-        camera.transform.position = new Vector3(schematic.width / 2f, 0, -(schematic.height / 2f));
+        camera.transform.position = new Vector3(schematic.width / 2f, schematic.LowestHeight() / 30f, -(schematic.height / 2f));
         camera.transform.eulerAngles = new Vector3(35, 40, 0);
         camera.transform.position -= camera.transform.forward * (schematic.width + padding);
 
@@ -75,9 +89,20 @@ public class SchematicMeshItemView : MonoBehaviour {
 
     void Rename() {
 
+        textFieldPopupHandler.OpenPopupTextField(schematic.name);
+
     }
 
     void Delete() {
+
+        DialogWindowUtil.Dialog("Delete Leve Schematic", "Are you sure you would like to delete this level schematic? (This cannot be undone)", () => {
+
+            Presets.levelSchematics.Remove(schematic);
+
+            parentView.RefreshView();
+
+            return true;
+        });
 
     }
 
@@ -85,6 +110,7 @@ public class SchematicMeshItemView : MonoBehaviour {
     
     public void OnClick() {
         controller.SelectSchematic(schematic);
+        parentView.OnClickDone();
     }
 
 
