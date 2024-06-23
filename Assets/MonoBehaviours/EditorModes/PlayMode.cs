@@ -27,12 +27,23 @@ public class PlayMode : EditMode {
 
     public void OnDestroy() {
 
+        Object.Destroy(player.gameObject);
+        Object.Destroy(playerCamera.gameObject);
+
         main.EnableMainCamera();
 
     }
 
     public void Update() {
+
         UpdateCamPos();
+
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+
+            main.Undo();
+
+        }
+
     }
 
     void UpdateCamPos() {
