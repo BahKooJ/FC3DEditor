@@ -9,7 +9,24 @@ public class PlayModePlayer : MonoBehaviour {
     float moveSpeed = 8f;
     float turnSpeed = 90f;
 
+    public bool placed = false;
+
     void Update() {
+
+        if (!placed) {
+            var pos = controller.main.CursorOnLevelMesh();
+
+            if (pos != null) {
+                transform.position = (Vector3)pos;
+            }
+
+            if (Input.GetMouseButtonDown(0)) {
+                placed = true;
+                controller.Place();
+            }
+
+            return;
+        }
 
         if (Controls.IsDown("CameraForward")) {
             transform.position += moveSpeed * Time.deltaTime * transform.forward;

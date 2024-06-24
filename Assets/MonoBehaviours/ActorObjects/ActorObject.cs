@@ -9,7 +9,7 @@ public class ActorObject : MonoBehaviour {
 
     public Collider actCollider;
 
-    public ActorEditMode controller;
+    public EditMode controller;
 
     public FCopActor actor;
 

@@ -26,7 +26,7 @@ public class MeshIDDebug: MonoBehaviour {
         level = new FCopLevel(iffFile.parsedData);
 
         exampleColumn = new TileColumn(0, 0, new(), new() {
-            new HeightPoints(0,1,2), new HeightPoints(0,1,2), new HeightPoints(0,1,2), new HeightPoints(0,1,2)
+            new HeightPoints(0f,1f,2f), new HeightPoints(0f,1f,2f), new HeightPoints(0f, 1f, 2f), new HeightPoints(0f,1f,2f)
         });
 
         exampleTile = new Tile(new TileBitfield(0, 0, 0, 0, meshID, 0), exampleColumn, level.sections[0].parser);

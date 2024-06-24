@@ -7,7 +7,11 @@ using System.Linq;
 namespace FCopParser {
     public abstract class MeshType {
 
-        static public List<int> quadMeshes = new List<int> { 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 103, 104, 105, 106, 107, 108, 109, 110 };
+        static readonly public List<int> quadMeshes = new() { 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 103, 104, 105, 106, 107, 108, 109, 110 };
+        static readonly public List<int> topWallMeshes = new() { 79, 80, 81, 82, 83, 84, 85, 86, 108, 110 };
+        static readonly public List<int> leftWallMeshes = new() { 71, 72, 73, 74, 75, 76, 77, 78, 107, 109 };
+
+
 
         static public Dictionary<int, List<TileVertex>> meshes = ReadMeshType();
 

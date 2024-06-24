@@ -68,6 +68,17 @@ public class TextureEditMode : TileMutatingEditMode {
 
             ClearAllSelectedItems();
         }
+
+        if (Input.GetKeyDown(KeyCode.Alpha0)) {
+
+            foreach (var item in selectedItems) {
+                item.tile.MirrorUVsHorizontally();
+                RefreshMeshes();
+                RefreshTileOverlayTexture();
+                RefreshUVMapper();
+            }
+
+        }
     
     }
 

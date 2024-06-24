@@ -15,13 +15,9 @@ public class PlayMode : EditMode {
 
     public void OnCreateMode() {
 
-        main.DisableMainCamera();
-
-        var camObj = Object.Instantiate(main.playerCamera);
-        playerCamera = camObj.GetComponent<Camera>();
-        
         var playerObj = Object.Instantiate(main.playModePlayer);
         player = playerObj.GetComponent<PlayModePlayer>();
+        player.controller = this;
 
     }
 
@@ -46,7 +42,21 @@ public class PlayMode : EditMode {
 
     }
 
+    public void Place() {
+
+        main.DisableMainCamera();
+
+        var camObj = Object.Instantiate(main.playerCamera);
+        playerCamera = camObj.GetComponent<Camera>();
+        playerCamera.aspect = 4f / 3f;
+
+    }
+
     void UpdateCamPos() {
+
+        if (!player.placed) {
+            return;
+        }
 
         playerCamera.transform.position = player.transform.position;
         playerCamera.transform.localEulerAngles = player.transform.localEulerAngles;
