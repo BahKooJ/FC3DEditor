@@ -43,6 +43,11 @@ public class SectionEditMode : EditMode {
 
         }
 
+        if (Input.GetKeyDown(KeyCode.Alpha0)) {
+            selectedSection.section.RotateClockwise();
+            selectedSection.RefreshMesh();
+        }
+
     }
 
     public void SelectSection(LevelMesh section) {
@@ -173,6 +178,42 @@ public class SectionEditMode : EditMode {
                 if (selectedSection != null) {
                     AddSectionSaveStateCounterAction();
                     selectedSection.section.MirrorDiagonally();
+                    selectedSection.RefreshMesh();
+                }
+
+                return true;
+
+            });
+
+    }
+
+    public void RotateSectionClockwise() {
+
+        DialogWindowUtil.Dialog("Warning",
+            "Some tiles cannot be rotated correct and may be deleted. This will overwrite all current map data, are you sure you want to continue?",
+            () => {
+
+                if (selectedSection != null) {
+                    AddSectionSaveStateCounterAction();
+                    selectedSection.section.RotateClockwise();
+                    selectedSection.RefreshMesh();
+                }
+
+                return true;
+
+            });
+
+    }
+
+    public void RotateSectionCounterClockwise() {
+
+        DialogWindowUtil.Dialog("Warning",
+            "Some tiles cannot be rotated correct and may be deleted. This will overwrite all current map data, are you sure you want to continue?",
+            () => {
+
+                if (selectedSection != null) {
+                    AddSectionSaveStateCounterAction();
+                    selectedSection.section.RotateCounterClockwise();
                     selectedSection.RefreshMesh();
                 }
 

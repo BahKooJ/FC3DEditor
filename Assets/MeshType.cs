@@ -7,9 +7,22 @@ using System.Linq;
 namespace FCopParser {
     public abstract class MeshType {
 
-        static readonly public List<int> quadMeshes = new() { 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 103, 104, 105, 106, 107, 108, 109, 110 };
-        static readonly public List<int> topWallMeshes = new() { 79, 80, 81, 82, 83, 84, 85, 86, 108, 110 };
-        static readonly public List<int> leftWallMeshes = new() { 71, 72, 73, 74, 75, 76, 77, 78, 107, 109 };
+        public static readonly List<int> quadMeshes = new() { 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 103, 104, 105, 106, 107, 108, 109, 110 };
+        public static readonly List<int> wallMeshes = new() { 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110 };
+        public static readonly List<int> topWallMeshes = new() { 79, 80, 81, 82, 83, 84, 85, 86, 108, 110 };
+        public static readonly List<int> leftWallMeshes = new() { 71, 72, 73, 74, 75, 76, 77, 78, 107, 109 };
+        public static readonly List<int> diagonalBLeftTRightQuadWallMeshes = new() { 103, 104 };
+        public static readonly List<int> diagonalTLeftBRightQuadWallMeshes = new() { 105, 106 };
+        public static readonly List<int> diagonalBLeftTRightTriWallMeshes = new() { 87, 88, 89, 90, 91, 92, 93, 94 };
+        public static readonly List<int> diagonalTLeftBRightTriWallMeshes = new() { 95, 96, 97, 98, 99, 100, 101, 102 };
+
+
+
+        public static readonly List<int> bottomRightTriangles = new() { 0, 2,  4, 16, 18, 25, 27, 33, 35, 36, 38, 44, 46, 53, 55 };
+        public static readonly List<int> bottomLeftTriangles = new()  { 6, 8, 10, 12, 14, 21, 23, 28, 30, 41, 43, 48, 50, 56, 58 };
+
+        public static readonly List<int> topRightTriangles = new()    { 7, 9, 11, 13, 15, 20, 22, 29, 31, 40, 42, 49, 51, 57, 59 };
+
 
 
 

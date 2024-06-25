@@ -30,4 +30,12 @@ public class SectionEditView : MonoBehaviour {
         controller.RemoveShadersFromSection();
     }
 
+    public void OnClickRotateSectionClockwise() {
+        controller.RotateSectionClockwise();
+    }
+
+    public void OnClickRotateSectionCounterClockwise() {
+        controller.RotateSectionCounterClockwise();
+    }
+
 }
