@@ -815,6 +815,7 @@ namespace FCopParser {
                     if (result == Tile.TransformResult.Success) {
 
                         tile.MirrorUVsHorizontally();
+                        tile.MirrorShadersHorizontally();
 
                         validTiles.Add(tile);
 
@@ -899,6 +900,7 @@ namespace FCopParser {
                     if (result == Tile.TransformResult.Success) {
 
                         tile.MirrorUVsVertically();
+                        tile.MirrorShadersVertically();
 
                         validTiles.Add(tile);
 
@@ -985,6 +987,7 @@ namespace FCopParser {
                     if (result == Tile.TransformResult.Success) {
 
                         tile.RotateUVsClockwise();
+                        tile.RotateShadersClockwise();
 
                         validTiles.Add(tile);
 
@@ -1071,6 +1074,7 @@ namespace FCopParser {
                     if (result == Tile.TransformResult.Success) {
 
                         tile.RotateUVsCounterClockwise();
+                        tile.RotateShadersCounterClockwise();
 
                         validTiles.Add(tile);
 
@@ -1358,8 +1362,11 @@ namespace FCopParser {
         public TileColumn column;
 
         public bool isEndInColumnArray;
+        // tile vertex ordering Top-Left, Top-Right, Bottom-Left, Bottom-Right
         public List<TileVertex> verticies;
 
+        // Something important to note, uvs order is different than tile vertices.
+        // It goes from Top-Left, Top-Right, Bottom-Right, Bottom-Left
         public List<int> uvs = new();
         public TileShaders shaders;
         public List<int> animatedUVs = new();
@@ -1701,6 +1708,8 @@ namespace FCopParser {
 
         #region Transforming
 
+        // Call the UV and shader transforming methods AFTER the vert transforming methods
+
         public enum TransformResult {
             Success,
             Invalid,
@@ -1711,7 +1720,8 @@ namespace FCopParser {
 
         }
 
-        // Call the UV transforming methods AFTER the vert transforming methods
+        // - Mirror Vertically -
+
         public TransformResult MirrorVerticesVertically() {
 
             int ogMeshID = (int)MeshType.IDFromVerticies(verticies);
@@ -1763,12 +1773,88 @@ namespace FCopParser {
         }
 
         public void MirrorUVsVertically() {
-            // Oddly enough if the order of the UVs are just reversed the textures mirror perfectly
-            // This isn't the case for mirroring horizontally. I wonder why this is the case, I might be missing something
 
+            // Oddly enough if the order of the UVs are just reversed the textures mirror perfectly for most tiles
+
+            int meshID = (int)MeshType.IDFromVerticies(verticies);
+
+            // Walls
+            if (MeshType.wallMeshes.Contains(meshID)) {
+
+                if (MeshType.leftWallMeshes.Contains(meshID)) {
+                    FlipUVOrderVertically();
+                }
+                else if (MeshType.diagonalTLeftBRightTriWallMeshes.Contains(meshID)) {
+                    FlipUVOrderVertically();
+                    RotateUVOrderCounterClockwise();
+                }
+                else if (MeshType.diagonalBLeftTRightTriWallMeshes.Contains(meshID)) {
+                    FlipUVOrderVertically();
+                    RotateUVOrderCounterClockwise();
+                }
+
+                return;
+
+            }
+            
             FlipUVOrderVertically();
 
         }
+
+        public void MirrorShadersVertically() {
+
+            int meshID = (int)MeshType.IDFromVerticies(verticies);
+
+            if (shaders is DynamicMonoChromeShader) {
+
+                if (MeshType.wallMeshes.Contains(meshID)) {
+
+                    if (MeshType.leftWallMeshes.Contains(meshID)) {
+                        FlipDynamicMonoShaderOrderVertically();
+                    }
+                    else if (MeshType.diagonalTLeftBRightTriWallMeshes.Contains(meshID)) {
+                        FlipDynamicMonoShaderOrderVertically();
+                        RotateMonoShaderOrderCounterClockwise();
+                    }
+                    else if (MeshType.diagonalBLeftTRightTriWallMeshes.Contains(meshID)) {
+                        FlipDynamicMonoShaderOrderVertically();
+                        RotateMonoShaderOrderCounterClockwise();
+                    }
+
+                    return;
+
+                }
+
+                FlipDynamicMonoShaderOrderVertically();
+
+            }
+            if (shaders is ColorShader) {
+
+                if (MeshType.wallMeshes.Contains(meshID)) {
+
+                    if (MeshType.leftWallMeshes.Contains(meshID)) {
+                        FlipColorShaderOrderVertically();
+                    }
+                    else if (MeshType.diagonalTLeftBRightTriWallMeshes.Contains(meshID)) {
+                        FlipColorShaderOrderVertically();
+                        RotateColorShaderOrderCounterClockwise();
+                    }
+                    else if (MeshType.diagonalBLeftTRightTriWallMeshes.Contains(meshID)) {
+                        FlipColorShaderOrderVertically();
+                        RotateColorShaderOrderCounterClockwise();
+                    }
+
+                    return;
+
+                }
+
+                FlipColorShaderOrderVertically();
+
+            }
+
+        }
+
+        // - Mirror Horizontally -
 
         public TransformResult MirrorVerticesHorizontally() {
 
@@ -1822,8 +1908,6 @@ namespace FCopParser {
 
         public void MirrorUVsHorizontally() {
 
-            // This one isn't as clean as mirror vertically
-
             int meshID = (int)MeshType.IDFromVerticies(verticies);
 
             // Walls
@@ -1869,6 +1953,103 @@ namespace FCopParser {
             FlipUVOrderHorizontally();
 
         }
+
+        public void MirrorShadersHorizontally() {
+
+            int meshID = (int)MeshType.IDFromVerticies(verticies);
+
+            if (shaders is DynamicMonoChromeShader) {
+
+                if (MeshType.wallMeshes.Contains(meshID)) {
+
+                    if (MeshType.topWallMeshes.Contains(meshID)) {
+                        FlipDynamicMonoShaderOrderVertically();
+                    }
+                    else if (MeshType.diagonalBLeftTRightQuadWallMeshes.Contains(meshID)) {
+                        FlipDynamicMonoShaderOrderVertically();
+                    }
+                    else if (MeshType.diagonalTLeftBRightQuadWallMeshes.Contains(meshID)) {
+                        FlipDynamicMonoShaderOrderVertically();
+                    }
+                    else if (MeshType.diagonalTLeftBRightTriWallMeshes.Contains(meshID)) {
+                        RotateMonoShaderOrderClockwise();
+                    }
+                    else if (MeshType.diagonalBLeftTRightTriWallMeshes.Contains(meshID)) {
+                        RotateMonoShaderOrderCounterClockwise();
+                    }
+
+                    return;
+
+                }
+
+                if (MeshType.bottomLeftTriangles.Contains(meshID)) {
+
+                    FlipDynamicMonoShaderOrderVertically();
+                    RotateMonoShaderOrderCounterClockwise();
+
+                    return;
+
+                }
+                if (MeshType.bottomRightTriangles.Contains(meshID)) {
+
+                    FlipDynamicMonoShaderOrderVertically();
+                    RotateMonoShaderOrderCounterClockwise();
+
+                    return;
+
+                }
+
+                FlipDynamicMonoShaderOrderHorizontally();
+
+            }
+            if (shaders is ColorShader) {
+
+                if (MeshType.wallMeshes.Contains(meshID)) {
+
+                    if (MeshType.topWallMeshes.Contains(meshID)) {
+                        FlipColorShaderOrderVertically();
+                    }
+                    else if (MeshType.diagonalBLeftTRightQuadWallMeshes.Contains(meshID)) {
+                        FlipColorShaderOrderVertically();
+                    }
+                    else if (MeshType.diagonalTLeftBRightQuadWallMeshes.Contains(meshID)) {
+                        FlipColorShaderOrderVertically();
+                    }
+                    else if (MeshType.diagonalTLeftBRightTriWallMeshes.Contains(meshID)) {
+                        RotateColorShaderOrderClockwise();
+                    }
+                    else if (MeshType.diagonalBLeftTRightTriWallMeshes.Contains(meshID)) {
+                        RotateColorShaderOrderCounterClockwise();
+                    }
+
+                    return;
+
+                }
+
+                if (MeshType.bottomLeftTriangles.Contains(meshID)) {
+
+                    FlipColorShaderOrderVertically();
+                    RotateColorShaderOrderCounterClockwise();
+
+                    return;
+
+                }
+                if (MeshType.bottomRightTriangles.Contains(meshID)) {
+
+                    FlipColorShaderOrderVertically();
+                    RotateColorShaderOrderCounterClockwise();
+
+                    return;
+
+                }
+
+                FlipColorShaderOrderHorizontally();
+
+            }
+
+        }
+
+        // - Rotate Clockwise -
 
         public TransformResult RotateVerticesClockwise() {
 
@@ -1989,6 +2170,81 @@ namespace FCopParser {
 
         }
 
+        public void RotateShadersClockwise() {
+
+            int meshID = (int)MeshType.IDFromVerticies(verticies);
+
+            if (shaders is DynamicMonoChromeShader) {
+
+                // Walls
+                if (MeshType.wallMeshes.Contains(meshID)) {
+
+                    if (MeshType.topWallMeshes.Contains(meshID)) {
+                        FlipDynamicMonoShaderOrderVertically();
+                    }
+                    else if (MeshType.diagonalBLeftTRightQuadWallMeshes.Contains(meshID)) {
+                        FlipDynamicMonoShaderOrderVertically();
+                    }
+                    else if (MeshType.diagonalBLeftTRightTriWallMeshes.Contains(meshID)) {
+                        RotateMonoShaderOrderCounterClockwise();
+                    }
+                    else if (MeshType.diagonalTLeftBRightTriWallMeshes.Contains(meshID)) {
+                        FlipDynamicMonoShaderOrderVertically();
+                        RotateMonoShaderOrderCounterClockwise();
+                    }
+
+                    return;
+
+                }
+
+                // I guess top right and bottom right triangles use the same UV order?
+                if (MeshType.bottomRightTriangles.Contains(meshID)) {
+
+                    return;
+
+                }
+
+                RotateMonoShaderOrderCounterClockwise();
+
+            }
+            if (shaders is ColorShader) {
+
+                // Walls
+                if (MeshType.wallMeshes.Contains(meshID)) {
+
+                    if (MeshType.topWallMeshes.Contains(meshID)) {
+                        FlipColorShaderOrderVertically();
+                    }
+                    else if (MeshType.diagonalBLeftTRightQuadWallMeshes.Contains(meshID)) {
+                        FlipColorShaderOrderVertically();
+                    }
+                    else if (MeshType.diagonalBLeftTRightTriWallMeshes.Contains(meshID)) {
+                        RotateColorShaderOrderCounterClockwise();
+                    }
+                    else if (MeshType.diagonalTLeftBRightTriWallMeshes.Contains(meshID)) {
+                        FlipColorShaderOrderVertically();
+                        RotateColorShaderOrderCounterClockwise();
+                    }
+
+                    return;
+
+                }
+
+                // I guess top right and bottom right triangles use the same UV order?
+                if (MeshType.bottomRightTriangles.Contains(meshID)) {
+
+                    return;
+
+                }
+
+                RotateColorShaderOrderCounterClockwise();
+
+            }
+
+        }
+
+        // - Rotate Counter-Clockwise -
+
         public TransformResult RotateVerticesCounterClockwise() {
 
             int ogMeshID = (int)MeshType.IDFromVerticies(verticies);
@@ -2108,8 +2364,82 @@ namespace FCopParser {
 
         }
 
+        public void RotateShadersCounterClockwise() {
 
-        // Util
+            int meshID = (int)MeshType.IDFromVerticies(verticies);
+
+            if (shaders is DynamicMonoChromeShader) {
+
+                // Walls
+                if (MeshType.wallMeshes.Contains(meshID)) {
+
+                    if (MeshType.leftWallMeshes.Contains(meshID)) {
+                        FlipDynamicMonoShaderOrderVertically();
+                    }
+                    else if (MeshType.diagonalTLeftBRightQuadWallMeshes.Contains(meshID)) {
+                        FlipDynamicMonoShaderOrderVertically();
+                    }
+                    else if (MeshType.diagonalTLeftBRightTriWallMeshes.Contains(meshID)) {
+                        RotateMonoShaderOrderClockwise();
+                    }
+                    else if (MeshType.diagonalBLeftTRightTriWallMeshes.Contains(meshID)) {
+                        FlipDynamicMonoShaderOrderVertically();
+                        RotateMonoShaderOrderCounterClockwise();
+                    }
+
+                    return;
+
+                }
+
+                // Order stays the same
+                if (MeshType.topRightTriangles.Contains(meshID)) {
+
+                    return;
+
+                }
+
+                RotateMonoShaderOrderClockwise();
+
+            }
+            if (shaders is ColorShader) {
+
+                // Walls
+                if (MeshType.wallMeshes.Contains(meshID)) {
+
+                    if (MeshType.leftWallMeshes.Contains(meshID)) {
+                        FlipColorShaderOrderVertically();
+                    }
+                    else if (MeshType.diagonalTLeftBRightQuadWallMeshes.Contains(meshID)) {
+                        FlipColorShaderOrderVertically();
+                    }
+                    else if (MeshType.diagonalTLeftBRightTriWallMeshes.Contains(meshID)) {
+                        RotateColorShaderOrderClockwise();
+                    }
+                    else if (MeshType.diagonalBLeftTRightTriWallMeshes.Contains(meshID)) {
+                        FlipColorShaderOrderVertically();
+                        RotateColorShaderOrderCounterClockwise();
+                    }
+
+                    return;
+
+                }
+
+                // Order stays the same
+                if (MeshType.topRightTriangles.Contains(meshID)) {
+
+                    return;
+
+                }
+
+                RotateColorShaderOrderClockwise();
+
+            }
+
+        }
+
+        // - Util -
+
+        // - UVs -
         void FlipUVPositionHorizontally() {
 
             var uvVectors = new List<int[]>();
@@ -2270,6 +2600,244 @@ namespace FCopParser {
 
         }
 
+        // - Shaders -
+
+        // Well here's some confusing stuff...
+        // Vertices, UVs and shaders all have their own order. To avoid redoing a lot of work,
+        // I'm using the UV array order on shaders. Which means there's some funky indexing.
+        // Unless it's dynamic monochrome which has the same order as UVs
+
+        // - Mono -
+        void FlipDynamicMonoShaderOrderVertically() {
+
+            var monoShader = (DynamicMonoChromeShader)shaders;
+
+            var newValues = new List<int>();
+
+            if (monoShader.isQuad) {
+
+                newValues.Add(monoShader.values[3]);
+                newValues.Add(monoShader.values[2]);
+                newValues.Add(monoShader.values[1]);
+                newValues.Add(monoShader.values[0]);
+
+            }
+            else {
+
+                newValues.Add(monoShader.values[2]);
+                newValues.Add(monoShader.values[1]);
+                newValues.Add(monoShader.values[0]);
+                // Even if the tile is a triangle it stores 4 vertex colors
+                // Not adding the last one will cause crashes!
+                newValues.Add(monoShader.values[3]);
+
+            }
+
+            monoShader.values = newValues.ToArray();
+            monoShader.Apply();
+
+        }
+
+        void FlipDynamicMonoShaderOrderHorizontally() {
+
+            var monoShader = (DynamicMonoChromeShader)shaders;
+
+            var newValues = new List<int>();
+
+            if (monoShader.isQuad) {
+
+                newValues.Add(monoShader.values[1]);
+                newValues.Add(monoShader.values[0]);
+                newValues.Add(monoShader.values[3]);
+                newValues.Add(monoShader.values[2]);
+
+            }
+            else {
+
+                newValues.Add(monoShader.values[1]);
+                newValues.Add(monoShader.values[0]);
+                newValues.Add(monoShader.values[2]);
+                // Even if the tile is a triangle it stores 4 vertex colors
+                // Not adding the last one will cause crashes!
+                newValues.Add(monoShader.values[3]);
+
+            }
+
+            monoShader.values = newValues.ToArray();
+            monoShader.Apply();
+
+        }
+
+        void RotateMonoShaderOrderCounterClockwise() {
+
+            var monoShader = (DynamicMonoChromeShader)shaders;
+
+            var newValues = new List<int>();
+
+            if (monoShader.isQuad) {
+
+                newValues.Add(monoShader.values[3]);
+                newValues.Add(monoShader.values[0]);
+                newValues.Add(monoShader.values[1]);
+                newValues.Add(monoShader.values[2]);
+
+            }
+            else {
+
+                newValues.Add(monoShader.values[2]);
+                newValues.Add(monoShader.values[0]);
+                newValues.Add(monoShader.values[1]);
+                // Even if the tile is a triangle it stores 4 vertex colors
+                // Not adding the last one will cause crashes!
+                newValues.Add(monoShader.values[3]);
+
+            }
+
+            monoShader.values = newValues.ToArray();
+            monoShader.Apply();
+
+        }
+
+        void RotateMonoShaderOrderClockwise() {
+
+            var monoShader = (DynamicMonoChromeShader)shaders;
+
+            var newValues = new List<int>();
+
+            if (monoShader.isQuad) {
+
+                newValues.Add(monoShader.values[1]);
+                newValues.Add(monoShader.values[2]);
+                newValues.Add(monoShader.values[3]);
+                newValues.Add(monoShader.values[0]);
+
+            }
+            else {
+
+                newValues.Add(monoShader.values[1]);
+                newValues.Add(monoShader.values[2]);
+                newValues.Add(monoShader.values[0]);
+                // Even if the tile is a triangle it stores 4 vertex colors
+                // Not adding the last one will cause crashes!
+                newValues.Add(monoShader.values[3]);
+
+            }
+
+            monoShader.values = newValues.ToArray();
+            monoShader.Apply();
+
+        }
+
+        // - Color -
+        void FlipColorShaderOrderVertically() {
+
+            var colorShader = (ColorShader)shaders;
+
+            var newValues = new List<XRGB555>(colorShader.values);
+
+            if (colorShader.isQuad) {
+
+                newValues[ColorShader.uvOrderedQuadIndexes[0]] = colorShader.values[ColorShader.uvOrderedQuadIndexes[3]];
+                newValues[ColorShader.uvOrderedQuadIndexes[1]] = colorShader.values[ColorShader.uvOrderedQuadIndexes[2]];
+                newValues[ColorShader.uvOrderedQuadIndexes[2]] = colorShader.values[ColorShader.uvOrderedQuadIndexes[1]];
+                newValues[ColorShader.uvOrderedQuadIndexes[3]] = colorShader.values[ColorShader.uvOrderedQuadIndexes[0]];
+
+            }
+            else {
+
+                newValues[ColorShader.uvOrderedTriIndexes[0]] = colorShader.values[ColorShader.uvOrderedTriIndexes[2]];
+                newValues[ColorShader.uvOrderedTriIndexes[1]] = colorShader.values[ColorShader.uvOrderedTriIndexes[1]];
+                newValues[ColorShader.uvOrderedTriIndexes[2]] = colorShader.values[ColorShader.uvOrderedTriIndexes[0]];
+
+            }
+
+            colorShader.values = newValues.ToArray();
+            colorShader.Apply();
+
+        }
+
+        void FlipColorShaderOrderHorizontally() {
+
+            var colorShader = (ColorShader)shaders;
+
+            var newValues = new List<XRGB555>(colorShader.values);
+
+            if (colorShader.isQuad) {
+
+                newValues[ColorShader.uvOrderedQuadIndexes[0]] = colorShader.values[ColorShader.uvOrderedQuadIndexes[1]];
+                newValues[ColorShader.uvOrderedQuadIndexes[1]] = colorShader.values[ColorShader.uvOrderedQuadIndexes[0]];
+                newValues[ColorShader.uvOrderedQuadIndexes[2]] = colorShader.values[ColorShader.uvOrderedQuadIndexes[3]];
+                newValues[ColorShader.uvOrderedQuadIndexes[3]] = colorShader.values[ColorShader.uvOrderedQuadIndexes[2]];
+
+            }
+            else {
+
+                newValues[ColorShader.uvOrderedTriIndexes[0]] = colorShader.values[ColorShader.uvOrderedTriIndexes[1]];
+                newValues[ColorShader.uvOrderedTriIndexes[1]] = colorShader.values[ColorShader.uvOrderedTriIndexes[0]];
+                newValues[ColorShader.uvOrderedTriIndexes[2]] = colorShader.values[ColorShader.uvOrderedTriIndexes[2]];
+
+            }
+
+            colorShader.values = newValues.ToArray();
+            colorShader.Apply();
+
+        }
+
+        void RotateColorShaderOrderCounterClockwise() {
+
+            var colorShader = (ColorShader)shaders;
+
+            var newValues = new List<XRGB555>(colorShader.values);
+
+            if (colorShader.isQuad) {
+
+                newValues[ColorShader.uvOrderedQuadIndexes[0]] = colorShader.values[ColorShader.uvOrderedQuadIndexes[3]];
+                newValues[ColorShader.uvOrderedQuadIndexes[1]] = colorShader.values[ColorShader.uvOrderedQuadIndexes[0]];
+                newValues[ColorShader.uvOrderedQuadIndexes[2]] = colorShader.values[ColorShader.uvOrderedQuadIndexes[1]];
+                newValues[ColorShader.uvOrderedQuadIndexes[3]] = colorShader.values[ColorShader.uvOrderedQuadIndexes[2]];
+
+            }
+            else {
+
+                newValues[ColorShader.uvOrderedTriIndexes[0]] = colorShader.values[ColorShader.uvOrderedTriIndexes[2]];
+                newValues[ColorShader.uvOrderedTriIndexes[1]] = colorShader.values[ColorShader.uvOrderedTriIndexes[0]];
+                newValues[ColorShader.uvOrderedTriIndexes[2]] = colorShader.values[ColorShader.uvOrderedTriIndexes[1]];
+
+            }
+
+            colorShader.values = newValues.ToArray();
+            colorShader.Apply();
+
+        }
+
+        void RotateColorShaderOrderClockwise() {
+
+            var colorShader = (ColorShader)shaders;
+
+            var newValues = new List<XRGB555>(colorShader.values);
+
+            if (colorShader.isQuad) {
+
+                newValues[ColorShader.uvOrderedQuadIndexes[0]] = colorShader.values[ColorShader.uvOrderedQuadIndexes[1]];
+                newValues[ColorShader.uvOrderedQuadIndexes[1]] = colorShader.values[ColorShader.uvOrderedQuadIndexes[2]];
+                newValues[ColorShader.uvOrderedQuadIndexes[2]] = colorShader.values[ColorShader.uvOrderedQuadIndexes[3]];
+                newValues[ColorShader.uvOrderedQuadIndexes[3]] = colorShader.values[ColorShader.uvOrderedQuadIndexes[0]];
+
+            }
+            else {
+
+                newValues[ColorShader.uvOrderedTriIndexes[0]] = colorShader.values[ColorShader.uvOrderedTriIndexes[1]];
+                newValues[ColorShader.uvOrderedTriIndexes[1]] = colorShader.values[ColorShader.uvOrderedTriIndexes[2]];
+                newValues[ColorShader.uvOrderedTriIndexes[2]] = colorShader.values[ColorShader.uvOrderedTriIndexes[0]];
+
+            }
+
+            colorShader.values = newValues.ToArray();
+            colorShader.Apply();
+
+        }
+
+
         #endregion
 
     }
@@ -2356,7 +2924,14 @@ namespace FCopParser {
 
     }
 
+    // Note that regardless of shape, this will always store 4 vertex colors
+    // These values are ordered the same as UVs
     public class DynamicMonoChromeShader : TileShaders {
+
+        // Ordered by tile vertex positions (Top-Left, Top-Right, Bottom-Left, Bottom-Right)
+        public static readonly int[] vertexOrderedQuadIndexes = new int[] { 0, 1, 3, 2 };
+        public static readonly int[] vertexOrderedTriIndexes = new int[] { 0, 2, 1 };
+
         public float[][] colors { get; set; }
         public bool isQuad { get; set; }
 
@@ -2489,7 +3064,16 @@ namespace FCopParser {
 
     }
 
+    // This doesn't apply to color shader, triangles will store 3
     public class ColorShader : TileShaders {
+
+        // Ordered by tile vertex positions (Top-Left, Top-Right, Bottom-Left, Bottom-Right)
+        public static readonly int[] vertexOrderedQuadIndexes = new int[] { 3, 1, 2, 0 };
+        public static readonly int[] vertexOrderedTriIndexes = new int[] { 2, 0, 1 };
+
+        // Ordered by tile uv positions (Top-Left, Top-Right, Bottom-Right, Bottom-Left)
+        public static readonly int[] uvOrderedQuadIndexes = new int[] { 3, 1, 0, 2 };
+        public static readonly int[] uvOrderedTriIndexes = new int[] { 2, 1, 0 };
 
         public float[][] colors { get; set; }
         public bool isQuad { get; set; }
