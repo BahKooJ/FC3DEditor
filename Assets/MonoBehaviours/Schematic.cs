@@ -204,6 +204,8 @@ public class Schematic {
 
         tileColumns = newTileColum;
 
+        var queueTilesToMove = new List<(int x, int y, Tile tile)>();
+
         var movedTiles = new List<Tile>();
 
         foreach (var column in tileColumns) {
@@ -239,6 +241,11 @@ public class Schematic {
                         movedTiles.Add(tile);
 
                     }
+                    else {
+
+                        queueTilesToMove.Add((column.x + 1, column.y, tile));
+
+                    }
 
                 }
 
@@ -247,6 +254,23 @@ public class Schematic {
             column.tiles = validTiles;
         }
 
+        if (queueTilesToMove.Count != 0) {
+
+            AddTileColumnPaddingPosX();
+
+            foreach (var queue in queueTilesToMove) {
+
+                var nextColumn = tileColumns[(queue.y * width) + queue.x];
+
+                queue.tile.column = nextColumn;
+
+                nextColumn.tiles.Add(queue.tile);
+
+            }
+
+        }
+
+        CleanUpUnusedColumnPadding();
 
     }
 
@@ -289,6 +313,8 @@ public class Schematic {
 
         tileColumns = newTileColum;
 
+        var queueTilesToMove = new List<(int x, int y, Tile tile)>();
+
         var movedTiles = new List<Tile>();
 
         foreach (var column in tileColumns) {
@@ -324,6 +350,11 @@ public class Schematic {
                         movedTiles.Add(tile);
 
                     }
+                    else {
+
+                        queueTilesToMove.Add((column.x, column.y + 1, tile));
+
+                    }
 
                 }
 
@@ -332,6 +363,23 @@ public class Schematic {
             column.tiles = validTiles;
         }
 
+        if (queueTilesToMove.Count != 0) {
+
+            AddTileColumnPaddingPosY();
+
+            foreach (var queue in queueTilesToMove) {
+
+                var nextColumn = tileColumns[(queue.y * width) + queue.x];
+
+                queue.tile.column = nextColumn;
+
+                nextColumn.tiles.Add(queue.tile);
+
+            }
+
+        }
+
+        CleanUpUnusedColumnPadding();
 
     }
 
@@ -382,6 +430,8 @@ public class Schematic {
         width = newWidth;
         height = newHeight;
 
+        var queueTilesToMove = new List<(int x, int y, Tile tile)>();
+
         var movedTiles = new List<Tile>();
 
         foreach (var column in tileColumns) {
@@ -417,6 +467,11 @@ public class Schematic {
                         movedTiles.Add(tile);
 
                     }
+                    else {
+
+                        queueTilesToMove.Add((column.x + 1, column.y, tile));
+
+                    }
 
                 }
 
@@ -425,6 +480,24 @@ public class Schematic {
             column.tiles = validTiles;
 
         }
+
+        if (queueTilesToMove.Count != 0) {
+
+            AddTileColumnPaddingPosX();
+
+            foreach (var queue in queueTilesToMove) {
+
+                var nextColumn = tileColumns[(queue.y * width) + queue.x];
+
+                queue.tile.column = nextColumn;
+
+                nextColumn.tiles.Add(queue.tile);
+
+            }
+
+        }
+
+        CleanUpUnusedColumnPadding();
 
     }
 
@@ -475,6 +548,8 @@ public class Schematic {
         width = newWidth;
         height = newHeight;
 
+        var queueTilesToMove = new List<(int x, int y, Tile tile)>();
+
         var movedTiles = new List<Tile>();
 
         foreach (var column in tileColumns) {
@@ -510,6 +585,11 @@ public class Schematic {
                         movedTiles.Add(tile);
 
                     }
+                    else {
+
+                        queueTilesToMove.Add((column.x, column.y + 1, tile));
+
+                    }
 
                 }
 
@@ -518,6 +598,79 @@ public class Schematic {
             column.tiles = validTiles;
 
         }
+
+        if (queueTilesToMove.Count != 0) {
+
+            AddTileColumnPaddingPosY();
+
+            foreach (var queue in queueTilesToMove) {
+
+                var nextColumn = tileColumns[(queue.y * width) + queue.x];
+
+                queue.tile.column = nextColumn;
+
+                nextColumn.tiles.Add(queue.tile);
+
+            }
+
+        }
+
+        CleanUpUnusedColumnPadding();
+
+    }
+
+    public void AddTileColumnPaddingPosX() {
+
+        var newWidth = width + 1;
+
+        foreach (var i in Enumerable.Range(0, height + 1)) {
+
+            heightMap.Insert((i * (newWidth + 1)) + width + 1, new HeightPoints(-128, -128, -128));
+
+        }
+
+        foreach (var i in Enumerable.Range(0, height)) {
+
+            var heights = new List<HeightPoints>();
+
+            heights.Add(GetHeightPoint(newWidth - 1, i, newWidth));
+            heights.Add(GetHeightPoint(newWidth, i, newWidth));
+            heights.Add(GetHeightPoint(newWidth - 1, i + 1, newWidth));
+            heights.Add(GetHeightPoint(newWidth, i + 1, newWidth));
+
+            tileColumns.Insert((i * newWidth) + width, new TileColumn(newWidth - 1, i, new(), heights));
+
+        }
+
+        width = newWidth;
+
+
+    }
+
+    public void AddTileColumnPaddingPosY() {
+
+        var newHeight = height + 1;
+
+        foreach (var i in Enumerable.Range(0, width + 1)) {
+
+            heightMap.Add(new HeightPoints(-128, -128, -128));
+
+        }
+
+        foreach (var i in Enumerable.Range(0, width)) {
+
+            var heights = new List<HeightPoints>();
+
+            heights.Add(GetHeightPoint(i, newHeight - 1));
+            heights.Add(GetHeightPoint(i + 1, newHeight - 1));
+            heights.Add(GetHeightPoint(i, newHeight));
+            heights.Add(GetHeightPoint(i + 1, newHeight));
+
+            tileColumns.Add(new TileColumn(i, newHeight - 1, new(), heights));
+
+        }
+
+        height = newHeight;
 
     }
 
@@ -532,7 +685,7 @@ public class Schematic {
 
             if (column.tiles.Count != 0) {
                 tilesLocatedTopRow = true;
-                //break;
+                break;
             }
 
         }
@@ -541,7 +694,7 @@ public class Schematic {
 
             if (column.tiles.Count != 0) {
                 tilesLocatedBottomRow = true;
-                //break;
+                break;
             }
 
         }
@@ -552,7 +705,7 @@ public class Schematic {
 
             if (column.tiles.Count != 0) {
                 tilesLocatedLeftColumn = true;
-                //break;
+                break;
             }
 
         }
@@ -562,9 +715,81 @@ public class Schematic {
             var column = tileColumns[(i * width) + (width - 1)];
 
             if (column.tiles.Count != 0) {
-                tilesLocatedLeftColumn = true;
-                //break;
+                tilesLocatedRightColumn = true;
+                break;
             }
+
+        }
+
+        if (!tilesLocatedTopRow) {
+
+            var newHeight = height - 1;
+
+            heightMap.RemoveRange(0, width + 1);
+            tileColumns.RemoveRange(0, width);
+
+            foreach (var column in tileColumns) {
+                column.y--;
+            }
+
+            height = newHeight;
+
+        }
+
+        // This is never called so idk if it works
+        if (!tilesLocatedBottomRow) {
+
+            var newHeight = height - 1;
+
+            heightMap.RemoveRange(height * (width + 1), width + 1);
+            tileColumns.RemoveRange((height - 1) * width, width);
+
+            height = newHeight;
+
+        }
+
+        if (!tilesLocatedLeftColumn) {
+
+            var newWidth = width - 1;
+
+            foreach (var i in Enumerable.Range(0, height + 1)) {
+
+                heightMap.RemoveAt(i * (newWidth + 1));
+
+            }
+
+            foreach (var i in Enumerable.Range(0, height)) {
+
+                tileColumns.RemoveAt(i * newWidth);
+
+            }
+
+            foreach (var column in tileColumns) {
+                column.x--;
+            }
+
+            width = newWidth;
+
+        }
+
+        // Same with this one...
+        if (!tilesLocatedRightColumn) {
+
+            var newWidth = width - 1;
+
+            foreach (var i in Enumerable.Range(0, height + 1)) {
+
+                heightMap.RemoveAt((i * (newWidth + 1)) + width);
+
+            }
+
+            foreach (var i in Enumerable.Range(0, height)) {
+
+                tileColumns.RemoveAt((i * newWidth) + (width - 1));
+
+            }
+
+            width = newWidth;
 
         }
 
