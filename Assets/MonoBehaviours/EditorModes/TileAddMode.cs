@@ -89,7 +89,60 @@ public class TileAddMode : EditMode {
 
         }
 
-        if (Controls.OnDown("Select")) {
+        if (Controls.OnDown("ResetLevelSchematic")) {
+
+            selectedSchematic.transformedSchematic = null;
+
+            schematicBuildOverlay.RefreshPreviewColumns();
+            schematicBuildOverlay.RefreshMesh();
+
+        }
+
+        if (Controls.IsDown("EnableRotateLevelSchematic")) {
+
+            if (Input.GetMouseButtonDown(0)) {
+
+                selectedSchematic.transformedSchematic ??= selectedSchematic.Clone();
+
+                selectedSchematic.transformedSchematic.RotateClockwise();
+                schematicBuildOverlay.RefreshPreviewColumns();
+                schematicBuildOverlay.RefreshMesh();
+
+            }
+            else if (Input.GetMouseButtonDown(1)) {
+
+                selectedSchematic.transformedSchematic ??= selectedSchematic.Clone();
+
+                selectedSchematic.transformedSchematic.RotateCounterClockwise();
+                schematicBuildOverlay.RefreshPreviewColumns();
+                schematicBuildOverlay.RefreshMesh();
+
+            }
+
+        }
+        else if (Controls.IsDown("EnableMirrorLevelSchematic")) {
+
+            if (Input.GetMouseButtonDown(0)) {
+
+                selectedSchematic.transformedSchematic ??= selectedSchematic.Clone();
+
+                selectedSchematic.transformedSchematic.MirrorVertically();
+                schematicBuildOverlay.RefreshPreviewColumns();
+                schematicBuildOverlay.RefreshMesh();
+
+            }
+            else if (Input.GetMouseButtonDown(1)) {
+
+                selectedSchematic.transformedSchematic ??= selectedSchematic.Clone();
+
+                selectedSchematic.transformedSchematic.MirrorHorizontally();
+                schematicBuildOverlay.RefreshPreviewColumns();
+                schematicBuildOverlay.RefreshMesh();
+
+            }
+
+        }
+        else if (Controls.OnDown("Select")) {
 
             if (selectedTilePreset != null) {
                 AddTile((TilePreset)selectedTilePreset);
@@ -107,6 +160,10 @@ public class TileAddMode : EditMode {
         ClearBuildingOverlay();
 
         selectedTilePreset = null;
+
+        if (selectedSchematic != null) {
+            selectedSchematic.transformedSchematic = null;
+        }
 
         selectedSchematic = schematic;
         InitSchematicMeshOverlay();
@@ -178,11 +235,11 @@ public class TileAddMode : EditMode {
 
     void PreviewSchematicPlacement() {
 
+        var prevX = hoverSelection.columnWorldX;
+        var prevY = hoverSelection.columnWorldY;
+
         if (placementSetting == SchematicPlacementSetting.Exact) {
-            schematicBuildOverlay.transform.position =
-                new Vector3(hoverSelection.columnWorldX,
-                0,
-                -hoverSelection.columnWorldY);
+            schematicBuildOverlay.transform.position = new Vector3(prevX, 0, -prevY);
         }
         if (placementSetting == SchematicPlacementSetting.Relative) {
 
@@ -191,10 +248,7 @@ public class TileAddMode : EditMode {
 
             var dif = hoverMax - schemLow;
 
-            schematicBuildOverlay.transform.position =
-                new Vector3(hoverSelection.columnWorldX,
-                dif / HeightPoints.multiplyer,
-                -hoverSelection.columnWorldY);
+            schematicBuildOverlay.transform.position = new Vector3(prevX, dif / HeightPoints.multiplyer, -prevY);
 
         }
         if (placementSetting == SchematicPlacementSetting.Keep) {
@@ -220,10 +274,7 @@ public class TileAddMode : EditMode {
 
             schematicBuildOverlay.RefreshMesh();
 
-            schematicBuildOverlay.transform.position =
-                new Vector3(hoverSelection.columnWorldX,
-                0,
-                -hoverSelection.columnWorldY);
+            schematicBuildOverlay.transform.position = new Vector3(prevX, 0, -prevY);
 
         }
 
@@ -343,6 +394,8 @@ public class TileAddMode : EditMode {
 
         if (hoverSelection == null) { return; }
 
+        var schematicToPlace = selectedSchematic.transformedSchematic == null ? selectedSchematic : selectedSchematic.transformedSchematic;
+
         var affectedSections = new HashSet<LevelMesh>();
 
         void FinishUp() {
@@ -352,9 +405,9 @@ public class TileAddMode : EditMode {
         }
 
         // Firse it needs to know the amount of sections that will be mutated for undo
-        foreach (var y in Enumerable.Range(hoverSelection.columnWorldY, selectedSchematic.height)) {
+        foreach (var y in Enumerable.Range(hoverSelection.columnWorldY, schematicToPlace.height)) {
 
-            foreach (var x in Enumerable.Range(hoverSelection.columnWorldX, selectedSchematic.width)) {
+            foreach (var x in Enumerable.Range(hoverSelection.columnWorldX, schematicToPlace.width)) {
 
                 var itSection = main.GetLevelMesh(x / 16, y / 16);
 
@@ -367,14 +420,14 @@ public class TileAddMode : EditMode {
         AddSchematicAddCounterAction(affectedSections.ToList());
 
         // Next it adds all the tiles
-        foreach (var y in Enumerable.Range(hoverSelection.columnWorldY, selectedSchematic.height)) {
+        foreach (var y in Enumerable.Range(hoverSelection.columnWorldY, schematicToPlace.height)) {
 
-            foreach (var x in Enumerable.Range(hoverSelection.columnWorldX, selectedSchematic.width)) {
+            foreach (var x in Enumerable.Range(hoverSelection.columnWorldX, schematicToPlace.width)) {
 
                 var itSection = main.GetLevelMesh(x / 16, y / 16);
                 var itColumn = itSection.section.GetTileColumn(x % 16, y % 16);
 
-                var itSchemColumn = selectedSchematic.GetTileColumn(x - hoverSelection.columnWorldX, y - hoverSelection.columnWorldY);
+                var itSchemColumn = schematicToPlace.GetTileColumn(x - hoverSelection.columnWorldX, y - hoverSelection.columnWorldY);
 
                 if (itSchemColumn.tiles.Count == 0) {
                     continue;
@@ -426,18 +479,18 @@ public class TileAddMode : EditMode {
         }
 
         var hoverMax = hoverSelection.tile.GetMaxHeight();
-        var schemLow = selectedSchematic.LowestHeight();
+        var schemLow = schematicToPlace.LowestHeight();
 
         var dif = hoverMax - schemLow;
 
-        foreach (var y in Enumerable.Range(hoverSelection.columnWorldY, selectedSchematic.height)) {
+        foreach (var y in Enumerable.Range(hoverSelection.columnWorldY, schematicToPlace.height)) {
 
-            foreach (var x in Enumerable.Range(hoverSelection.columnWorldX, selectedSchematic.width)) {
+            foreach (var x in Enumerable.Range(hoverSelection.columnWorldX, schematicToPlace.width)) {
 
                 var itSection = main.GetLevelMesh(x / 16, y / 16);
                 var itColumn = itSection.section.GetTileColumn(x % 16, y % 16);
 
-                var itSchemColumn = selectedSchematic.GetTileColumn(x - hoverSelection.columnWorldX, y - hoverSelection.columnWorldY);
+                var itSchemColumn = schematicToPlace.GetTileColumn(x - hoverSelection.columnWorldX, y - hoverSelection.columnWorldY);
 
                 foreach (var i in Enumerable.Range(0, itColumn.heights.Count)) {
 

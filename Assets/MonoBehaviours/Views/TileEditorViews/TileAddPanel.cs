@@ -103,6 +103,10 @@ public class TileAddPanel : MonoBehaviour {
 
         CloseTileEffectsPanel();
 
+        if (TileAddMode.selectedSchematic != null) {
+            TileAddMode.selectedSchematic.transformedSchematic = null;
+        }
+
         var obj = Instantiate(schematicPanelPrefab);
         obj.transform.SetParent(transform.parent, false);
         activeSchematicView = obj.GetComponent<SchematicMeshPresetsView>();

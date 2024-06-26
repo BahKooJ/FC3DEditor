@@ -75,11 +75,26 @@ public class SchematicMesh : MonoBehaviour {
 
         previewColumns.Clear();
 
-        foreach (var column in schematic.tileColumns) {
+        if (schematic.transformedSchematic != null) {
 
-            previewColumns.Add(column.CloneWithHeights());
+            foreach (var column in schematic.transformedSchematic.tileColumns) {
+
+                previewColumns.Add(column.CloneWithHeights());
+
+            }
 
         }
+        else {
+
+            foreach (var column in schematic.tileColumns) {
+
+                previewColumns.Add(column.CloneWithHeights());
+
+            }
+
+        }
+
+
 
     }
 
