@@ -2,6 +2,7 @@
 
 using FCopParser;
 using System.Collections.Generic;
+using UnityEditor.Presets;
 
 public class ShaderPresets {
 
@@ -33,60 +34,8 @@ public class ShaderPresets {
 
             foreach (var preset in presets) {
 
-                // All Objects:
-                // (NAME(string), TYPE(int), MESHTYPE(int), ...
-
-                total += "(\"" + preset.name + "\",";
-
-                total += ((int)preset.shader.type).ToString() + ",";
-
-                total += preset.meshID.ToString() + ",";
-
-                switch (preset.shader.type) {
-                    case VertexColorType.MonoChrome:
-                        // VALUE(int))
-
-                        var solidMono = (MonoChromeShader)preset.shader;
-                        total += solidMono.value.ToString() + "),";
-
-                        break;
-                    case VertexColorType.DynamicMonoChrome:
-                        // [VALUES(int)])
-
-                        var mono = (DynamicMonoChromeShader)preset.shader;
-
-                        total += "[";
-
-                        foreach (var v in mono.values) {
-                            total += v.ToString() + ",";
-                        }
-
-                        total = total.Remove(total.Length - 1);
-
-                        total += "]),";
-
-                        break;
-                    case VertexColorType.Color:
-                        // [VALUES(uShort)])
-
-                        var color = (ColorShader)preset.shader;
-
-                        total += "[";
-
-                        foreach (var v in color.values) {
-                            total += v.ToUShort().ToString() + ",";
-                        }
-
-                        total = total.Remove(total.Length - 1);
-
-                        total += "]),";
-
-                        break;
-                    case VertexColorType.ColorAnimated: 
-                        // This should never be the case
-
-                        break;
-                }
+                total += preset.Compile();
+                total += ",";
 
             }
 
@@ -151,6 +100,85 @@ public class ShaderPreset {
     }
 
     public ShaderPreset() {
+
+    }
+
+    public ShaderPreset(Tile tile) {
+        this.shader = tile.shaders.Clone();
+        this.name = "Preset";
+        this.meshID = (int)MeshType.IDFromVerticies(tile.verticies);
+    }
+
+    public string Compile() {
+
+        var total = "";
+
+        // All Objects:
+        // (NAME(string), TYPE(int), MESHTYPE(int), ...
+
+        total += "(\"" + name + "\",";
+
+        total += ((int)shader.type).ToString() + ",";
+
+        total += meshID.ToString() + ",";
+
+        switch (shader.type) {
+            case VertexColorType.MonoChrome:
+                // VALUE(int))
+
+                var solidMono = (MonoChromeShader)shader;
+                total += solidMono.value.ToString() + ")";
+
+                break;
+            case VertexColorType.DynamicMonoChrome:
+                // [VALUES(int)])
+
+                var mono = (DynamicMonoChromeShader)shader;
+
+                total += "[";
+
+                foreach (var v in mono.values) {
+                    total += v.ToString() + ",";
+                }
+
+                total = total.Remove(total.Length - 1);
+
+                total += "])";
+
+                break;
+            case VertexColorType.Color:
+                // [VALUES(uShort)])
+
+                var color = (ColorShader)shader;
+
+                total += "[";
+
+                foreach (var v in color.values) {
+                    total += v.ToUShort().ToString() + ",";
+                }
+
+                total = total.Remove(total.Length - 1);
+
+                total += "])";
+
+                break;
+            case VertexColorType.ColorAnimated:
+                // This should never be the case
+                // Update: Welp now it is because of schematics
+                // Thanks past me for not closing this causing a slew of issues
+
+                total += ")";
+
+                break;
+        }
+
+        return total;
+
+    }
+
+    public void ReceiveDataToTile(Tile tile) {
+
+        tile.shaders = shader.Clone();
 
     }
 
@@ -240,6 +268,10 @@ public class ColorPresets {
                         break;
                     case VertexColorType.ColorAnimated:
                         // This should never be the case
+                        // Update: Welp now it is because of schematics
+                        // Thanks past me for not closing this causing a slew of issues
+
+                        total += "),";
 
                         break;
                 }

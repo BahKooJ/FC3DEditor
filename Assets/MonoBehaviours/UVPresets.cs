@@ -1,8 +1,10 @@
 ﻿
+using FCopParser;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEditor.Presets;
 
 public class UVPresets {
 
@@ -188,44 +190,8 @@ public class UVPresets {
 
             foreach (var preset in presets) {
 
-                total += "(";
-
-                total += "\"" + preset.name + "\",";
-                total += preset.texturePalette.ToString() + ",";
-                total += (preset.isSemiTransparent ? 1 : 0).ToString() + ",";
-                total += (preset.isVectorAnimated ? 1 : 0).ToString() + ",";
-                total += preset.meshID.ToString() + ",";
-
-
-                total += "[";
-                foreach (var uv in preset.uvs) {
-
-                    total += uv.ToString() + ",";
-
-                }
-                total = total.Remove(total.Length - 1);
-
-                if (preset.animatedUVs.Count == 0) {
-                    total += "]),";
-                }
-                else {
-
-                    total += "],";
-
-                    total += preset.animationSpeed.ToString() + ",";
-
-                    total += "[";
-                    foreach (var uv in preset.animatedUVs) {
-
-                        total += uv.ToString() + ",";
-
-                    }
-                    total = total.Remove(total.Length - 1);
-
-                    total += "]),";
-
-                }
-
+                total += preset.Compile();
+                total += ",";
 
             }
 
@@ -299,6 +265,17 @@ public class UVPreset {
         this.animatedUVs = new List<int>(animatedUVs);
     }
 
+    public UVPreset(Tile tile) {
+        this.uvs = new List<int>(tile.uvs);
+        this.texturePalette = tile.texturePalette;
+        this.name = "Preset";
+        this.meshID = (int)MeshType.IDFromVerticies(tile.verticies);
+        this.isSemiTransparent = tile.isSemiTransparent;
+        this.isVectorAnimated = tile.isVectorAnimated;
+        this.animationSpeed = tile.animationSpeed;
+        this.animatedUVs = new List<int>(tile.animatedUVs);
+    }
+
     public UVPreset() {
 
         uvs = new List<int>();
@@ -309,6 +286,80 @@ public class UVPreset {
         isVectorAnimated = false;
         animationSpeed = -1;
         animatedUVs = new List<int>();
+
+    }
+
+    public void ReceiveDataToTile(Tile tile) {
+
+        if (animatedUVs.Count > 0) {
+
+            tile.animationSpeed = animationSpeed;
+            tile.animatedUVs = new List<int>(animatedUVs);
+            tile.texturePalette = texturePalette;
+            tile.isVectorAnimated = false;
+            tile.isSemiTransparent = isSemiTransparent;
+
+            if (tile.verticies.Count == 4) {
+                tile.uvs = new List<int>(animatedUVs.GetRange(0, 4));
+            }
+            else {
+                tile.uvs = new List<int>(animatedUVs.GetRange(0, 3));
+            }
+
+            return;
+        }
+
+        tile.uvs = new List<int>(uvs);
+        tile.texturePalette = texturePalette;
+        tile.isVectorAnimated = isVectorAnimated;
+        tile.isSemiTransparent = isSemiTransparent;
+        tile.animationSpeed = -1;
+        tile.animatedUVs = new List<int>();
+
+    }
+
+    public string Compile() {
+
+        var total = "";
+
+        total += "(";
+
+        total += "\"" + name + "\",";
+        total += texturePalette.ToString() + ",";
+        total += (isSemiTransparent ? 1 : 0).ToString() + ",";
+        total += (isVectorAnimated ? 1 : 0).ToString() + ",";
+        total += meshID.ToString() + ",";
+
+
+        total += "[";
+        foreach (var uv in uvs) {
+
+            total += uv.ToString() + ",";
+
+        }
+        total = total.Remove(total.Length - 1);
+
+        if (animatedUVs.Count == 0) {
+            total += "])";
+        }
+        else {
+            total += "],";
+
+            total += animationSpeed.ToString() + ",";
+
+            total += "[";
+            foreach (var uv in animatedUVs) {
+
+                total += uv.ToString() + ",";
+
+            }
+            total = total.Remove(total.Length - 1);
+
+            total += "])";
+
+        }
+
+        return total;
 
     }
 

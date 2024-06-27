@@ -2,11 +2,13 @@
 
 using FCopParser;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using UnityEngine;
-using static System.Collections.Specialized.BitVector32;
+using System.Text;
 
 public class Schematic {
+
+    public static string tag = "LVSMTAG";
 
     public string name;
 
@@ -792,6 +794,56 @@ public class Schematic {
             width = newWidth;
 
         }
+
+    }
+
+    public string Compile() {
+
+        var total = new StringBuilder();
+
+        total.Append("(\"" + name + "\"," + width.ToString() + "," + height.ToString() + ",[");
+
+        foreach (var height in heightMap) {
+            total.Append("(" + height.GetTruePoint(1).ToString() + "," + height.GetTruePoint(2).ToString() + "," + height.GetTruePoint(3).ToString() + "),");
+        }
+
+        // Removes access comma
+        total.Remove(total.Length - 1, 1);
+
+        total.Append("], [");
+
+        foreach (var column in tileColumns) {
+            total.Append("([");
+
+            foreach (var tile in column.tiles) {
+                total.Append("(");
+                total.Append(((int)MeshType.IDFromVerticies(tile.verticies)).ToString() + ",");
+                total.Append(tile.culling.ToString() + ",");
+                total.Append(tile.effectIndex.ToString() + ",");
+                total.Append(new UVPreset(tile).Compile() + ",");
+                total.Append(new ShaderPreset(tile).Compile() + ")");
+
+                total.Append(",");
+            }
+
+            if (column.tiles.Count != 0) {
+
+                // Removes access comma
+                total.Remove(total.Length - 1, 1);
+
+            }
+
+
+            total.Append("]),");
+
+        }
+
+        // Removes access comma
+        total.Remove(total.Length - 1, 1);
+
+        total.Append("])");
+
+        return total.ToString();
 
     }
 

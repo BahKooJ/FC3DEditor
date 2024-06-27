@@ -284,6 +284,8 @@ public class UVPresentViewItem : MonoBehaviour {
             tile.texturePalette = preset.texturePalette;
             tile.isVectorAnimated = preset.isVectorAnimated;
             tile.isSemiTransparent = preset.isSemiTransparent;
+            tile.animationSpeed = -1;
+            tile.animatedUVs = new List<int>();
 
         }
 
