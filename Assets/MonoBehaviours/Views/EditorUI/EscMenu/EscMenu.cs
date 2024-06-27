@@ -1,5 +1,6 @@
 ﻿
 
+using FCopParser;
 using UnityEngine;
 
 public class EscMenu : MonoBehaviour {
@@ -94,6 +95,35 @@ public class EscMenu : MonoBehaviour {
         main.Compile();
         Main.counterActions.Clear();
         
+    }
+
+    public void OnClickSavePresets() {
+        DeactivateAllViews();
+
+        OpenFileWindowUtil.SaveFile("Presets", "Presets", path => {
+
+            var fileName = Utils.RemovePathingFromFilePath(path);
+
+            Presets.uvPresets.directoryName = Utils.RemoveExtensionFromFileName(fileName);
+            Presets.shaderPresets.directoryName = Utils.RemoveExtensionFromFileName(fileName);
+            Presets.colorPresets.directoryName = Utils.RemoveExtensionFromFileName(fileName);
+
+            Presets.SaveToFile(Utils.RemoveExtensionFromFileName(fileName));
+
+        });
+
+    }
+
+    public void OnClickOpenPresets() {
+
+        DeactivateAllViews();
+
+        OpenFileWindowUtil.OpenFile("Presets", "", path => {
+
+            Presets.ReadFile(path);
+
+        });
+
     }
 
     public void OnClickExit() {
