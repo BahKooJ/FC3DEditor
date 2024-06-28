@@ -18,7 +18,6 @@ public struct TilePreset {
         this.previewImagePath = previewImagePath;
     }
 
-    //TODO: This should not need to section
     public Tile Create(bool isStart, TileColumn column) {
 
         return new Tile(column, meshID, culling);

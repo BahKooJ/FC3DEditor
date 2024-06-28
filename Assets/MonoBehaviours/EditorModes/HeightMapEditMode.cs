@@ -43,8 +43,7 @@ public class HeightMapEditMode : EditMode {
 
             DeselectAllHeights();
 
-        } 
-
+        }
 
     }
 
@@ -420,6 +419,15 @@ public class HeightMapEditMode : EditMode {
 
     }
 
+    public void DiscardUnusedChannels() {
+
+        AddAllHeightMapSaveStateCounterAction();
+        selectedSection.section.DiscardUnusedHeights();
+        RefreshHeights();
+        selectedSection.RefreshMesh();
+
+    }
+
     #endregion
 
     #region Callbacks
@@ -583,6 +591,33 @@ public class HeightMapEditMode : EditMode {
             if (heightObj.isSelected) {
                 affectedHeights.Add(heightObj.heightPoints);
             }
+
+        }
+
+        Main.AddCounterAction(new MultiHeightMapSaveStateCounterAction(new(affectedHeights), () => {
+
+            if (Main.editMode is not HeightMapEditMode) {
+                return;
+            }
+
+            var editMode = (HeightMapEditMode)Main.editMode;
+
+            editMode.RefreshHeights();
+
+            HeightMapEditMode.selectedSection.RefreshMesh();
+
+
+        }));
+
+    }
+
+    public void AddAllHeightMapSaveStateCounterAction() {
+
+        var affectedHeights = new List<HeightPoints>();
+
+        foreach (var heightObj in heightPointObjects) {
+            
+            affectedHeights.Add(heightObj.heightPoints);
 
         }
 

@@ -4,7 +4,6 @@ using System.Collections;
 using System.Linq;
 using System;
 using System.Text;
-using System.Drawing;
 
 namespace FCopParser {
 

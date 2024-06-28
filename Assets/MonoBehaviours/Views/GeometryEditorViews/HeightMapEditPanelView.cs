@@ -47,6 +47,14 @@ public class HeightMapEditPanelView: MonoBehaviour {
 
     }
 
+    public void OnClickDiscardUnusedChannels() {
+
+        QuickLogHandler.Log("Unused channels (vertices) sent to -128", LogSeverity.Success);
+
+        controller.DiscardUnusedChannels();
+
+    }
+
 
 }
 

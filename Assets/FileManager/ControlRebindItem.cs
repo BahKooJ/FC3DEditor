@@ -91,6 +91,8 @@ class ControlRebindItem : MonoBehaviour {
         listen = false;
         SetKeyText();
 
+        pressedKeys.Clear();
+
     }
 
     void SetKeyText() {

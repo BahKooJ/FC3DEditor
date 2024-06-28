@@ -1102,6 +1102,114 @@ namespace FCopParser {
 
         }
 
+        public void DiscardUnusedHeights() {
+
+            foreach (var y in Enumerable.Range(0, 17)) {
+
+                foreach (var x in Enumerable.Range(0, 17)) {
+
+                    var usedChannels = new HashSet<int>();
+
+                    var heightPoint = GetHeightPoint(x, y);
+
+                    TileColumn topLeft = null;
+                    TileColumn topRight = null;
+                    TileColumn bottomLeft = null;
+                    TileColumn bottomRight = null;
+
+                    if (x - 1 >= 0 && y - 1 >= 0) {
+                        topLeft = GetTileColumn(x - 1, y - 1);
+                    }
+
+                    if (x < 16 && y - 1 >= 0) {
+                        topRight = GetTileColumn(x, y - 1);
+                    }
+
+                    if (x - 1 >= 0 && y < 16) {
+                        bottomLeft = GetTileColumn(x - 1, y);
+                    }
+
+                    if (x < 16 && y < 16) {
+                        bottomRight = GetTileColumn(x, y);
+                    }
+
+                    if (topLeft != null) {
+                        
+                        foreach (var tile in topLeft.tiles) {
+
+                            foreach (var vert in tile.verticies) {
+
+                                if (vert.vertexPosition == VertexPosition.BottomRight) {
+                                    usedChannels.Add(vert.heightChannel); 
+                                }
+
+                            }
+
+                        }
+
+                    }
+                    if (topRight != null) {
+
+                        foreach (var tile in topRight.tiles) {
+
+                            foreach (var vert in tile.verticies) {
+
+                                if (vert.vertexPosition == VertexPosition.BottomLeft) {
+                                    usedChannels.Add(vert.heightChannel);
+                                }
+
+                            }
+
+                        }
+
+                    }
+                    if (bottomLeft != null) {
+
+                        foreach (var tile in bottomLeft.tiles) {
+
+                            foreach (var vert in tile.verticies) {
+
+                                if (vert.vertexPosition == VertexPosition.TopRight) {
+                                    usedChannels.Add(vert.heightChannel);
+                                }
+
+                            }
+
+                        }
+
+                    }
+                    if (bottomRight != null) {
+
+                        foreach (var tile in bottomRight.tiles) {
+
+                            foreach (var vert in tile.verticies) {
+
+                                if (vert.vertexPosition == VertexPosition.TopLeft) {
+                                    usedChannels.Add(vert.heightChannel);
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                    if (!usedChannels.Contains(1)) {
+                        heightPoint.SetPoint(HeightPoints.invalid, 1);
+                    }
+                    if (!usedChannels.Contains(2)) {
+                        heightPoint.SetPoint(HeightPoints.invalid, 2);
+                    }
+                    if (!usedChannels.Contains(3)) {
+                        heightPoint.SetPoint(HeightPoints.invalid, 3);
+                    }
+
+                }
+
+            }
+
+        }
+
         public void Overwrite(FCopLevelSection section) {
 
             heightMap.Clear();
@@ -1168,6 +1276,7 @@ namespace FCopParser {
         public const float multiplyer = 30f;
         public const float maxValue = SByte.MaxValue / multiplyer;
         public const float minValue = SByte.MinValue / multiplyer;
+        public const int invalid = -128;
 
         // Man why did I make these floats way back when :(
         public float height1;

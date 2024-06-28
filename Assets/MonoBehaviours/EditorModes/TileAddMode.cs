@@ -89,55 +89,64 @@ public class TileAddMode : EditMode {
 
         }
 
-        if (Controls.OnDown("ResetLevelSchematic")) {
+        if (selectedSchematic != null) {
 
-            selectedSchematic.transformedSchematic = null;
+            if (Controls.OnDown("ResetLevelSchematic")) {
 
-            schematicBuildOverlay.RefreshPreviewColumns();
-            schematicBuildOverlay.RefreshMesh();
+                selectedSchematic.transformedSchematic = null;
 
-        }
-
-        if (Controls.IsDown("EnableRotateLevelSchematic")) {
-
-            if (Input.GetMouseButtonDown(0)) {
-
-                selectedSchematic.transformedSchematic ??= selectedSchematic.Clone();
-
-                selectedSchematic.transformedSchematic.RotateClockwise();
-                schematicBuildOverlay.RefreshPreviewColumns();
-                schematicBuildOverlay.RefreshMesh();
-
-            }
-            else if (Input.GetMouseButtonDown(1)) {
-
-                selectedSchematic.transformedSchematic ??= selectedSchematic.Clone();
-
-                selectedSchematic.transformedSchematic.RotateCounterClockwise();
                 schematicBuildOverlay.RefreshPreviewColumns();
                 schematicBuildOverlay.RefreshMesh();
 
             }
 
-        }
-        else if (Controls.IsDown("EnableMirrorLevelSchematic")) {
+            if (Controls.IsDown("EnableRotateLevelSchematic")) {
 
-            if (Input.GetMouseButtonDown(0)) {
+                if (Input.GetMouseButtonDown(0)) {
 
-                selectedSchematic.transformedSchematic ??= selectedSchematic.Clone();
+                    selectedSchematic.transformedSchematic ??= selectedSchematic.Clone();
 
-                selectedSchematic.transformedSchematic.MirrorVertically();
-                schematicBuildOverlay.RefreshPreviewColumns();
-                schematicBuildOverlay.RefreshMesh();
+                    selectedSchematic.transformedSchematic.RotateClockwise();
+                    schematicBuildOverlay.RefreshPreviewColumns();
+                    schematicBuildOverlay.RefreshMesh();
+
+                }
+                else if (Input.GetMouseButtonDown(1)) {
+
+                    selectedSchematic.transformedSchematic ??= selectedSchematic.Clone();
+
+                    selectedSchematic.transformedSchematic.RotateCounterClockwise();
+                    schematicBuildOverlay.RefreshPreviewColumns();
+                    schematicBuildOverlay.RefreshMesh();
+
+                }
 
             }
-            else if (Input.GetMouseButtonDown(1)) {
+            else if (Controls.IsDown("EnableMirrorLevelSchematic")) {
 
-                selectedSchematic.transformedSchematic ??= selectedSchematic.Clone();
+                if (Input.GetMouseButtonDown(0)) {
 
-                selectedSchematic.transformedSchematic.MirrorHorizontally();
-                schematicBuildOverlay.RefreshPreviewColumns();
-                schematicBuildOverlay.RefreshMesh();
+                    selectedSchematic.transformedSchematic ??= selectedSchematic.Clone();
+
+                    selectedSchematic.transformedSchematic.MirrorVertically();
+                    schematicBuildOverlay.RefreshPreviewColumns();
+                    schematicBuildOverlay.RefreshMesh();
+
+                }
+                else if (Input.GetMouseButtonDown(1)) {
+
+                    selectedSchematic.transformedSchematic ??= selectedSchematic.Clone();
+
+                    selectedSchematic.transformedSchematic.MirrorHorizontally();
+                    schematicBuildOverlay.RefreshPreviewColumns();
+                    schematicBuildOverlay.RefreshMesh();
+
+                }
+
+            }
+            else if (Controls.OnDown("Select")) {
+                
+                PlaceSchematic();
 
             }
 
@@ -146,10 +155,6 @@ public class TileAddMode : EditMode {
 
             if (selectedTilePreset != null) {
                 AddTile((TilePreset)selectedTilePreset);
-            }
-
-            if (selectedSchematic != null) {
-                PlaceSchematic();
             }
 
         }

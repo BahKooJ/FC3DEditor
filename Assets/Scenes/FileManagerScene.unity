@@ -302,6 +302,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: HomeScreen
       objectReference: {fileID: 0}
+    - target: {fileID: 8995432282465699879, guid: c61b2c95d735c614699d244937113bb6, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8995432282465699879, guid: c61b2c95d735c614699d244937113bb6, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c61b2c95d735c614699d244937113bb6, type: 3}
 --- !u!224 &1208303788 stripped

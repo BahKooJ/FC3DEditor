@@ -2,7 +2,6 @@
 
 using FCopParser;
 using System.Collections.Generic;
-using UnityEditor.Presets;
 
 public class ShaderPresets {
 
