@@ -114,11 +114,24 @@ public class SectionEditMode : EditMode {
 
         if (selectedSection != null) {
             copySection = selectedSection.section;
+            QuickLogHandler.Log("Section copied to clipboard", LogSeverity.Success);
+        } else {
+            QuickLogHandler.Log("No section is selected", LogSeverity.Info);
+
         }
 
     }
 
     public void PasteSectionData() {
+
+        if (selectedSection == null) {
+            QuickLogHandler.Log("No section is selected", LogSeverity.Info);
+            return;
+        }
+        if (copySection == null) {
+            QuickLogHandler.Log("No section copied to clipboard!", LogSeverity.Error);
+            return;
+        }
 
         DialogWindowUtil.Dialog("Warning", "This will overwrite all current map data, are you sure you want to continue?", () => {
 
@@ -134,6 +147,11 @@ public class SectionEditMode : EditMode {
     }
 
     public void MirrorSectionVertically() {
+
+        if (selectedSection == null) {
+            QuickLogHandler.Log("No section is selected", LogSeverity.Info);
+            return;
+        }
 
         DialogWindowUtil.Dialog("Warning",
             "Some tiles cannot be mirrored correct and may be deleted. This will overwrite all current map data, are you sure you want to continue?",
@@ -153,6 +171,11 @@ public class SectionEditMode : EditMode {
 
     public void MirrorSectionHorizontally() {
 
+        if (selectedSection == null) {
+            QuickLogHandler.Log("No section is selected", LogSeverity.Info);
+            return;
+        }
+
         DialogWindowUtil.Dialog("Warning",
             "Some tiles cannot be mirrored correct and may be deleted. This will overwrite all current map data, are you sure you want to continue?",
             () => {
@@ -170,6 +193,11 @@ public class SectionEditMode : EditMode {
     }
 
     public void MirrorSectionDiagonally() {
+
+        if (selectedSection == null) {
+            QuickLogHandler.Log("No section is selected", LogSeverity.Info);
+            return;
+        }
 
         DialogWindowUtil.Dialog("Warning",
             "Some tiles cannot be mirrored correct and may be deleted. This will overwrite all current map data, are you sure you want to continue?",
@@ -189,6 +217,11 @@ public class SectionEditMode : EditMode {
 
     public void RotateSectionClockwise() {
 
+        if (selectedSection == null) {
+            QuickLogHandler.Log("No section is selected", LogSeverity.Info);
+            return;
+        }
+
         DialogWindowUtil.Dialog("Warning",
             "Some tiles cannot be rotated correct and may be deleted. This will overwrite all current map data, are you sure you want to continue?",
             () => {
@@ -207,6 +240,11 @@ public class SectionEditMode : EditMode {
 
     public void RotateSectionCounterClockwise() {
 
+        if (selectedSection == null) {
+            QuickLogHandler.Log("No section is selected", LogSeverity.Info);
+            return;
+        }
+
         DialogWindowUtil.Dialog("Warning",
             "Some tiles cannot be rotated correct and may be deleted. This will overwrite all current map data, are you sure you want to continue?",
             () => {
@@ -224,6 +262,11 @@ public class SectionEditMode : EditMode {
     }
 
     public void RemoveShadersFromSection() {
+
+        if (selectedSection == null) {
+            QuickLogHandler.Log("No section is selected", LogSeverity.Info);
+            return;
+        }
 
         DialogWindowUtil.Dialog("Warning",
         "This will remove all tile shader data, are you sure you want to continue?",
