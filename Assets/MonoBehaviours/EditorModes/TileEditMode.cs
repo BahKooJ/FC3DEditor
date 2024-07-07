@@ -636,6 +636,24 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
+    public void BreakApartQuadTileTopBottom() {
+
+        var newTiles = FirstTile.BreakApartQuadTileBottomTop();
+
+        if (newTiles != null) {
+
+            FirstItem.column.tiles.AddRange(newTiles);
+
+            FirstItem.column.tiles.Remove(FirstTile);
+
+            RefreshMeshes();
+
+            ClearAllSelectedItems();
+
+        }
+
+    }
+
     public void AddWallsToTiles() {
 
         TileSelection selectedTileAtLocation(int worldX, int worldY) {

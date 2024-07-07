@@ -86,6 +86,10 @@ public class TileEditPanel : MonoBehaviour {
 
     }
 
+    public void OnClickBreakApartQuadTileTopBottom() {
+        controller.BreakApartQuadTileTopBottom();
+    }
+
     public void OnClickSaveSchematic() {
 
         if (controller.HasSelection) {
