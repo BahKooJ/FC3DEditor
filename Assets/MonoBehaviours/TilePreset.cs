@@ -2,26 +2,68 @@
 
 using FCopParser;
 
-public struct TilePreset {
+public class TilePreset {
 
-    public int meshID;
-    public int culling;
-    public int textureIndex;
-    public int graphicsIndex;
-    public string previewImagePath;
+    public Tile tile;
+    public Tile transformedTile = null;
 
-    public TilePreset(int meshID, int culling, int textureIndex, int graphicsIndex, string previewImagePath) {
-        this.meshID = meshID;
-        this.culling = culling;
-        this.textureIndex = textureIndex;
-        this.graphicsIndex = graphicsIndex;
-        this.previewImagePath = previewImagePath;
-    }
-
-    public Tile Create(bool isStart, TileColumn column) {
-
-        return new Tile(column, meshID, culling);
+    public TilePreset(int meshID, int culling) {
+        tile = new Tile(null, meshID, culling);
 
     }
 
+    public int MeshID() {
+
+        if (transformedTile == null) {
+            var id = MeshType.IDFromVerticies(tile.verticies);
+
+            return (int)id;
+        }
+        else {
+            var id = MeshType.IDFromVerticies(transformedTile.verticies);
+
+            return (int)id;
+        }
+
+    }
+
+    public Tile Create(TileColumn column) {
+
+        if (transformedTile == null) {
+            return new Tile(tile, column, null);
+        }
+        else {
+            return new Tile(transformedTile, column, null);
+        }
+
+
+    }
+
+    public void RotateClockwise() {
+
+        transformedTile ??= tile.Clone();
+
+        var result = transformedTile.RotateVerticesClockwise();
+
+    }
+
+    public void RotateCounterClockwise() {
+
+        transformedTile ??= tile.Clone();
+
+        var result = transformedTile.RotateVerticesCounterClockwise();
+
+    }
+
+    public void MoveHeightChannelsToNextChannel() {
+
+        transformedTile ??= tile.Clone();
+
+        var result = transformedTile.MoveHeightChannelsToNextChannel();
+
+        if (result == Tile.TransformResult.Invalid) {
+            transformedTile = null;
+        }
+
+    }
 }

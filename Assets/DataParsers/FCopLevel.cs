@@ -1829,6 +1829,36 @@ namespace FCopParser {
 
         }
 
+        public TransformResult MoveHeightChannelsToNextChannel() {
+
+            var previousVerticies = new List<TileVertex>(verticies);
+            var newVerticies = new HashSet<TileVertex>();
+
+            foreach (var index in Enumerable.Range(0, verticies.Count)) {
+
+                var vertex = verticies[index];
+
+                if (vertex.heightChannel < 3) {
+
+                    vertex.heightChannel += 1;
+
+                    newVerticies.Add(vertex);
+
+                }
+
+            }
+
+            if (newVerticies.Count == previousVerticies.Count) {
+                verticies = newVerticies.ToList();
+                return TransformResult.Success;
+            }
+            else {
+                return TransformResult.Invalid;
+
+            }
+
+        }
+
         // - Mirror Vertically -
 
         public TransformResult MirrorVerticesVertically() {

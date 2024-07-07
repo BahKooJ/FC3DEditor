@@ -18,8 +18,17 @@ public class TileAddMode : EditMode {
     public static SchematicPlacementSetting placementSetting = SchematicPlacementSetting.Exact;
     public static bool removeAllTilesOnSchematicPlacement = false;
 
+    public static readonly List<TilePreset> defaultPresets = new() {
+        new TilePreset(68, 0),  // Quad
+        new TilePreset(0, 0),   // Triangle
+        new TilePreset(108, 3), // Quad Wall
+        new TilePreset(83, 3),  // Triangle Wall
+        new TilePreset(103, 3),  // Diagonal Quad Wall
+        new TilePreset(91, 3),  // Diagonal Triangle Wall
 
-    public static TilePreset? selectedTilePreset = null;
+    };
+
+    public static TilePreset selectedTilePreset = null;
     public static Schematic selectedSchematic = null;
 
     public TileSelection hoverSelection;
@@ -37,6 +46,10 @@ public class TileAddMode : EditMode {
         
         if (selectedSchematic != null) {
             InitSchematicMeshOverlay();
+        }
+
+        foreach (var preset in defaultPresets) {
+            preset.transformedTile = null;
         }
 
     }
@@ -87,6 +100,10 @@ public class TileAddMode : EditMode {
 
             hoverSelection = null;
 
+        }
+
+        if (Main.ignoreAllInputs) {
+            return;
         }
 
         if (selectedSchematic != null) {
@@ -151,10 +168,26 @@ public class TileAddMode : EditMode {
             }
 
         }
-        else if (Controls.OnDown("Select")) {
+        else if (selectedTilePreset != null) {
 
-            if (selectedTilePreset != null) {
-                AddTile((TilePreset)selectedTilePreset);
+            float axis = Input.GetAxis("Mouse ScrollWheel");
+
+            if (axis > 0) {
+                selectedTilePreset.RotateClockwise();
+                RefreshTilePlacementOverlay();
+            }
+            else if (axis < 0) {
+                selectedTilePreset.RotateCounterClockwise();
+                RefreshTilePlacementOverlay();
+            }
+
+            if (Input.GetMouseButtonDown(1)) {
+                selectedTilePreset.MoveHeightChannelsToNextChannel();
+                RefreshTilePlacementOverlay();
+            }
+
+            if (Controls.OnDown("Select")) {
+                AddTile(selectedTilePreset);
             }
 
         }
@@ -174,12 +207,12 @@ public class TileAddMode : EditMode {
         InitSchematicMeshOverlay();
     }
 
-    public void SelectTilePreset(TilePreset preset) {
+    public void SelectTilePreset(int index) {
         ClearBuildingOverlay();
 
         selectedSchematic = null;
 
-        selectedTilePreset = preset;
+        selectedTilePreset = defaultPresets[index];
     }
 
     #region GameObject Managment
@@ -192,7 +225,7 @@ public class TileAddMode : EditMode {
 
         if (selectedTilePreset != null) {
 
-            InitBuildTileOverlay(((TilePreset)selectedTilePreset).Create(false, hoverSelection.column));
+            InitBuildTileOverlay(selectedTilePreset.Create(hoverSelection.column));
 
         }
 
@@ -226,7 +259,7 @@ public class TileAddMode : EditMode {
 
         if (selectedTilePreset != null) {
 
-            InitBuildTileOverlay(((TilePreset)selectedTilePreset).Create(false, hoverSelection.column));
+            InitBuildTileOverlay(selectedTilePreset.Create(hoverSelection.column));
 
             // Re-adds HeightMapChannelPoints (0 = top left, 1 = top right, 2 = bottom left, 3 = bottom right)
             AddHeightObjects(VertexPosition.TopLeft);
@@ -376,14 +409,14 @@ public class TileAddMode : EditMode {
         foreach (var t in hoverSelection.column.tiles) {
 
             // Checks to make sure the tile doesn't already exist
-            if (MeshType.IDFromVerticies(t.verticies) == preset.meshID) {
+            if (MeshType.IDFromVerticies(t.verticies) == preset.MeshID()) {
                 QuickLogHandler.Log("Tile already exists!", LogSeverity.Error);
                 return;
             }
 
         }
 
-        var tile = preset.Create(true, hoverSelection.column);
+        var tile = preset.Create(hoverSelection.column);
 
         Main.AddCounterAction(new AddTileCounterAction(tile, hoverSelection.column, hoverSelection.section));
 

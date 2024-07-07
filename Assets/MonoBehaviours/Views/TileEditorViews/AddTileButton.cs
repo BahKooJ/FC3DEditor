@@ -5,15 +5,11 @@ public class AddTileButton : MonoBehaviour {
 
     public TileAddPanel view;
 
-    public TilePreset preset;
-
-    void Start() {
-
-    }
+    public int index;
 
     public void OnClick() {
 
-        view.Select(preset);
+        view.Select(index);
 
     }
 
