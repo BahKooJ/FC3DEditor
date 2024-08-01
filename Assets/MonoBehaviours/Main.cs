@@ -65,6 +65,7 @@ public class Main : MonoBehaviour {
 
 
     public GameObject meshSection;
+    public GameObject litMeshSection;
     public GameObject heightMapChannelPoint;
     public GameObject tileHeightMapChannelPoint;
     public GameObject vertexColorPoint;
@@ -121,11 +122,10 @@ public class Main : MonoBehaviour {
 
         RefreshTextures();
 
-        RenderFullMap();
+        //RenderFullMap();
+        RenderFullMapLitMeshes();
 
         ApplySettings();
-
-        //RenderSection(3);
 
     }
 
@@ -490,6 +490,42 @@ public class Main : MonoBehaviour {
                     script.x = x;
                     script.y = y;
                     script.arrayX = itx; 
+                    script.arrayY = ity;
+                    sectionMeshes.Add(script);
+                }
+                itx++;
+                x += 16;
+            }
+            itx = 0;
+            x = 0;
+            y += 16;
+            ity++;
+
+        }
+
+    }
+
+    void RenderFullMapLitMeshes() {
+
+        var x = 0;
+        var y = 0;
+
+        var itx = 0;
+        var ity = 0;
+
+        foreach (var row in level.layout) {
+
+            foreach (var column in row) {
+
+                if (column != 0) {
+                    var section = Instantiate(litMeshSection, new Vector3(x, 0, -y), Quaternion.identity);
+                    var script = section.GetComponent<LevelMesh>();
+                    script.section = level.sections[column - 1];
+                    script.levelTexturePallet = levelTexturePallet;
+                    script.controller = this;
+                    script.x = x;
+                    script.y = y;
+                    script.arrayX = itx;
                     script.arrayY = ity;
                     sectionMeshes.Add(script);
                 }
