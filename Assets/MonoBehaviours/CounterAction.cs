@@ -13,6 +13,30 @@ public interface CounterAction {
 
 }
 
+public class MultiCounterAction : CounterAction {
+
+    List<CounterAction> counterActions = new();
+    Action additionalAction;
+
+    public MultiCounterAction(List<CounterAction> counterActions, Action additionalAction) {
+
+        this.counterActions = counterActions;
+
+        this.additionalAction = additionalAction;
+    }
+
+    public void Action() {
+
+        foreach (var action in counterActions) {
+            action.Action();
+        }
+
+        additionalAction();
+
+    }
+
+}
+
 public class TileSaveStateCounterAction : CounterAction {
 
     Tile saveStateTile;

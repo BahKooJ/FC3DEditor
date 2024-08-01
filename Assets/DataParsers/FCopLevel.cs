@@ -1859,87 +1859,87 @@ namespace FCopParser {
 
         }
 
-        public List<Tile> BreakApartQuadTileBottomTop() {
+        Tile MakeTriTile(List<int> vertOrder, List<int> UVOrder) {
 
-            var total = new List<Tile>();
-
-            Tile MakeTriTile(List<int> vertOrder, List<int> UVOrder) {
-
-                var meshID = MeshType.IDFromVerticies(new() {
+            var meshID = MeshType.IDFromVerticies(new() {
                     verticies[vertOrder[0]],
                     verticies[vertOrder[1]],
                     verticies[vertOrder[2]],
                 });
 
-                Tile tile = null;
+            Tile tile = null;
 
-                if (meshID != null) {
-                    tile = new Tile(column, (int)meshID, culling);
-                }
+            if (meshID != null) {
+                tile = new Tile(column, (int)meshID, culling);
+            }
 
-                if (tile != null) {
+            if (tile != null) {
 
-                    tile.uvs = new List<int> { uvs[UVOrder[0]], uvs[UVOrder[1]], uvs[UVOrder[2]] };
-                    tile.texturePalette = texturePalette;
-                    tile.isVectorAnimated = isVectorAnimated;
-                    tile.isSemiTransparent = isSemiTransparent;
-                    tile.effectIndex = effectIndex;
+                tile.uvs = new List<int> { uvs[UVOrder[0]], uvs[UVOrder[1]], uvs[UVOrder[2]] };
+                tile.texturePalette = texturePalette;
+                tile.isVectorAnimated = isVectorAnimated;
+                tile.isSemiTransparent = isSemiTransparent;
+                tile.effectIndex = effectIndex;
 
-                    switch (shaders.type) {
-                        case VertexColorType.MonoChrome:
+                switch (shaders.type) {
+                    case VertexColorType.MonoChrome:
 
-                            var thisSolidMono = (MonoChromeShader)shaders;
+                        var thisSolidMono = (MonoChromeShader)shaders;
 
-                            tile.shaders = new MonoChromeShader(false);
-                            var solidMono = (MonoChromeShader)tile.shaders;
+                        tile.shaders = new MonoChromeShader(false);
+                        var solidMono = (MonoChromeShader)tile.shaders;
 
-                            solidMono.value = thisSolidMono.value;
-                            solidMono.Apply();
+                        solidMono.value = thisSolidMono.value;
+                        solidMono.Apply();
 
-                            break;
-                        case VertexColorType.DynamicMonoChrome:
+                        break;
+                    case VertexColorType.DynamicMonoChrome:
 
-                            var thisMono = (DynamicMonoChromeShader)shaders;
+                        var thisMono = (DynamicMonoChromeShader)shaders;
 
-                            tile.shaders = new DynamicMonoChromeShader(false);
-                            var mono = (DynamicMonoChromeShader)tile.shaders;
+                        tile.shaders = new DynamicMonoChromeShader(false);
+                        var mono = (DynamicMonoChromeShader)tile.shaders;
 
-                            // Remember that dynamic mono stores 4 regardless of shape
-                            mono.values = new int[] { 
-                                thisMono.values[UVOrder[0]], 
-                                thisMono.values[UVOrder[1]], 
-                                thisMono.values[UVOrder[2]], 
-                                thisMono.values[UVOrder[0]] 
+                        // Remember that dynamic mono stores 4 regardless of shape
+                        mono.values = new int[] {
+                                thisMono.values[UVOrder[0]],
+                                thisMono.values[UVOrder[1]],
+                                thisMono.values[UVOrder[2]],
+                                thisMono.values[UVOrder[0]]
                             };
-                            mono.Apply();
+                        mono.Apply();
 
-                            break;
-                        case VertexColorType.Color:
+                        break;
+                    case VertexColorType.Color:
 
-                            var thisColor = (ColorShader)shaders;
+                        var thisColor = (ColorShader)shaders;
 
-                            tile.shaders = new ColorShader(false);
-                            var color = (ColorShader)tile.shaders;
+                        tile.shaders = new ColorShader(false);
+                        var color = (ColorShader)tile.shaders;
 
-                            color.values[ColorShader.uvOrderedTriIndexes[0]] = thisColor.values[ColorShader.uvOrderedQuadIndexes[UVOrder[0]]].Clone();
-                            color.values[ColorShader.uvOrderedTriIndexes[1]] = thisColor.values[ColorShader.uvOrderedQuadIndexes[UVOrder[1]]].Clone();
-                            color.values[ColorShader.uvOrderedTriIndexes[2]] = thisColor.values[ColorShader.uvOrderedQuadIndexes[UVOrder[2]]].Clone();
+                        color.values[ColorShader.uvOrderedTriIndexes[0]] = thisColor.values[ColorShader.uvOrderedQuadIndexes[UVOrder[0]]].Clone();
+                        color.values[ColorShader.uvOrderedTriIndexes[1]] = thisColor.values[ColorShader.uvOrderedQuadIndexes[UVOrder[1]]].Clone();
+                        color.values[ColorShader.uvOrderedTriIndexes[2]] = thisColor.values[ColorShader.uvOrderedQuadIndexes[UVOrder[2]]].Clone();
 
-                            color.Apply();
+                        color.Apply();
 
-                            break;
-                        case VertexColorType.ColorAnimated:
-                            tile.shaders = shaders.Clone();
-                            tile.shaders.isQuad = false;
-                            break;
-                    }
-
-
+                        break;
+                    case VertexColorType.ColorAnimated:
+                        tile.shaders = shaders.Clone();
+                        tile.shaders.isQuad = false;
+                        break;
                 }
 
-                return tile;
 
             }
+
+            return tile;
+
+        }
+
+        public List<Tile> BreakApartQuadTileBottomTop() {
+
+            var total = new List<Tile>();
 
             if (verticies.Count == 3) {
                 return null;
@@ -1986,6 +1986,71 @@ namespace FCopParser {
                 tile2 = MakeTriTile(
                     new() { (int)VertexPosition.TopRight - 1, (int)VertexPosition.BottomRight - 1, (int)VertexPosition.BottomLeft - 1 },
                     new() { 1, 2, 3 }
+                );
+
+            }
+
+            if (tile1 != null) {
+                total.Add(tile1);
+            }
+
+            if (tile2 != null) {
+                total.Add(tile2);
+            }
+
+            return total;
+
+        }
+
+        public List<Tile> BreakApartQuadTileTopBottom() {
+
+            var total = new List<Tile>();
+
+            if (verticies.Count == 3) {
+                return null;
+            }
+
+            int originalMeshID = (int)MeshType.IDFromVerticies(verticies);
+
+            Tile tile1 = null;
+            Tile tile2 = null;
+
+            if (MeshType.topWallMeshes.Contains(originalMeshID) || MeshType.diagonalTLeftBRightQuadWallMeshes.Contains(originalMeshID)) {
+
+                tile1 = MakeTriTile(
+                    new() { 2, 3, 1 },
+                    new() { 1, 2, 3 }
+                );
+
+                tile2 = MakeTriTile(
+                    new() { 2, 0, 1 },
+                    new() { 0, 1, 3 }
+                );
+
+            }
+            else if (MeshType.diagonalBLeftTRightQuadWallMeshes.Contains(originalMeshID)) {
+
+                tile1 = MakeTriTile(
+                    new() { 2, 3, 1 },
+                    new() { 1, 3, 2 }
+                );
+
+                tile2 = MakeTriTile(
+                    new() { 2, 0, 1 },
+                    new() { 0, 3, 1 }
+                );
+
+            }
+            else {
+
+                tile1 = MakeTriTile(
+                    new() { (int)VertexPosition.TopLeft - 1, (int)VertexPosition.TopRight - 1, (int)VertexPosition.BottomRight - 1 },
+                    new() { 0, 1, 2 }
+                );
+
+                tile2 = MakeTriTile(
+                    new() { (int)VertexPosition.TopLeft - 1, (int)VertexPosition.BottomRight - 1, (int)VertexPosition.BottomLeft - 1 },
+                    new() { 0, 2, 3 }
                 );
 
             }

@@ -271,9 +271,9 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
-    void ClearAllSelectedItems() {
+    void ClearAllSelectedItems(bool addCounterAction = true) {
 
-        if (HasSelection) {
+        if (HasSelection && addCounterAction) {
             AddSelectionStateCounterAction();
         }
 
@@ -636,21 +636,87 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
-    public void BreakApartQuadTileTopBottom() {
+    public void BreakApartQuadTileBottomTop() {
 
-        var newTiles = FirstTile.BreakApartQuadTileBottomTop();
+        if (!HasSelection) {
+            QuickLogHandler.Log("No tiles are selected", LogSeverity.Info);
+            return;
+        }
 
-        if (newTiles != null) {
+        var counterActions = new List<CounterAction>();
 
-            FirstItem.column.tiles.AddRange(newTiles);
+        foreach (var selection in selectedItems) {
 
-            FirstItem.column.tiles.Remove(FirstTile);
+            var newTiles = selection.tile.BreakApartQuadTileBottomTop();
 
-            RefreshMeshes();
+            if (newTiles != null) {
 
-            ClearAllSelectedItems();
+                selection.column.tiles.AddRange(newTiles);
+
+                foreach (var tile in newTiles) {
+                    counterActions.Add(new PassiveAddTileCounterAction(tile, selection.column));
+                }
+
+                selection.column.tiles.Remove(selection.tile);
+
+                counterActions.Add(new RemoveTileCounterAction(selection.tile, selection.column));
+
+            }
+            else {
+                QuickLogHandler.Log("Selected tile is already a triangle", LogSeverity.Error);
+            }
 
         }
+
+        RefreshMeshes();
+
+        counterActions.Add(new SelectionSaveStateCounterAction((TileEditMode)Main.editMode, () => { }));
+
+        ClearAllSelectedItems(false);
+
+        AddBreakApartTileCounterAction(counterActions);
+
+    }
+
+    public void BreakApartQuadTileTopBottom() {
+
+        if (!HasSelection) {
+            QuickLogHandler.Log("No tiles are selected", LogSeverity.Info);
+            return;
+        }
+
+        var counterActions = new List<CounterAction>();
+
+        foreach (var selection in selectedItems) {
+
+            var newTiles = selection.tile.BreakApartQuadTileTopBottom();
+
+            if (newTiles != null) {
+
+                selection.column.tiles.AddRange(newTiles);
+
+                foreach (var tile in newTiles) {
+                    counterActions.Add(new PassiveAddTileCounterAction(tile, selection.column));
+                }
+
+                selection.column.tiles.Remove(selection.tile);
+
+                counterActions.Add(new RemoveTileCounterAction(selection.tile, selection.column));
+
+            }
+            else {
+                QuickLogHandler.Log("Selected tile is already a triangle", LogSeverity.Error);
+            }
+
+        }
+
+        RefreshMeshes();
+
+        counterActions.Add(new SelectionSaveStateCounterAction((TileEditMode)Main.editMode, () => { }));
+
+        ClearAllSelectedItems(false);
+
+        AddBreakApartTileCounterAction(counterActions);
 
     }
 
@@ -819,6 +885,24 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
+    public class PassiveAddTileCounterAction : CounterAction {
+
+        Tile addedTile;
+        TileColumn columnAddedTo;
+
+        public PassiveAddTileCounterAction(Tile addedTile, TileColumn columnAddedTo) {
+            this.addedTile = addedTile;
+            this.columnAddedTo = columnAddedTo;
+        }
+
+        public void Action() {
+
+            columnAddedTo.tiles.Remove(addedTile);
+
+        }
+
+    }
+
     void AddTileEffectChangeCounterAction(int index) {
 
         Main.AddCounterAction(new MultiTileEffectChangeCounterAction(selectedSections, index));
@@ -856,6 +940,28 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
     static void AddTileStateCounterAction() {
 
         Main.AddCounterAction(new MultiTileSaveStateCounterAction(((TileEditMode)Main.editMode).selectedItems, () => {
+
+            if (Main.editMode is not TileEditMode) {
+                return;
+            }
+
+            var editMode = (TileEditMode)Main.editMode;
+
+            editMode.RefreshMeshes();
+
+            editMode.RefeshTileOverlay();
+
+            editMode.RefreshPreviewOverlay();
+
+            editMode.view.RefreshTileEffectsPanel();
+
+        }));
+
+    }
+
+    static void AddBreakApartTileCounterAction(List<CounterAction> counterActions) {
+
+        Main.AddCounterAction(new MultiCounterAction(counterActions, () => {
 
             if (Main.editMode is not TileEditMode) {
                 return;

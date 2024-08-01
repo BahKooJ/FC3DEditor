@@ -86,6 +86,10 @@ public class TileEditPanel : MonoBehaviour {
 
     }
 
+    public void OnClickBreakApartQuadTileBottomTop() {
+        controller.BreakApartQuadTileBottomTop();
+    }
+
     public void OnClickBreakApartQuadTileTopBottom() {
         controller.BreakApartQuadTileTopBottom();
     }
