@@ -9,6 +9,9 @@ public class EscMenuViewSettingsView : MonoBehaviour {
     public Toggle showShaderToggle;
     public Toggle showTransparencyToggle;
     public Toggle showAnimationsToggle;
+    public Toggle renderDirectionalLight;
+    public Slider lightDirectionX;
+    public Slider lightDirectionY;
 
     // - Parameters -
     public Main main;
@@ -22,6 +25,9 @@ public class EscMenuViewSettingsView : MonoBehaviour {
         showShaderToggle.isOn = SettingsManager.showShaders;
         showTransparencyToggle.isOn = SettingsManager.showTransparency;
         showAnimationsToggle.isOn = SettingsManager.showAnimations;
+        renderDirectionalLight.isOn = SettingsManager.renderDirectionalLight;
+        lightDirectionX.value = SettingsManager.lightDirectionX;
+        lightDirectionY.value = SettingsManager.lightDirectionY;
 
         refuseCallback = false;
 
@@ -51,6 +57,39 @@ public class EscMenuViewSettingsView : MonoBehaviour {
 
         SettingsManager.showAnimations = showAnimationsToggle.isOn;
         main.RefreshLevel();
+
+    }
+
+    public void OnToggleRenderDirectionalLight() {
+
+        if (refuseCallback) return;
+
+        SettingsManager.renderDirectionalLight = renderDirectionalLight.isOn;
+        main.ChangeRenderedLevelMeshes();
+
+
+    }
+
+    public void OnDirectionXSliderChange() {
+
+        if (refuseCallback) return;
+
+        SettingsManager.lightDirectionX = lightDirectionX.value;
+        var angle = main.worldLight.transform.eulerAngles;
+        angle.x = SettingsManager.lightDirectionX;
+        main.worldLight.transform.eulerAngles = angle;
+
+
+    }
+
+    public void OnDirectionYSliderChange() {
+
+        if (refuseCallback) return;
+
+        SettingsManager.lightDirectionY = lightDirectionY.value;
+        var angle = main.worldLight.transform.eulerAngles;
+        angle.y = SettingsManager.lightDirectionY;
+        main.worldLight.transform.eulerAngles = angle;
 
     }
 

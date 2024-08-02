@@ -92,6 +92,7 @@ public class Main : MonoBehaviour {
     // - View Refs -
     public GameObject canvas;
     public GameObject mainCamera;
+    public Light worldLight;
 
     // - Unity Asset Refs -
     public Texture2D tileEffectTexture;
@@ -122,8 +123,7 @@ public class Main : MonoBehaviour {
 
         RefreshTextures();
 
-        //RenderFullMap();
-        RenderFullMapLitMeshes();
+        RenderFullMap();
 
         ApplySettings();
 
@@ -459,6 +459,23 @@ public class Main : MonoBehaviour {
 
     }
 
+    public void ChangeRenderedLevelMeshes() {
+
+        foreach (var obj in sectionMeshes) {
+            Destroy(obj.gameObject);
+        }
+
+        sectionMeshes.Clear();
+
+        if (SettingsManager.renderDirectionalLight) {
+            RenderFullMapLitMeshes();
+        }
+        else {
+            RenderFullMap();
+        }
+
+    }
+
     void RenderSection(int id) {
 
         var section = Instantiate(meshSection, new Vector3(0, 0, 0), Quaternion.identity);
@@ -540,5 +557,7 @@ public class Main : MonoBehaviour {
         }
 
     }
+
+
 
 }

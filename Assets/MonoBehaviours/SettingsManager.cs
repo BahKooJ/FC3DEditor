@@ -15,6 +15,9 @@ public abstract class SettingsManager {
     public static bool showTransparency = true;
     public static bool clipBlack = true;
     public static bool showAnimations = true;
+    public static bool renderDirectionalLight = false;
+    public static float lightDirectionX = 135f;
+    public static float lightDirectionY = 325f;
 
     static public void ParseSettings() {
 
