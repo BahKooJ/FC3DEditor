@@ -3,6 +3,7 @@
 using FCopParser;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Presets;
 using UnityEngine;
 
 public class TileAddMode : EditMode {
@@ -35,6 +36,7 @@ public class TileAddMode : EditMode {
 
     public List<TileHeightMapChannelPoint> heightPointObjects = new();
     public SelectedTileOverlay buildTileOverlay = null;
+    public List<SelectedTileOverlay> rangeBuildOverlay = new();
     public SchematicMesh schematicBuildOverlay = null;
 
 
@@ -66,6 +68,9 @@ public class TileAddMode : EditMode {
 
     }
 
+    TileSelection startSelection = null;
+    TileSelection endSelection = null;
+
     public void Update() {
 
         TileSelection hover;
@@ -85,7 +90,9 @@ public class TileAddMode : EditMode {
         } 
         if (hover != null && selectedTilePreset != null) {
             
-            PreviewTilePlacement();
+            if (!Controls.IsDown("Select")) {
+                PreviewTilePlacement();
+            }
 
         }
         else if (heightPointObjects.Count != 0) {
@@ -186,9 +193,30 @@ public class TileAddMode : EditMode {
                 RefreshTilePlacementOverlay();
             }
 
-            if (Controls.OnDown("Select")) {
-                AddTile(selectedTilePreset);
+            if (Controls.OnDown("Select") && hoverSelection != null) {
+                startSelection = hoverSelection;
             }
+
+            if (Controls.IsDown("Select") && hoverSelection != null) {
+                PreviewRangeTilePlacement();
+            }
+
+            if (Controls.OnUp("Select") && hoverSelection != null && startSelection != null) {
+                endSelection = hoverSelection;
+
+                if (startSelection.tile == endSelection.tile) {
+
+                    AddTile(selectedTilePreset);
+
+                } else {
+
+                    RangeBuild(startSelection, endSelection, selectedTilePreset);
+                    ClearBuildingOverlay();
+
+                }
+
+            }
+
 
         }
 
@@ -318,6 +346,74 @@ public class TileAddMode : EditMode {
 
     }
 
+
+    Tile lastHoverTile = null;
+    void PreviewRangeTilePlacement() {
+
+        var firstClickColumnSectionX = startSelection.column.x + startSelection.section.arrayX * 16;
+        var firstClickColumnSectionY = startSelection.column.y + startSelection.section.arrayY * 16;
+
+        var lastClickColumnSectionX = hoverSelection.column.x + hoverSelection.section.arrayX * 16;
+        var lastClickColumnSectionY = hoverSelection.column.y + hoverSelection.section.arrayY * 16;
+
+        var startSectionX = firstClickColumnSectionX < lastClickColumnSectionX ? firstClickColumnSectionX : lastClickColumnSectionX;
+        var startSectionY = firstClickColumnSectionY < lastClickColumnSectionY ? firstClickColumnSectionY : lastClickColumnSectionY;
+
+        var endSectionX = firstClickColumnSectionX > lastClickColumnSectionX ? firstClickColumnSectionX : lastClickColumnSectionX;
+        var endSectionY = firstClickColumnSectionY > lastClickColumnSectionY ? firstClickColumnSectionY : lastClickColumnSectionY;
+
+        if (lastHoverTile != null) {
+
+            if (lastHoverTile == hoverSelection.tile) {
+                return;
+            }
+
+        }
+
+        lastHoverTile = hoverSelection.tile;
+        ClearBuildingOverlay();
+
+        foreach (var y in Enumerable.Range(startSectionY, endSectionY - startSectionY + 1)) {
+
+            foreach (var x in Enumerable.Range(startSectionX, endSectionX - startSectionX + 1)) {
+
+                var sectionX = x / 16;
+                var sectionY = y / 16;
+                var columnX = x % 16;
+                var columnY = y % 16;
+
+                if (MeshType.topWallMeshes.Contains(selectedTilePreset.MeshID())) {
+
+                    if (startSectionY / 16 != sectionY || startSectionY % 16 != columnY) {
+                        continue;
+                    }
+
+                }
+                if (MeshType.leftWallMeshes.Contains(selectedTilePreset.MeshID())) {
+
+                    if (startSectionX / 16 != sectionX || startSectionX % 16 != columnX) {
+                        continue;
+                    }
+
+                }
+
+                var itSection = main.GetLevelMesh(sectionX, sectionY);
+                var itColumn = itSection.section.GetTileColumn(columnX, columnY);
+
+                var overlay = Object.Instantiate(main.SelectedTileOverlay);
+                var script = overlay.GetComponent<SelectedTileOverlay>();
+                script.controller = main;
+                script.tile = selectedTilePreset.Create(itColumn);
+                rangeBuildOverlay.Add(script);
+                overlay.transform.SetParent(itSection.transform);
+                overlay.transform.localPosition = Vector3.zero;
+
+            }
+
+        }
+
+    }
+
     void ClearBuildingOverlay() {
 
         if (buildTileOverlay != null) {
@@ -331,6 +427,12 @@ public class TileAddMode : EditMode {
         }
 
         schematicBuildOverlay = null;
+
+        foreach (var obj in rangeBuildOverlay) {
+            Object.Destroy(obj.gameObject);
+        }
+
+        rangeBuildOverlay.Clear();
 
 
     }
@@ -423,6 +525,86 @@ public class TileAddMode : EditMode {
         hoverSelection.column.tiles.Add(tile);
 
         hoverSelection.section.RefreshMesh();
+
+    }
+
+    void RangeBuild(TileSelection firstSelection, TileSelection endSelection, TilePreset preset) {
+
+        var firstClickColumnSectionX = firstSelection.column.x + firstSelection.section.arrayX * 16;
+        var firstClickColumnSectionY = firstSelection.column.y + firstSelection.section.arrayY * 16;
+
+        var lastClickColumnSectionX = endSelection.column.x + endSelection.section.arrayX * 16;
+        var lastClickColumnSectionY = endSelection.column.y + endSelection.section.arrayY * 16;
+
+        var startSectionX = firstClickColumnSectionX < lastClickColumnSectionX ? firstClickColumnSectionX : lastClickColumnSectionX;
+        var startSectionY = firstClickColumnSectionY < lastClickColumnSectionY ? firstClickColumnSectionY : lastClickColumnSectionY;
+
+        var endSectionX = firstClickColumnSectionX > lastClickColumnSectionX ? firstClickColumnSectionX : lastClickColumnSectionX;
+        var endSectionY = firstClickColumnSectionY > lastClickColumnSectionY ? firstClickColumnSectionY : lastClickColumnSectionY;
+
+        var affectedSections = new HashSet<LevelMesh>();
+
+        foreach (var y in Enumerable.Range(startSectionY, endSectionY - startSectionY + 1)) {
+
+            foreach (var x in Enumerable.Range(startSectionX, endSectionX - startSectionX + 1)) {
+
+                var sectionX = x / 16;
+                var sectionY = y / 16;
+                var columnX = x % 16;
+                var columnY = y % 16;
+
+                if (MeshType.topWallMeshes.Contains(preset.MeshID())) {
+
+                    if (startSectionY / 16 != sectionY || startSectionY % 16 != columnY) {
+                        continue;
+                    }
+
+                }
+                if (MeshType.leftWallMeshes.Contains(selectedTilePreset.MeshID())) {
+
+                    if (startSectionX / 16 != sectionX || startSectionX % 16 != columnX) {
+                        continue;
+                    }
+
+                }
+                if (MeshType.dia.Contains(selectedTilePreset.MeshID())) {
+
+                    if (startSectionX != startSectionY) {
+                        continue;
+                    }
+
+                }
+
+                var itSection = main.GetLevelMesh(sectionX, sectionY);
+                var itColumn = itSection.section.GetTileColumn(columnX, columnY);
+
+                affectedSections.Add(itSection);
+
+                var alreadyExists = false;
+                foreach (var itTile in itColumn.tiles) {
+
+                    if (MeshType.IDFromVerticies(itTile.verticies) == preset.MeshID()) {
+                        alreadyExists = true;
+                    }
+
+                }
+
+                if (!alreadyExists) {
+
+                    // Mutation
+                    var tile = preset.Create(itColumn);
+
+                    itColumn.tiles.Add(tile);
+
+                }
+
+            }
+
+        }
+
+        foreach (var affectSection in affectedSections) {
+            affectSection.RefreshMesh();
+        }
 
     }
 
