@@ -720,38 +720,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
-    public void AddWallsToTiles() {
-
-        TileSelection selectedTileAtLocation(int worldX, int worldY) {
-
-            var item = selectedItems.FirstOrDefault(selection => { 
-                return selection.columnWorldX == worldX && selection.columnWorldY == worldY; 
-            });
-
-            return item;
-
-        }
-
-        if (!HasSelection) {
-            QuickLogHandler.Log("No tiles are selected", LogSeverity.Info);
-            return;
-        }
-
-        foreach (var item in selectedItems) {
-
-            var meshID = (int)MeshType.IDFromVerticies(item.tile.verticies);
-
-            if (MeshType.wallMeshes.Contains(meshID)) {
-                QuickLogHandler.Log("Cannot add walls to a wall!", LogSeverity.Error);
-                continue;
-            }
-
-
-        }
-
-        RefreshMeshes();
-
-        RefeshTileOverlay();
+    public void ExtrudeTiles() {
 
     }
 
