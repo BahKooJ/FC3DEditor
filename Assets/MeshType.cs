@@ -12,6 +12,7 @@ namespace FCopParser {
         public static readonly List<int> topWallMeshes = new() { 79, 80, 81, 82, 83, 84, 85, 86, 108, 110 };
         public static readonly List<int> leftWallMeshes = new() { 71, 72, 73, 74, 75, 76, 77, 78, 107, 109 };
         public static readonly List<int> diagonalTLeftBRightWallMeshes = new() { 95, 96, 97, 98, 99, 100, 101, 102, 105, 106 };
+        public static readonly List<int> diagonalBLeftTRightWallMeshes = new() { 87, 88, 89, 90, 91, 92, 93, 94, 103, 104 };
 
         public static readonly List<int> diagonalBLeftTRightQuadWallMeshes = new() { 103, 104 };
         public static readonly List<int> diagonalTLeftBRightQuadWallMeshes = new() { 105, 106 };

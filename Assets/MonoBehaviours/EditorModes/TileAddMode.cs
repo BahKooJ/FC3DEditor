@@ -346,7 +346,7 @@ public class TileAddMode : EditMode {
 
     }
 
-
+    // FIXME: This is an exact copy of RangeAdd...
     Tile lastHoverTile = null;
     void PreviewRangeTilePlacement() {
 
@@ -384,14 +384,36 @@ public class TileAddMode : EditMode {
 
                 if (MeshType.topWallMeshes.Contains(selectedTilePreset.MeshID())) {
 
-                    if (startSectionY / 16 != sectionY || startSectionY % 16 != columnY) {
+                    if (firstClickColumnSectionY / 16 != sectionY || firstClickColumnSectionY % 16 != columnY) {
                         continue;
                     }
 
                 }
                 if (MeshType.leftWallMeshes.Contains(selectedTilePreset.MeshID())) {
 
-                    if (startSectionX / 16 != sectionX || startSectionX % 16 != columnX) {
+                    if (firstClickColumnSectionX / 16 != sectionX || firstClickColumnSectionX % 16 != columnX) {
+                        continue;
+                    }
+
+                }
+                if (MeshType.diagonalTLeftBRightWallMeshes.Contains(selectedTilePreset.MeshID())) {
+
+                    if (x - firstClickColumnSectionX != y - firstClickColumnSectionY) {
+                        continue;
+                    }
+
+                }
+                if (MeshType.diagonalBLeftTRightWallMeshes.Contains(selectedTilePreset.MeshID())) {
+
+                    if (x - firstClickColumnSectionX < 0 && y - firstClickColumnSectionY < 0) {
+                        continue;
+                    }
+
+                    if (x - firstClickColumnSectionX > 0 && y - firstClickColumnSectionY > 0) {
+                        continue;
+                    }
+
+                    if (Mathf.Abs(x - firstClickColumnSectionX) != Mathf.Abs(y - firstClickColumnSectionY)) {
                         continue;
                     }
 
@@ -543,6 +565,7 @@ public class TileAddMode : EditMode {
         var endSectionY = firstClickColumnSectionY > lastClickColumnSectionY ? firstClickColumnSectionY : lastClickColumnSectionY;
 
         var affectedSections = new HashSet<LevelMesh>();
+        var addedTiles = new List<Tile>();
 
         foreach (var y in Enumerable.Range(startSectionY, endSectionY - startSectionY + 1)) {
 
@@ -555,21 +578,36 @@ public class TileAddMode : EditMode {
 
                 if (MeshType.topWallMeshes.Contains(preset.MeshID())) {
 
-                    if (startSectionY / 16 != sectionY || startSectionY % 16 != columnY) {
+                    if (firstClickColumnSectionY / 16 != sectionY || firstClickColumnSectionY % 16 != columnY) {
                         continue;
                     }
 
                 }
                 if (MeshType.leftWallMeshes.Contains(selectedTilePreset.MeshID())) {
 
-                    if (startSectionX / 16 != sectionX || startSectionX % 16 != columnX) {
+                    if (firstClickColumnSectionX / 16 != sectionX || firstClickColumnSectionX % 16 != columnX) {
                         continue;
                     }
 
                 }
-                if (MeshType.dia.Contains(selectedTilePreset.MeshID())) {
+                if (MeshType.diagonalTLeftBRightWallMeshes.Contains(selectedTilePreset.MeshID())) {
 
-                    if (startSectionX != startSectionY) {
+                    if (x - firstClickColumnSectionX != y - firstClickColumnSectionY) {
+                        continue;
+                    }
+
+                }
+                if (MeshType.diagonalBLeftTRightWallMeshes.Contains(selectedTilePreset.MeshID())) {
+
+                    if (x - firstClickColumnSectionX < 0 && y - firstClickColumnSectionY < 0) {
+                        continue;
+                    }
+
+                    if (x - firstClickColumnSectionX > 0 && y - firstClickColumnSectionY > 0) {
+                        continue;
+                    }
+
+                    if (Mathf.Abs(x - firstClickColumnSectionX) != Mathf.Abs(y - firstClickColumnSectionY)) {
                         continue;
                     }
 
@@ -596,6 +634,9 @@ public class TileAddMode : EditMode {
 
                     itColumn.tiles.Add(tile);
 
+                    // Added for counter-action
+                    addedTiles.Add(tile);
+
                 }
 
             }
@@ -605,6 +646,8 @@ public class TileAddMode : EditMode {
         foreach (var affectSection in affectedSections) {
             affectSection.RefreshMesh();
         }
+
+        AddMultiAddTileCounterAction(addedTiles, affectedSections);
 
     }
 
@@ -773,6 +816,34 @@ public class TileAddMode : EditMode {
 
     }
 
+    public class MultiAddTileCounterAction : CounterAction {
+
+        List<Tile> tilesAdded;
+        HashSet<LevelMesh> affectedSections;
+
+        public MultiAddTileCounterAction(List<Tile> tilesAdded, HashSet<LevelMesh> affectedSections) {
+            this.tilesAdded = tilesAdded;
+            this.affectedSections = affectedSections;
+        }
+
+        public void Action() {
+
+            foreach (var tile in tilesAdded) {
+
+                tile.column.tiles.Remove(tile);
+
+            }
+
+            foreach (var affectSection in affectedSections) {
+                affectSection.RefreshMesh();
+            }
+
+        }
+
+
+
+    }
+
     public class SchematicAddCounterAction : CounterAction {
 
         List<SectionSaveStateCounterAction> savedSections = new();
@@ -797,6 +868,10 @@ public class TileAddMode : EditMode {
 
     void AddSchematicAddCounterAction(List<LevelMesh> levelMeshes) {
         Main.AddCounterAction(new SchematicAddCounterAction(levelMeshes));
+    }
+
+    void AddMultiAddTileCounterAction(List<Tile> tilesAdded, HashSet<LevelMesh> affectedSections) {
+        Main.AddCounterAction(new MultiAddTileCounterAction(tilesAdded, affectedSections));
     }
 
     #endregion
