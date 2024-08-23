@@ -9,8 +9,6 @@ namespace FCopParser {
     // =WIP=
     public class FCopLevel {
 
-        public FCopRPNS rpns;
-
         public List<List<int>> layout;
 
         public List<FCopLevelSection> sections = new();
@@ -20,6 +18,8 @@ namespace FCopParser {
         public List<FCopNavMesh> navMeshes = new();
 
         public List<FCopObject> objects = new();
+
+        public FCopScriptingProject scripting;
 
         public List<FCopActor> actors = new();
 
@@ -177,11 +177,19 @@ namespace FCopParser {
 
         void InitData() {
 
-            rpns = new FCopRPNS(fileManager.files.First(file => {
+            var rpns = new FCopRPNS(fileManager.files.First(file => {
 
                 return file.dataFourCC == "RPNS";
 
             }));
+
+            var cfun = new FCopFunctionParser(fileManager.files.First(file => {
+
+                return file.dataFourCC == "Cfun";
+
+            }));
+
+            scripting = new FCopScriptingProject(rpns, cfun);
 
             var rawBitmapFiles = fileManager.files.Where(file => {
 
@@ -240,6 +248,8 @@ namespace FCopParser {
             foreach (var texture in textures) {
                 texture.Compile();
             }
+
+            scripting.Compile();
 
             foreach (var actor in actors) {
                 actor.Compile();

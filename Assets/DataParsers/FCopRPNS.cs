@@ -4,7 +4,11 @@ namespace FCopParser {
 
     public class FCopRPNS {
 
-        public List<FCopScript> code = new();
+        // Uses the script offset as it's ID or key.
+        // The key is only updated on a new file load.
+        // Even if the file is compiled the key stays the same.
+        // The new offset is stored on FCopScript.
+        public Dictionary<int, FCopScript> code = new();
 
         public List<byte> bytes = new();
 
@@ -28,7 +32,7 @@ namespace FCopParser {
 
                 if (b == 0) {
 
-                    code.Add(new FCopScript(offset, new List<byte>(currentLine)));
+                    code.Add(offset, new FCopScript(offset, new List<byte>(currentLine)));
 
                     currentLine.Clear();
 
@@ -41,7 +45,20 @@ namespace FCopParser {
 
         public void Compile() {
 
-            rawFile.data = bytes;
+            var total = new List<byte>();
+
+            var offset = 0;
+            foreach (var line in code) {
+
+                var compiledLine = line.Value.Compile(offset);
+
+                total.AddRange(compiledLine);
+
+                offset += compiledLine.Count;
+
+            }
+
+            rawFile.data = total;
 
         }
 
