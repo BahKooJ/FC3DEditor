@@ -16,5 +16,11 @@ public class ScriptingButtonItemView : MonoBehaviour {
 
     }
 
+    public void OnClick() {
+
+        view.SelectScript(view.level.scripting.rpns.code[value]);
+
+    }
+
 
 }

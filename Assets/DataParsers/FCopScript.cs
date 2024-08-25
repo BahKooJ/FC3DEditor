@@ -139,6 +139,46 @@ namespace FCopParser {
 
         }
 
+        public struct ScriptOperationMetaData {
+
+            public bool leftRightOperation;
+            public string topLevelOperatorString;
+            public string topLevelName;
+
+            public int parameterCount;
+            public ScriptReturnType returnType;
+
+            public ScriptOperationMetaData(bool leftRightOperation, string topLevelOperatorString, string topLevelName, int parameterCount, ScriptReturnType returnType) {
+                this.leftRightOperation = leftRightOperation;
+                this.topLevelOperatorString = topLevelOperatorString;
+                this.topLevelName = topLevelName;
+                this.parameterCount = parameterCount;
+                this.returnType = returnType;
+            }
+
+            public ScriptOperationMetaData(string topLevelName, int parameterCount) : this() {
+                this.leftRightOperation = false;
+                this.topLevelOperatorString = "";
+                this.topLevelName = topLevelName;
+                this.parameterCount = parameterCount;
+                this.returnType = ScriptReturnType.Void;
+            }
+
+            public ScriptOperationMetaData(string topLevelOperatorString, string topLevelName, int parameterCount) : this() {
+                this.leftRightOperation = false;
+                this.topLevelOperatorString = topLevelOperatorString;
+                this.topLevelName = topLevelName;
+                this.parameterCount = parameterCount;
+                this.returnType = ScriptReturnType.Void;
+            }
+        }
+
+        public enum ScriptReturnType {
+            Void = 0,
+            Int = 1,
+            Bool = 2
+        }
+
         public enum Operator {
 
             Literal = 256,
@@ -177,48 +217,44 @@ namespace FCopParser {
 
         }
 
-        public Dictionary<Operator, int> operatorParameterCount = new Dictionary<Operator, int>() {
-
-            { Operator.Literal, 0 },
-            { Operator.GET_16, 1 },
-            { Operator.GET_18, 1 },
-            { Operator.GET_19, 1 },
-            { Operator.Equal, 2 },
-            { Operator.GreaterThan, 2 },
-            { Operator.GreaterThanOrEqual, 2 },
-            { Operator.LessThan, 2 },
-            { Operator.Subtract, 2 },
-            { Operator.And, 2 },
-
+        public static Dictionary<Operator, ScriptOperationMetaData> operatorMetaData = new Dictionary<Operator, ScriptOperationMetaData>() {
+            { Operator.Literal, new ScriptOperationMetaData("Literal", 0) },
+            { Operator.GET_16, new ScriptOperationMetaData("Get 16", 1) },
+            { Operator.GET_18, new ScriptOperationMetaData("Get 18", 1) },
+            { Operator.GET_19, new ScriptOperationMetaData("Get 19", 1) },
+            { Operator.Equal, new ScriptOperationMetaData(true, "==", "Is Equal", 2, ScriptReturnType.Bool) },
+            { Operator.GreaterThan, new ScriptOperationMetaData(true, ">", "Is Greater Than", 2, ScriptReturnType.Bool) },
+            { Operator.GreaterThanOrEqual, new ScriptOperationMetaData(true, ">=", "Is Greater Than Or Equal", 2, ScriptReturnType.Bool) },
+            { Operator.LessThan, new ScriptOperationMetaData(true, "<", "Is Less Than", 2, ScriptReturnType.Bool) },
+            { Operator.Subtract, new ScriptOperationMetaData(true, "-", "Subtrack", 2, ScriptReturnType.Int) },
+            { Operator.And, new ScriptOperationMetaData(true, "&&", "And", 2, ScriptReturnType.Bool) },
         };
 
-        public Dictionary<Instruction, int> instructionParameterCount = new Dictionary<Instruction, int>() {
-
-            { Instruction.None, 0 },
-            { Instruction.End, 0 },
-            { Instruction.Jump, 1 },
-            { Instruction.Unknown12, 1 },
-            { Instruction.ConditionalJump, 2 },
-            { Instruction.Increment, 1 },
-            { Instruction.INCREMENT_19, 1 },
-            { Instruction.Decrement, 1 },
-            { Instruction.DECREMENT_19, 1 },
-            { Instruction.Set, 2 },
-            { Instruction.Sound, 2 },
-            { Instruction.Unknown31, 2 },
-            { Instruction.SET_19, 2 },
-            { Instruction.Add, 2 },
-            { Instruction.Subtract, 2 },
-            { Instruction.Destroy, 3 },
-            { Instruction.Unknown57, 3 },
-            { Instruction.Spawn, 3 },
-
-
-
+        public static Dictionary<Instruction, ScriptOperationMetaData> instructionMetaData = new Dictionary<Instruction, ScriptOperationMetaData>() {
+            { Instruction.None, new ScriptOperationMetaData("None", 0) },
+            { Instruction.End, new ScriptOperationMetaData("End", 0) },
+            { Instruction.Jump, new ScriptOperationMetaData("Else", 1) },
+            { Instruction.Unknown12, new ScriptOperationMetaData("Unknown12", 1) },
+            { Instruction.ConditionalJump, new ScriptOperationMetaData("If", 2) },
+            { Instruction.Increment, new ScriptOperationMetaData("++", "Increment By 1", 1) },
+            { Instruction.INCREMENT_19, new ScriptOperationMetaData("++(19)", "Increment By 1", 1) },
+            { Instruction.Decrement, new ScriptOperationMetaData("--", "Decrement By 1", 1) },
+            { Instruction.DECREMENT_19, new ScriptOperationMetaData("--(19)", "Decrement By 1", 1) },
+            { Instruction.Set, new ScriptOperationMetaData(true, "=", "Set", 2, ScriptReturnType.Void) },
+            { Instruction.Sound, new ScriptOperationMetaData("Play Sound", 2) },
+            { Instruction.Unknown31, new ScriptOperationMetaData("Unknown31", 2) },
+            { Instruction.SET_19, new ScriptOperationMetaData(true, "=(19)", "Set", 2, ScriptReturnType.Void) },
+            { Instruction.Add, new ScriptOperationMetaData(true, "+=", "Add And Set", 2, ScriptReturnType.Void) },
+            { Instruction.Subtract, new ScriptOperationMetaData(true, "-=", "Subtract And Set", 2, ScriptReturnType.Void) },
+            { Instruction.Destroy, new ScriptOperationMetaData("Destroy Actors", 3) },
+            { Instruction.Unknown57, new ScriptOperationMetaData("Unkown57", 3) },
+            { Instruction.Spawn, new ScriptOperationMetaData("Spawn", 3) },
         };
 
         public List<ScriptNode> scriptNodes = new List<ScriptNode>();
         List<Statement> statements = new List<Statement>();
+
+        public bool failed = false;
 
         public string name = "";
         public int id;
@@ -231,9 +267,14 @@ namespace FCopParser {
             this.offset = offset;
             this.compiledBytes.AddRange(compiledBytes);
 
-            this.Disassemble(compiledBytes);
-            // TODO: Line by line debug DeCompile
-            this.DeCompile();
+            try {
+                this.Disassemble(compiledBytes);
+                this.DeCompile();
+            } catch (Exception e) { 
+                this.failed = true;
+                //throw e;
+            }
+
         }
 
         class VarHasNoID : Exception { }
@@ -261,14 +302,14 @@ namespace FCopParser {
                 }
             }
             else {
-                var node = new ExpressionNode(expression.operationType, operatorParameterCount[expression.operationType]);
+                var node = new ExpressionNode(expression.operationType, operatorMetaData[expression.operationType].parameterCount);
                 node.nestedExpressiveNodes = nestedExp;
                 return node;
             }
 
         }
 
-        (int, int, ScriptNode) UnwrapStatement(int it) {
+        (int statementsUnwrapped, int compiledBytesUnwrapped, ScriptNode node) UnwrapStatement(int it) {
 
             int i = it;
 
@@ -288,37 +329,64 @@ namespace FCopParser {
 
                     i++;
 
-                    var nextStatement = statements[i];
-
                     var unwrappedNextStatement = UnwrapStatement(i);
 
-                    i += unwrappedNextStatement.Item1;
-                    byteIt += unwrappedNextStatement.Item2;
+                    // Iterator already moves over one at the top to get the next statement.
+                    // Iterator only needs to move over if more than one statement was unwrapped.
+                    i += unwrappedNextStatement.statementsUnwrapped;
+                    byteIt += unwrappedNextStatement.compiledBytesUnwrapped;
 
-                    node.nestedNodes.Add(unwrappedNextStatement.Item3);
+                    node.nestedNodes.Add(unwrappedNextStatement.node);
 
                     if (byteCount == byteIt) {
                         break;
                     }
 
-                    byteIt += nextStatement.GetTotalStatementByteCount();
+                }
 
+                return (i - it, byteCount, node);
+
+            }
+            else if (statement.instruction == Instruction.Jump) {
+
+                var node = new StatementNode(statement.instruction, 0);
+
+                var byteIt = 0;
+                var byteCount = (int)statement.parametes[0].value - 1;
+
+
+                while (byteCount != byteIt) {
+
+                    i++;
+
+                    var unwrappedNextStatement = UnwrapStatement(i);
+
+                    // Iterator already moves over one at the top to get the next statement.
+                    // Iterator only needs to move over if more than one statement was unwrapped.
+                    i += unwrappedNextStatement.statementsUnwrapped;
+                    byteIt += unwrappedNextStatement.compiledBytesUnwrapped;
+
+                    node.nestedNodes.Add(unwrappedNextStatement.node);
+
+                    if (byteCount == byteIt) {
+                        break;
+                    }
 
                 }
 
-                return (i, byteCount, node);
+                return (i - it, statement.GetTotalStatementByteCount(), node);
 
             }
             else {
 
-                var node = new StatementNode(statement.instruction, instructionParameterCount[statement.instruction]);
+                var node = new StatementNode(statement.instruction, instructionMetaData[statement.instruction].parameterCount);
 
                 foreach (var par in statement.parametes) {
                     node.nestedExpressiveNodes.Add(UnwrapExpression(par));
 
                 }
 
-                return (i, statement.GetTotalStatementByteCount(), node);
+                return (i - it, statement.GetTotalStatementByteCount(), node);
             }
 
         }
@@ -330,9 +398,11 @@ namespace FCopParser {
 
                 var unwrappedNextStatement = UnwrapStatement(i);
 
-                i += unwrappedNextStatement.Item1;
+                i += unwrappedNextStatement.statementsUnwrapped;
 
-                scriptNodes.Add(unwrappedNextStatement.Item3);
+                scriptNodes.Add(unwrappedNextStatement.node);
+
+                i++;
 
             }
 
@@ -351,7 +421,7 @@ namespace FCopParser {
 
                     var opCase = (Operator)b;
 
-                    var parCount = operatorParameterCount[opCase];
+                    var parCount = operatorMetaData[opCase].parameterCount;
 
                     var expressions = floatingExpressions.GetRange(floatingExpressions.Count - parCount, parCount);
 
@@ -396,7 +466,7 @@ namespace FCopParser {
 
                         var state = new Statement(instuctionCase, 1);
 
-                        var parCount = instructionParameterCount[instuctionCase];
+                        var parCount = instructionMetaData[instuctionCase].parameterCount;
 
                         if (parCount != 0) {
 

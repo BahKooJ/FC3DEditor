@@ -5,10 +5,11 @@ using UnityEngine;
 public class ScriptingPanelView : MonoBehaviour {
 
 
-    // View refs
+    // - Unity Refs -
     public Transform scriptListContent;
+    public VisualScriptingWindowView scriptingWindow;
 
-    // View refs prefabs
+    // - Prefabs -
     public GameObject ScriptListItem;
 
     public bool isScriptTab = true;
@@ -18,27 +19,31 @@ public class ScriptingPanelView : MonoBehaviour {
 
     void Start() {
 
-        //if (isScriptTab) {
+        if (isScriptTab) {
 
-        //    foreach (var script in level.rpns.code) {
+            foreach (var script in level.scripting.rpns.code) {
 
-        //        var listItem = Instantiate(ScriptListItem);
+                var listItem = Instantiate(ScriptListItem);
 
-        //        listItem.gameObject.SetActive(true);
+                listItem.gameObject.SetActive(true);
 
-        //        var listItemScript = listItem.GetComponent<ScriptingButtonItemView>();
+                var listItemScript = listItem.GetComponent<ScriptingButtonItemView>();
 
-        //        listItemScript.view = this;
-        //        listItemScript.value = script.offset;
+                listItemScript.view = this;
+                listItemScript.value = script.Key;
 
-        //        listItem.transform.SetParent(scriptListContent, false);
+                listItem.transform.SetParent(scriptListContent, false);
 
-        //    }
+            }
 
+        }
 
-        //}
-        
+    }
 
+    public void SelectScript(FCopScript script) {
+
+        scriptingWindow.script = script;
+        scriptingWindow.Init();
 
     }
 
