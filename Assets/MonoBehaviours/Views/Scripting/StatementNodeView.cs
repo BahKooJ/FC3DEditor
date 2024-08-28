@@ -55,11 +55,17 @@ public class StatementNodeView : MonoBehaviour {
 
         if (metadata.leftRightOperation) {
 
+            var order = new List<int>() { 0, 1 };
+
+            if (metadata.topLevelReverseleftRightOperation) {
+                order = new List<int>() { 1, 0 };
+            }
+
             if (metadata.parameterCount != 2) {
                 Debug.LogError(scriptNode.instruction.ToString() + " left right operator with a parameter count of " + metadata.parameterCount.ToString() + "?");
             }
 
-            CreateNode(scriptNode.nestedExpressiveNodes[0]);
+            CreateNode(scriptNode.nestedExpressiveNodes[order[0]]);
 
             Pad();
 
@@ -68,7 +74,7 @@ public class StatementNodeView : MonoBehaviour {
 
             Pad();
 
-            CreateNode(scriptNode.nestedExpressiveNodes[1]);
+            CreateNode(scriptNode.nestedExpressiveNodes[order[1]]);
 
         }
         else if (metadata.topLevelOperatorString != "" && metadata.parameterCount == 1) {

@@ -1,5 +1,6 @@
 ﻿
 using FCopParser;
+using System;
 using UnityEngine;
 
 public class ScriptingPanelView : MonoBehaviour {
@@ -41,6 +42,28 @@ public class ScriptingPanelView : MonoBehaviour {
     }
 
     public void SelectScript(FCopScript script) {
+        try {
+            if (script.failed) {
+                //script.failed = false;
+                script.Disassemble(script.compiledBytes);
+                script.DeCompile();
+            }
+        }
+        catch (Exception e) {
+
+            var error = "";
+
+            foreach (var b in script.compiledBytes) {
+                error += b.ToString() + " ";
+            }
+            error += "\n";
+
+            Debug.Log(error);
+            throw e;
+
+        }
+
+
 
         scriptingWindow.script = script;
         scriptingWindow.Init();

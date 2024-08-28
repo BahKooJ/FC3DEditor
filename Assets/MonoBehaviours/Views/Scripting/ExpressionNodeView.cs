@@ -104,6 +104,13 @@ public class ExpressionNodeView : MonoBehaviour {
             backgroundImage.color = varColor;
 
         }
+        else if (scriptNode is FCopScript.ActorRefNode aNode) {
+
+            expressionText.text = "Actor" + aNode.actorID.ToString();
+
+            backgroundImage.color = varColor;
+
+        }
         else {
 
             Debug.LogError("Nested expression " + scriptNode.GetType().ToString() + " does not return value!");

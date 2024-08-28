@@ -1,5 +1,4 @@
 ﻿
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +28,7 @@ namespace FCopParser {
             // nested nodes is for like code blocks
             public List<ScriptNode> nestedExpressiveNodes = new();
             public List<ScriptNode> nestedNodes = new();
+            public ScriptNode parent = null;
 
             public int expectedNestedNodeCount;
 
@@ -69,6 +69,16 @@ namespace FCopParser {
 
         }
 
+        public class ActorRefNode : ScriptNode {
+
+            public int actorID;
+
+            public ActorRefNode(int actorID) : base(0) {
+                this.actorID = actorID;
+            }
+
+        }
+
         public class LiteralNode : ScriptNode {
 
             public int value;
@@ -86,17 +96,21 @@ namespace FCopParser {
             public object value = null;
 
             public int byteCount;
+            public ScriptPrimitiveType returnType;
 
-            public Expression(List<Expression> nestedExpressions, Operator operationType, int byteCount) {
+            public Expression(List<Expression> nestedExpressions, Operator operationType, int byteCount, ScriptPrimitiveType returnType) {
                 this.nestedExpressions = nestedExpressions;
                 this.operationType = operationType;
                 this.byteCount = byteCount;
+                this.returnType = returnType;
             }
 
-            public Expression(object value, Operator operationType, int byteCount) {
+            public Expression(object value, Operator operationType, int byteCount, ScriptPrimitiveType returnType) {
                 this.value = value;
                 this.operationType = operationType;
                 this.byteCount = byteCount;
+                this.returnType = returnType;
+
             }
 
         }
@@ -142,41 +156,129 @@ namespace FCopParser {
         public struct ScriptOperationMetaData {
 
             public bool leftRightOperation;
+            public bool topLevelReverseleftRightOperation;
             public string topLevelOperatorString;
             public string topLevelName;
 
+            public List<ParameterMetaData> parameters;
             public int parameterCount;
-            public ScriptReturnType returnType;
+            public ScriptPrimitiveType returnType;
 
-            public ScriptOperationMetaData(bool leftRightOperation, string topLevelOperatorString, string topLevelName, int parameterCount, ScriptReturnType returnType) {
+            public bool overloaded;
+            public List<Operator> overloadedOperators;
+            public List<Instruction> overloadedInstructions;
+
+            public ScriptOperationMetaData(bool leftRightOperation, bool topLevelReverseleftRightOperation, string topLevelOperatorString, string topLevelName, List<ParameterMetaData> parameters, ScriptPrimitiveType returnType) {
                 this.leftRightOperation = leftRightOperation;
+                this.topLevelReverseleftRightOperation = topLevelReverseleftRightOperation;
                 this.topLevelOperatorString = topLevelOperatorString;
                 this.topLevelName = topLevelName;
-                this.parameterCount = parameterCount;
+                this.parameters = parameters;
+                this.parameterCount = parameters.Count;
                 this.returnType = returnType;
+                this.overloaded = false;
+                overloadedOperators = null;
+                overloadedInstructions = null;
             }
 
-            public ScriptOperationMetaData(string topLevelName, int parameterCount) : this() {
+            public ScriptOperationMetaData(bool leftRightOperation, string topLevelOperatorString, string topLevelName, List<ParameterMetaData> parameters, ScriptPrimitiveType returnType) {
+                this.leftRightOperation = leftRightOperation;
+                this.topLevelReverseleftRightOperation = false;
+                this.topLevelOperatorString = topLevelOperatorString;
+                this.topLevelName = topLevelName;
+                this.parameters = parameters;
+                this.parameterCount = parameters.Count;
+                this.returnType = returnType;
+                this.overloaded = false;
+                overloadedOperators = null;
+                overloadedInstructions = null;
+            }
+
+            public ScriptOperationMetaData(string topLevelName, List<ParameterMetaData> parameters) : this() {
                 this.leftRightOperation = false;
+                this.topLevelReverseleftRightOperation = false;
                 this.topLevelOperatorString = "";
                 this.topLevelName = topLevelName;
-                this.parameterCount = parameterCount;
-                this.returnType = ScriptReturnType.Void;
+                this.parameters = parameters;
+                this.parameterCount = parameters.Count;
+                this.returnType = ScriptPrimitiveType.Void;
+                this.overloaded = false;
+                overloadedOperators = null;
+                overloadedInstructions = null;
             }
 
-            public ScriptOperationMetaData(string topLevelOperatorString, string topLevelName, int parameterCount) : this() {
+            public ScriptOperationMetaData(string topLevelName, List<ParameterMetaData> parameters, ScriptPrimitiveType returnType) {
                 this.leftRightOperation = false;
+                this.topLevelReverseleftRightOperation = false;
+                this.topLevelOperatorString = "";
+                this.topLevelName = topLevelName;
+                this.parameters = parameters;
+                this.parameterCount = parameters.Count;
+                this.returnType = returnType;
+                this.overloaded = false;
+                overloadedOperators = null;
+                overloadedInstructions = null;
+            }
+
+            public ScriptOperationMetaData(string topLevelOperatorString, string topLevelName, List<ParameterMetaData> parameters) : this() {
+                this.leftRightOperation = false;
+                this.topLevelReverseleftRightOperation = false;
                 this.topLevelOperatorString = topLevelOperatorString;
                 this.topLevelName = topLevelName;
-                this.parameterCount = parameterCount;
-                this.returnType = ScriptReturnType.Void;
+                this.parameters = parameters;
+                this.parameterCount = parameters.Count;
+                this.returnType = ScriptPrimitiveType.Void;
+                this.overloaded = false;
+                overloadedOperators = null;
+                overloadedInstructions = null;
             }
+
+            public ScriptOperationMetaData(bool leftRightOperation, string topLevelOperatorString, string topLevelName, List<ParameterMetaData> parameters, ScriptPrimitiveType returnType, List<Operator> overloadedOperators) : this() {
+                this.leftRightOperation = leftRightOperation;
+                this.topLevelReverseleftRightOperation = false;
+                this.topLevelOperatorString = topLevelOperatorString;
+                this.topLevelName = topLevelName;
+                this.parameters = parameters;
+                this.parameterCount = parameters.Count;
+                this.returnType = returnType;
+                this.overloaded = true;
+                this.overloadedOperators = overloadedOperators;
+                overloadedInstructions = null;
+            }
+
+            public ScriptOperationMetaData(bool leftRightOperation, string topLevelOperatorString, string topLevelName, List<ParameterMetaData> parameters, ScriptPrimitiveType returnType, List<Instruction> overloadedInstructions) : this() {
+                this.leftRightOperation = leftRightOperation;
+                this.topLevelReverseleftRightOperation = false;
+                this.topLevelOperatorString = topLevelOperatorString;
+                this.topLevelName = topLevelName;
+                this.parameters = parameters;
+                this.parameterCount = parameters.Count;
+                this.returnType = returnType;
+                this.overloaded = true;
+                this.overloadedOperators = null;
+                this.overloadedInstructions = overloadedInstructions;
+            }
+
         }
 
-        public enum ScriptReturnType {
+        public struct ParameterMetaData {
+
+            public string name;
+            public ScriptPrimitiveType type;
+
+            public ParameterMetaData(string name, ScriptPrimitiveType type) {
+                this.name = name;
+                this.type = type;
+            }
+
+        }
+
+        public enum ScriptPrimitiveType {
             Void = 0,
             Int = 1,
-            Bool = 2
+            Bool = 2,
+            VarRef = 3,
+            ActorRef = 4
         }
 
         public enum Operator {
@@ -190,7 +292,9 @@ namespace FCopParser {
             GreaterThanOrEqual = 36,
             LessThan = 37,
             Subtract = 40,
-            And = 44
+            And = 44,
+            // Overloads
+            Is = 289
 
         }
 
@@ -200,6 +304,7 @@ namespace FCopParser {
             End = 0,
             Jump = 8,
             Unknown12 = 12,
+            Unknown13 = 13,
             ConditionalJump = 20,
             Increment = 21,
             INCREMENT_19 = 24,
@@ -218,37 +323,41 @@ namespace FCopParser {
         }
 
         public static Dictionary<Operator, ScriptOperationMetaData> operatorMetaData = new Dictionary<Operator, ScriptOperationMetaData>() {
-            { Operator.Literal, new ScriptOperationMetaData("Literal", 0) },
-            { Operator.GET_16, new ScriptOperationMetaData("Get 16", 1) },
-            { Operator.GET_18, new ScriptOperationMetaData("Get 18", 1) },
-            { Operator.GET_19, new ScriptOperationMetaData("Get 19", 1) },
-            { Operator.Equal, new ScriptOperationMetaData(true, "==", "Is Equal", 2, ScriptReturnType.Bool) },
-            { Operator.GreaterThan, new ScriptOperationMetaData(true, ">", "Is Greater Than", 2, ScriptReturnType.Bool) },
-            { Operator.GreaterThanOrEqual, new ScriptOperationMetaData(true, ">=", "Is Greater Than Or Equal", 2, ScriptReturnType.Bool) },
-            { Operator.LessThan, new ScriptOperationMetaData(true, "<", "Is Less Than", 2, ScriptReturnType.Bool) },
-            { Operator.Subtract, new ScriptOperationMetaData(true, "-", "Subtrack", 2, ScriptReturnType.Int) },
-            { Operator.And, new ScriptOperationMetaData(true, "&&", "And", 2, ScriptReturnType.Bool) },
+            { Operator.Literal, new ScriptOperationMetaData("Literal", new(), ScriptPrimitiveType.Int) },
+            { Operator.GET_16, new ScriptOperationMetaData("Get 16", new() { new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }, ScriptPrimitiveType.Int) },
+            { Operator.GET_18, new ScriptOperationMetaData("Get 18", new() { new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }, ScriptPrimitiveType.Int) },
+            { Operator.GET_19, new ScriptOperationMetaData("Get 19", new() { new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }, ScriptPrimitiveType.Int) },
+            { Operator.Equal, new ScriptOperationMetaData(true, "==", "Is Equal", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Bool, new List<Operator>() { Operator.Is }) },
+            { Operator.GreaterThan, new ScriptOperationMetaData(true, ">", "Is Greater Than", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Bool) },
+            { Operator.GreaterThanOrEqual, new ScriptOperationMetaData(true, ">=", "Is Greater Than Or Equal", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Bool) },
+            { Operator.LessThan, new ScriptOperationMetaData(true, "<", "Is Less Than", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Bool) },
+            { Operator.Subtract, new ScriptOperationMetaData(true, "-", "Subtrack", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Int) },
+            { Operator.And, new ScriptOperationMetaData(true, "&&", "And", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Bool), new ParameterMetaData("Right", ScriptPrimitiveType.Bool) }, ScriptPrimitiveType.Bool) },
+            // Overloads
+            { Operator.Is, new ScriptOperationMetaData(false, "", "Is", new() { new ParameterMetaData("Actor", ScriptPrimitiveType.ActorRef) }, ScriptPrimitiveType.Bool) },
+
         };
 
         public static Dictionary<Instruction, ScriptOperationMetaData> instructionMetaData = new Dictionary<Instruction, ScriptOperationMetaData>() {
-            { Instruction.None, new ScriptOperationMetaData("None", 0) },
-            { Instruction.End, new ScriptOperationMetaData("End", 0) },
-            { Instruction.Jump, new ScriptOperationMetaData("Else", 1) },
-            { Instruction.Unknown12, new ScriptOperationMetaData("Unknown12", 1) },
-            { Instruction.ConditionalJump, new ScriptOperationMetaData("If", 2) },
-            { Instruction.Increment, new ScriptOperationMetaData("++", "Increment By 1", 1) },
-            { Instruction.INCREMENT_19, new ScriptOperationMetaData("++(19)", "Increment By 1", 1) },
-            { Instruction.Decrement, new ScriptOperationMetaData("--", "Decrement By 1", 1) },
-            { Instruction.DECREMENT_19, new ScriptOperationMetaData("--(19)", "Decrement By 1", 1) },
-            { Instruction.Set, new ScriptOperationMetaData(true, "=", "Set", 2, ScriptReturnType.Void) },
-            { Instruction.Sound, new ScriptOperationMetaData("Play Sound", 2) },
-            { Instruction.Unknown31, new ScriptOperationMetaData("Unknown31", 2) },
-            { Instruction.SET_19, new ScriptOperationMetaData(true, "=(19)", "Set", 2, ScriptReturnType.Void) },
-            { Instruction.Add, new ScriptOperationMetaData(true, "+=", "Add And Set", 2, ScriptReturnType.Void) },
-            { Instruction.Subtract, new ScriptOperationMetaData(true, "-=", "Subtract And Set", 2, ScriptReturnType.Void) },
-            { Instruction.Destroy, new ScriptOperationMetaData("Destroy Actors", 3) },
-            { Instruction.Unknown57, new ScriptOperationMetaData("Unkown57", 3) },
-            { Instruction.Spawn, new ScriptOperationMetaData("Spawn", 3) },
+            { Instruction.None, new ScriptOperationMetaData("None", new()) },
+            { Instruction.End, new ScriptOperationMetaData("End", new()) },
+            { Instruction.Jump, new ScriptOperationMetaData("Else", new() { new ParameterMetaData("JumpCount", ScriptPrimitiveType.Int) }) },
+            { Instruction.Unknown12, new ScriptOperationMetaData("Unknown12", new() { new ParameterMetaData("Unknown", ScriptPrimitiveType.Int) }) },
+            { Instruction.Unknown13, new ScriptOperationMetaData("Unknown13", new() { new ParameterMetaData("Unknown", ScriptPrimitiveType.Int) }) },
+            { Instruction.ConditionalJump, new ScriptOperationMetaData("If", new() { new ParameterMetaData("Condition", ScriptPrimitiveType.Bool), new ParameterMetaData("JumpCount", ScriptPrimitiveType.Int) }) },
+            { Instruction.Increment, new ScriptOperationMetaData("++", "Increment By 1", new() { new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }) },
+            { Instruction.INCREMENT_19, new ScriptOperationMetaData("++(19)", "Increment By 1", new() { new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }) },
+            { Instruction.Decrement, new ScriptOperationMetaData("--", "Decrement By 1", new() { new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }) },
+            { Instruction.DECREMENT_19, new ScriptOperationMetaData("--(19)", "Decrement By 1", new() { new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }) },
+            { Instruction.Set, new ScriptOperationMetaData(true, true, "=", "Set", new() { new ParameterMetaData("Value", ScriptPrimitiveType.Int), new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }, ScriptPrimitiveType.Void) },
+            { Instruction.Sound, new ScriptOperationMetaData("Play Sound", new() { new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int) }) },
+            { Instruction.Unknown31, new ScriptOperationMetaData("Unknown31", new() { new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int) }) },
+            { Instruction.SET_19, new ScriptOperationMetaData(true, true, "=(19)", "Set", new() { new ParameterMetaData("Value", ScriptPrimitiveType.Int), new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }, ScriptPrimitiveType.Void) },
+            { Instruction.Add, new ScriptOperationMetaData(true, true, "+=", "Add And Set", new() { new ParameterMetaData("Value", ScriptPrimitiveType.Int), new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }, ScriptPrimitiveType.Void) },
+            { Instruction.Subtract, new ScriptOperationMetaData(true, true, "-=", "Subtract And Set", new() { new ParameterMetaData("Value", ScriptPrimitiveType.Int), new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }, ScriptPrimitiveType.Void) },
+            { Instruction.Destroy, new ScriptOperationMetaData("Destroy Actors", new() { new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int) }) },
+            { Instruction.Unknown57, new ScriptOperationMetaData("Unkown57", new() { new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int) }) },
+            { Instruction.Spawn, new ScriptOperationMetaData("Spawn", new() { new ParameterMetaData("ActorID", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int) }) },
         };
 
         public List<ScriptNode> scriptNodes = new List<ScriptNode>();
@@ -272,35 +381,58 @@ namespace FCopParser {
                 this.DeCompile();
             } catch (Exception e) { 
                 this.failed = true;
-                //throw e;
             }
 
         }
 
         class VarHasNoID : Exception { }
+        class MissingArguments : Exception {
+            public MissingArguments(string message) : base(message) {
+            }
 
-        ScriptNode UnwrapExpression(Expression expression) {
+        }
+        class TypeMisMatch : Exception {
+            public TypeMisMatch(string message) : base(message) {
+            }
+
+        }
+
+        ScriptNode UnwrapExpression(Expression expression, ScriptPrimitiveType expectedType) {
 
             var nestedExp = new List<ScriptNode>();
 
-            foreach (var nestE in expression.nestedExpressions) {
-                nestedExp.Add(UnwrapExpression(nestE));
+            var parameterData = operatorMetaData[expression.operationType].parameters;
+
+            var i = 0;
+            foreach (var data in parameterData) {
+
+                nestedExp.Add(UnwrapExpression(expression.nestedExpressions[i], data.type));
+
+                i++;
             }
 
-            if (expression.operationType == Operator.Literal) {
+            if (expression.operationType == Operator.Literal && expectedType == ScriptPrimitiveType.Int) {
                 return new LiteralNode((int)expression.value);
             }
-            else if (expression.operationType == Operator.GET_16 ||
-                expression.operationType == Operator.GET_18 ||
-                expression.operationType == Operator.GET_19) {
-                try {
-                    return new VariableNode(((LiteralNode)nestedExp[0]).value);
-
-                }
-                catch {
-                    throw new VarHasNoID();
-                }
+            else if (expression.operationType == Operator.Literal && expectedType == ScriptPrimitiveType.VarRef) {
+                return new VariableNode((int)expression.value);
             }
+            else if (expression.operationType == Operator.Literal && expectedType == ScriptPrimitiveType.ActorRef) {
+                return new ActorRefNode((int)expression.value);
+            }
+            //else if (expectedType == ScriptPrimitiveType.Int && parameterData.Count == 1) {
+
+            //    // This unnests those "Get Var" instuctions for readability.
+            //    if (parameterData[0].type == ScriptPrimitiveType.VarRef) {
+            //        return nestedExp[0];
+            //    }
+            //    else {
+            //        var node = new ExpressionNode(expression.operationType, operatorMetaData[expression.operationType].parameterCount);
+            //        node.nestedExpressiveNodes = nestedExp;
+            //        return node;
+            //    }
+
+            //}
             else {
                 var node = new ExpressionNode(expression.operationType, operatorMetaData[expression.operationType].parameterCount);
                 node.nestedExpressiveNodes = nestedExp;
@@ -309,9 +441,41 @@ namespace FCopParser {
 
         }
 
+        // This method also nest nodes and it's a little confusing how it works.
+        // The byte code uses a byte count for jump statements.
+        // In order to know which stuff is nested it has to iterate through.
         (int statementsUnwrapped, int compiledBytesUnwrapped, ScriptNode node) UnwrapStatement(int it) {
 
             int i = it;
+
+            int NestNodes(int byteCount, StatementNode node) {
+
+                var byteIt = 0;
+
+                while (byteIt < byteCount) {
+
+                    i++;
+
+                    var unwrappedNextStatement = UnwrapStatement(i);
+
+                    // Iterator already moves over one at the top to get the next statement.
+                    // Iterator only needs to move over if more than one statement was unwrapped.
+                    i += unwrappedNextStatement.statementsUnwrapped;
+                    byteIt += unwrappedNextStatement.compiledBytesUnwrapped;
+
+                    unwrappedNextStatement.node.parent = node;
+
+                    node.nestedNodes.Add(unwrappedNextStatement.node);
+
+                    if (byteIt >= byteCount) {
+                        break;
+                    }
+
+                }
+
+                return byteIt;
+
+            }
 
             var statement = statements[i];
 
@@ -319,71 +483,37 @@ namespace FCopParser {
 
                 var node = new StatementNode(statement.instruction, 1);
 
-                node.nestedExpressiveNodes.Add(UnwrapExpression(statement.parametes[0]));
+                node.nestedExpressiveNodes.Add(UnwrapExpression(statement.parametes[0], ScriptPrimitiveType.Bool));
 
-                var byteIt = 0;
                 var byteCount = (int)statement.parametes[1].value - 1;
 
+                var byteIt = NestNodes(byteCount, node);
 
-                while (byteCount != byteIt) {
-
-                    i++;
-
-                    var unwrappedNextStatement = UnwrapStatement(i);
-
-                    // Iterator already moves over one at the top to get the next statement.
-                    // Iterator only needs to move over if more than one statement was unwrapped.
-                    i += unwrappedNextStatement.statementsUnwrapped;
-                    byteIt += unwrappedNextStatement.compiledBytesUnwrapped;
-
-                    node.nestedNodes.Add(unwrappedNextStatement.node);
-
-                    if (byteCount == byteIt) {
-                        break;
-                    }
-
-                }
-
-                return (i - it, byteCount, node);
+                return (i - it, byteIt + statement.GetTotalStatementByteCount(), node);
 
             }
             else if (statement.instruction == Instruction.Jump) {
 
                 var node = new StatementNode(statement.instruction, 0);
 
-                var byteIt = 0;
                 var byteCount = (int)statement.parametes[0].value - 1;
 
+                var byteIt = NestNodes(byteCount, node);
 
-                while (byteCount != byteIt) {
-
-                    i++;
-
-                    var unwrappedNextStatement = UnwrapStatement(i);
-
-                    // Iterator already moves over one at the top to get the next statement.
-                    // Iterator only needs to move over if more than one statement was unwrapped.
-                    i += unwrappedNextStatement.statementsUnwrapped;
-                    byteIt += unwrappedNextStatement.compiledBytesUnwrapped;
-
-                    node.nestedNodes.Add(unwrappedNextStatement.node);
-
-                    if (byteCount == byteIt) {
-                        break;
-                    }
-
-                }
-
-                return (i - it, statement.GetTotalStatementByteCount(), node);
+                return (i - it, byteIt + statement.GetTotalStatementByteCount(), node);
 
             }
             else {
 
                 var node = new StatementNode(statement.instruction, instructionMetaData[statement.instruction].parameterCount);
 
-                foreach (var par in statement.parametes) {
-                    node.nestedExpressiveNodes.Add(UnwrapExpression(par));
+                var parameterData = instructionMetaData[statement.instruction].parameters;
+                var pi = 0;
+                foreach (var data in parameterData) {
 
+                    node.nestedExpressiveNodes.Add(UnwrapExpression(statement.parametes[pi], data.type));
+
+                    pi++;
                 }
 
                 return (i - it, statement.GetTotalStatementByteCount(), node);
@@ -393,14 +523,16 @@ namespace FCopParser {
 
         public void DeCompile() {
 
+            scriptNodes.Clear();
+
             var i = 0;
             while (i < statements.Count) {
 
-                var unwrappedNextStatement = UnwrapStatement(i);
+                var (statementsUnwrapped, compiledBytesUnwrapped, node) = UnwrapStatement(i);
 
-                i += unwrappedNextStatement.statementsUnwrapped;
+                i += statementsUnwrapped;
 
-                scriptNodes.Add(unwrappedNextStatement.node);
+                scriptNodes.Add(node);
 
                 i++;
 
@@ -409,6 +541,8 @@ namespace FCopParser {
         }
 
         public void Disassemble(List<byte> code) {
+
+            statements.Clear();
 
             List<Expression> floatingExpressions = new();
 
@@ -419,15 +553,134 @@ namespace FCopParser {
 
                 if (Enum.IsDefined(typeof(Operator), (Int32)b)) {
 
+
+
+                    // As if things weren't compilcated enough, instructions/operators can be overloaded.
+
+                    bool CheckParameterTypes(ScriptOperationMetaData localMetaData) {
+
+                        var typeMismatch = false;
+
+                        var expressions = floatingExpressions.GetRange(floatingExpressions.Count - localMetaData.parameterCount, localMetaData.parameterCount);
+
+                        var localI = 0;
+                        foreach (var par in localMetaData.parameters) {
+
+                            if (par.type != expressions[localI].returnType) {
+
+                                if (!((par.type == ScriptPrimitiveType.VarRef || par.type == ScriptPrimitiveType.ActorRef) && 
+                                    expressions[localI].returnType == ScriptPrimitiveType.Int)) {
+                                    typeMismatch = true;
+                                    break;
+                                }
+
+                            }
+
+                            localI++;
+                        }
+
+                        return typeMismatch;
+
+                    }
+
+                    void CreateFloatingExpression(Operator operatorCase, ScriptPrimitiveType returnType, int parameterCount) {
+
+                        var expressions = floatingExpressions.GetRange(floatingExpressions.Count - parameterCount, parameterCount);
+
+                        floatingExpressions.RemoveRange(floatingExpressions.Count - parameterCount, parameterCount);
+
+                        floatingExpressions.Add(new Expression(expressions, operatorCase, 1, returnType));
+
+                    }
+
+                    void ThrowTypeMismatchError(List<Expression> expressions, ScriptOperationMetaData metaData, Operator opCase) {
+
+                        var message = "";
+
+                        var localI = 0;
+
+                        foreach (var par in metaData.parameters) {
+
+                            message += "Expected Type: " + par.type.ToString() + " Type: " + expressions[localI].returnType.ToString() + ", ";
+
+                            localI++;
+                        }
+
+                        throw new TypeMisMatch("Type mismatch from provided arguments for " + opCase.ToString() + ". " + message);
+
+
+                    }
+
                     var opCase = (Operator)b;
 
-                    var parCount = operatorMetaData[opCase].parameterCount;
+                    var metaData = operatorMetaData[opCase];
 
-                    var expressions = floatingExpressions.GetRange(floatingExpressions.Count - parCount, parCount);
+                    var checkForOverloads = false;
 
-                    floatingExpressions.RemoveRange(floatingExpressions.Count - parCount, parCount);
+                    checkForOverloads = floatingExpressions.Count < metaData.parameterCount;
 
-                    floatingExpressions.Add(new Expression(expressions, opCase, 1));
+                    if (!checkForOverloads) { // Enough arguments are provided
+
+                        var typeMismatch = CheckParameterTypes(metaData);
+
+                        if (!typeMismatch) {
+                            CreateFloatingExpression(opCase, metaData.returnType, metaData.parameterCount);
+                        }
+                        else {
+
+                            if (!metaData.overloaded) { // Type mismatch and no overloads
+                                ThrowTypeMismatchError(floatingExpressions.GetRange(floatingExpressions.Count - metaData.parameterCount, metaData.parameterCount), metaData, opCase);
+                            }
+
+                            checkForOverloads = true;
+                        }
+
+                    }
+                    else if (!metaData.overloaded) {
+
+                        throw new MissingArguments("Not enough arguments for Operator " + opCase.ToString());
+
+                    }
+
+                    #region Check Overloads
+                    if (checkForOverloads && metaData.overloaded) {
+
+                        Operator? foundValidOverload = null;
+
+                        foreach (var overloadOpCase in metaData.overloadedOperators) {
+
+                            var overloadData = operatorMetaData[overloadOpCase];
+
+                            if (floatingExpressions.Count < overloadData.parameterCount) {
+                                continue;
+                            }
+
+                            var typeMismatch = CheckParameterTypes(overloadData);
+
+                            if (!typeMismatch) {
+                                foundValidOverload = overloadOpCase;
+                                break;
+                            }
+
+                        }
+
+                        if (foundValidOverload != null) {
+                            var overloadOpCase = (Operator)foundValidOverload;
+
+                            var overloadData = operatorMetaData[overloadOpCase];
+
+                            CreateFloatingExpression(overloadOpCase, overloadData.returnType, overloadData.parameterCount);
+
+                        }
+                        else {
+
+                            throw new MissingArguments("No overloads with the provided arguments");
+
+                        }
+
+                    }
+                    #endregion
+
 
                 }
                 else if (Enum.IsDefined(typeof(Instruction), (Int32)b)) {
@@ -442,7 +695,7 @@ namespace FCopParser {
 
                         floatingExpressions.RemoveAt(floatingExpressions.Count - 1);
 
-                        state.parametes.Add(new Expression((int)code[i + 1], Operator.Literal, 1));
+                        state.parametes.Add(new Expression((int)code[i + 1], Operator.Literal, 1, ScriptPrimitiveType.Int));
 
                         statements.Add(state);
 
@@ -454,7 +707,7 @@ namespace FCopParser {
 
                         var state = new Statement(instuctionCase, 1);
 
-                        state.parametes.Add(new Expression((int)code[i + 1], Operator.Literal, 1));
+                        state.parametes.Add(new Expression((int)code[i + 1], Operator.Literal, 1, ScriptPrimitiveType.Int));
 
                         statements.Add(state);
 
@@ -486,10 +739,10 @@ namespace FCopParser {
                 else {
 
                     if (b > 127) {
-                        floatingExpressions.Add(new Expression(b - 128, Operator.Literal, 1));
+                        floatingExpressions.Add(new Expression(b - 128, Operator.Literal, 1, ScriptPrimitiveType.Int));
                     }
                     else if (b == 2) {
-                        floatingExpressions.Add(new Expression(128 + (code[i + 1]), Operator.Literal, 2));
+                        floatingExpressions.Add(new Expression(128 + (code[i + 1]), Operator.Literal, 2, ScriptPrimitiveType.Int));
                         i += 2;
                         continue;
                     }
