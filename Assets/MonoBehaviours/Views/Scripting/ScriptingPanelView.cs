@@ -1,6 +1,7 @@
 ﻿
 using FCopParser;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ScriptingPanelView : MonoBehaviour {
@@ -8,7 +9,8 @@ public class ScriptingPanelView : MonoBehaviour {
 
     // - Unity Refs -
     public Transform scriptListContent;
-    public VisualScriptingWindowView scriptingWindow;
+    public VisualScriptingScriptWindowView scriptingWindow;
+    public VisualScriptingFuncWindowView funcScriptingWindow;
 
     // - Prefabs -
     public GameObject ScriptListItem;
@@ -18,7 +20,21 @@ public class ScriptingPanelView : MonoBehaviour {
     public FCopActor actor;
     public FCopLevel level;
 
+    List<ScriptingButtonItemView> scriptButtons = new();
+
     void Start() {
+
+        Refresh();
+
+    }
+
+    void Refresh() {
+
+        foreach (var item in scriptButtons) {
+            Destroy(item.gameObject);
+        }
+
+        scriptButtons.Clear();
 
         if (isScriptTab) {
 
@@ -35,6 +51,30 @@ public class ScriptingPanelView : MonoBehaviour {
 
                 listItem.transform.SetParent(scriptListContent, false);
 
+                scriptButtons.Add(listItemScript);
+
+            }
+
+        }
+        else {
+
+            var i = 0;
+            foreach (var script in level.scripting.functionParser.functions) {
+
+                var listItem = Instantiate(ScriptListItem);
+
+                listItem.gameObject.SetActive(true);
+
+                var listItemScript = listItem.GetComponent<ScriptingButtonItemView>();
+
+                listItemScript.view = this;
+                listItemScript.value = i;
+
+                listItem.transform.SetParent(scriptListContent, false);
+
+                scriptButtons.Add(listItemScript);
+
+                i++;
             }
 
         }
@@ -63,10 +103,54 @@ public class ScriptingPanelView : MonoBehaviour {
 
         }
 
-
+        funcScriptingWindow.Clear();
 
         scriptingWindow.script = script;
         scriptingWindow.Init();
+
+    }
+
+    public void SelectFunc(FCopFunction func) {
+
+        try {
+            if (func.code.failed) {
+                //script.failed = false;
+                func.code.Disassemble(func.code.compiledBytes);
+                func.code.DeCompile();
+            }
+        }
+        catch (Exception e) {
+
+            var error = "";
+
+            foreach (var b in func.code.compiledBytes) {
+                error += b.ToString() + " ";
+            }
+            error += "\n";
+
+            Debug.Log(error);
+            throw e;
+
+        }
+
+        scriptingWindow.Clear();
+
+        funcScriptingWindow.func = func;
+        funcScriptingWindow.Init();
+
+    }
+
+    public void OnClickScriptTab() {
+
+        isScriptTab = true;
+        Refresh();
+
+    }
+
+    public void OnClickFuncTab() {
+
+        isScriptTab = false;
+        Refresh();
 
     }
 

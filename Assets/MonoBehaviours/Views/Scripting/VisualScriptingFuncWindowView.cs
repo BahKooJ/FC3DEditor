@@ -4,29 +4,72 @@ using FCopParser;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VisualScriptingWindowView : MonoBehaviour {
+public class VisualScriptingFuncWindowView : MonoBehaviour {
 
     // - Prefabs -
     public GameObject linePrefab;
     public GameObject statementNodePrefab;
     public GameObject endCodeBracket;
+    public GameObject funcDataPrefab;
+    public GameObject thickSeparatorPrefab;
+    public GameObject runConditionHeaderPrefab;
+    public GameObject codeHeaderPrefab;
 
     // - Parameters -
-    public FCopScript script;
+    public FCopFunction func;
 
-    List<VisualScriptingLineView> lines = new();
+    FuncDataView funcData;
+    List<VisualScriptingLineView> conditionalLines = new();
+    List<VisualScriptingLineView> codeLines = new();
+    List<GameObject> uiFillerObjects = new();
 
     public void Init() {
 
-        foreach (var line in lines) {
+        Clear();
+
+        if (func.runCondition.failed || func.code.failed) {
+            return;
+        }
+
+        InitFuncData();
+        InitUIGameObject(thickSeparatorPrefab);
+        InitUIGameObject(runConditionHeaderPrefab);
+        InitCode(func.runCondition.scriptNodes, conditionalLines);
+        InitUIGameObject(thickSeparatorPrefab);
+        InitUIGameObject(codeHeaderPrefab);
+        InitCode(func.code.scriptNodes, codeLines);
+
+    }
+
+    public void Clear() {
+
+        foreach (var line in conditionalLines) {
             Destroy(line.gameObject);
         }
 
-        lines.Clear();
+        conditionalLines.Clear();
 
-        if (script.failed) {
-            return;
+        foreach (var line in codeLines) {
+            Destroy(line.gameObject);
         }
+
+        codeLines.Clear();
+
+        foreach (var line in uiFillerObjects) {
+            Destroy(line);
+        }
+
+        uiFillerObjects.Clear();
+
+        if (funcData != null) {
+            Destroy(funcData.gameObject);
+        }
+
+        funcData = null;
+
+    }
+
+    void InitCode(List<FCopScript.ScriptNode> script, List<VisualScriptingLineView> lines) {
 
         var i = 1;
 
@@ -85,7 +128,7 @@ public class VisualScriptingWindowView : MonoBehaviour {
 
                     visualNode.scriptNode = statementNode;
                     line.scriptNodes.Add(visualNodeObj);
-                    
+
                     if (node.nestedNodes.Count > 0) {
 
                         nestCount++;
@@ -107,9 +150,23 @@ public class VisualScriptingWindowView : MonoBehaviour {
 
         }
 
-        AddLines(script.scriptNodes);
+        AddLines(script);
 
+    }
 
+    void InitFuncData() {
+
+        var obj = Instantiate(funcDataPrefab);
+        obj.transform.SetParent(transform, false);
+        funcData = obj.GetComponent<FuncDataView>();
+
+    }
+
+    void InitUIGameObject(GameObject prefab) {
+
+        var obj = Instantiate(prefab);
+        obj.transform.SetParent(transform, false);
+        uiFillerObjects.Add(obj);
 
     }
 

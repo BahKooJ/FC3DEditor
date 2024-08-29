@@ -284,6 +284,7 @@ namespace FCopParser {
         public enum Operator {
 
             Literal = 256,
+            Unknown11 = 11,
             GET_16 = 16,
             GET_18 = 18,
             GET_19 = 19,
@@ -291,6 +292,7 @@ namespace FCopParser {
             GreaterThan = 35,
             GreaterThanOrEqual = 36,
             LessThan = 37,
+            Add = 39,
             Subtract = 40,
             And = 44,
             // Overloads
@@ -318,12 +320,14 @@ namespace FCopParser {
             Subtract = 52,
             Destroy = 56,
             Unknown57 = 57,
-            Spawn = 60
+            Spawn = 60,
+            SpawnAll = 61
 
         }
 
         public static Dictionary<Operator, ScriptOperationMetaData> operatorMetaData = new Dictionary<Operator, ScriptOperationMetaData>() {
             { Operator.Literal, new ScriptOperationMetaData("Literal", new(), ScriptPrimitiveType.Int) },
+            { Operator.Unknown11, new ScriptOperationMetaData("Unknown11", new() { new ParameterMetaData("par1", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Int) },
             { Operator.GET_16, new ScriptOperationMetaData("Get 16", new() { new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }, ScriptPrimitiveType.Int) },
             { Operator.GET_18, new ScriptOperationMetaData("Get 18", new() { new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }, ScriptPrimitiveType.Int) },
             { Operator.GET_19, new ScriptOperationMetaData("Get 19", new() { new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }, ScriptPrimitiveType.Int) },
@@ -331,6 +335,7 @@ namespace FCopParser {
             { Operator.GreaterThan, new ScriptOperationMetaData(true, ">", "Is Greater Than", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Bool) },
             { Operator.GreaterThanOrEqual, new ScriptOperationMetaData(true, ">=", "Is Greater Than Or Equal", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Bool) },
             { Operator.LessThan, new ScriptOperationMetaData(true, "<", "Is Less Than", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Bool) },
+            { Operator.Add, new ScriptOperationMetaData(true, "+", "Add", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Int) },
             { Operator.Subtract, new ScriptOperationMetaData(true, "-", "Subtrack", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Int) },
             { Operator.And, new ScriptOperationMetaData(true, "&&", "And", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Bool), new ParameterMetaData("Right", ScriptPrimitiveType.Bool) }, ScriptPrimitiveType.Bool) },
             // Overloads
@@ -339,7 +344,7 @@ namespace FCopParser {
         };
 
         public static Dictionary<Instruction, ScriptOperationMetaData> instructionMetaData = new Dictionary<Instruction, ScriptOperationMetaData>() {
-            { Instruction.None, new ScriptOperationMetaData("None", new()) },
+            { Instruction.None, new ScriptOperationMetaData("None", new() { new ParameterMetaData("Expression", ScriptPrimitiveType.Int) }) },
             { Instruction.End, new ScriptOperationMetaData("End", new()) },
             { Instruction.Jump, new ScriptOperationMetaData("Else", new() { new ParameterMetaData("JumpCount", ScriptPrimitiveType.Int) }) },
             { Instruction.Unknown12, new ScriptOperationMetaData("Unknown12", new() { new ParameterMetaData("Unknown", ScriptPrimitiveType.Int) }) },
@@ -358,6 +363,8 @@ namespace FCopParser {
             { Instruction.Destroy, new ScriptOperationMetaData("Destroy Actors", new() { new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int) }) },
             { Instruction.Unknown57, new ScriptOperationMetaData("Unkown57", new() { new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int) }) },
             { Instruction.Spawn, new ScriptOperationMetaData("Spawn", new() { new ParameterMetaData("ActorID", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int) }) },
+            { Instruction.SpawnAll, new ScriptOperationMetaData("Spawn Group", new() { new ParameterMetaData("GroupID", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int) }) },
+
         };
 
         public List<ScriptNode> scriptNodes = new List<ScriptNode>();
@@ -744,6 +751,21 @@ namespace FCopParser {
                     else if (b == 2) {
                         floatingExpressions.Add(new Expression(128 + (code[i + 1]), Operator.Literal, 2, ScriptPrimitiveType.Int));
                         i += 2;
+                        continue;
+                    }
+                    else if (b == 3) {
+
+                        var value = 256;
+                        value += code[i + 1] * 128;
+                        if (code[i + 1] == 1) {
+                            value += code[i + 2] - 128;
+                        }
+                        else {
+                            value += code[i + 2];
+                        }
+
+                        floatingExpressions.Add(new Expression(value, Operator.Literal, 3, ScriptPrimitiveType.Int));
+                        i += 3;
                         continue;
                     }
                     else {

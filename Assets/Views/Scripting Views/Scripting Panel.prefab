@@ -556,6 +556,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scriptListContent: {fileID: 8630534303278027532}
   scriptingWindow: {fileID: 7723221786156386216}
+  funcScriptingWindow: {fileID: 1443692001758029070}
   ScriptListItem: {fileID: 7265295910534662172}
   isScriptTab: 1
   actorRPNSRefIndex: 0
@@ -804,6 +805,7 @@ GameObject:
   - component: {fileID: 7658294828048643186}
   - component: {fileID: 2656733160080851849}
   - component: {fileID: 7723221786156386216}
+  - component: {fileID: 1443692001758029070}
   m_Layer: 6
   m_Name: Visual Scripting Window
   m_TagString: Untagged
@@ -880,12 +882,31 @@ MonoBehaviour:
   m_GameObject: {fileID: 3152181402739081747}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b6cf9833fcc3c2e468766b95a7f6f8af, type: 3}
+  m_Script: {fileID: 11500000, guid: 176533123f05cb440bc40e516c236b45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   linePrefab: {fileID: 3382321042328164128, guid: 2c360744b6e2f444db55b3d40c64b2b6, type: 3}
   statementNodePrefab: {fileID: 5572845360304710419, guid: c0a4177e7fea3194b83898dc567fef61, type: 3}
   endCodeBracket: {fileID: 5085074400097344224, guid: e3958550fbf3af040b2a34ef284a7ca9, type: 3}
+--- !u!114 &1443692001758029070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3152181402739081747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dc81cd2de5f32a48a2ccd103377790c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  linePrefab: {fileID: 3382321042328164128, guid: 2c360744b6e2f444db55b3d40c64b2b6, type: 3}
+  statementNodePrefab: {fileID: 5572845360304710419, guid: c0a4177e7fea3194b83898dc567fef61, type: 3}
+  endCodeBracket: {fileID: 5085074400097344224, guid: e3958550fbf3af040b2a34ef284a7ca9, type: 3}
+  funcDataPrefab: {fileID: 2709038752801359774, guid: aedd2a2cae404ce41bb9c23cea19ff02, type: 3}
+  thickSeparatorPrefab: {fileID: 2197133105715308462, guid: 765d136e37f50e84ba67db556e70822f, type: 3}
+  runConditionHeaderPrefab: {fileID: 1704636988333703921, guid: 54eaba9483602e849924f6ed006bc44c, type: 3}
+  codeHeaderPrefab: {fileID: 7312038295910684567, guid: 1b5b346967f498a4ea104cb967461091, type: 3}
 --- !u!1 &3196045885846496898
 GameObject:
   m_ObjectHideFlags: 0
@@ -1576,7 +1597,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5877429485746554493}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 7579575469340579952}
+        m_TargetAssemblyTypeName: ScriptingPanelView, Assembly-CSharp
+        m_MethodName: OnClickScriptTab
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2669125716228963052
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1864,7 +1897,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5942810342228795061}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 7579575469340579952}
+        m_TargetAssemblyTypeName: ScriptingPanelView, Assembly-CSharp
+        m_MethodName: OnClickFuncTab
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &8374049376073952364
 MonoBehaviour:
   m_ObjectHideFlags: 0
