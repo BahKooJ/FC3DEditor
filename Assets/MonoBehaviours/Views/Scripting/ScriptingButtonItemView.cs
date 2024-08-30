@@ -19,7 +19,7 @@ public class ScriptingButtonItemView : MonoBehaviour {
     public void OnClick() {
 
         if (view.isScriptTab) {
-            view.SelectScript(view.level.scripting.rpns.code[value]);
+            view.SelectScript(value);
         }
         else {
             view.SelectFunc(view.level.scripting.functionParser.functions[value]);

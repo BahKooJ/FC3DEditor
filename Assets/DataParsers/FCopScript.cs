@@ -289,12 +289,15 @@ namespace FCopParser {
             GET_18 = 18,
             GET_19 = 19,
             Equal = 33,
+            NotEqual = 34,
             GreaterThan = 35,
             GreaterThanOrEqual = 36,
             LessThan = 37,
+            LessThanOrEqual = 38,
             Add = 39,
             Subtract = 40,
             And = 44,
+            Unknown47 = 47,
             // Overloads
             Is = 289
 
@@ -317,9 +320,11 @@ namespace FCopParser {
             Unknown31 = 31,
             SET_19 = 32,
             Add = 48,
+            Unkown51 = 51,
             Subtract = 52,
             Destroy = 56,
             Unknown57 = 57,
+            Unknown59 = 59,
             Spawn = 60,
             SpawnAll = 61
 
@@ -332,12 +337,16 @@ namespace FCopParser {
             { Operator.GET_18, new ScriptOperationMetaData("Get 18", new() { new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }, ScriptPrimitiveType.Int) },
             { Operator.GET_19, new ScriptOperationMetaData("Get 19", new() { new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }, ScriptPrimitiveType.Int) },
             { Operator.Equal, new ScriptOperationMetaData(true, "==", "Is Equal", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Bool, new List<Operator>() { Operator.Is }) },
+            { Operator.NotEqual, new ScriptOperationMetaData(true, "!=", "Is Not Equal", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Bool) },
             { Operator.GreaterThan, new ScriptOperationMetaData(true, ">", "Is Greater Than", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Bool) },
             { Operator.GreaterThanOrEqual, new ScriptOperationMetaData(true, ">=", "Is Greater Than Or Equal", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Bool) },
             { Operator.LessThan, new ScriptOperationMetaData(true, "<", "Is Less Than", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Bool) },
+            { Operator.LessThanOrEqual, new ScriptOperationMetaData(true, "<=", "Is Less Than Or Equal", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Bool) },
             { Operator.Add, new ScriptOperationMetaData(true, "+", "Add", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Int) },
             { Operator.Subtract, new ScriptOperationMetaData(true, "-", "Subtrack", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Int), new ParameterMetaData("Right", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Int) },
             { Operator.And, new ScriptOperationMetaData(true, "&&", "And", new() { new ParameterMetaData("Left", ScriptPrimitiveType.Bool), new ParameterMetaData("Right", ScriptPrimitiveType.Bool) }, ScriptPrimitiveType.Bool) },
+            { Operator.Unknown47, new ScriptOperationMetaData("Unknown47", new() { new ParameterMetaData("Unknown", ScriptPrimitiveType.Int), new ParameterMetaData("Unknown", ScriptPrimitiveType.Int) }, ScriptPrimitiveType.Int) },
+            
             // Overloads
             { Operator.Is, new ScriptOperationMetaData(false, "", "Is", new() { new ParameterMetaData("Actor", ScriptPrimitiveType.ActorRef) }, ScriptPrimitiveType.Bool) },
 
@@ -359,9 +368,11 @@ namespace FCopParser {
             { Instruction.Unknown31, new ScriptOperationMetaData("Unknown31", new() { new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int) }) },
             { Instruction.SET_19, new ScriptOperationMetaData(true, true, "=(19)", "Set", new() { new ParameterMetaData("Value", ScriptPrimitiveType.Int), new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }, ScriptPrimitiveType.Void) },
             { Instruction.Add, new ScriptOperationMetaData(true, true, "+=", "Add And Set", new() { new ParameterMetaData("Value", ScriptPrimitiveType.Int), new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }, ScriptPrimitiveType.Void) },
+            { Instruction.Unkown51, new ScriptOperationMetaData("Unkown51", new() { new ParameterMetaData("Unknown", ScriptPrimitiveType.Int), new ParameterMetaData("Unknown", ScriptPrimitiveType.Int) }) },
             { Instruction.Subtract, new ScriptOperationMetaData(true, true, "-=", "Subtract And Set", new() { new ParameterMetaData("Value", ScriptPrimitiveType.Int), new ParameterMetaData("VariableID", ScriptPrimitiveType.VarRef) }, ScriptPrimitiveType.Void) },
             { Instruction.Destroy, new ScriptOperationMetaData("Destroy Actors", new() { new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int) }) },
             { Instruction.Unknown57, new ScriptOperationMetaData("Unkown57", new() { new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int) }) },
+            { Instruction.Unknown59, new ScriptOperationMetaData("Unkown59", new() { new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int) }) },
             { Instruction.Spawn, new ScriptOperationMetaData("Spawn", new() { new ParameterMetaData("ActorID", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int) }) },
             { Instruction.SpawnAll, new ScriptOperationMetaData("Spawn Group", new() { new ParameterMetaData("GroupID", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int), new ParameterMetaData("Unkown", ScriptPrimitiveType.Int) }) },
 

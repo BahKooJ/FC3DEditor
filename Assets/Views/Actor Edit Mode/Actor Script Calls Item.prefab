@@ -120,7 +120,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2819713224376765959}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 836502995835538172}
+        m_TargetAssemblyTypeName: ActorScriptCallItemView, Assembly-CSharp
+        m_MethodName: OnClickRPNSRef3
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1977952715223143764
 GameObject:
   m_ObjectHideFlags: 0
@@ -662,7 +674,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7099401691169308572}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 836502995835538172}
+        m_TargetAssemblyTypeName: ActorScriptCallItemView, Assembly-CSharp
+        m_MethodName: OnClickRPNSRef2
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &6011889809363480388
 GameObject:
   m_ObjectHideFlags: 0
@@ -1226,7 +1250,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 836502995835538172}
         m_TargetAssemblyTypeName: ActorScriptCallItemView, Assembly-CSharp
-        m_MethodName: OpenPanel
+        m_MethodName: OnClickRPNSRef1
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

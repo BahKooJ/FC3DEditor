@@ -23,10 +23,9 @@ public class ActorScriptCallItemView : MonoBehaviour {
         rpnsRefText2.text = actor.rpnsReferences[1].ToString();
         rpnsRefText3.text = actor.rpnsReferences[2].ToString();
 
-
     }
 
-    public void OpenPanel() {
+    void OpenPanel(int index) {
 
         var view = Instantiate(scriptingPanel);
 
@@ -36,6 +35,22 @@ public class ActorScriptCallItemView : MonoBehaviour {
         viewScript.level = FileManagerMain.level;
 
         view.transform.SetParent(DialogWindowUtil.canvas.transform, false);
+
+        viewScript.SelectScript(actor.rpnsReferences[index]);
+
+    }
+
+    public void OnClickRPNSRef1() {
+        OpenPanel(0);
+    }
+
+    public void OnClickRPNSRef2() {
+        OpenPanel(1);
+
+    }
+
+    public void OnClickRPNSRef3() {
+        OpenPanel(2);
 
     }
 

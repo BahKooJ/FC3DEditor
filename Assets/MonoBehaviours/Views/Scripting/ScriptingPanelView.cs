@@ -81,7 +81,10 @@ public class ScriptingPanelView : MonoBehaviour {
 
     }
 
-    public void SelectScript(FCopScript script) {
+    public void SelectScript(int id) {
+
+        var script = level.scripting.rpns.code[id];
+
         try {
             if (script.failed) {
                 //script.failed = false;
