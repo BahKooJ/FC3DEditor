@@ -11,6 +11,7 @@ public class ScriptingPanelView : MonoBehaviour {
     public Transform scriptListContent;
     public VisualScriptingScriptWindowView scriptingWindow;
     public VisualScriptingFuncWindowView funcScriptingWindow;
+    public AssetManagerView assetManager;
 
     // - Prefabs -
     public GameObject ScriptListItem;
@@ -23,6 +24,8 @@ public class ScriptingPanelView : MonoBehaviour {
     List<ScriptingButtonItemView> scriptButtons = new();
 
     void Start() {
+
+        assetManager.level = level;
 
         Refresh();
 

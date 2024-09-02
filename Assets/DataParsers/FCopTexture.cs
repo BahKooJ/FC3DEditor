@@ -7,7 +7,7 @@ using System.Text;
 
 namespace FCopParser {
 
-    public class FCopTexture {
+    public class FCopTexture : FCopAsset {
 
         public static List<byte> CCBFourCC = new List<byte>() { 32, 66, 67, 67 };
         public static List<byte> LkUpfourCC = new List<byte>() { 112, 85, 107, 76 };
@@ -22,8 +22,6 @@ namespace FCopParser {
 
         public List<ChunkHeader> offsets = new List<ChunkHeader>();
 
-        public IFFDataFile rawFile;
-
         public List<byte> bitmap;
 
         public List<XRGB555> colorPalette;
@@ -33,9 +31,9 @@ namespace FCopParser {
 
         public bool isColorIndexed = false;
 
-        public FCopTexture(IFFDataFile rawFile) {
+        public FCopTexture(IFFDataFile rawFile) : base(rawFile) {
 
-            this.rawFile = rawFile;
+            name = "bitmap " + DataID;
 
             FindChunks(rawFile.data.ToArray());
 

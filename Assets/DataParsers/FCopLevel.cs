@@ -13,6 +13,8 @@ namespace FCopParser {
 
         public List<FCopLevelSection> sections = new();
 
+        public FCopSoundEffectParser soundEffects;
+
         public List<FCopTexture> textures = new();
 
         public List<FCopNavMesh> navMeshes = new();
@@ -177,37 +179,40 @@ namespace FCopParser {
 
         void InitData() {
 
-            var rpns = new FCopRPNS(fileManager.files.First(file => {
+            List<IFFDataFile> GetFiles(string fourCC) {
 
-                return file.dataFourCC == "RPNS";
+                return fileManager.files.Where(file => {
 
-            }));
+                    return file.dataFourCC == fourCC;
 
-            var cfun = new FCopFunctionParser(fileManager.files.First(file => {
+                }).ToList();
 
-                return file.dataFourCC == "Cfun";
+            }
 
-            }));
+            IFFDataFile GetFile(string fourCC) {
+
+                return fileManager.files.First(file => {
+
+                    return file.dataFourCC == fourCC;
+
+                });
+
+            }
+
+            var rpns = new FCopRPNS(GetFile("RPNS"));
+
+            var cfun = new FCopFunctionParser(GetFile("Cfun"));
 
             scripting = new FCopScriptingProject(rpns, cfun);
 
-            var rawBitmapFiles = fileManager.files.Where(file => {
+            var rawCwavs = GetFiles("Cwav");
+            var rawCshd = GetFile("Cshd");
 
-                return file.dataFourCC == "Cbmp";
+            var rawBitmapFiles = GetFiles("Cbmp");
 
-            }).ToList();
+            var rawNavMeshFiles = GetFiles("Cnet");
 
-            var rawNavMeshFiles = fileManager.files.Where(file => {
-
-                return file.dataFourCC == "Cnet";
-
-            }).ToList();
-
-            var rawObjectFiles = fileManager.files.Where(file => {
-
-                return file.dataFourCC == "Cobj";
-
-            }).ToList();
+            var rawObjectFiles = GetFiles("Cobj");
 
             var rawActorFiles = fileManager.files.Where(file => {
 
@@ -228,10 +233,10 @@ namespace FCopParser {
             }
 
             foreach (var rawFile in rawActorFiles) {
-
                 actors.Add(new FCopActor(rawFile));
-
             }
+
+            soundEffects = new FCopSoundEffectParser(rawCwavs, rawCshd);
 
         }
 

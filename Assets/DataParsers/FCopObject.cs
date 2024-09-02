@@ -7,7 +7,7 @@ using System.Text;
 
 namespace FCopParser {
 
-    public class FCopObject {
+    public class FCopObject : FCopAsset {
 
         static class FourCC {
 
@@ -45,19 +45,20 @@ namespace FCopParser {
 
         public List<ChunkHeader> offsets = new();
 
-        public IFFDataFile rawFile;
 
         public List<FCopPolygon> polygons = new();
         public List<FCopVertex> vertices = new();
         public List<FCopUVMap> uvMaps = new();
 
-        public FCopObject(IFFDataFile rawFile) {
-            this.rawFile = rawFile;
+        public FCopObject(IFFDataFile rawFile) : base(rawFile) {
+
+            name = "Object " + DataID.ToString();
+            
             FindStartChunkOffset();
             ParseVertices();
             ParsePolygons();
             ParseUVMaps();
-            var bonk = 3;
+
         }
 
         void FindStartChunkOffset() {
