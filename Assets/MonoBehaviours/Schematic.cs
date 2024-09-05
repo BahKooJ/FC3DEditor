@@ -59,6 +59,9 @@ public class Schematic {
 
         sortedSelectedItems = sortedSelectedItems.OrderBy(item => item.columnWorldX).ThenBy(item => item.columnWorldY).ToList();
 
+        // Creates a empty grid space of the width and height of selection.
+        // This is done by taking the lowest cord selected tile to the highest.
+
         width = (sortedSelectedItems.Max(item => item.columnWorldX) - sortedSelectedItems.Min(item => item.columnWorldX)) + 1;
         height = (sortedSelectedItems.Max(item => item.columnWorldY) - sortedSelectedItems.Min(item => item.columnWorldY)) + 1;
 
@@ -88,6 +91,8 @@ public class Schematic {
             }
 
         }
+
+        // After making an empty grid space it can now start filling the empty data with selected tiles
 
         var startingX = sortedSelectedItems.Min(item => item.columnWorldX);
         var startingY = sortedSelectedItems.Min(item => item.columnWorldY);

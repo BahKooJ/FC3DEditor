@@ -722,6 +722,129 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     public void ExtrudeTiles() {
 
+        var heightMap = new List<HeightPoints>();
+        var tileColumns = new List<TileColumn>();
+
+        int width;
+        int height;
+
+        HeightPoints GetHeightPoint(int x, int y) {
+            return heightMap[(y * (width + 1)) + x];
+        }
+
+        TileColumn GetTileColumn(int x, int y) {
+            return tileColumns[(y * width) + x];
+        }
+
+        var sortedSelectedItems = new List<TileSelection>(selectedItems);
+
+        sortedSelectedItems = sortedSelectedItems.OrderBy(item => item.columnWorldX).ThenBy(item => item.columnWorldY).ToList();
+
+        // Creates a empty grid space of the width and height of selection.
+        // This is done by taking the lowest cord selected tile to the highest.
+
+        width = (sortedSelectedItems.Max(item => item.columnWorldX) - sortedSelectedItems.Min(item => item.columnWorldX)) + 1;
+        height = (sortedSelectedItems.Max(item => item.columnWorldY) - sortedSelectedItems.Min(item => item.columnWorldY)) + 1;
+
+        foreach (var y in Enumerable.Range(0, height + 1)) {
+
+            foreach (var x in Enumerable.Range(0, width + 1)) {
+
+                heightMap.Add(new HeightPoints(-128, -128, -128));
+
+            }
+
+        }
+
+        foreach (var y in Enumerable.Range(0, height)) {
+
+            foreach (var x in Enumerable.Range(0, width)) {
+
+                var heights = new List<HeightPoints>();
+
+                heights.Add(GetHeightPoint(x, y));
+                heights.Add(GetHeightPoint(x + 1, y));
+                heights.Add(GetHeightPoint(x, y + 1));
+                heights.Add(GetHeightPoint(x + 1, y + 1));
+
+                tileColumns.Add(new TileColumn(x, y, new(), heights));
+
+            }
+
+        }
+
+        // After making an empty grid space it can now start filling the empty data with selected tiles
+
+        var startingX = sortedSelectedItems.Min(item => item.columnWorldX);
+        var startingY = sortedSelectedItems.Min(item => item.columnWorldY);
+
+        foreach (var item in sortedSelectedItems) {
+
+            var emptyColumn = GetTileColumn(item.columnWorldX - startingX, item.columnWorldY - startingY);
+
+            foreach (var vert in item.tile.verticies) {
+
+                emptyColumn.heights[(int)vert.vertexPosition - 1]
+                    .SetPoint(item.column.heights[(int)vert.vertexPosition - 1].GetTruePoint(vert.heightChannel), vert.heightChannel);
+
+            }
+
+            // Note: A tile reference was passed, not a new tile.
+            emptyColumn.tiles.Add(item.tile);
+
+        }
+
+        // Verify if tile selection is valid for extuding
+
+        foreach (var column in tileColumns) {
+
+            if (column.tiles.Count > 1) {
+                QuickLogHandler.Log("Unable to extrude tiles. Only one tile per column can be selected!", LogSeverity.Error);
+                return;
+            }
+            else if (column.tiles.Count != 0) {
+
+                var tile = column.tiles[0];
+
+                var nullableTileMeshID = MeshType.IDFromVerticies(tile.verticies);
+
+                if (nullableTileMeshID == null) {
+                    QuickLogHandler.Log("Unable to extrude tiles. Tile has invalid mesh ID!", LogSeverity.Error);
+                    return;
+                }
+
+                var tileMeshID = (int)nullableTileMeshID;
+
+                if (MeshType.wallMeshes.Contains(tileMeshID)) {
+
+                    QuickLogHandler.Log("Unable to extrude tiles. Cannot extrude wall tiles.", LogSeverity.Error);
+                    return;
+
+                }
+
+                if (tile.verticies.Any(vert => { return vert.heightChannel == 3; })) {
+
+                    QuickLogHandler.Log("Unable to extrude tiles. Tile is already at max height channel!", LogSeverity.Error);
+                    return;
+
+                }
+
+            }
+
+        }
+
+
+        foreach (var y in Enumerable.Range(0, height)) {
+
+            foreach (var x in Enumerable.Range(0, width)) {
+
+                var tileColumn = GetTileColumn(x, y);
+
+
+            }
+
+        }
+
     }
 
     #endregion
