@@ -24,7 +24,7 @@ Inputs = {
 "DragPalette":"1" "#1"
 "Delete":"1" "Delete"
 "Unselect":"1" "C"
-"Undo":"2" "LeftControl""Z"
+"Undo":"1" "Z"
 "ModifierChannelSelect1":"1" "Alpha1"
 "ModifierChannelSelect2":"1" "Alpha2"
 "ModifierChannelSelect3":"1" "Alpha3"

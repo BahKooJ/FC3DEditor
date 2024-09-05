@@ -3,7 +3,9 @@
 using FCopParser;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Presets;
 using UnityEngine;
+using static UnityEditor.Progress;
 using Object = UnityEngine.Object;
 
 public class TileEditMode : TileMutatingEditMode, EditMode {
@@ -722,6 +724,11 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     public void ExtrudeTiles() {
 
+        if (!HasSelection) {
+            QuickLogHandler.Log("No tiles are selected", LogSeverity.Info);
+            return;
+        }
+
         var heightMap = new List<HeightPoints>();
         var tileColumns = new List<TileColumn>();
 
@@ -829,21 +836,283 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
                 }
 
+                if (!tile.verticies.All(vert => { return vert.heightChannel == tile.verticies[0].heightChannel; })) {
+
+                    QuickLogHandler.Log("Unable to extrude tiles. Tile has different height channels.", LogSeverity.Error);
+                    return;
+
+                }
+
             }
 
         }
 
+        var affectedSections = new HashSet<LevelMesh>();
+        var counterActions = new List<CounterAction>();
+
+        void ShiftTileUp(Tile tile) {
+
+            counterActions.Add(new TileSaveStateCounterAction(tile));
+
+            var previousVerticies = new List<TileVertex>(tile.verticies);
+            var newVerticies = new HashSet<TileVertex>();
+
+            foreach (var index in Enumerable.Range(0, tile.verticies.Count)) {
+
+                var vertex = tile.verticies[index];
+
+                if (vertex.heightChannel < 3) {
+
+                    vertex.heightChannel += 1;
+
+                    newVerticies.Add(vertex);
+
+                }
+
+            }
+
+            if (newVerticies.Count == previousVerticies.Count) {
+                tile.verticies = newVerticies.ToList();
+            }
+            else {
+                QuickLogHandler.Log("Tile is already attatched to highest channels", LogSeverity.Error);
+            }
+
+        }
+
+        void CheckAndExtrude(int x, int y, ExtrudeSide side, int heightChannel, bool ignoreCheck = false) {
+
+            if (y > -1 && y < height && x > -1 && x < width && !ignoreCheck) {
+
+                var virtualColumn = GetTileColumn(x, y);
+
+                if (virtualColumn.tiles.Count != 0) {
+
+                    if (virtualColumn.tiles[0].verticies[0].heightChannel == heightChannel) {
+                        return;
+
+                    }
+
+                }
+
+            }
+
+            var worldX = startingX + x;
+            var worldY = startingY + y;
+
+            TilePreset referedPreset = null;
+            LevelMesh worldSection = null;
+            TileColumn worldColumn = null;
+
+
+            switch (side) {
+                case ExtrudeSide.Top:
+
+                    worldY++;
+
+                    worldSection = main.GetLevelMesh(worldX / 16, worldY / 16);
+                    worldColumn = worldSection.section.GetTileColumn(worldX % 16, worldY % 16);
+
+                    referedPreset = TileAddMode.defaultPresets[2];
+
+                    // Because presets are classes and not structs, it needs to clean any uses transforms.
+                    referedPreset.transformedTile = null;
+
+                    if (heightChannel == 3) {
+                        referedPreset.MoveHeightChannelsToNextChannel();
+                    }
+
+                    break;
+                case ExtrudeSide.Left:
+
+                    worldX++;
+
+                    worldSection = main.GetLevelMesh(worldX / 16, worldY / 16);
+                    worldColumn = worldSection.section.GetTileColumn(worldX % 16, worldY % 16);
+
+                    referedPreset = TileAddMode.defaultPresets[2];
+
+                    // Because presets are classes and not structs, it needs to clean any uses transforms.
+                    referedPreset.transformedTile = null;
+
+                    referedPreset.RotateCounterClockwise();
+
+                    if (heightChannel == 3) {
+                        referedPreset.MoveHeightChannelsToNextChannel();
+                    }
+
+                    break;
+                case ExtrudeSide.Right:
+
+                    // Fixme: test for world width
+                    //if (worldX > ) {
+                    //    QuickLogHandler.Log("Unable to extrude side, no room in grid space.", LogSeverity.Warning);
+                    //}
+
+                    worldSection = main.GetLevelMesh(worldX / 16, worldY / 16);
+                    worldColumn = worldSection.section.GetTileColumn(worldX % 16, worldY % 16);
+
+                    referedPreset = TileAddMode.defaultPresets[2];
+
+                    // Because presets are classes and not structs, it needs to clean any uses transforms.
+                    referedPreset.transformedTile = null;
+
+                    referedPreset.RotateCounterClockwise();
+
+                    if (heightChannel == 3) {
+                        referedPreset.MoveHeightChannelsToNextChannel();
+                    }
+
+                    break;
+                case ExtrudeSide.Bottom:
+
+                    // Fixme: test for world height
+                    //if (worldX > ) {
+                    //    QuickLogHandler.Log("Unable to extrude side, no room in grid space.", LogSeverity.Warning);
+                    //}
+
+                    worldSection = main.GetLevelMesh(worldX / 16, worldY / 16);
+                    worldColumn = worldSection.section.GetTileColumn(worldX % 16, worldY % 16);
+
+                    referedPreset = TileAddMode.defaultPresets[2];
+
+                    // Because presets are classes and not structs, it needs to clean any uses transforms.
+                    referedPreset.transformedTile = null;
+
+                    if (heightChannel == 3) {
+                        referedPreset.MoveHeightChannelsToNextChannel();
+                    }
+
+                    break;
+                case ExtrudeSide.TopLBottomRDiagnol:
+
+                    worldSection = main.GetLevelMesh(worldX / 16, worldY / 16);
+                    worldColumn = worldSection.section.GetTileColumn(worldX % 16, worldY % 16);
+
+                    referedPreset = TileAddMode.defaultPresets[4];
+
+                    // Because presets are classes and not structs, it needs to clean any uses transforms.
+                    referedPreset.transformedTile = null;
+
+                    referedPreset.RotateCounterClockwise();
+
+                    if (heightChannel == 3) {
+                        referedPreset.MoveHeightChannelsToNextChannel();
+                    }
+
+                    break;
+                case ExtrudeSide.BottomLTopRDiagnol:
+
+                    worldSection = main.GetLevelMesh(worldX / 16, worldY / 16);
+                    worldColumn = worldSection.section.GetTileColumn(worldX % 16, worldY % 16);
+
+                    referedPreset = TileAddMode.defaultPresets[4];
+
+                    // Because presets are classes and not structs, it needs to clean any uses transforms.
+                    referedPreset.transformedTile = null;
+
+                    if (heightChannel == 3) {
+                        referedPreset.MoveHeightChannelsToNextChannel();
+                    }
+
+                    break;
+            }
+
+            if (worldSection != null) {
+                affectedSections.Add(worldSection);
+            }
+
+            foreach (var t in worldColumn.tiles) {
+
+                // Checks to make sure the tile doesn't already exist
+                if (MeshType.IDFromVerticies(t.verticies) == referedPreset.MeshID()) {
+                    QuickLogHandler.Log("Tile was not added as tile aready existed.", LogSeverity.Warning);
+                    return;
+                }
+
+            }
+
+            var createdTile = referedPreset.Create(worldColumn);
+
+            counterActions.Add(new PassiveAddTileCounterAction(createdTile, worldColumn));
+
+            worldColumn.tiles.Add(createdTile);
+
+
+        }
+
+        // Does the shift first before anything else.
+        foreach (var virtualColumn in tileColumns) {
+
+            if (virtualColumn.tiles.Count != 0) {
+
+                var tile = virtualColumn.tiles[0];
+
+                ShiftTileUp(tile);
+
+            }
+        
+        }
 
         foreach (var y in Enumerable.Range(0, height)) {
 
             foreach (var x in Enumerable.Range(0, width)) {
 
-                var tileColumn = GetTileColumn(x, y);
+                var virtualColumn = GetTileColumn(x, y);
+
+                if (virtualColumn.tiles.Count != 0) {
+
+                    var tile = virtualColumn.tiles[0];
+
+                    if (tile.verticies.Count == 4) {
+                        CheckAndExtrude(x, y - 1, ExtrudeSide.Top, virtualColumn.tiles[0].verticies[0].heightChannel);
+                        CheckAndExtrude(x - 1, y, ExtrudeSide.Left, virtualColumn.tiles[0].verticies[0].heightChannel);
+                        CheckAndExtrude(x + 1, y, ExtrudeSide.Right, virtualColumn.tiles[0].verticies[0].heightChannel);
+                        CheckAndExtrude(x, y + 1, ExtrudeSide.Bottom, virtualColumn.tiles[0].verticies[0].heightChannel);
+                    }
+                    else {
+
+                        if (!tile.verticies.Any(vert => { return vert.vertexPosition == VertexPosition.TopLeft; })) {
+                            CheckAndExtrude(x, y, ExtrudeSide.BottomLTopRDiagnol, virtualColumn.tiles[0].verticies[0].heightChannel, true);
+                            CheckAndExtrude(x, y + 1, ExtrudeSide.Bottom, virtualColumn.tiles[0].verticies[0].heightChannel);
+                            CheckAndExtrude(x + 1, y, ExtrudeSide.Right, virtualColumn.tiles[0].verticies[0].heightChannel);
+
+                        }
+                        else if (!tile.verticies.Any(vert => { return vert.vertexPosition == VertexPosition.TopRight; })) {
+                            CheckAndExtrude(x, y, ExtrudeSide.TopLBottomRDiagnol, virtualColumn.tiles[0].verticies[0].heightChannel, true);
+                            CheckAndExtrude(x, y + 1, ExtrudeSide.Bottom, virtualColumn.tiles[0].verticies[0].heightChannel);
+                            CheckAndExtrude(x - 1, y, ExtrudeSide.Left, virtualColumn.tiles[0].verticies[0].heightChannel);
+
+                        }
+                        else if (!tile.verticies.Any(vert => { return vert.vertexPosition == VertexPosition.BottomLeft; })) {
+                            CheckAndExtrude(x, y, ExtrudeSide.TopLBottomRDiagnol, virtualColumn.tiles[0].verticies[0].heightChannel, true);
+                            CheckAndExtrude(x, y - 1, ExtrudeSide.Top, virtualColumn.tiles[0].verticies[0].heightChannel);
+                            CheckAndExtrude(x + 1, y, ExtrudeSide.Right, virtualColumn.tiles[0].verticies[0].heightChannel);
+
+                        }
+                        else if (!tile.verticies.Any(vert => { return vert.vertexPosition == VertexPosition.BottomRight; })) {
+                            CheckAndExtrude(x, y, ExtrudeSide.BottomLTopRDiagnol, virtualColumn.tiles[0].verticies[0].heightChannel, true);
+                            CheckAndExtrude(x, y - 1, ExtrudeSide.Top, virtualColumn.tiles[0].verticies[0].heightChannel);
+                            CheckAndExtrude(x - 1, y, ExtrudeSide.Left, virtualColumn.tiles[0].verticies[0].heightChannel);
+
+                        }
+
+                    }
+
+                }
 
 
             }
 
         }
+
+        AddTileExtrudeCounterAction(counterActions, affectedSections);
+
+        foreach (var section in affectedSections) {
+            section.RefreshMesh();
+        }
+        RefeshTileOverlay();
+
 
     }
 
@@ -995,6 +1264,44 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
+    public class TileExtrudeCounterAction : CounterAction {
+
+        List<CounterAction> counterActions = new();
+        HashSet<LevelMesh> affectedSections;
+
+        public TileExtrudeCounterAction(List<CounterAction> counterActions, HashSet<LevelMesh> affectedSections) {
+            this.counterActions = counterActions;
+            this.affectedSections = affectedSections;
+        }
+
+        public void Action() {
+
+            foreach (var action in counterActions) {
+                action.Action();
+            }
+
+            if (Main.editMode is not TileEditMode) {
+                return;
+            }
+
+            foreach (var section in affectedSections) {
+                section.RefreshMesh();
+            }
+
+            var editMode = (TileEditMode)Main.editMode;
+
+            editMode.ClearAllGameObjects();
+
+            editMode.ReinitExistingSelectedItems();
+
+            editMode.RefreshPreviewOverlay();
+
+            editMode.view.RefreshTileEffectsPanel();
+
+        }
+
+    }
+
     void AddTileEffectChangeCounterAction(int index) {
 
         Main.AddCounterAction(new MultiTileEffectChangeCounterAction(selectedSections, index));
@@ -1073,6 +1380,23 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     }
 
+    static void AddTileExtrudeCounterAction(List<CounterAction> counterActions, HashSet<LevelMesh> affectedSections) {
+        Main.AddCounterAction(new TileExtrudeCounterAction(counterActions, affectedSections));
+    }
+
     #endregion
+
+
+    public enum ExtrudeSide {
+        Top,
+        Left, 
+        Right,
+        Bottom,
+        TopLBottomRDiagnol,
+        BottomLTopRDiagnol
+
+
+
+    }
 
 }

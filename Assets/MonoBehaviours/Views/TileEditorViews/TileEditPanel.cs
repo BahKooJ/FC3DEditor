@@ -111,5 +111,9 @@ public class TileEditPanel : MonoBehaviour {
 
     }
 
+    public void OnClickExtrudeTiles() {
+        controller.ExtrudeTiles();
+    }
+
 
 }

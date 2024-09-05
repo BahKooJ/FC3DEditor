@@ -50,6 +50,13 @@ public class TileSaveStateCounterAction : CounterAction {
         this.additionalAction = additionalAction;
     }
 
+    public TileSaveStateCounterAction(Tile tile) {
+        this.tile = tile;
+        this.saveStateTile = tile.Clone();
+
+        this.additionalAction = () => { };
+    }
+
     public void Action() {
         tile.ReceiveData(saveStateTile);
         additionalAction();
