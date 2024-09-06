@@ -20,19 +20,26 @@ public class HeightMapEditMode : EditMode {
     public HeightMapEditPanelView view;
 
     HeightMapChannelPoint lastSelectedHeightChannel = null;
+    TileColumn startGridRange = null;
+    TileColumn lastHoveredColumn = null;
 
     public void Update() {
         
         if (FreeMove.looking) {
 
-            if (Controls.OnDown("Select")) {
+            if (Controls.IsDown("Select")) {
                 
                 var selection = main.GetTileOnLevelMesh(false);
 
                 if (selection != null) {
                     SelectLevel(selection.column, selection.section);
+                    lastHoveredColumn = selection.column;
                 }
 
+            }
+            if (Controls.OnUp("Select")) {
+                startGridRange = null;
+                lastHoveredColumn = null;
             }
 
         }
@@ -100,16 +107,16 @@ public class HeightMapEditMode : EditMode {
         // If the number of the height channel is held down, all HeightMapChannelPoints will be selected in the column.
         if (Controls.IsDown("ModifierChannelSelect1")) {
 
-            SelectAllInColumn(1);
+            GridRangeSelect(1);
 
         } else if (Controls.IsDown("ModifierChannelSelect2")) {
 
-            SelectAllInColumn(2);
+            GridRangeSelect(2);
 
 
         } else if (Controls.IsDown("ModifierChannelSelect3")) {
 
-            SelectAllInColumn(3);
+            GridRangeSelect(3);
 
         }
 
@@ -118,6 +125,8 @@ public class HeightMapEditMode : EditMode {
     void SelectAllInColumn(int channel) {
 
         AddHeightSelectionSaveStateCounterAction();
+
+        startGridRange = selectedColumn;
 
         foreach (var height in selectedColumn.heights) {
 
@@ -132,7 +141,10 @@ public class HeightMapEditMode : EditMode {
 
     void RangeSelect(HeightMapChannelPoint heightVertex) {
 
-        if (lastSelectedHeightChannel == null) return;
+        if (lastSelectedHeightChannel == null) {
+            SelectAllHeightChannelsInSection(heightVertex.channel);
+            return;
+        }
 
         AddHeightSelectionSaveStateCounterAction();
 
@@ -175,6 +187,53 @@ public class HeightMapEditMode : EditMode {
 
     }
 
+    void GridRangeSelect(int channel) {
+
+        if (startGridRange == null) {
+            SelectAllInColumn(channel);
+            return;
+        }
+
+        if (lastHoveredColumn == selectedColumn) {
+            return;
+        }
+
+        AddHeightSelectionSaveStateCounterAction();
+
+        var firstClickX = startGridRange.x;
+        var firstClickY = startGridRange.y;
+
+        var lastClickX = selectedColumn.x;
+        var lastClickY = selectedColumn.y;
+
+        var startX = firstClickX < lastClickX ? firstClickX : lastClickX;
+        var startY = firstClickY < lastClickY ? firstClickY : lastClickY;
+
+        var endX = firstClickX > lastClickX ? firstClickX : lastClickX;
+        var endY = firstClickY > lastClickY ? firstClickY : lastClickY;
+
+        foreach (var y in Enumerable.Range(startY, endY - startY + 1)) {
+
+            foreach (var x in Enumerable.Range(startX, endX - startX + 1)) {
+
+                var column = selectedSection.section.GetTileColumn(x, y);
+
+                foreach (var height in column.heights) {
+
+                    var heightobj = heightPointObjects.First(obj => {
+                        return obj.heightPoints == height && obj.channel == channel;
+                    });
+                    heightobj.Select();
+
+                }
+
+            }
+
+        }
+
+    }
+
+
     void SelectAllHeightChannelsInSection(int channel) {
 
         AddHeightSelectionSaveStateCounterAction();
@@ -203,17 +262,27 @@ public class HeightMapEditMode : EditMode {
         }
 
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, 8)) {
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, 8)) {
 
             foreach (var channel in heightPointObjects) {
 
                 if (hit.colliderInstanceID == channel.boxCollider.GetInstanceID()) {
 
+                    if (Controls.IsDown("ModifierChannelSelect1") && channel.channel != 1) {
+                        return;
+                    }
+                    if (Controls.IsDown("ModifierChannelSelect2") && channel.channel != 2) {
+                        return;
+                    }
+                    if (Controls.IsDown("ModifierChannelSelect3") && channel.channel != 3) {
+                        return;
+                    }
+
                     if (Controls.OnDown("RangeSelect")) {
                         RangeSelect(channel);
-                    } else if (Controls.OnDown("MultiSelect")) {
+                    }
+                    else if (Controls.OnDown("MultiSelect")) {
 
                         AddHeightSelectionSaveStateCounterAction();
 
@@ -221,11 +290,13 @@ public class HeightMapEditMode : EditMode {
 
                         if (channel.isSelected) {
                             lastSelectedHeightChannel = channel;
-                        } else {
+                        }
+                        else {
                             lastSelectedHeightChannel = null;
                         }
 
-                    } else if (Controls.OnDown("Select")) {
+                    }
+                    else if (Controls.OnDown("Select")) {
 
                         channel.Click();
 
@@ -357,6 +428,10 @@ public class HeightMapEditMode : EditMode {
             height.DeSelect();
 
         }
+
+        lastSelectedHeightChannel = null;
+        startGridRange = null;
+        lastHoveredColumn = null;
 
     }
 

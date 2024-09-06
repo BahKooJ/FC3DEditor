@@ -29,23 +29,14 @@ public class SectionEditMode : EditMode {
 
     public void Update() {
 
-        if (FreeMove.looking) {
+        if (Controls.OnDown("Select")) {
 
-            if (Controls.OnDown("Select")) {
+            var selection = main.GetTileOnLevelMesh(!FreeMove.looking);
 
-                var selection = main.GetTileOnLevelMesh(!FreeMove.looking);
-
-                if (selection != null) {
-                    SelectSection(selection.section);
-                }
-
+            if (selection != null) {
+                SelectSection(selection.section);
             }
 
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha0)) {
-            selectedSection.section.RotateClockwise();
-            selectedSection.RefreshMesh();
         }
 
     }
@@ -129,7 +120,7 @@ public class SectionEditMode : EditMode {
             return;
         }
         if (copySection == null) {
-            QuickLogHandler.Log("No section copied to clipboard!", LogSeverity.Error);
+            QuickLogHandler.Log("No section copied to clipboard", LogSeverity.Info);
             return;
         }
 
@@ -291,6 +282,58 @@ public class SectionEditMode : EditMode {
 
         });
 
+
+    }
+
+    public void PasteHeightMapData() {
+
+        if (selectedSection == null) {
+            QuickLogHandler.Log("No section is selected", LogSeverity.Info);
+            return;
+        }
+        if (copySection == null) {
+            QuickLogHandler.Log("No section copied to clipboard", LogSeverity.Info);
+            return;
+        }
+
+        DialogWindowUtil.Dialog("Warning", "This will overwrite all current map data, are you sure you want to continue?", () => {
+
+            if (selectedSection != null && copySection != null) {
+                AddSectionSaveStateCounterAction();
+                selectedSection.section.OverwriteHeights(copySection);
+                selectedSection.RefreshMesh();
+            }
+
+            return true;
+        });
+
+    }
+
+    public void PasteTileData() {
+
+        if (selectedSection == null) {
+            QuickLogHandler.Log("No section is selected", LogSeverity.Info);
+            return;
+        }
+        if (copySection == null) {
+            QuickLogHandler.Log("No section copied to clipboard", LogSeverity.Info);
+            return;
+        }
+
+        DialogWindowUtil.Dialog("Warning", "This will overwrite all current map data, are you sure you want to continue?", () => {
+
+            if (selectedSection != null && copySection != null) {
+                AddSectionSaveStateCounterAction();
+                selectedSection.section.OverwriteTiles(copySection);
+                selectedSection.RefreshMesh();
+            }
+
+            return true;
+        });
+
+    }
+
+    public void ClearSectionData() {
 
     }
 

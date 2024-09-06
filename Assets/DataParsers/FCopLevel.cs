@@ -1274,6 +1274,103 @@ namespace FCopParser {
 
         }
 
+        public void OverwriteHeights(FCopLevelSection section) {
+
+            heightMap.Clear();
+            foreach (var newHeight in section.heightMap) {
+                heightMap.Add(new HeightPoints(newHeight.height1, newHeight.height2, newHeight.height3));
+            }
+
+            var oldTileColumns = new List<TileColumn>(tileColumns);
+
+            tileColumns.Clear();
+            var x = 0;
+            var y = 0;
+            var i = 0;
+            foreach (var newColumn in section.tileColumns) {
+
+                var newTiles = new List<Tile>();
+
+                var heights = new List<HeightPoints>();
+
+                heights.Add(GetHeightPoint(x, y));
+                heights.Add(GetHeightPoint(x + 1, y));
+                heights.Add(GetHeightPoint(x, y + 1));
+                heights.Add(GetHeightPoint(x + 1, y + 1));
+
+                var column = new TileColumn(x, y, newTiles, heights);
+
+                foreach (var newTile in oldTileColumns[i].tiles) {
+                    newTiles.Add(newTile);
+                }
+
+                tileColumns.Add(column);
+
+                x++;
+                if (x == 16) {
+                    y++;
+                    x = 0;
+                }
+                i++;
+
+            }
+
+            colors.Clear();
+
+            animationVector = new AnimationVector(section.animationVector.x, section.animationVector.y);
+
+            foreach (var newColor in section.colors) {
+
+                colors.Add(new XRGB555(newColor.x, newColor.r, newColor.g, newColor.b));
+
+            }
+
+        }
+
+        public void OverwriteTiles(FCopLevelSection section) {
+
+            tileColumns.Clear();
+            var x = 0;
+            var y = 0;
+            foreach (var newColumn in section.tileColumns) {
+
+                var newTiles = new List<Tile>();
+
+                var heights = new List<HeightPoints>();
+
+                heights.Add(GetHeightPoint(x, y));
+                heights.Add(GetHeightPoint(x + 1, y));
+                heights.Add(GetHeightPoint(x, y + 1));
+                heights.Add(GetHeightPoint(x + 1, y + 1));
+
+                var column = new TileColumn(x, y, newTiles, heights);
+
+                foreach (var newTile in newColumn.tiles) {
+                    newTiles.Add(new Tile(newTile, column, section));
+                }
+
+                tileColumns.Add(column);
+
+                x++;
+                if (x == 16) {
+                    y++;
+                    x = 0;
+                }
+
+            }
+
+            colors.Clear();
+
+            animationVector = new AnimationVector(section.animationVector.x, section.animationVector.y);
+
+            foreach (var newColor in section.colors) {
+
+                colors.Add(new XRGB555(newColor.x, newColor.r, newColor.g, newColor.b));
+
+            }
+
+        }
+
         public FCopLevelSection Clone() {
 
             var clone = new FCopLevelSection();

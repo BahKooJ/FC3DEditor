@@ -38,4 +38,16 @@ public class SectionEditView : MonoBehaviour {
         controller.RotateSectionCounterClockwise();
     }
 
+    public void OnClickPasteHeightMapData() {
+        controller.PasteHeightMapData();
+    }
+
+    public void OnClickPasteTileData() {
+        controller.PasteTileData();
+    }
+
+    public void OnClickClearSectionData() {
+        controller.ClearSectionData();
+    }
+
 }
