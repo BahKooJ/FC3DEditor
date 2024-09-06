@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace FCopParser {
 
@@ -186,6 +185,28 @@ namespace FCopParser {
 
         public void Compile() {
 
+            scripting.Compile();
+
+            // Updates all rpns offsets for existing files.
+            foreach (var rawFile in fileManager.files) {
+
+                var preCompileRefs = rawFile.rpnsReferences;
+
+                rawFile.rpnsReferences = new();
+
+                // Remember that the actual compiled offset is stored on the script object
+                foreach (var rpnsRef in preCompileRefs) {
+                    if (rpnsRef == -1) {
+                        rawFile.rpnsReferences.Add(-1);
+                    }
+                    else {
+                        rawFile.rpnsReferences.Add(scripting.rpns.code[rpnsRef].offset);
+                    }
+
+                }
+
+            }
+
             foreach (var navMesh in navMeshes) {
                 navMesh.Compile();
             }
@@ -193,8 +214,6 @@ namespace FCopParser {
             foreach (var texture in textures) {
                 texture.Compile();
             }
-
-            scripting.Compile();
 
             foreach (var actor in actors) {
                 actor.Compile();
@@ -247,18 +266,18 @@ namespace FCopParser {
                 layout[row].Add(0);
             }
 
-            var message = "";
+            //var message = "";
 
-            foreach (var row2 in layout) {
+            //foreach (var row2 in layout) {
 
-                foreach (var column in row2) {
-                    message += " " + column.ToString();
-                }
-                message += "\n";
-            }
+            //    foreach (var column in row2) {
+            //        message += " " + column.ToString();
+            //    }
+            //    message += "\n";
+            //}
 
             // TEMP AHH BAD UNITY IN MODEL WEEE WOOOO WEEE WOOOO
-            Debug.Log(message);
+            //Debug.Log(message);
 
             FCopLevelLayoutParser.Compile(layout, fileManager.files.First(file => {
 
@@ -280,7 +299,7 @@ namespace FCopParser {
 
             foreach (var group in groupedSections) {
                 var bytes = group.Value.Compile().Compile();
-                var rawFile = new IFFDataFile(2, bytes, "Ctil", group.Key);
+                var rawFile = new IFFDataFile(2, bytes, "Ctil", group.Key, scripting.emptyOffset);
                 fileManager.files.Insert(index, rawFile);
                 index++;
             }
@@ -307,7 +326,7 @@ namespace FCopParser {
             var y = 0;
             foreach (var i in Enumerable.Range(0, 16 * 16)) {
 
-                var newTiles = new List<Tile>() { new Tile(null, 68, 0) };
+                var newTiles = new List<Tile>();
 
                 var heights = new List<HeightPoints> {
                     emptySection.GetHeightPoint(x, y),
@@ -317,6 +336,7 @@ namespace FCopParser {
                 };
 
                 var column = new TileColumn(x, y, newTiles, heights);
+                newTiles.Add(new Tile(column, 68, 0));
 
                 emptySection.tileColumns.Add(column);
 

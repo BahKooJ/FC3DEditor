@@ -98,6 +98,8 @@ public class Main : MonoBehaviour {
     // - Unity Asset Refs -
     public Texture2D tileEffectTexture;
 
+    public ToolbarView toolbar;
+
     IFFParser iffFile;
     public FCopLevel level;
 
@@ -209,14 +211,7 @@ public class Main : MonoBehaviour {
         FileManagerMain.iffFile = null;
         FileManagerMain.level = null;
 
-        HeightMapEditMode.selectedColumn = null;
-        HeightMapEditMode.selectedSection = null;
-
-        TileAddMode.selectedTilePreset = null;
-        TileAddMode.selectedSchematic = null;
-
-        TileEditMode.savedSelections = new();
-        TileEditMode.savedSectionSelections = new();
+        ClearStaticData();
 
         Presets.uvPresets = new UVPresets("Texture Presets", null);
         Presets.shaderPresets = new ShaderPresets("Shader Presets", null);
@@ -231,6 +226,17 @@ public class Main : MonoBehaviour {
 
         System.GC.Collect();
 
+    }
+
+    void ClearStaticData() {
+        HeightMapEditMode.selectedColumn = null;
+        HeightMapEditMode.selectedSection = null;
+
+        TileAddMode.selectedTilePreset = null;
+        TileAddMode.selectedSchematic = null;
+
+        TileEditMode.savedSelections = new();
+        TileEditMode.savedSectionSelections = new();
     }
 
     public void DisableMainCamera() {
@@ -365,6 +371,8 @@ public class Main : MonoBehaviour {
 
         iffFile.Compile();
 
+        iffFile.parsedData.CreateFileList("Debug file list.txt");
+
         FreeMove.StopLooking();
 
         OpenFileWindowUtil.SaveFile("Output", "Mission File", path => {
@@ -445,18 +453,28 @@ public class Main : MonoBehaviour {
 
     public void ChangeRenderedLevelMeshes() {
 
-        foreach (var obj in sectionMeshes) {
-            Destroy(obj.gameObject);
-        }
+        DialogWindowUtil.Dialog("Warning", "Changing render modes will cause all undo history and selections to clear.", () => {
 
-        sectionMeshes.Clear();
+            ClearStaticData();
+            toolbar.SelectHeightMapEditMode();
+            counterActions.Clear();
 
-        if (SettingsManager.renderDirectionalLight) {
-            RenderFullMapLitMeshes();
-        }
-        else {
-            RenderFullMap();
-        }
+            foreach (var obj in sectionMeshes) {
+                Destroy(obj.gameObject);
+            }
+
+            sectionMeshes.Clear();
+
+            if (SettingsManager.renderDirectionalLight) {
+                RenderFullMapLitMeshes();
+            }
+            else {
+                RenderFullMap();
+            }
+
+            return true;
+
+        });
 
     }
 

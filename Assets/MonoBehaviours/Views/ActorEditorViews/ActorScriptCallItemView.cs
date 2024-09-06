@@ -19,9 +19,9 @@ public class ActorScriptCallItemView : MonoBehaviour {
 
     void Start() {
 
-        rpnsRefText1.text = actor.rpnsReferences[0].ToString();
-        rpnsRefText2.text = actor.rpnsReferences[1].ToString();
-        rpnsRefText3.text = actor.rpnsReferences[2].ToString();
+        rpnsRefText1.text = actor.rawFile.rpnsReferences[0].ToString();
+        rpnsRefText2.text = actor.rawFile.rpnsReferences[1].ToString();
+        rpnsRefText3.text = actor.rawFile.rpnsReferences[2].ToString();
 
     }
 
@@ -36,7 +36,7 @@ public class ActorScriptCallItemView : MonoBehaviour {
 
         view.transform.SetParent(DialogWindowUtil.canvas.transform, false);
 
-        viewScript.SelectScript(actor.rpnsReferences[index]);
+        viewScript.SelectScript(actor.rawFile.rpnsReferences[index]);
 
     }
 

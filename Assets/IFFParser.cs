@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEditor;
 
 namespace FCopParser {
     public class IFFParser {
@@ -148,7 +149,7 @@ namespace FCopParser {
 
                     var vagbFile = new IFFDataFile(0,
                         CopyOfRange(header.index + 20, header.index + header.chunkSize).ToList(),
-                        header.fourCCDeclaration, 0, new()
+                        header.fourCCDeclaration, 0, 0
                         );
 
                     if (!fileMananger.subFiles.ContainsKey(subFileName)) {
@@ -167,7 +168,7 @@ namespace FCopParser {
 
                     var camnFile = new IFFDataFile(0,
                         CopyOfRange(header.index + 20, header.index + header.chunkSize).ToList(),
-                        header.fourCCDeclaration, 0, new()
+                        header.fourCCDeclaration, 0, 0
                         );
 
                     if (!fileMananger.subFiles.ContainsKey(subFileName)) {
@@ -204,12 +205,33 @@ namespace FCopParser {
 
                     if (file == null && header.fileHeader != null) {
 
+                        List<int> rpnsReferences = new();
+                        List<int> headerCodeData = new();
+                        List<byte> headerCode = new();
+
+                        var offset = 0;
+
+                        foreach (var i in Enumerable.Range(0, IFFDataFile.rpnsRefCount)) {
+
+                            rpnsReferences.Add(Utils.BytesToInt(header.fileHeader.actData.ToArray(), offset));
+                            offset += 4;
+
+                        }
+
+                        foreach (var i in Enumerable.Range(0, IFFDataFile.headerCodeDataCount)) {
+
+                            headerCodeData.Add(Utils.BytesToInt(header.fileHeader.actData.ToArray(), offset));
+                            offset += 4;
+                        }
+
+                        headerCode = header.fileHeader.actData.ToList().GetRange(offset, header.fileHeader.actData.Count() - offset);
+
                         file = new IFFDataFile(
                             header.fileHeader.startNumber, 
                             new List<byte>(), 
                             header.fileHeader.fourCCData, 
-                            header.fileHeader.dataID, 
-                            header.fileHeader.actData.ToList()
+                            header.fileHeader.dataID,
+                            rpnsReferences, headerCodeData, headerCode
                         );
 
                         dataChunksToAdd = DataChunksBySize(header.fileHeader.dataSize);
@@ -337,7 +359,9 @@ namespace FCopParser {
 
                 var dataSize = file.data.Count();
 
-                var headerSize = 36 + file.additionalData.Count();
+                var additionalData = file.CompileAdditionalData();
+
+                var headerSize = 36 + additionalData.Count();
 
                 dataHeader.AddRange(FourCC.SHOCbytes);
                 dataHeader.AddRange(BitConverter.GetBytes(headerSize));
@@ -347,7 +371,7 @@ namespace FCopParser {
                 dataHeader.AddRange(Encoding.ASCII.GetBytes(Reverse(file.dataFourCC)));
                 dataHeader.AddRange(BitConverter.GetBytes(file.dataID));
                 dataHeader.AddRange(BitConverter.GetBytes(dataSize));
-                dataHeader.AddRange(file.additionalData);
+                dataHeader.AddRange(additionalData);
 
                 FILLCheck(headerSize);
                 current24kSectionSize += headerSize;

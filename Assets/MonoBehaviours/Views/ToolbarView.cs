@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 
 
-class ToolbarView: MonoBehaviour {
+public class ToolbarView: MonoBehaviour {
 
     public GameObject heightMapEditPanel;
     public GameObject tileEditPanel;
@@ -19,6 +19,8 @@ class ToolbarView: MonoBehaviour {
     public GameObject activePanel;
 
     void Start() {
+
+        controller.toolbar = this;
 
         SelectHeightMapEditMode();
 

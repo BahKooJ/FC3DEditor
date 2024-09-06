@@ -44,12 +44,6 @@ namespace FCopParser {
         public int x;
         public int y;
 
-        public List<int> rpnsReferences = new();
-
-        public List<int> headerCodeData = new();
-
-        public List<byte> headerCode = new();
-
         public List<FCopResource> resourceReferences = new();
 
         public FCopActorBehavior behavior;
@@ -68,8 +62,6 @@ namespace FCopParser {
             x = Utils.BytesToInt(rawFile.data.ToArray(), 24);
 
             ParseResourceReferences();
-
-            ParseRPNSReferences();
 
             switch (actorType) {
                 case 1:
@@ -109,18 +101,6 @@ namespace FCopParser {
 
         virtual public void Compile() {
 
-            rawFile.additionalData.Clear();
-
-            foreach (var rpnsRef in rpnsReferences) {
-                rawFile.additionalData.AddRange(BitConverter.GetBytes(rpnsRef));
-            }
-
-            foreach (var i in headerCodeData) {
-                rawFile.additionalData.AddRange(BitConverter.GetBytes(i));
-            }
-
-            rawFile.additionalData.AddRange(headerCode);
-
             rawFile.data.RemoveRange(yOffset, 4);
             rawFile.data.InsertRange(yOffset, BitConverter.GetBytes(y));
             rawFile.data.RemoveRange(xOffset, 4);
@@ -157,29 +137,6 @@ namespace FCopParser {
 
         }
 
-        void ParseRPNSReferences() {
-
-            var headerData = rawFile.additionalData;
-
-            var offset = 0;
-
-            foreach (var i in Enumerable.Range(0, 3)) {
-
-                rpnsReferences.Add(Utils.BytesToInt(headerData.ToArray(), offset));
-                offset += 4;
-
-            }
-
-            foreach (var i in Enumerable.Range(0, 2)) {
-
-                headerCodeData.Add(Utils.BytesToInt(headerData.ToArray(), offset));
-                offset += 4;
-
-            }
-
-            headerCode = headerData.GetRange(offset, headerData.Count - offset);
-
-        }
 
         void FindStartChunkOffset() {
 
@@ -212,47 +169,6 @@ namespace FCopParser {
 
         string BytesToStringReversed(int offset, int length) {
             return Reverse(Encoding.Default.GetString(rawFile.data.ToArray(), offset, length));
-        }
-
-        public static IFFDataFile AddNetrualTurretTempMethod(int id, int x, int y) {
-
-            var file = new IFFDataFile(2, new(), "Csac", id, new());
-
-            file.additionalData.AddRange(BitConverter.GetBytes(1807));
-            file.additionalData.AddRange(BitConverter.GetBytes(1807));
-            file.additionalData.AddRange(BitConverter.GetBytes(1807));
-            file.additionalData.AddRange(new List<byte>() { 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x43, 0x4F });
-
-
-            file.data.AddRange(new List<byte>() { 0x54, 0x43, 0x41, 0x74, 0x58, 0x00, 0x00, 0x00 });
-            file.data.AddRange(BitConverter.GetBytes(id));
-            file.data.AddRange(BitConverter.GetBytes(36));
-            file.data.AddRange(BitConverter.GetBytes(y));
-            file.data.AddRange(BitConverter.GetBytes(0));
-            file.data.AddRange(BitConverter.GetBytes(x));
-            file.data.AddRange(new List<byte>() {
-                0x48, 0x01, 0x11, 0x00, 0xF4, 0x01, 0x00, 0x00, 0x00, 0x32, 0x03, 0x00, 0x65, 0x00, 0x00, 0x00, 0x03,
-                0x00, 0x06, 0x02, 0x03, 0x04, 0x0A, 0x00, 0x00, 0x10, 0x00, 0x10, 0x00, 0x18, 0x20, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00,
-                0x02, 0x00, 0x00, 0x99, 0x09, 0x00, 0x18, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x01, 0x02, 0x01, 0x02, 0x3C,
-                0x00, 0x00, 0x04, 0x4C, 0x53, 0x52, 0x61, 0x2C, 0x00, 0x00, 0x00
-            });
-
-            file.data.AddRange(BitConverter.GetBytes(id));
-
-            file.data.AddRange(new List<byte>() {
-                0x6A, 0x62, 0x6F, 0x43, 0x1F, 0x00, 0x00, 0x00, 0x4C, 0x4C, 0x55, 0x4E, 0x00, 0x00, 0x00, 0x00, 0x6A, 0x62, 0x6F, 0x43, 0x20, 0x00, 0x00, 0x00, 0x4C,
-                0x4C, 0x55, 0x4E, 0x00, 0x00, 0x00, 0x00, 0x43, 0x41, 0x53, 0x74, 0x30, 0x00, 0x00, 0x00
-            });
-
-
-            file.data.AddRange(BitConverter.GetBytes(id));
-            file.data.AddRange(new List<byte>() {
-                0x24, 0xFA, 0x01, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-            });
-
-            return file;
-
         }
 
 
