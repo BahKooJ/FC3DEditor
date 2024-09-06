@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using static System.Collections.Specialized.BitVector32;
 
 public class Main : MonoBehaviour {
 
@@ -362,23 +363,6 @@ public class Main : MonoBehaviour {
             return;
         }
 
-        var index = iffFile.parsedData.files.FindIndex(file => {
-
-            return file.dataFourCC == "Ctil";
-
-        });
-
-        iffFile.parsedData.files.RemoveAll(file => {
-
-            return file.dataFourCC == "Ctil";
-
-        });
-
-        foreach (var section in level.sections) {
-            iffFile.parsedData.files.Insert(index, section.parser.rawFile);
-            index++;
-        }
-
         iffFile.Compile();
 
         FreeMove.StopLooking();
@@ -488,35 +472,21 @@ public class Main : MonoBehaviour {
 
     void RenderFullMap() {
 
-        var x = 0;
-        var y = 0;
+        foreach (var y in Enumerable.Range(0, level.height)) {
 
-        var itx = 0;
-        var ity = 0;
+            foreach (var x in Enumerable.Range(0, level.width)) {
 
-        foreach (var row in level.layout) {
-
-            foreach (var column in row) {
-
-                if (column != 0) {
-                    var section = Instantiate(meshSection, new Vector3(x, 0, -y), Quaternion.identity);
-                    var script = section.GetComponent<LevelMesh>();
-                    script.section = level.sections[column - 1];
-                    script.levelTexturePallet = levelTexturePallet;
-                    script.controller = this;
-                    script.x = x;
-                    script.y = y;
-                    script.arrayX = itx; 
-                    script.arrayY = ity;
-                    sectionMeshes.Add(script);
-                }
-                itx++;
-                x += 16;
+                var section = Instantiate(meshSection, new Vector3(x * 16, 0, -(y * 16)), Quaternion.identity);
+                var script = section.GetComponent<LevelMesh>();
+                script.section = level.sections[(y * level.width) + x];
+                script.levelTexturePallet = levelTexturePallet;
+                script.controller = this;
+                script.x = x * 16;
+                script.y = y * 16;
+                script.arrayX = x;
+                script.arrayY = y;
+                sectionMeshes.Add(script);
             }
-            itx = 0;
-            x = 0;
-            y += 16;
-            ity++;
 
         }
 
@@ -524,40 +494,24 @@ public class Main : MonoBehaviour {
 
     void RenderFullMapLitMeshes() {
 
-        var x = 0;
-        var y = 0;
+        foreach (var y in Enumerable.Range(0, level.height)) {
 
-        var itx = 0;
-        var ity = 0;
+            foreach (var x in Enumerable.Range(0, level.width)) {
 
-        foreach (var row in level.layout) {
-
-            foreach (var column in row) {
-
-                if (column != 0) {
-                    var section = Instantiate(litMeshSection, new Vector3(x, 0, -y), Quaternion.identity);
-                    var script = section.GetComponent<LevelMesh>();
-                    script.section = level.sections[column - 1];
-                    script.levelTexturePallet = levelTexturePallet;
-                    script.controller = this;
-                    script.x = x;
-                    script.y = y;
-                    script.arrayX = itx;
-                    script.arrayY = ity;
-                    sectionMeshes.Add(script);
-                }
-                itx++;
-                x += 16;
+                var section = Instantiate(litMeshSection, new Vector3(x * 16, 0, -(y * 16)), Quaternion.identity);
+                var script = section.GetComponent<LevelMesh>();
+                script.section = level.sections[(y * level.width) + x];
+                script.levelTexturePallet = levelTexturePallet;
+                script.controller = this;
+                script.x = x * 16;
+                script.y = y * 16;
+                script.arrayX = x;
+                script.arrayY = y;
+                sectionMeshes.Add(script);
             }
-            itx = 0;
-            x = 0;
-            y += 16;
-            ity++;
 
         }
 
     }
-
-
 
 }

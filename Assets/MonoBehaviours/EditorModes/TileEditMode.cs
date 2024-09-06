@@ -546,7 +546,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
         AddTileEffectChangeCounterAction(channel);
 
         foreach (var section in selectedSections) {
-            section.section.parser.tileEffects[channel] = (byte)value;
+            section.section.tileEffects[channel] = (byte)value;
         }
 
         RefeshTileOverlay();

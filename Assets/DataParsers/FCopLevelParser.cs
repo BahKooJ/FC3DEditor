@@ -66,6 +66,10 @@ namespace FCopParser {
         public FCopLevelSectionParser(IFFDataFile rawFile) {
             this.rawFile = rawFile;
 
+            if (rawFile == null) {
+                return;
+            }
+
             FindStartChunkOffset();
 
             colorCount = Utils.BytesToShort(rawFile.data.ToArray(), colorCountOffset);
@@ -93,7 +97,7 @@ namespace FCopParser {
 
         }
 
-        public void Compile() {
+        public List<byte> Compile() {
 
             List<byte> compiledFile = new List<byte>();
 
@@ -232,7 +236,10 @@ namespace FCopParser {
 
             CompileThirdSection();
 
-            compiledFile.AddRange(rawFile.data.GetRange(1484, 4));
+            // I'm not sure what this value is, it's like the tile count?
+            // In anycase changing the value doesn't give a reaction to future cop
+            // so I guess I can ignore it.
+            compiledFile.AddRange(BitConverter.GetBytes(16384));
 
             CompileTiles();
 
@@ -266,10 +273,7 @@ namespace FCopParser {
             CompileAnimatedUVs();
             CompileSLFX();
 
-            rawFile.data = compiledFile;
-            rawFile.modified = true;
-
-
+            return compiledFile;
 
         }
 
@@ -650,6 +654,10 @@ namespace FCopParser {
                 offset += 4;
             }
 
+        }
+
+        public LevelCulling() {
+            sectionCulling = null;
         }
 
         public List<byte> Compile() {

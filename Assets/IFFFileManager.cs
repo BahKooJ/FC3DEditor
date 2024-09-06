@@ -39,6 +39,15 @@ namespace FCopParser {
             this.additionalData = additionalData;
         }
 
+        public IFFDataFile(int startNumber, List<byte> data, string dataFourCC, int dataID) {
+            this.startNumber = startNumber;
+            this.data = data;
+            this.dataFourCC = dataFourCC;
+            this.dataID = dataID;
+            // Temp
+            this.additionalData = new List<byte>() { 15, 7, 0, 0, 15, 7, 0, 0, 15, 7, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 67, 79 };
+        }
+
         public IFFDataFile Clone(int newID) {
             return new IFFDataFile(startNumber, data, dataFourCC, newID, additionalData);
         }

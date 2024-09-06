@@ -36,7 +36,7 @@ public class TileEffectsView : MonoBehaviour {
 
             item.UnCheck();
 
-            item.SetDropdown(controller.FirstItem.section.section.parser.tileEffects[item.channel]);
+            item.SetDropdown(controller.FirstItem.section.section.tileEffects[item.channel]);
 
         }
 
