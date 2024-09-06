@@ -335,6 +335,22 @@ public class SectionEditMode : EditMode {
 
     public void ClearSectionData() {
 
+        if (selectedSection == null) {
+            QuickLogHandler.Log("No section is selected", LogSeverity.Info);
+            return;
+        }
+
+        DialogWindowUtil.Dialog("Warning", "This will overwrite all current map data, are you sure you want to continue?", () => {
+
+            if (selectedSection != null) {
+                AddSectionSaveStateCounterAction();
+                selectedSection.section.Overwrite(FCopLevelSection.CreateEmpty(-120, -100, -80));
+                selectedSection.RefreshMesh();
+            }
+
+            return true;
+        });
+
     }
 
     void AddSectionSaveStateCounterAction() {

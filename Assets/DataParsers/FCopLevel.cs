@@ -42,12 +42,21 @@ namespace FCopParser {
         public FCopLevel(int width, int height, IFFFileManager fileManager) {
 
             this.fileManager = fileManager;
+            this.width = width + 8;
+            this.height = height + 8;
 
             // + 8s are there for the out of bounds padding, 4 sections on either side.
             foreach (var y in Enumerable.Range(0, height + 8)) {
 
                 foreach (var x in Enumerable.Range(0, width + 8)) {
-                    sections.Add(FCopLevelSection.CreateEmpty(-120, -100, -80));
+
+                    if (x >= 4 && x < width + 4 && y >= 4 && y < height + 4) {
+                        sections.Add(FCopLevelSection.CreateEmpty(-120, -100, -80));
+                    }
+                    else {
+                        sections.Add(FCopLevelSection.CreateEmpty(20, -128, -128));
+                    }
+
                 }
 
             }
@@ -289,7 +298,7 @@ namespace FCopParser {
             foreach (var hy in Enumerable.Range(0, 17)) {
 
                 foreach (var hx in Enumerable.Range(0, 17)) {
-                    
+                    emptySection.heightMap.Add(new HeightPoints(height1, hieght2, height3));
                 }
 
             }
@@ -344,11 +353,13 @@ namespace FCopParser {
         public List<byte> tileEffects;
 
         public LevelCulling culling;
+        public List<byte> slfxData;
 
         public FCopLevelSection(FCopLevelSectionParser parser, FCopLevel parent) {
 
             this.colors = parser.colors;
             this.culling = parser.culling;
+            this.slfxData = parser.slfxData;
 
             animationVector = new AnimationVector(parser.animationVector);
             tileEffects = parser.tileEffects;
@@ -819,6 +830,7 @@ namespace FCopParser {
 
             parser.animationVector = animationVector.Compile();
             parser.tileEffects = new List<byte>(tileEffects);
+            parser.slfxData = slfxData;
 
             return parser;
 
@@ -1330,6 +1342,11 @@ namespace FCopParser {
 
             }
 
+            tileEffects = new List<byte>(section.tileEffects);
+            if (section.slfxData != null) {
+                slfxData = new List<byte>(section.slfxData);
+            }
+
         }
 
         public void OverwriteHeights(FCopLevelSection section) {
@@ -1426,6 +1443,9 @@ namespace FCopParser {
                 colors.Add(new XRGB555(newColor.x, newColor.r, newColor.g, newColor.b));
 
             }
+
+            tileEffects = new List<byte>(section.tileEffects);
+            slfxData = new List<byte>(slfxData);
 
         }
 

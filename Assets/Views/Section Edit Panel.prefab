@@ -1308,7 +1308,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 5441642211485763945}
         m_TargetAssemblyTypeName: SectionEditView, Assembly-CSharp
-        m_MethodName: OnClickRemoveShadersFromSectionButton
+        m_MethodName: OnClickClearSectionData
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

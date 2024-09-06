@@ -657,7 +657,17 @@ namespace FCopParser {
         }
 
         public LevelCulling() {
-            sectionCulling = null;
+
+            sectionCulling = new ChunkCulling(0, 0);
+
+            foreach (var i in Enumerable.Range(0, chunkCulling8Size)) {
+                chunkCulling8.Add(new ChunkCulling(0, 0));
+            }
+
+            foreach (var i in Enumerable.Range(0, chunkCulling4Size)) {
+                chunkCulling4.Add(new ChunkCulling(0, 0));
+            }
+
         }
 
         public List<byte> Compile() {
