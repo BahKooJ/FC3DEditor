@@ -75,6 +75,10 @@ public class ShaderPresetsDirectoryViewItem : MonoBehaviour {
 
     public void OnClick() {
 
+        if (controller.PresetPainting) {
+            controller.selectedPreset = null;
+        }
+
         controller.currentShaderPresets = presets;
 
         view.Refresh();

@@ -20,6 +20,7 @@ public class ShaderPresetViewItem : MonoBehaviour {
     public TMP_InputField nameTextField;
     public ContextMenuHandler contextMenu;
     public RawImage shaderPreview;
+    public Image backgroundColor;
 
     public ShaderPreset preset;
     public ShaderEditMode controller;
@@ -196,6 +197,15 @@ public class ShaderPresetViewItem : MonoBehaviour {
         return true;
     }
 
+    public void Select() {
+        backgroundColor.color = new Color(0f, 0x33 / 255f, 0f);
+    }
+
+    public void DeSelect() {
+        backgroundColor.color = new Color(0x22 / 255f, 0x22 / 255f, 0x22 / 255f);
+
+    }
+
     public void OnStartNameType() {
 
         Main.ignoreAllInputs = true;
@@ -220,6 +230,13 @@ public class ShaderPresetViewItem : MonoBehaviour {
     }
 
     public void OnClick() {
+
+        if (controller.PresetPainting) {
+            controller.selectedPreset = preset;
+            view.RefreshSelection();
+            Select();
+            return;
+        }
 
         ShaderEditMode.AddTileStateCounterAction();
 

@@ -13,6 +13,7 @@ public class ShaderEditPanelView : MonoBehaviour {
     public Image paintTool;
     public Image clickToggle;
     public Image switchPresets;
+    public Image presetPaintTool;
 
     public Sprite showShaderPresetsSprite;
     public Sprite showColorPresetsSprite;
@@ -39,19 +40,7 @@ public class ShaderEditPanelView : MonoBehaviour {
 
         activeShaderPresetPanel.transform.SetParent(transform.parent, false);
 
-        if (!controller.painting) {
-            paintTool.color = Color.gray;
-        }
-        else {
-            paintTool.color = Color.white;
-        }
-
-        if (!ShaderEditMode.applyColorsOnClick) {
-            clickToggle.color = Color.gray;
-        }
-        else {
-            clickToggle.color = Color.white;
-        }
+        GrayOutAllTools();
 
     }
 
@@ -122,24 +111,37 @@ public class ShaderEditPanelView : MonoBehaviour {
 
     public void PaintToolButton() {
 
-        controller.StartPainting();
+        controller.SelectTool(2);
 
-        if (!controller.painting) {
-            paintTool.color = Color.gray;
-        } else {
+        GrayOutAllTools();
+
+        if (!controller.Default) {
             paintTool.color = Color.white;
         }
+
+
+    }
+
+    public void PresetPaintToolButton() {
+
+        controller.SelectTool(3);
+
+        GrayOutAllTools();
+
+        if (!controller.Default) {
+            presetPaintTool.color = Color.white;
+        }
+
 
     }
 
     public void OnClickApplyColorOnClickToggle() {
 
-        controller.ChangeClickToggle();
+        controller.SelectTool(1);
 
-        if (!ShaderEditMode.applyColorsOnClick) {
-            clickToggle.color = Color.gray;
-        }
-        else {
+        GrayOutAllTools();
+
+        if (!controller.Default) {
             clickToggle.color = Color.white;
         }
 
@@ -161,5 +163,25 @@ public class ShaderEditPanelView : MonoBehaviour {
         }
 
     }
+
+    void ChangeToggleColor(Image image, bool toggle) {
+
+        if (toggle) {
+            image.color = Color.white;
+
+        }
+        else {
+            image.color = Color.gray;
+
+        }
+
+    }
+
+    void GrayOutAllTools() {
+        paintTool.color = Color.gray;
+        clickToggle.color = Color.gray;
+        presetPaintTool.color = Color.gray;
+    }
+
 
 }

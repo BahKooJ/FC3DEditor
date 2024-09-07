@@ -65,6 +65,20 @@ public class ShaderPresetsView : MonoBehaviour {
 
     }
 
+    public void RefreshSelection() {
+
+        foreach (Transform obj in presetListContent) {
+
+            var preset = obj.gameObject.GetComponent<ShaderPresetViewItem>();
+
+            if (preset != null) {
+                preset.DeSelect();
+            }
+
+        }
+
+    }
+
     void AddBackItem() {
 
         if (controller.currentShaderPresets.parent != null) {

@@ -400,7 +400,7 @@ public class ShaderColorPickerView : MonoBehaviour {
 
         if (refuseCallbacks) { return; }
 
-        if (!ShaderEditMode.applyColorsOnClick && controller.HasSelection) {
+        if (!controller.ColorClick && controller.HasSelection) {
 
             ShaderEditMode.AddTileStateCounterAction();
 

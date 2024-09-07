@@ -2311,6 +2311,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Asset Manager Window
       objectReference: {fileID: 0}
+    - target: {fileID: 5034767195390374454, guid: 5f10661846b707244a9d972a571a924f, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6469256210417607116, guid: 5f10661846b707244a9d972a571a924f, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6469256210417607116, guid: 5f10661846b707244a9d972a571a924f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7057803411013275092, guid: 5f10661846b707244a9d972a571a924f, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -2329,6 +2341,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8135658677681505636, guid: 5f10661846b707244a9d972a571a924f, type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8645029215301174052, guid: 5f10661846b707244a9d972a571a924f, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8645029215301174052, guid: 5f10661846b707244a9d972a571a924f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8645029215301174052, guid: 5f10661846b707244a9d972a571a924f, type: 3}
+      propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8932025759670490388, guid: 5f10661846b707244a9d972a571a924f, type: 3}

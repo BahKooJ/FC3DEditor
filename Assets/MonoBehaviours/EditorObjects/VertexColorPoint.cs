@@ -156,7 +156,7 @@ public class VertexColorPoint : MonoBehaviour {
             return;
         }
 
-        if (!controller.painting) {
+        if (!controller.Painting) {
             ManualChangeValue();
         }
         else {
