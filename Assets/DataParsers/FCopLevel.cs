@@ -304,6 +304,8 @@ namespace FCopParser {
                 index++;
             }
 
+            scripting.ResetIDAndOffsets();
+
         }
 
     }
@@ -2040,6 +2042,12 @@ namespace FCopParser {
                 isRect ? 1 : 0,
                 (int)shaders.type);
 
+            var potentialNewShaders = shaders.VerifyCorrectShader();
+
+            if (potentialNewShaders != null) {
+                shaders = potentialNewShaders;
+            }
+
             var shaderData = new List<byte>();
 
             if (shaders.type == VertexColorType.Color) {
@@ -3522,6 +3530,8 @@ namespace FCopParser {
 
         public List<byte> Compile();
 
+        public TileShaders VerifyCorrectShader();
+
         public TileShaders Clone();
 
         public bool Compare(TileShaders shaders);
@@ -3584,6 +3594,10 @@ namespace FCopParser {
 
         public List<byte> Compile() {
             return new List<byte> { value };
+        }
+
+        public TileShaders VerifyCorrectShader() {
+            return null;
         }
 
         public TileShaders Clone() {
@@ -3736,6 +3750,27 @@ namespace FCopParser {
                     });
 
             return Utils.BitArrayToByteArray(bitfield.Compile()).ToList();
+
+        }
+
+        public TileShaders VerifyCorrectShader() {
+
+            var first = values[0];
+
+            if (values.All(value => value == first)) {
+
+                var whitePercentage = first / white;
+
+                var newShader = new MonoChromeShader((byte)MathF.Round(MonoChromeShader.white * whitePercentage), isQuad);
+
+                return newShader;
+
+            }
+            else {
+
+                return null;
+
+            }
 
         }
 
@@ -3965,6 +4000,86 @@ namespace FCopParser {
 
         }
 
+        public TileShaders VerifyCorrectShader() {
+
+            var first = values[0];
+
+            var sameColor = values.All(color => first.ToUShort() == color.ToUShort());
+
+            if (sameColor) {
+
+                var firstChannel = first.r;
+
+                var isGrey = first.g == firstChannel && first.b == firstChannel;
+
+                if (isGrey) {
+
+                    var whitePercentage = first.r / XRGB555.maxChannelValue;
+
+                    return new MonoChromeShader((byte)MathF.Round(MonoChromeShader.white * whitePercentage), isQuad);
+
+                }
+                else {
+
+                    return null;
+
+                }
+
+
+            }
+            else {
+
+                var monoValues = new List<int>();
+                foreach (var color in values) {
+
+                    var firstChannel = color.r;
+
+                    var isGrey = color.g == firstChannel && color.b == firstChannel;
+
+                    if (!isGrey) {
+                        return null;
+                    }
+
+                    var whitePercentage = color.r / XRGB555.maxChannelValue;
+                    monoValues.Add((int)MathF.Round(DynamicMonoChromeShader.white * whitePercentage));
+
+                }
+
+                var newShader = new DynamicMonoChromeShader();
+                newShader.isQuad = isQuad;
+
+                if (!isQuad) {
+                    monoValues.Add(0);
+                }
+
+                var quadMonoPosToColor = new int[] { 3, 1, 0, 2 };
+                var triangleMonoPosToColor = new int[] { 1, 0, 2 };
+
+                var orderedMonoValues = new List<int>();
+
+                foreach (var i in Enumerable.Range(0, monoValues.Count)) {
+
+                    if (isQuad) {
+                        //orderedMonoValues[quadMonoPosToColor[i]] = monoValues[i];
+                        orderedMonoValues.Add(monoValues[quadMonoPosToColor[i]]);
+                    }
+                    else {
+                        //orderedMonoValues[triangleMonoPosToColor[i]] = monoValues[i];
+
+                        orderedMonoValues.Add(monoValues[triangleMonoPosToColor[i]]);
+                    }
+
+                }
+
+                newShader.values = orderedMonoValues.ToArray();
+                newShader.Apply();
+
+                return newShader;
+
+            }
+
+        }
+
         public TileShaders Clone() {
 
             var colors = new List<XRGB555>();
@@ -4043,6 +4158,10 @@ namespace FCopParser {
 
         public List<byte> Compile() {
             return new List<byte> { 0 };
+        }
+
+        public TileShaders VerifyCorrectShader() {
+            return null;
         }
 
         public TileShaders Clone() {

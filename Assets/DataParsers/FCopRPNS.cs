@@ -62,6 +62,21 @@ namespace FCopParser {
 
         }
 
+        public void ResetKeys() {
+
+            var newOrder = new List<FCopScript>();
+            foreach (var line in code) {
+                newOrder.Add(line.Value);
+            }
+
+            code.Clear();
+
+            foreach (var line in newOrder) {
+                code.Add(line.offset, line);
+            }
+
+        }
+
     }
 
 

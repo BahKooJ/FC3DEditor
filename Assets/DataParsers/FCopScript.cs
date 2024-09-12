@@ -24,6 +24,10 @@ namespace FCopParser {
             rpns.Compile();
             emptyOffset = rpns.code.Last().Value.offset;
         }
+
+        public void ResetIDAndOffsets() {
+            rpns.ResetKeys();
+        }
     }
 
     public class FCopScript {

@@ -4,7 +4,6 @@
 using FCopParser;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Presets;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
