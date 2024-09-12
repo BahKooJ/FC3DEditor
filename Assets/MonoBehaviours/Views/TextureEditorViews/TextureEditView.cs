@@ -10,6 +10,7 @@ public class TextureEditView: MonoBehaviour {
     public GameObject graphicsPropertiesView;
     public GameObject texturePresetPanel;
     public Toggle openUVMapperToggle;
+    public Image mapperPaintingIcon;
 
     public GameObject activeTextureUVMapper = null;
     public GameObject activeTexturePresetPanel = null;
@@ -98,6 +99,32 @@ public class TextureEditView: MonoBehaviour {
 
     public void OnClickMakeTilesTransparent() {
         controller.MakeTilesTransparent();
+    }
+
+    public void OnClickMapperPainting() {
+
+        if (!controller.mapperDrawing) {
+            controller.StartDrawing();
+        }
+        else {
+            controller.mapperDrawing = false;
+        }
+
+        ChangeToggleColor(mapperPaintingIcon, controller.mapperDrawing);
+
+    }
+
+    void ChangeToggleColor(Image image, bool toggle) {
+
+        if (toggle) {
+            image.color = Color.white;
+
+        }
+        else {
+            image.color = Color.gray;
+
+        }
+
     }
 
 

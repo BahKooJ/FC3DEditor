@@ -3,7 +3,7 @@ using FCopParser;
 using UnityEngine;
 using UnityEngine.UI;
 
-class TextureCoordinatePoint : MonoBehaviour {
+public class TextureCoordinatePoint : MonoBehaviour {
 
     public int uvOffset;
     public int textureOffset;
@@ -37,6 +37,10 @@ class TextureCoordinatePoint : MonoBehaviour {
         }
 
         transform.localPosition = pos;
+
+        if (!view.controller.HasSelection) {
+            return;
+        }
 
         if (view.frameSelected != -1) {
 
@@ -80,6 +84,10 @@ class TextureCoordinatePoint : MonoBehaviour {
         }
 
         transform.localPosition = pos;
+
+        if (!view.controller.HasSelection) {
+            return;
+        }
 
         if (view.frameSelected != -1) {
 
@@ -156,9 +164,11 @@ class TextureCoordinatePoint : MonoBehaviour {
     }
 
     void Start() {
-        
-        if (view.controller.FirstTile.isVectorAnimated) {
-            ShowGhostPos();
+
+        if (view.controller.HasSelection) {
+            if (view.controller.FirstTile.isVectorAnimated) {
+                ShowGhostPos();
+            }
         }
 
     }
@@ -169,9 +179,7 @@ class TextureCoordinatePoint : MonoBehaviour {
             return;
         }
 
-        Vector2 pointOnPallete = Vector2.zero;
-
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(imageTransform, Input.mousePosition, Camera.main, out pointOnPallete);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(imageTransform, Input.mousePosition, Camera.main, out Vector2 pointOnPallete);
 
         var x = Mathf.Floor(pointOnPallete.x);
         var y = Mathf.Floor(pointOnPallete.y);
@@ -204,6 +212,7 @@ class TextureCoordinatePoint : MonoBehaviour {
         if (Input.GetMouseButton(0)) {
             TextureEditMode.AddTileStateCounterAction();
             drag = true;
+            view.refusedUVDrag = true;
         }
 
     }
@@ -215,6 +224,7 @@ class TextureCoordinatePoint : MonoBehaviour {
         }
 
         drag = false;
+        view.refusedUVDrag = false;
 
     }
 

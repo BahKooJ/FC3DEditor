@@ -10,7 +10,7 @@ public class TextureCoordinatesLines : MonoBehaviour {
 
     LineRenderer lineRenderer;
 
-    public List<GameObject> points = new();
+    public List<TextureCoordinatePoint> points = new();
 
     List<int> textureCoords = new();
 
@@ -31,18 +31,24 @@ public class TextureCoordinatesLines : MonoBehaviour {
         }
 
         foreach (var point in points) {
-            Destroy(point);
+            Destroy(point.gameObject);
         }
 
         points.Clear();
 
-        if (!view.controller.HasSelection || view.editTransparency) { return; }
+        if (view.editTransparency) { return; }
 
         GrabTextureCoords();
 
         if (textureCoords.Count == 0) { return; }
 
-        lineRenderer.positionCount = view.controller.FirstTile.verticies.Count + 1;
+        if (view.controller.HasSelection) {
+            lineRenderer.positionCount = view.controller.FirstTile.verticies.Count + 1;
+        }
+        else {
+            lineRenderer.positionCount = 5;
+        }
+
 
         int it = 0;
         foreach (var coord in textureCoords) {
@@ -78,7 +84,7 @@ public class TextureCoordinatesLines : MonoBehaviour {
                     break;
             }
 
-            points.Add(point);
+            points.Add(script);
 
             lineRenderer.SetPosition(it, new Vector3(
                 TextureCoordinate.GetXPixel(coord),
@@ -88,7 +94,7 @@ public class TextureCoordinatesLines : MonoBehaviour {
 
         }
 
-        lineRenderer.SetPosition(view.controller.FirstTile.verticies.Count, new Vector3(
+        lineRenderer.SetPosition(textureCoords.Count, new Vector3(
             TextureCoordinate.GetXPixel(textureCoords[0]),
             TextureCoordinate.GetYPixel(textureCoords[0]), -1));
 
@@ -110,7 +116,7 @@ public class TextureCoordinatesLines : MonoBehaviour {
             it++;
         }
 
-        lineRenderer.SetPosition(view.controller.FirstTile.verticies.Count, new Vector3(
+        lineRenderer.SetPosition(textureCoords.Count, new Vector3(
             TextureCoordinate.GetXPixel(textureCoords[0]),
             TextureCoordinate.GetYPixel(textureCoords[0]), -1));
 
@@ -119,23 +125,54 @@ public class TextureCoordinatesLines : MonoBehaviour {
 
     public void RefreshGhostPoints() {
         foreach (var point in points) {
-            point.GetComponent<TextureCoordinatePoint>().ChangeGhostPos();
+            point.ChangeGhostPos();
         }
+    }
+
+    public void SetUVs(int x, int y, int startX, int startY) {
+
+        points[0].ChangePosition(startX, startY);
+        points[1].ChangePosition(x, startY);
+        points[2].ChangePosition(x, y);
+
+        if (points.Count > 3) {
+            points[3].ChangePosition(startX, y);
+        }
+
     }
 
     void GrabTextureCoords() {
 
         textureCoords.Clear();
 
-        if (view.frameSelected != -1) {
-            var animatedUVs = view.controller.FirstTile.animatedUVs.GetRange(view.frameSelected * 4, 4);
-            textureCoords = new List<int>(animatedUVs);
-            return;
+        if (view.controller.HasSelection) {
+
+            if (view.frameSelected != -1) {
+                var animatedUVs = view.controller.FirstTile.animatedUVs.GetRange(view.frameSelected * 4, 4);
+                textureCoords = new List<int>(animatedUVs);
+                return;
+            }
+
+            var uvs = view.controller.FirstTile.uvs;
+
+            textureCoords = new List<int>(uvs);
+
         }
+        else if (points.Count == 0) {
+            textureCoords = new List<int>() { 57200, 57228, 50060, 50032 };
+        }
+        else {
 
-        var uvs = view.controller.FirstTile.uvs;
+            var uvs = new List<int>();
+            foreach (var point in points) {
 
-        textureCoords = new List<int>(uvs);
+                uvs.Add(TextureCoordinate.SetPixel((int)point.transform.localPosition.x, (int)point.transform.localPosition.y));
+
+            }
+
+            textureCoords = new List<int>(uvs);
+
+        }
 
     }
 

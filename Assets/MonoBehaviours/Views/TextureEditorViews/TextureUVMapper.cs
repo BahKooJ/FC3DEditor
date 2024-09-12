@@ -6,10 +6,12 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System.IO;
 using FCopParser;
+using UnityEngine.EventSystems;
 
 public class TextureUVMapper : MonoBehaviour {
 
     public bool editTransparency = false;
+    public bool refusedUVDrag = false;
 
     public TextureEditMode controller;
 
@@ -93,6 +95,8 @@ public class TextureUVMapper : MonoBehaviour {
 
     }
 
+    float startUVDragX = -1f;
+    float startUVDragY = -1f;
     void Update() {
 
         float axis = Input.GetAxis("Mouse ScrollWheel");
@@ -133,11 +137,93 @@ public class TextureUVMapper : MonoBehaviour {
 
         }
 
+
+        if (Main.ignoreAllInputs) {
+            return;
+        }
+
+        if (Controls.OnDown("RotateClockwiseUV")) {
+            OnClickRotateClockwise();
+        }
+        if (Controls.OnDown("RotateCounterClockwiseUV")) {
+            OnClickRotateCounterClockwise();
+        }
+        if (Controls.OnDown("FlipTextureCoordsVerticallyUV")) {
+            OnFlipTextureCoordsVertically();
+        }
+        if (Controls.OnDown("FlipTextureCoordsHorizontallyUV")) {
+            OnFlipTextureCoordsHorizontally();
+        }
+
+    }
+
+    private void LateUpdate() {
+
+        if (Input.GetMouseButton(0) && IsCursorInTexturePallete() && !refusedUVDrag) {
+
+            PointerEventData pointerData = new PointerEventData(EventSystem.current);
+            pointerData.position = Input.mousePosition;
+
+            var results = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(pointerData, results);
+
+            if (results.Count > 0) {
+                if (results[0].gameObject.name != texturePaletteImage.name) return;
+            }
+            else {
+                return;
+            }
+
+            RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)texturePaletteImage.transform, Input.mousePosition, Camera.main, out Vector2 pointOnPallete);
+
+            var x = Mathf.Floor(pointOnPallete.x);
+            var y = Mathf.Floor(pointOnPallete.y);
+
+            if (startUVDragX == -1) {
+                startUVDragX = x;
+                startUVDragY = y;
+            }
+
+            TextureEditMode.AddTileStateCounterAction();
+            textureLines.SetUVs((int)x, (int)y, (int)startUVDragX, (int)startUVDragY);
+            textureLines.Refresh();
+
+        }
+        else {
+
+            startUVDragX = -1;
+            startUVDragY = -1;
+
+        }
+
     }
 
     void OnDestroy() {
 
         transparentMapper.GarbageCollectDrawCounterActions();
+
+    }
+
+    public void ApplyCurrentDataToTile(Tile tile) {
+
+        var newUvs = new List<int>();
+        foreach (var point in textureLines.points) {
+
+            newUvs.Add(TextureCoordinate.SetPixel((int)point.transform.localPosition.x, (int)point.transform.localPosition.y));
+
+        }
+
+        if (tile.uvs.Count == newUvs.Count) {
+            tile.uvs = newUvs;
+        }
+        else if (tile.uvs.Count < newUvs.Count) {
+            tile.uvs = newUvs.GetRange(0, tile.uvs.Count);
+        }
+        else {
+            return;
+        }
+
+        tile.texturePalette = bmpID;
 
     }
 
@@ -163,30 +249,15 @@ public class TextureUVMapper : MonoBehaviour {
 
         if (!controller.HasSelection) {
 
-            var bmpID = texturePaletteDropdown.GetComponent<TMP_Dropdown>().value;
+            bmpID = texturePaletteDropdown.GetComponent<TMP_Dropdown>().value;
 
             texturePaletteImage.GetComponent<Image>().sprite = controller.main.bmpTextures[bmpID];
 
             return;
         }
+        else {
 
-        var sameTexture = true;
-
-        // If multiple tiles are select this checks to see if they're all the same texture
-        bmpID = controller.FirstTile.texturePalette;
-        foreach (var selection in controller.selectedItems) {
-
-            if (bmpID != selection.tile.texturePalette) {
-                sameTexture = false;
-                bmpID = -1;
-                break;
-            }
-
-        }
-
-        if (sameTexture) {
-
-            var bmpID = controller.FirstTile.texturePalette;
+            bmpID = controller.FirstTile.texturePalette;
 
             texturePaletteDropdown.GetComponent<TMP_Dropdown>().value = bmpID;
 
@@ -474,7 +545,7 @@ public class TextureUVMapper : MonoBehaviour {
         int index = 1;
         foreach (var point in textureLines.points) {
 
-            var script = point.GetComponent<TextureCoordinatePoint>();
+            var script = point;
 
             if (index == oldPoints.Count) {
 
@@ -524,7 +595,7 @@ public class TextureUVMapper : MonoBehaviour {
 
             var vFlippedX = center - distanceFromCenter;
 
-            var script = point.GetComponent<TextureCoordinatePoint>();
+            var script = point;
 
             script.ChangePosition((int)(minX + vFlippedX), (int)point.transform.localPosition.y);
 
@@ -562,7 +633,7 @@ public class TextureUVMapper : MonoBehaviour {
 
             var vFlippedY = center - distanceFromCenter;
 
-            var script = point.GetComponent<TextureCoordinatePoint>();
+            var script = point;
 
             script.ChangePosition((int)point.transform.localPosition.x, (int)(minY + vFlippedY));
 
@@ -587,18 +658,18 @@ public class TextureUVMapper : MonoBehaviour {
         }
 
         if (textureLines.points.Count == 4) {
-            textureLines.points[0].GetComponent<TextureCoordinatePoint>()
+            textureLines.points[0]
                 .ChangePosition((int)oldPoints[3].x, (int)oldPoints[3].y);
-            textureLines.points[1].GetComponent<TextureCoordinatePoint>()
+            textureLines.points[1]
                 .ChangePosition((int)oldPoints[2].x, (int)oldPoints[2].y);
-            textureLines.points[2].GetComponent<TextureCoordinatePoint>()
+            textureLines.points[2]
                 .ChangePosition((int)oldPoints[1].x, (int)oldPoints[1].y);
-            textureLines.points[3].GetComponent<TextureCoordinatePoint>()
+            textureLines.points[3]
                 .ChangePosition((int)oldPoints[0].x, (int)oldPoints[0].y);
         } else {
-            textureLines.points[0].GetComponent<TextureCoordinatePoint>()
+            textureLines.points[0]
                 .ChangePosition((int)oldPoints[2].x, (int)oldPoints[2].y);
-            textureLines.points[2].GetComponent<TextureCoordinatePoint>()
+            textureLines.points[2]
                 .ChangePosition((int)oldPoints[0].x, (int)oldPoints[0].y);
         }
 
@@ -619,19 +690,19 @@ public class TextureUVMapper : MonoBehaviour {
         }
 
         if (textureLines.points.Count == 4) {
-            textureLines.points[0].GetComponent<TextureCoordinatePoint>()
+            textureLines.points[0]
                 .ChangePosition((int)oldPoints[1].x, (int)oldPoints[1].y);
-            textureLines.points[1].GetComponent<TextureCoordinatePoint>()
+            textureLines.points[1]
                 .ChangePosition((int)oldPoints[0].x, (int)oldPoints[0].y);
-            textureLines.points[2].GetComponent<TextureCoordinatePoint>()
+            textureLines.points[2]
                 .ChangePosition((int)oldPoints[3].x, (int)oldPoints[3].y);
-            textureLines.points[3].GetComponent<TextureCoordinatePoint>()
+            textureLines.points[3]
                 .ChangePosition((int)oldPoints[2].x, (int)oldPoints[2].y);
         }
         else {
-            textureLines.points[0].GetComponent<TextureCoordinatePoint>()
+            textureLines.points[0]
                 .ChangePosition((int)oldPoints[1].x, (int)oldPoints[1].y);
-            textureLines.points[1].GetComponent<TextureCoordinatePoint>()
+            textureLines.points[1]
                 .ChangePosition((int)oldPoints[0].x, (int)oldPoints[0].y);
         }
 
@@ -656,8 +727,8 @@ public class TextureUVMapper : MonoBehaviour {
         var secondPoint = textureLines.points[1].transform.localPosition;
         var thirdPoint = textureLines.points[2].transform.localPosition;
 
-        textureLines.points[1].GetComponent<TextureCoordinatePoint>().ChangePosition((int)thirdPoint.x, (int)thirdPoint.y);
-        textureLines.points[2].GetComponent<TextureCoordinatePoint>().ChangePosition((int)secondPoint.x, (int)secondPoint.y);
+        textureLines.points[1].ChangePosition((int)thirdPoint.x, (int)thirdPoint.y);
+        textureLines.points[2].ChangePosition((int)secondPoint.x, (int)secondPoint.y);
 
     }
 
@@ -674,7 +745,7 @@ public class TextureUVMapper : MonoBehaviour {
         int index = oldPoints.Count - 1;
         foreach (var point in textureLines.points) {
 
-            var script = point.GetComponent<TextureCoordinatePoint>();
+            var script = point;
 
             if (index == oldPoints.Count - 1) {
 

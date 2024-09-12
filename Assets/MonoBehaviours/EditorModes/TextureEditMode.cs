@@ -18,6 +18,8 @@ public class TextureEditMode : TileMutatingEditMode {
 
     public UVPresets currentUVPresets;
 
+    public bool mapperDrawing = false;
+
     public TextureEditMode(Main main) {
         this.main = main;
     }
@@ -34,7 +36,10 @@ public class TextureEditMode : TileMutatingEditMode {
 
     override public void Update() {
 
-        if (Controls.OnDown("Select")) {
+        if (mapperDrawing) {
+            TestPaintTileSelection();
+        }
+        else if (Controls.OnDown("Select")) {
 
             var selection = main.GetTileOnLevelMesh(!FreeMove.looking);
 
@@ -71,15 +76,15 @@ public class TextureEditMode : TileMutatingEditMode {
 
         if (Input.GetKeyDown(KeyCode.Alpha0)) {
 
-            foreach (var item in selectedItems) {
-                item.tile.MirrorUVsHorizontally();
-                RefreshMeshes();
-                RefreshTileOverlayTexture();
-                RefreshUVMapper();
-            }
+            StartDrawing();
 
         }
     
+    }
+
+    public void StartDrawing() {
+        mapperDrawing = true;
+        ClearAllSelectedItems();
     }
 
     #region Selection
@@ -352,6 +357,54 @@ public class TextureEditMode : TileMutatingEditMode {
 
     #region Model Mutating
 
+    void TestPaintTileSelection() {
+
+        if (FreeMove.looking) {
+            return;
+        }
+
+        var hover = main.GetTileOnLevelMesh();
+
+        if (hover == null) {
+            ClearPreviewOverlay();
+            return;
+        }
+
+        var mapperObj = view.activeTextureUVMapper;
+
+        if (mapperObj == null) {
+            return;
+        }
+
+        var mapper = mapperObj.GetComponent<TextureUVMapper>();
+
+        void PaintTile() {
+
+            var tile = hover.tile;
+
+            mapper.ApplyCurrentDataToTile(tile);
+
+        }
+
+        if (Controls.IsDown("Select")) {
+
+            AddNonSelectiveTileStateOrTileStateCounterAction(hover);
+
+            PaintTile();
+            ClearAllSelectedItems();
+            selectedSections.Add(hover.section);
+            RefreshMeshes();
+            return;
+
+        }
+        else {
+            PreviewSelection(hover);
+        }
+
+        return;
+
+    }
+
     public void ChangeTexturePallette(int palletteOffset) {
 
         foreach (var selection in selectedItems) {
@@ -574,6 +627,35 @@ public class TextureEditMode : TileMutatingEditMode {
 
     }
 
+    public static void AddNonSelectiveTileStateOrTileStateCounterAction(TileSelection item) {
+
+        if (Main.counterActionAddedOnCurrentSelectHold) {
+
+            var last = Main.counterActions.Last();
+
+            var tileCounterAction = (NonSelectiveMultiTileSaveStateCounterAction)last;
+
+            tileCounterAction.AddTileSaveState(item);
+
+        }
+        else {
+
+            // No need to refresh meshes as the class already does that.
+            Main.AddCounterAction(new NonSelectiveMultiTileSaveStateCounterAction(item, () => {
+
+                if (Main.editMode is not ShaderEditMode) {
+                    return;
+                }
+
+                var editMode = (TextureEditMode)Main.editMode;
+
+                editMode.RefeshTileOverlay();
+
+            }));
+
+        }
+
+    }
 
     #endregion
 
