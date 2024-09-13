@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using static System.Collections.Specialized.BitVector32;
 
 public class Main : MonoBehaviour {
@@ -15,6 +16,7 @@ public class Main : MonoBehaviour {
     public static bool ignoreAllInputs = false;
     public static bool debug = false;
     public bool isEscMenuOpen = false;
+    public static float uiScaleFactor = 1f;
 
     // Undos
     public static List<CounterAction> counterActions = new();
@@ -64,7 +66,6 @@ public class Main : MonoBehaviour {
 
     }
 
-
     public GameObject meshSection;
     public GameObject litMeshSection;
     public GameObject heightMapChannelPoint;
@@ -92,6 +93,7 @@ public class Main : MonoBehaviour {
 
     // - View Refs -
     public GameObject canvas;
+    public CanvasScaler uiScaler;
     public GameObject mainCamera;
     public Light worldLight;
 
@@ -161,6 +163,9 @@ public class Main : MonoBehaviour {
         if (!(Controls.IsDown("Select") && Input.GetMouseButton(0))) {
             counterActionAddedOnCurrentSelectHold = false;
         }
+
+        // Temp
+        uiScaleFactor = uiScaler.scaleFactor;
 
     }
 
@@ -245,6 +250,10 @@ public class Main : MonoBehaviour {
 
     public void EnableMainCamera() {
         mainCamera.SetActive(true);
+    }
+
+    public Vector3 WorldToScreenPointScaled(Vector3 worldPoint) {
+        return Camera.main.WorldToScreenPoint(worldPoint) / uiScaler.scaleFactor;
     }
 
     public void RefreshLevel() {

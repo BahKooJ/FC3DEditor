@@ -59,8 +59,8 @@ public class TextureUVMapper : MonoBehaviour {
 
     void ScaleToScreen() {
 
-        var screenWidth = Screen.width * 0.40f;
-        var screenHeight = Screen.height * 0.80f;
+        var screenWidth = (Screen.width / Main.uiScaleFactor) * 0.40f;
+        var screenHeight = (Screen.height / Main.uiScaleFactor) * 0.80f;
 
         var multiplierWidth = screenWidth / ((RectTransform)transform).rect.width;
 

@@ -7,7 +7,7 @@ public class InfoPopUpView : MonoBehaviour {
 
     void Update() {
         
-        ((RectTransform)transform).anchoredPosition = Input.mousePosition;
+        ((RectTransform)transform).anchoredPosition = Input.mousePosition / Main.uiScaleFactor;
 
 
     }

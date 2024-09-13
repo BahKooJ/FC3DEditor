@@ -205,7 +205,7 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
         if (dragField != null) {
             dragField.field.text = heightPoints.GetTruePoint(channel).ToString();
-            ((RectTransform)dragField.transform).anchoredPosition = Camera.main.WorldToScreenPoint(transform.position);
+            ((RectTransform)dragField.transform).anchoredPosition = controller.main.WorldToScreenPointScaled(transform.position);
         }
 
     }

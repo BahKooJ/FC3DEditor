@@ -48,3 +48,4 @@ Inputs = {
 RenderMode = "Pixelated";
 MouseSensitivity = "3";
 FOV = "90";
+Scaling = "1";

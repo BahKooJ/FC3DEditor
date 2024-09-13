@@ -2532,9 +2532,11 @@ MonoBehaviour:
   escMenuPrefab: {fileID: 2543452746665536543, guid: 0b1cfcc4ead36d44cbd2aa5e5fd5b8cc, type: 3}
   boundsPrefab: {fileID: 2168547336867362444, guid: 9ea2ba9bd14a6d84f92bbce323964dbf, type: 3}
   canvas: {fileID: 494504592}
+  uiScaler: {fileID: 494504594}
   mainCamera: {fileID: 963194225}
   worldLight: {fileID: 288404031}
   tileEffectTexture: {fileID: 2800000, guid: ca11707c759caf54ca3cfd588e4f12a9, type: 3}
+  toolbar: {fileID: 0}
   sectionMeshes: []
   levelTexturePallet: {fileID: 0}
   bmpTextures: []

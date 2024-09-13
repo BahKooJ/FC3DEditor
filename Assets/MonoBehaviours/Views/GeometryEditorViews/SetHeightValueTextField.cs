@@ -21,7 +21,7 @@ class SetHeightValueTextField: MonoBehaviour {
 
         field.text = selelctedHeightObject.heightPoints.GetTruePoint(selelctedHeightObject.channel).ToString();
 
-        ((RectTransform)transform).anchoredPosition = Camera.main.WorldToScreenPoint(selelctedHeightObject.transform.position);
+        ((RectTransform)transform).anchoredPosition = controller.main.WorldToScreenPointScaled(selelctedHeightObject.transform.position);
 
     }
 
