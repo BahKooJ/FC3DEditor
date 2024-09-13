@@ -41,6 +41,7 @@ Inputs = {
 "PaintTool":"1" "T"
 "ApplyColorOnClick":"1" "G"
 "SwitchPresets":"1" "B"
+"MovePresetToNextChannels":"1" "#1"
 "ResetLevelSchematic":"1" "R"
 "EnableRotateLevelSchematic":"1" "T"
 "EnableMirrorLevelSchematic":"1" "G"

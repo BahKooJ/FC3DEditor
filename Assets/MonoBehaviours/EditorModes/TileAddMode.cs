@@ -123,6 +123,27 @@ public class TileAddMode : EditMode {
 
             }
 
+            float axis = Input.GetAxis("Mouse ScrollWheel");
+
+            if (axis > 0) {
+
+                selectedSchematic.transformedSchematic ??= selectedSchematic.Clone();
+
+                selectedSchematic.transformedSchematic.RotateClockwise();
+                schematicBuildOverlay.RefreshPreviewColumns();
+                schematicBuildOverlay.RefreshMesh();
+
+            }
+            else if (axis < 0) {
+
+                selectedSchematic.transformedSchematic ??= selectedSchematic.Clone();
+
+                selectedSchematic.transformedSchematic.RotateCounterClockwise();
+                schematicBuildOverlay.RefreshPreviewColumns();
+                schematicBuildOverlay.RefreshMesh();
+
+            }
+
             if (Controls.IsDown("EnableRotateLevelSchematic")) {
 
                 if (Input.GetMouseButtonDown(0)) {
@@ -187,7 +208,7 @@ public class TileAddMode : EditMode {
                 RefreshTilePlacementOverlay();
             }
 
-            if (Input.GetMouseButtonDown(1)) {
+            if (Controls.OnDown("MovePresetToNextChannels")) {
                 selectedTilePreset.MoveHeightChannelsToNextChannel();
                 RefreshTilePlacementOverlay();
             }
