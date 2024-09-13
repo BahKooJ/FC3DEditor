@@ -1,10 +1,14 @@
 ﻿
 using System;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SettingsView : MonoBehaviour {
+
+    static float width = 1260f;
+    static float height = 600f;
 
     // View refs
     public TMP_Dropdown renderTypeDropdown;
@@ -12,6 +16,8 @@ public class SettingsView : MonoBehaviour {
     public TMP_InputField mouseSensInput;
     public Slider fovSlider;
     public TMP_InputField fovInput;
+    public Slider uiScaleSlider;
+    public TMP_InputField uiScaleInput;
 
     public FileManagerMain main;
 
@@ -24,7 +30,54 @@ public class SettingsView : MonoBehaviour {
         mouseSensInput.text = SettingsManager.mouseSensitivity.ToString();
         fovSlider.value = SettingsManager.fov;
         fovInput.text = SettingsManager.fov.ToString();
+        uiScaleSlider.value = SettingsManager.uiScale;
+        uiScaleInput.text = SettingsManager.uiScale.ToString();
         refuseCallbacks = false;
+
+        Resize();
+
+        preScreenWidth = Screen.width;
+        preScreenHeight = Screen.height;
+
+
+    }
+
+    float preScreenWidth = 0f;
+    float preScreenHeight = 0f;
+
+    public void Update() {
+
+        if (preScreenWidth != Screen.width || preScreenHeight != Screen.height) {
+            Resize();
+            preScreenWidth = Screen.width;
+            preScreenHeight = Screen.height;
+        }
+
+    }
+
+    void Resize() {
+
+        if (main == null) {
+
+            var widthScale = (Screen.width / Main.uiScaleFactor) / width;
+
+            var rectTrans = (RectTransform)transform;
+
+            transform.localScale = new Vector3(widthScale, widthScale, 1);
+            rectTrans.sizeDelta = new Vector2(width, (Screen.height / Main.uiScaleFactor) / widthScale);
+
+        }
+        else {
+
+            var widthScale = Screen.width / width;
+
+            var rectTrans = (RectTransform)transform;
+
+            transform.localScale = new Vector3(widthScale, widthScale, 1);
+            rectTrans.sizeDelta = new Vector2(width, Screen.height / widthScale);
+
+        }
+
     }
 
     public void OnClickDone() {
@@ -107,6 +160,39 @@ public class SettingsView : MonoBehaviour {
         } catch {
 
             OnChangeFOVSlider();
+
+        }
+
+    }
+
+    public void OnChangeUIScaleSlider() {
+
+        if (refuseCallbacks) { return; }
+
+        var sliderValue = uiScaleSlider.value;
+
+        sliderValue = (float)Math.Round(sliderValue, 2);
+
+        SettingsManager.uiScale = sliderValue;
+        uiScaleInput.text = sliderValue.ToString();
+
+    }
+
+    public void OnFinishUIScaleType() {
+
+        if (refuseCallbacks) { return; }
+
+        try {
+
+            var value = Single.Parse(uiScaleInput.text);
+
+            SettingsManager.uiScale = value;
+            uiScaleSlider.value = value;
+
+        }
+        catch {
+
+            OnChangeUIScaleSlider();
 
         }
 

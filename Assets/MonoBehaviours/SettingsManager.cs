@@ -10,6 +10,7 @@ public abstract class SettingsManager {
     public static Dictionary<string, string[]> keyBinds = new();
     public static float mouseSensitivity = 3f;
     public static float fov = 90f;
+    public static float uiScale = 1f;
     public static RenderType renderMode = RenderType.Smooth;
     public static bool showShaders = true;
     public static bool showTransparency = true;
@@ -70,6 +71,9 @@ public abstract class SettingsManager {
                 }
                 if (property == "FOV") {
                     fov = Single.Parse(values[0]);
+                }
+                if (property == "Scaling") {
+                    uiScale = Single.Parse(values[0]);
                 }
 
             }
@@ -157,7 +161,8 @@ public abstract class SettingsManager {
 
         total += "RenderMode = \"" + renderMode.ToString() + "\";\n";
         total += "MouseSensitivity = \"" + mouseSensitivity.ToString() + "\";\n";
-        total += "FOV = \"" + fov.ToString() + "\";";
+        total += "FOV = \"" + fov.ToString() + "\";\n";
+        total += "Scaling = \"" + uiScale.ToString() + "\";";
 
         File.WriteAllText("Settings.txt", total);
 

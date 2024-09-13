@@ -177,6 +177,9 @@ public class Main : MonoBehaviour {
             trans.GetComponent<Camera>().fieldOfView = SettingsManager.fov;
         }
 
+        uiScaler.scaleFactor = SettingsManager.uiScale;
+        uiScaleFactor = SettingsManager.uiScale;
+
     }
 
     public void Undo() {

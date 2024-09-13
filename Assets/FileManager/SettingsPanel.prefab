@@ -9931,7 +9931,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 93472614624226799}
         m_TargetAssemblyTypeName: SettingsView, Assembly-CSharp
-        m_MethodName: OnFinishFOVType
+        m_MethodName: OnFinishUIScaleType
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -16180,7 +16180,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 93472614624226799}
         m_TargetAssemblyTypeName: SettingsView, Assembly-CSharp
-        m_MethodName: OnChangeFOVSlider
+        m_MethodName: OnChangeUIScaleSlider
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -16226,9 +16226,9 @@ RectTransform:
   m_Father: {fileID: 9103961765646916840}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0.5}
-  m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -32, y: 249}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -32, y: -70}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &3185682094688240454
@@ -26841,10 +26841,10 @@ RectTransform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 1260, y: 600}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9103961765646916854
 CanvasRenderer:
@@ -26901,6 +26901,8 @@ MonoBehaviour:
   mouseSensInput: {fileID: 182740032719144757}
   fovSlider: {fileID: 9097051743190583580}
   fovInput: {fileID: 3492243669168526480}
+  uiScaleSlider: {fileID: 7454232426878041679}
+  uiScaleInput: {fileID: 4189158187434407360}
   main: {fileID: 0}
 --- !u!1 &9103961765892331233
 GameObject:
@@ -27149,7 +27151,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 9103961764855629104}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.4445993
+  m_Size: 0.41811848
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
