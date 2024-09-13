@@ -3,9 +3,7 @@
 using FCopParser;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Presets;
 using UnityEngine;
-using static UnityEditor.Progress;
 using Object = UnityEngine.Object;
 
 public class TileEditMode : TileMutatingEditMode, EditMode {

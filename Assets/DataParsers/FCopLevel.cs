@@ -636,6 +636,8 @@ namespace FCopParser {
 
                                 tileUVAnimationMetaData.Add(tile.CompileFrameAnimation(animatedTextureCoordinates.Count * 2, textureCoordinates.Count * 2));
                                 animatedTextureCoordinates.AddRange(tile.animatedUVs);
+                                // Re-reverses so it remains in the correct order after compile
+                                tile.ReverseAnimatedFrames();
 
                             }
 
@@ -1848,6 +1850,8 @@ namespace FCopParser {
 
                     animatedUVs.AddRange(frameUVs);
 
+                    ReverseAnimatedFrames();
+
                     break;
                 }
 
@@ -1991,6 +1995,20 @@ namespace FCopParser {
             return animatedUVs.Count > 0;
         }
 
+        public void ReverseAnimatedFrames() {
+
+            var newOrderedFrames = new List<int>();
+
+            var i = GetFrameCount() - 1;
+            foreach (var _ in Enumerable.Range(0, GetFrameCount())) {
+                newOrderedFrames.AddRange(animatedUVs.GetRange(i * 4, 4));
+                i--;
+            }
+
+            animatedUVs = newOrderedFrames;
+
+        }
+
         public void ChangeShader(VertexColorType type) {
 
             switch (type) {
@@ -2090,6 +2108,7 @@ namespace FCopParser {
         }
 
         public TileUVAnimationMetaData CompileFrameAnimation(int animationOffset, int textureReplaceOffset) {
+            ReverseAnimatedFrames();
             var metaData = new TileUVAnimationMetaData(GetFrameCount(), 9, animationSpeed, animationOffset, textureReplaceOffset);
             uvAnimationData = metaData;
             return metaData;
