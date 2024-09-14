@@ -12,6 +12,25 @@ namespace FCopParser {
         public List<ActorNode> behaviorGroupedActors;
         public List<ActorNode> scriptingGroupedActors;
 
+        public FCopSceneActors(List<FCopActor> actors) {
+            this.actors = actors;
+        }
+
+        public void DeleteActor(FCopActor actor) {
+
+            actors.Remove(actor);
+
+            // TODO: Forgot this was a thing tbh, though I think it's better to remove the actual raw file.
+            actor.rawFile.ignore = true;
+
+        }
+
+        public void Compile() {
+            foreach (var actor in actors) {
+                actor.Compile();
+            }
+        }
+
     }
 
     public class ActorNode {

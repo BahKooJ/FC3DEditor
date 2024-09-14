@@ -24,7 +24,7 @@ namespace FCopParser {
 
         public FCopScriptingProject scripting;
 
-        public List<FCopActor> actors = new();
+        public FCopSceneActors sceneActors;
 
         public IFFFileManager fileManager;
 
@@ -119,9 +119,11 @@ namespace FCopParser {
                 objects.Add(new FCopObject(rawFile));
             }
 
+            List<FCopActor> actors = new();
             foreach (var rawFile in rawActorFiles) {
                 actors.Add(new FCopActor(rawFile));
             }
+            sceneActors = new FCopSceneActors(actors);
 
             soundEffects = new FCopSoundEffectParser(rawCwavs, rawCshd);
 
@@ -215,9 +217,7 @@ namespace FCopParser {
                 texture.Compile();
             }
 
-            foreach (var actor in actors) {
-                actor.Compile();
-            }
+            sceneActors.Compile();
 
             List<List<int>> layout = new() { new() };
 

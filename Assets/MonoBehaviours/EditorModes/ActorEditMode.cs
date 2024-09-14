@@ -33,7 +33,7 @@ public class ActorEditMode : EditMode {
 
         }
 
-        foreach (var actor in main.level.actors) {
+        foreach (var actor in main.level.sceneActors.actors) {
 
             var nodeObject = Object.Instantiate(main.BlankActor);
 
@@ -177,10 +177,9 @@ public class ActorEditMode : EditMode {
 
         var actorObject = selectedActorObject.controlledObject.GetComponent<ActorObject>();
 
-        main.level.actors.Remove(actorObject.actor);
+        main.level.sceneActors.DeleteActor(actorObject.actor);
 
         actors.Remove(actorObject);
-        actorObject.actor.rawFile.ignore = true;
 
         Object.Destroy(actorObject.gameObject);
 
