@@ -1,6 +1,7 @@
 ﻿
 using FCopParser;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -10,7 +11,7 @@ public class ActorEditMode : EditMode {
 
     public ActorEditPanelView view;
 
-    List<ActorObject> actors = new();
+    List<ActorObject> actorObjects = new();
 
     public AxisControl selectedActorObject = null;
     public FCopActor selectedActor = null;
@@ -29,7 +30,7 @@ public class ActorEditMode : EditMode {
 
             script.controller = this;
 
-            actors.Add(script);
+            actorObjects.Add(script);
 
         }
 
@@ -47,11 +48,11 @@ public class ActorEditMode : EditMode {
 
         UnselectActor();
 
-        foreach (var actor in actors) {
+        foreach (var actor in actorObjects) {
             Object.Destroy(actor.gameObject);
         }
 
-        actors.Clear();
+        actorObjects.Clear();
 
         view.CloseActorPorpertiesView();
 
@@ -87,7 +88,7 @@ public class ActorEditMode : EditMode {
 
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, 8)) {
 
-                foreach (var act in actors) {
+                foreach (var act in actorObjects) {
 
                     var didHit = false;
 
@@ -158,6 +159,24 @@ public class ActorEditMode : EditMode {
 
     }
 
+    public void SelectActorByID(int id) {
+
+        var actorObj = actorObjects.First(obj => obj.actor.DataID == id);
+
+        SelectActor(actorObj);
+
+    }
+
+    public void MoveToActor(int id) {
+
+        var actorObj = actorObjects.First(obj => obj.actor.DataID == id);
+
+        Camera.main.transform.position = actorObj.transform.position;
+
+        Camera.main.transform.position = Camera.main.transform.position + (Camera.main.transform.forward * -4);
+
+    }
+
     public void UnselectActor() {
 
         if (selectedActorObject != null) {
@@ -179,7 +198,7 @@ public class ActorEditMode : EditMode {
 
         main.level.sceneActors.DeleteActor(actorObject.actor);
 
-        actors.Remove(actorObject);
+        actorObjects.Remove(actorObject);
 
         Object.Destroy(actorObject.gameObject);
 

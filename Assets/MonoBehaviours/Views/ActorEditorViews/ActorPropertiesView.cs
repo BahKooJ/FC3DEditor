@@ -17,10 +17,14 @@ public class ActorPropertiesView : MonoBehaviour {
     public TMP_Text actorName;
     public TMP_Text idText;
     public TMP_Text actorTypeText;
+    public SceneActorsView sceneActorsView;
 
     public ActorEditMode controller;
 
     void Start() {
+
+        sceneActorsView.level = controller.main.level;
+        sceneActorsView.controller = controller;
 
         Refresh();
 
