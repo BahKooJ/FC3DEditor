@@ -14,6 +14,7 @@ public class ActorPropertiesView : MonoBehaviour {
 
     //View refs
     public Transform propertiesContent;
+    public TMP_Text actorName;
     public TMP_Text idText;
     public TMP_Text actorTypeText;
 
@@ -31,6 +32,7 @@ public class ActorPropertiesView : MonoBehaviour {
             Destroy(transform.gameObject);
         }
 
+        actorName.text = controller.selectedActor.name;
         idText.text = controller.selectedActor.id.ToString();
         actorTypeText.text = controller.selectedActor.actorType.ToString();
 

@@ -48,11 +48,20 @@ namespace FCopParser {
 
         public FCopActorBehavior behavior;
 
+        // Should this be a FCopAsset?
         public IFFDataFile rawFile;
+        public string name;
+
+        public int DataID {
+            get { return rawFile.dataID; }
+            set { rawFile.dataID = value; }
+        }
 
         public FCopActor(IFFDataFile rawFile) {
 
             this.rawFile = rawFile;
+
+            name = "Actor " + DataID;
 
             FindStartChunkOffset();
 
@@ -136,7 +145,6 @@ namespace FCopParser {
             }
 
         }
-
 
         void FindStartChunkOffset() {
 

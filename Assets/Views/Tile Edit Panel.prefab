@@ -98,6 +98,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileEffectsView: {fileID: 7047743489705887717, guid: 1f7dacc689d7a7543aeb9fee0978a992, type: 3}
+  tileSplitLinePrefab: {fileID: 2502991066385139686, guid: 8a750f69ee090be479f6a785109e330b, type: 3}
   debugTilePanel: {fileID: 8481524618504945480, guid: 0f9332c8bd146cb45b2ff6ca0bb002e6, type: 3}
   debugTilePanelView: {fileID: 0}
   activeTileEffectsView: {fileID: 0}
@@ -115,7 +116,7 @@ GameObject:
   - component: {fileID: 7413371786176554038}
   - component: {fileID: 153314439804728175}
   m_Layer: 6
-  m_Name: Break Apart Tile Top Bottom Button (1)
+  m_Name: Extrude Tile Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -262,6 +263,7 @@ GameObject:
   - component: {fileID: 6995580990557341291}
   - component: {fileID: 3782276952297119444}
   - component: {fileID: 923755234800328594}
+  - component: {fileID: 8512579700559404473}
   m_Layer: 6
   m_Name: Break Apart Tile Top Bottom Button
   m_TagString: Untagged
@@ -397,6 +399,48 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
   message: Break Apart Quad Tile (Top Left to Bottom Right))
+--- !u!114 &8512579700559404473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973572647999136260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c353f5b7a54526542a546aa4edfca87f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnEnter:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1508618424895006350}
+        m_TargetAssemblyTypeName: TileEditPanel, Assembly-CSharp
+        m_MethodName: OnHoverBreakApartQuadTileTopBottom
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnExit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1508618424895006350}
+        m_TargetAssemblyTypeName: TileEditPanel, Assembly-CSharp
+        m_MethodName: OnEndHoverBreakApartQuadTileTopBottom
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &2686127706274976177
 GameObject:
   m_ObjectHideFlags: 0
@@ -706,6 +750,7 @@ GameObject:
   - component: {fileID: 1443596977907192910}
   - component: {fileID: 2570471842245807125}
   - component: {fileID: 6274409119095278929}
+  - component: {fileID: 7361181467499334443}
   m_Layer: 6
   m_Name: Break Apart Tile Bottom Top Button
   m_TagString: Untagged
@@ -841,6 +886,48 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
   message: Break Apart Quad Tile (Bottom Left to Top Right)
+--- !u!114 &7361181467499334443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3119995544101519493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c353f5b7a54526542a546aa4edfca87f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnEnter:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1508618424895006350}
+        m_TargetAssemblyTypeName: TileEditPanel, Assembly-CSharp
+        m_MethodName: OnHoverBreakApartQuadTileBottomTop
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnExit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1508618424895006350}
+        m_TargetAssemblyTypeName: TileEditPanel, Assembly-CSharp
+        m_MethodName: OnEndHoverBreakApartQuadTileBottomTop
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &3424647163011449828
 GameObject:
   m_ObjectHideFlags: 0
