@@ -2525,6 +2525,7 @@ MonoBehaviour:
   schematicMesh: {fileID: 8880727385032815715, guid: c707b823d86afb840b8711c3b2f06131, type: 3}
   BlankActor: {fileID: 1640186847095666650, guid: 49bee21158884a8459dfdc42e65ffd06, type: 3}
   ObjectMesh: {fileID: 3982175839306991789, guid: 8d9aa84093398e5458aa180203865e97, type: 3}
+  actorGroupObjectFab: {fileID: 7382528864980433952, guid: 8495c4d72b0fa3e46abae712537dd032, type: 3}
   playerCamera: {fileID: 3980026059195325994, guid: fd18efa683a2f574cb71981049afecfd, type: 3}
   playModePlayer: {fileID: 7944998007720351482, guid: 810a6bf8ff8a94f42b989355eae1738a, type: 3}
   line3d: {fileID: 2980094452611837016, guid: 8dd5e36aa455bea41b061af29dbf9f7d, type: 3}

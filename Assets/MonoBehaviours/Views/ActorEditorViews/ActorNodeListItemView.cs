@@ -60,10 +60,10 @@ public class ActorNodeListItemView : MonoBehaviour {
 
         if (actor != null) {
 
-            view.controller.SelectActorByID(actor.DataID);
+            view.controller.SelectActorByID(actor.DataID, true);
 
             if (clickTimer != 0) {
-                view.controller.MoveToActor(actor.DataID);
+                view.controller.MoveToActor(actor.DataID, true);
             }
 
             clickTimer = 30;
@@ -74,10 +74,10 @@ public class ActorNodeListItemView : MonoBehaviour {
 
         if (node.nestedActors.Count == 1 && !forceGroup) {
 
-            view.controller.SelectActorByID(node.nestedActors[0].DataID);
+            view.controller.SelectActorByID(node.nestedActors[0].DataID, false);
 
             if (clickTimer != 0) {
-                view.controller.MoveToActor(node.nestedActors[0].DataID);
+                view.controller.MoveToActor(node.nestedActors[0].DataID, false);
             }
 
         }

@@ -12,6 +12,8 @@ public class ActorEditMode : EditMode {
     public ActorEditPanelView view;
 
     List<ActorObject> actorObjects = new();
+    List<ActorGroupObject> actorGroupObjects = new();
+
 
     public AxisControl selectedActorObject = null;
     public FCopActor selectedActor = null;
@@ -24,21 +26,57 @@ public class ActorEditMode : EditMode {
 
     public void OnCreateMode() {
 
-        void CreateActor(FCopActor actor, ActorObject script) {
-
-            script.actor = actor;
-
-            script.controller = this;
-
-            actorObjects.Add(script);
-
-        }
-
-        foreach (var actor in main.level.sceneActors.actors) {
+        ActorObject CreateActor(FCopActor actor, ActorGroupObject group = null) {
 
             var nodeObject = Object.Instantiate(main.BlankActor);
 
-            CreateActor(actor, nodeObject.GetComponent<ActorObject>());
+            var script = nodeObject.GetComponent<ActorObject>();
+
+            script.actor = actor;
+            script.controller = this;
+            script.group = group;
+
+            script.Create();
+
+            return script;
+
+        }
+
+        void CreateGroup(List<FCopActor> actors) {
+
+            var groupObj = Object.Instantiate(main.actorGroupObjectFab);
+
+            var script = groupObj.GetComponent<ActorGroupObject>();
+            script.controller = this;
+
+            foreach (var actor in actors) {
+
+                var createdActObj = CreateActor(actor, script);
+                
+                createdActObj.transform.SetParent(script.transform, false);
+
+                script.actObjects.Add(createdActObj);
+
+            }
+
+            script.Init();
+
+            actorGroupObjects.Add(script);
+
+        }
+
+        foreach (var node in main.level.sceneActors.positionalGroupedActors) {
+
+            if (node.Value.nestedActors.Count == 1) {
+
+                actorObjects.Add(CreateActor(node.Value.nestedActors[0]));
+
+            }
+            else {
+
+                CreateGroup(node.Value.nestedActors);
+
+            }
 
         }
         
@@ -83,11 +121,9 @@ public class ActorEditMode : EditMode {
 
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            RaycastHit hit;
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, 8)) {
 
-
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, 8)) {
-
+                // This is why groups can't be selected
                 foreach (var act in actorObjects) {
 
                     var didHit = false;
@@ -99,7 +135,8 @@ public class ActorEditMode : EditMode {
                             didHit = true;
                         }
 
-                    } else {
+                    }
+                    else {
 
                         foreach (var obj in act.objects) {
 
@@ -139,14 +176,30 @@ public class ActorEditMode : EditMode {
         var axisControl = Object.Instantiate(main.axisControl);
         var script = axisControl.GetComponent<AxisControl>();
 
-        script.controlledObject = actorObject.gameObject;
+        if (actorObject.group != null) {
 
-        script.moveCallback = (newPos) => {
+            script.controlledObject = actorObject.group.gameObject;
 
-            actorObject.ChangePosition(newPos);
+            script.moveCallback = (newPos) => {
 
-            return true;
-        };
+                actorObject.group.ChangePosition(newPos);
+
+                return true;
+            };
+
+        }
+        else {
+
+            script.controlledObject = actorObject.gameObject;
+
+            script.moveCallback = (newPos) => {
+
+                actorObject.ChangePosition(newPos);
+
+                return true;
+            };
+
+        }
 
         selectedActorObject = script;
         selectedActor = actorObject.actor;
@@ -159,7 +212,32 @@ public class ActorEditMode : EditMode {
 
     }
 
-    public void SelectActorByID(int id) {
+    public void SelectActorByID(int id, bool insideGroup) {
+
+        if (insideGroup) {
+
+            var i = 0;
+
+            var actorObjG = actorGroupObjects.First(group => { 
+
+                foreach (var act in group.actObjects) {
+
+                    if (act.actor.DataID == id) {
+                        return true;
+                    }
+                    i++;
+                }
+
+                i = 0;
+                return false;
+            
+            });
+
+            SelectActor(actorObjG.actObjects[i]);
+
+            return;
+
+        }
 
         var actorObj = actorObjects.First(obj => obj.actor.DataID == id);
 
@@ -167,9 +245,38 @@ public class ActorEditMode : EditMode {
 
     }
 
-    public void MoveToActor(int id) {
+    public void MoveToActor(int id, bool insideGroup) {
 
-        var actorObj = actorObjects.First(obj => obj.actor.DataID == id);
+        ActorObject actorObj;
+
+        if (insideGroup) {
+
+            var i = 0;
+
+            var actorObjG = actorGroupObjects.First(group => {
+
+                foreach (var act in group.actObjects) {
+
+                    if (act.actor.DataID == id) {
+                        return true;
+                    }
+                    i++;
+                }
+
+                i = 0;
+                return false;
+
+            });
+
+            actorObj = actorObjG.actObjects[i];
+
+        }
+        else {
+
+            actorObj = actorObjects.First(obj => obj.actor.DataID == id);
+
+        }
+
 
         Camera.main.transform.position = actorObj.transform.position;
 

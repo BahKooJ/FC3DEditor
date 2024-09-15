@@ -7,11 +7,15 @@ using UnityEngine;
 
 public class ActorObject : MonoBehaviour {
 
+
+
+    // - Unity Refs -
     public Collider actCollider;
 
-    public EditMode controller;
-
+    // - Parameters -
+    public ActorEditMode controller;
     public FCopActor actor;
+    public ActorGroupObject group = null;
 
     public List<ObjectMesh> objects = new();
 
@@ -168,12 +172,6 @@ public class ActorObject : MonoBehaviour {
                 return 0;
         }
     
-    }
-
-    void Start() {
-
-        Create();
-
     }
 
 }
