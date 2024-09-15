@@ -7,7 +7,7 @@ using System.Text;
 
 namespace FCopParser {
 
-    public class FCopActor {
+    public class FCopActor : FCopAsset {
 
         public static class FourCC {
 
@@ -47,19 +47,7 @@ namespace FCopParser {
         public List<FCopResource> resourceReferences = new();
 
         public FCopActorBehavior behavior;
-
-        // Should this be a FCopAsset?
-        public IFFDataFile rawFile;
-        public string name;
-
-        public int DataID {
-            get { return rawFile.dataID; }
-            set { rawFile.dataID = value; }
-        }
-
-        public FCopActor(IFFDataFile rawFile) {
-
-            this.rawFile = rawFile;
+        public FCopActor(IFFDataFile rawFile): base(rawFile) {
 
             name = "Actor " + DataID;
 
@@ -443,7 +431,6 @@ namespace FCopParser {
     }
 
     public class FCopBehavior36 : FCopActorBehavior {
-
 
         public FCopActor actor { get; set; }
         public List<ActorProperty> properties { get; set; }

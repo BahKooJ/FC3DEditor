@@ -266,19 +266,6 @@ namespace FCopParser {
                 layout[row].Add(0);
             }
 
-            //var message = "";
-
-            //foreach (var row2 in layout) {
-
-            //    foreach (var column in row2) {
-            //        message += " " + column.ToString();
-            //    }
-            //    message += "\n";
-            //}
-
-            // TEMP AHH BAD UNITY IN MODEL WEEE WOOOO WEEE WOOOO
-            //Debug.Log(message);
-
             FCopLevelLayoutParser.Compile(layout, fileManager.files.First(file => {
 
                 return file.dataFourCC == "Cptc";
@@ -370,6 +357,7 @@ namespace FCopParser {
 
         public List<HeightPoints> heightMap = new List<HeightPoints>();
         public List<TileColumn> tileColumns = new List<TileColumn>();
+        // This might be unused.
         List<XRGB555> colors = new List<XRGB555>();
         public AnimationVector animationVector;
         public List<byte> tileEffects;
