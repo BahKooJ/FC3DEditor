@@ -7,10 +7,9 @@ using UnityEngine;
 
 public class ActorObject : MonoBehaviour {
 
-
-
     // - Unity Refs -
     public Collider actCollider;
+    public TextFieldPopupHandler renameTextFeild;
 
     // - Parameters -
     public ActorEditMode controller;
@@ -18,6 +17,21 @@ public class ActorObject : MonoBehaviour {
     public ActorGroupObject group = null;
 
     public List<ObjectMesh> objects = new();
+
+    public List<(string, System.Action)> contextMenuItems = new();
+
+    private void Start() {
+
+        renameTextFeild.finishCallback = text => {
+            controller.RenameActor(actor, text);
+        };
+
+        contextMenuItems.Add(("Rename", () => { renameTextFeild.OpenPopupTextField(actor.name); }));
+        contextMenuItems.Add(("Group", () => { }));
+        contextMenuItems.Add(("Ungroup", () => { }));
+        contextMenuItems.Add(("Delete", () => { }));
+
+    }
 
     public void ChangePosition(Vector3 pos) {
 
@@ -37,7 +51,6 @@ public class ActorObject : MonoBehaviour {
         SetRotation();
 
     }
-
 
     public void Create() {
 

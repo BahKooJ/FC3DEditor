@@ -7,11 +7,12 @@ public class ActorEditPanelView : MonoBehaviour {
     //Prefabs
     public GameObject actorPropertiesView;
 
-    public GameObject activeActorPropertiesView = null;
+    public ActorPropertiesView activeActorPropertiesView;
 
     void Start() {
 
         controller.view = this;
+        OpenActorPropertiesView();
 
     }
 
@@ -28,11 +29,12 @@ public class ActorEditPanelView : MonoBehaviour {
         }
         else {
 
-            activeActorPropertiesView = Instantiate(actorPropertiesView);
+            var obj = Instantiate(actorPropertiesView);
 
-            activeActorPropertiesView.GetComponent<ActorPropertiesView>().controller = controller;
+            activeActorPropertiesView = obj.GetComponent<ActorPropertiesView>();
+            activeActorPropertiesView.controller = controller;
 
-            activeActorPropertiesView.transform.SetParent(transform.parent, false);
+            obj.transform.SetParent(transform.parent, false);
 
         }
 

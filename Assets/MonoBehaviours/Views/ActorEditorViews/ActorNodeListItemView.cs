@@ -15,7 +15,10 @@ public class ActorNodeListItemView : MonoBehaviour {
 
     // - Unity Refs -
     public TMP_Text nameText;
+    public TMP_InputField nameField;
+    public ContextMenuHandler contextMenu;
     public Image icon;
+    public Image background;
     public GameObject pad;
 
     // - Parameters -
@@ -25,15 +28,28 @@ public class ActorNodeListItemView : MonoBehaviour {
     public bool forceGroup = false;
 
     public List<ActorNodeListItemView> actorNodes = new();
+    public Dictionary<int, ActorNodeListItemView> actorNodesByID = null;
+
 
     int clickTimer = 0;
 
     private void Start() {
 
+        contextMenu.items = new() {
+            ("Rename", Rename)
+        };
+
         actorNodeListItemFab = view.actorNodeListItemFab;
 
-        if (node!= null ) {
-            nameText.text = node.name;
+        if (node != null) {
+
+            if (node.nestedActors.Count == 1) {
+                nameText.text = node.nestedActors[0].name;
+            }
+            else {
+                nameText.text = node.name;
+
+            }
 
             if (node.nestedActors.Count > 1 || forceGroup) {
                 icon.sprite = folderTexture;
@@ -46,6 +62,8 @@ public class ActorNodeListItemView : MonoBehaviour {
             pad.SetActive(true);
         }
 
+        RefreshSelection(true);
+
     }
 
     private void Update() {
@@ -56,14 +74,141 @@ public class ActorNodeListItemView : MonoBehaviour {
 
     }
 
+    public void RefreshName() {
+
+        if (node != null) {
+
+            if (node.nestedActors.Count == 1) {
+                nameText.text = node.nestedActors[0].name;
+            }
+            else {
+                nameText.text = node.name;
+
+            }
+        }
+        else {
+            nameText.text = actor.name;
+        }
+
+    }
+
+    public void RefreshSelection(bool jump) {
+
+        if (node != null) {
+
+            if (node.nestedActors.Count > 1) {
+                background.color = Main.mainColor;
+                return;
+            }
+
+        }
+
+        if (forceGroup) {
+            background.color = Main.mainColor;
+            return; 
+        }
+
+        if (view.controller.selectedActor != null) {
+
+            if (node != null) {
+
+                if (view.controller.selectedActor.DataID == node.nestedActors[0].DataID) {
+                    background.color = Main.selectedColor;
+
+                    if (jump) {
+                        JumpViewToListItem();
+                    }
+
+                    return;
+                }
+
+            }
+            else {
+
+                if (view.controller.selectedActor.DataID == actor.DataID) {
+                    background.color = Main.selectedColor;
+
+                    if (jump) {
+                        JumpViewToListItem();
+                    }
+
+                    return;
+                }
+
+            }
+
+        }
+
+        background.color = Main.mainColor;
+
+    }
+
+    void JumpViewToListItem() {
+
+        var normalizedPos = ((decimal)transform.GetSiblingIndex()) / ((decimal)transform.parent.childCount - 10);
+
+        view.contentScrollview.verticalNormalizedPosition = (float)(1 - normalizedPos);
+
+    }
+
+    void Rename() {
+
+        nameText.gameObject.SetActive(false);
+        nameField.gameObject.SetActive(true);
+
+        nameField.text = nameText.text;
+        nameField.Select();
+
+    }
+
+    public void OpenGroup() {
+
+        if (actorNodes.Count > 0) {
+
+            foreach (var actorNode in actorNodes) {
+                Destroy(actorNode.gameObject);
+            }
+
+            actorNodes.Clear();
+            actorNodesByID = null;
+
+        }
+        else {
+
+            actorNodesByID = new();
+
+            foreach (var actor in node.nestedActors) {
+
+                var obj = Instantiate(actorNodeListItemFab);
+                obj.transform.SetParent(view.listContent, false);
+
+
+                obj.transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
+
+                var nodeListItem = obj.GetComponent<ActorNodeListItemView>();
+                nodeListItem.actor = actor;
+                nodeListItem.view = view;
+
+                actorNodes.Add(nodeListItem);
+
+                actorNodesByID[actor.DataID] = nodeListItem;
+
+            }
+
+        }
+
+    }
+
+    // - Unity Events -
+
     public void OnClick() {
 
         if (actor != null) {
 
-            view.controller.SelectActorByID(actor.DataID, true);
+            view.controller.SelectActorByID(actor.DataID);
 
             if (clickTimer != 0) {
-                view.controller.MoveToActor(actor.DataID, true);
+                view.controller.MoveToActor(actor.DataID);
             }
 
             clickTimer = 30;
@@ -74,47 +219,16 @@ public class ActorNodeListItemView : MonoBehaviour {
 
         if (node.nestedActors.Count == 1 && !forceGroup) {
 
-            view.controller.SelectActorByID(node.nestedActors[0].DataID, false);
+            view.controller.SelectActorByID(node.nestedActors[0].DataID);
 
             if (clickTimer != 0) {
-                view.controller.MoveToActor(node.nestedActors[0].DataID, false);
+                view.controller.MoveToActor(node.nestedActors[0].DataID);
             }
 
         }
         else {
 
-            if (actorNodes.Count > 0) {
-
-                foreach (var actorNode in actorNodes) {
-                    Destroy(actorNode.gameObject);
-                }
-
-                actorNodes.Clear();
-
-            }
-            else {
-
-                var i = 0;
-                foreach (var actor in node.nestedActors) {
-
-                    var obj = Instantiate(actorNodeListItemFab);
-                    obj.transform.SetParent(view.listContent, false);
-
-
-                    obj.transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
-
-                    var nodeListItem = obj.GetComponent<ActorNodeListItemView>();
-                    nodeListItem.actor = actor;
-                    nodeListItem.view = view;
-
-                    actorNodes.Add(nodeListItem);
-
-                    i++;
-
-                }
-
-            }
-
+            OpenGroup();
 
         }
 
@@ -122,5 +236,30 @@ public class ActorNodeListItemView : MonoBehaviour {
 
     }
 
+    public void OnFinishNameType() {
+
+        if (node != null) {
+
+            if (node.nestedActors.Count == 1) {
+                view.controller.RenameActor(node.nestedActors[0], nameField.text);
+            }
+            else {
+
+                node.name = nameField.text;
+
+                nameText.text = node.name;
+
+            }
+        }
+        else {
+
+            view.controller.RenameActor(actor, nameField.text);
+
+        }
+
+        nameText.gameObject.SetActive(true);
+        nameField.gameObject.SetActive(false);
+
+    }
 
 }

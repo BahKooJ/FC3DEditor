@@ -7,13 +7,20 @@ namespace FCopParser {
     public class FCopSceneActors {
 
         public List<FCopActor> actors;
+        public Dictionary<int, FCopActor> actorsByID = new();
 
         public Dictionary<(int x, int y, int z), ActorNode> positionalGroupedActors = new();
         public Dictionary<int, ActorNode> behaviorGroupedActors = new();
         public List<ActorNode> scriptingGroupedActors;
 
         public FCopSceneActors(List<FCopActor> actors) {
+
             this.actors = actors;
+
+            foreach (var actor in actors) {
+                actorsByID[actor.DataID] = actor;
+            }
+
             SortActorsByPosition();
             SortActorsByBehavior();
         }

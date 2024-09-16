@@ -25,7 +25,16 @@ public class TextFieldPopupHandler : MonoBehaviour {
         DestroyActiveView();
 
         var obj = Instantiate(prefab);
-        obj.transform.SetParent(GetComponentInParent<Canvas>().rootCanvas.transform, false);
+
+        if (obj.transform.parent != null) {
+
+            obj.transform.SetParent(GetComponentInParent<Canvas>().rootCanvas.transform, false);
+
+        }
+        else {
+            obj.transform.SetParent(FindObjectOfType<Canvas>().transform, false);
+        }
+
 
         activeView = obj.GetComponent<TextFieldPopupView>();
 

@@ -36,6 +36,10 @@ public class ActorPropertiesView : MonoBehaviour {
             Destroy(transform.gameObject);
         }
 
+        if (controller.selectedActor == null) {
+            return;
+        }
+
         actorName.text = controller.selectedActor.name;
         idText.text = controller.selectedActor.id.ToString();
         actorTypeText.text = controller.selectedActor.actorType.ToString();
@@ -92,5 +96,10 @@ public class ActorPropertiesView : MonoBehaviour {
 
     }
 
+    public void RefreshName() {
+
+        actorName.text = controller.selectedActor.name;
+
+    }
 
 }

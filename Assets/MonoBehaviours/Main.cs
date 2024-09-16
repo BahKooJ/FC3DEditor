@@ -12,6 +12,8 @@ using static System.Collections.Specialized.BitVector32;
 public class Main : MonoBehaviour {
 
     public const int uiLayerMask = 480;
+    public static Color mainColor = new Color(0x22 / 255f, 0x22 / 255f, 0x22 / 255f);
+    public static Color selectedColor = new Color(0f, 0x33 / 255f, 0f);
 
     public static bool ignoreAllInputs = false;
     public static bool debug = false;

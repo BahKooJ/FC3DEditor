@@ -4,7 +4,7 @@ using FCopParser;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 public class SceneActorsView : MonoBehaviour {
 
@@ -13,6 +13,7 @@ public class SceneActorsView : MonoBehaviour {
 
     // - Unity Refs -
     public Transform listContent;
+    public ScrollRect contentScrollview;
     public TMP_Dropdown sortDropdown;
     public ActorPropertiesView view;
 
@@ -20,7 +21,8 @@ public class SceneActorsView : MonoBehaviour {
     public FCopLevel level;
     public ActorEditMode controller;
 
-    List<ActorNodeListItemView> actorNodes = new();
+    public List<ActorNodeListItemView> actorNodes = new();
+    public Dictionary<int, ActorNodeListItemView> actorNodesByID = null;
 
     void Start() {
 
@@ -41,6 +43,7 @@ public class SceneActorsView : MonoBehaviour {
         }
 
         actorNodes.Clear();
+        actorNodesByID = null;
 
     }
 
@@ -50,7 +53,7 @@ public class SceneActorsView : MonoBehaviour {
 
         switch (sortDropdown.value) {
             case 0:
-                
+                actorNodesByID = new();
                 foreach (var node in level.sceneActors.positionalGroupedActors) {
 
                     InitListNode(node.Value, false);
@@ -71,6 +74,64 @@ public class SceneActorsView : MonoBehaviour {
 
     }
 
+    public void RefreshSelection(bool jump) {
+
+        foreach (var actorNode in actorNodes) {
+            
+            if (actorNode.node.nestedActors.Count > 1 || actorNode.forceGroup) {
+
+                if (actorNode.actorNodes.Count == 0) {
+
+                    foreach (var act in actorNode.node.nestedActors) {
+
+                        if (act.DataID == controller.selectedActor.DataID) {
+                            actorNode.OpenGroup();
+                            break;
+                        }
+
+                    }
+
+                }
+
+                foreach (var actorNodeN in actorNode.actorNodes) {
+                    actorNodeN.RefreshSelection(jump);
+                }
+
+            }
+            else {
+                actorNode.RefreshSelection(jump);
+            }
+
+        }
+
+    }
+
+    public ActorNodeListItemView GetNodeItemByID(int id) {
+
+        if (actorNodesByID == null) {
+            return null;
+        }
+
+        if (actorNodesByID.ContainsKey(id)) {
+            return actorNodesByID[id];
+        }
+
+        foreach (var node in actorNodes) {
+
+            if (node.actorNodesByID != null) {
+
+                if (node.actorNodesByID.ContainsKey(id)) {
+                    return node.actorNodesByID[id];
+                }
+
+            }
+
+        }
+
+        return null;
+
+    }
+
     void InitListNode(ActorNode node, bool forceGroup) {
 
         var obj = Instantiate(actorNodeListItemFab);
@@ -82,6 +143,14 @@ public class SceneActorsView : MonoBehaviour {
         nodeListItem.forceGroup = forceGroup;
 
         actorNodes.Add(nodeListItem);
+
+        if (!forceGroup) {
+
+            if (node.nestedActors.Count == 1) {
+                actorNodesByID[node.nestedActors[0].DataID] = nodeListItem;
+            }
+
+        }
 
     }
 

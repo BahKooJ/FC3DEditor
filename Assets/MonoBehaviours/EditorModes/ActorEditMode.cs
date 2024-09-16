@@ -14,7 +14,6 @@ public class ActorEditMode : EditMode {
     List<ActorObject> actorObjects = new();
     List<ActorGroupObject> actorGroupObjects = new();
 
-
     public AxisControl selectedActorObject = null;
     public FCopActor selectedActor = null;
 
@@ -57,6 +56,8 @@ public class ActorEditMode : EditMode {
 
                 script.actObjects.Add(createdActObj);
 
+                actorObjects.Add(createdActObj);
+
             }
 
             script.Init();
@@ -92,6 +93,12 @@ public class ActorEditMode : EditMode {
 
         actorObjects.Clear();
 
+        foreach (var group in actorGroupObjects) {
+            Object.Destroy(group.gameObject);
+        }
+
+        actorGroupObjects.Clear();
+
         view.CloseActorPorpertiesView();
 
     }
@@ -117,13 +124,12 @@ public class ActorEditMode : EditMode {
 
         }
 
-        if (Controls.OnDown("Select") && !Main.IsMouseOverUI()) {
+        if ((Controls.OnDown("Select") || Input.GetMouseButtonDown(1)) && !Main.IsMouseOverUI()) {
 
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, 8)) {
 
-                // This is why groups can't be selected
                 foreach (var act in actorObjects) {
 
                     var didHit = false;
@@ -150,7 +156,13 @@ public class ActorEditMode : EditMode {
 
                     if (didHit) {
 
-                        SelectActor(act);
+                        if (Input.GetMouseButtonDown(1)) {
+                            ContextMenuUtil.CreateContextMenu(act.contextMenuItems);
+                        }
+                        else {
+                            SelectActor(act);
+                            view.activeActorPropertiesView.sceneActorsView.RefreshSelection(true);
+                        }
 
                         break;
 
@@ -164,7 +176,7 @@ public class ActorEditMode : EditMode {
         }
 
         if (Input.GetButtonDown("Delete")) {
-            deleteActor();
+            //DeleteActor();
         }
 
     }
@@ -203,80 +215,25 @@ public class ActorEditMode : EditMode {
 
         selectedActorObject = script;
         selectedActor = actorObject.actor;
-
-        if (view.activeActorPropertiesView != null) {
-            view.RefreshActorPropertiesView();
-        } else {
-            view.OpenActorPropertiesView();
-        }
+        
+        view.RefreshActorPropertiesView();
 
     }
 
-    public void SelectActorByID(int id, bool insideGroup) {
-
-        if (insideGroup) {
-
-            var i = 0;
-
-            var actorObjG = actorGroupObjects.First(group => { 
-
-                foreach (var act in group.actObjects) {
-
-                    if (act.actor.DataID == id) {
-                        return true;
-                    }
-                    i++;
-                }
-
-                i = 0;
-                return false;
-            
-            });
-
-            SelectActor(actorObjG.actObjects[i]);
-
-            return;
-
-        }
+    public void SelectActorByID(int id) {
 
         var actorObj = actorObjects.First(obj => obj.actor.DataID == id);
 
         SelectActor(actorObj);
+        view.activeActorPropertiesView.sceneActorsView.RefreshSelection(false);
 
     }
 
-    public void MoveToActor(int id, bool insideGroup) {
+    public void MoveToActor(int id) {
 
         ActorObject actorObj;
-
-        if (insideGroup) {
-
-            var i = 0;
-
-            var actorObjG = actorGroupObjects.First(group => {
-
-                foreach (var act in group.actObjects) {
-
-                    if (act.actor.DataID == id) {
-                        return true;
-                    }
-                    i++;
-                }
-
-                i = 0;
-                return false;
-
-            });
-
-            actorObj = actorObjG.actObjects[i];
-
-        }
-        else {
-
-            actorObj = actorObjects.First(obj => obj.actor.DataID == id);
-
-        }
-
+        
+        actorObj = actorObjects.First(obj => obj.actor.DataID == id);
 
         Camera.main.transform.position = actorObj.transform.position;
 
@@ -295,7 +252,31 @@ public class ActorEditMode : EditMode {
 
     }
 
-    void deleteActor() {
+    public void RenameActor(FCopActor actor, string newName) {
+
+        actor.name = newName;
+
+        if (selectedActor != null) {
+
+            if (selectedActor.DataID == actor.DataID) {
+
+                if (view.activeActorPropertiesView != null) {
+                    view.activeActorPropertiesView.RefreshName();
+                }
+
+            }
+
+        }
+
+        var nodeView = view.activeActorPropertiesView.sceneActorsView.GetNodeItemByID(actor.DataID);
+
+        if (nodeView != null) {
+            nodeView.RefreshName();
+        }
+
+    }
+
+    void DeleteActor() {
 
         if (selectedActorObject == null) {
             return;
