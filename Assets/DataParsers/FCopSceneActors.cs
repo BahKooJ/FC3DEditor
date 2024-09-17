@@ -1,6 +1,8 @@
 ﻿
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FCopParser {
 
@@ -9,7 +11,7 @@ namespace FCopParser {
         public List<FCopActor> actors;
         public Dictionary<int, FCopActor> actorsByID = new();
 
-        public Dictionary<(int x, int y, int z), ActorNode> positionalGroupedActors = new();
+        public List<ActorNode> positionalGroupedActors = new();
         public Dictionary<int, ActorNode> behaviorGroupedActors = new();
         public List<ActorNode> scriptingGroupedActors;
 
@@ -34,19 +36,57 @@ namespace FCopParser {
 
         }
 
+        public bool PositionalUngroupActor(FCopActor actor) {
+
+            var node = positionalGroupedActors.FirstOrDefault(n => {
+
+                foreach (var nestedN in n.nestedActors) {
+
+                    if (nestedN.DataID == actor.DataID) {
+                        return true;
+                    }
+
+                }
+
+                return false;
+
+            });
+
+            if (node == null) return false;
+
+            var indexOfNode = positionalGroupedActors.IndexOf(node);
+            var didRemove = node.nestedActors.Remove(actor);
+
+            // Debug
+            if (!didRemove) {
+                throw new Exception("Actor was not removed");
+            }
+
+            actor.x += 10;
+            actor.y += 10;
+
+            positionalGroupedActors.Insert(indexOfNode, new ActorNode(ActorGroupType.Position, actor.name, actor));
+            return true;
+
+        }
+
         public void SortActorsByPosition() {
+
+            Dictionary<(int x, int y, int z), ActorNode> dicPositionalGroupedActors = new();
 
             foreach (var actor in actors) { 
 
-                if (positionalGroupedActors.ContainsKey((actor.x, actor.y, 0))) {
-                    positionalGroupedActors[(actor.x, actor.y, 0)].nestedActors.Add(actor);
-                    positionalGroupedActors[(actor.x, actor.y, 0)].name = "Group";
+                if (dicPositionalGroupedActors.ContainsKey((actor.x, actor.y, 0))) {
+                    dicPositionalGroupedActors[(actor.x, actor.y, 0)].nestedActors.Add(actor);
+                    dicPositionalGroupedActors[(actor.x, actor.y, 0)].name = "Group";
                 }
                 else {
-                    positionalGroupedActors[(actor.x, actor.y, 0)] = new ActorNode(ActorGroupType.Position, actor.name, actor);
+                    dicPositionalGroupedActors[(actor.x, actor.y, 0)] = new ActorNode(ActorGroupType.Position, actor.name, actor);
                 }
 
             }
+
+            positionalGroupedActors = dicPositionalGroupedActors.Values.ToList();
 
         }
 

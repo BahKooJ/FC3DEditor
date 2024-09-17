@@ -47,7 +47,9 @@ public class SceneActorsView : MonoBehaviour {
 
     }
 
-    public void Refresh() {
+    public void Refresh(bool preserveScrollPosition = false) {
+
+        var scrollPos = contentScrollview.verticalNormalizedPosition;
 
         ClearList();
 
@@ -56,7 +58,7 @@ public class SceneActorsView : MonoBehaviour {
                 actorNodesByID = new();
                 foreach (var node in level.sceneActors.positionalGroupedActors) {
 
-                    InitListNode(node.Value, false);
+                    InitListNode(node, false);
 
                 }
                 break;
@@ -70,6 +72,10 @@ public class SceneActorsView : MonoBehaviour {
                 break;
             case 2:
                 break;
+        }
+
+        if (preserveScrollPosition) {
+            contentScrollview.verticalNormalizedPosition = scrollPos;
         }
 
     }

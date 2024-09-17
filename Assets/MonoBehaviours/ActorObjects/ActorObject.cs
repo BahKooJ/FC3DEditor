@@ -26,9 +26,15 @@ public class ActorObject : MonoBehaviour {
             controller.RenameActor(actor, text);
         };
 
-        contextMenuItems.Add(("Rename", () => { renameTextFeild.OpenPopupTextField(actor.name); }));
-        contextMenuItems.Add(("Group", () => { }));
-        contextMenuItems.Add(("Ungroup", () => { }));
+        contextMenuItems.Add(("Rename", () => { 
+            renameTextFeild.OpenPopupTextField(actor.name); 
+        }));
+        contextMenuItems.Add(("Group", () => { 
+        }));
+        contextMenuItems.Add(("Ungroup", () => { 
+            controller.UngroupActor(actor);
+        }
+        ));
         contextMenuItems.Add(("Delete", () => { }));
 
     }
@@ -119,13 +125,11 @@ public class ActorObject : MonoBehaviour {
 
     }
 
-    void SetToCurrentPosition() {
+    public void SetToCurrentPosition() {
 
         transform.position = new Vector3(actor.x / 8192f, 100f, -(actor.y / 8192f));
 
-        RaycastHit hit;
-
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, Mathf.Infinity, 1)) {
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, Mathf.Infinity, 1)) {
 
             var pos = transform.position;
 
@@ -133,7 +137,8 @@ public class ActorObject : MonoBehaviour {
 
             transform.position = pos;
 
-        } else {
+        }
+        else {
             print("No floor found");
         }
 

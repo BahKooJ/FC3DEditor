@@ -68,14 +68,14 @@ public class ActorEditMode : EditMode {
 
         foreach (var node in main.level.sceneActors.positionalGroupedActors) {
 
-            if (node.Value.nestedActors.Count == 1) {
+            if (node.nestedActors.Count == 1) {
 
-                actorObjects.Add(CreateActor(node.Value.nestedActors[0]));
+                actorObjects.Add(CreateActor(node.nestedActors[0]));
 
             }
             else {
 
-                CreateGroup(node.Value.nestedActors);
+                CreateGroup(node.nestedActors);
 
             }
 
@@ -272,6 +272,22 @@ public class ActorEditMode : EditMode {
 
         if (nodeView != null) {
             nodeView.RefreshName();
+        }
+
+    }
+
+    public void UngroupActor(FCopActor actor) {
+
+        var didUngroup = main.level.sceneActors.PositionalUngroupActor(actor);
+
+        if (didUngroup) {
+
+            var actorObj = actorObjects.First(obj => obj.actor.DataID == actor.DataID);
+
+            actorObj.SetToCurrentPosition();
+
+            view.activeActorPropertiesView.sceneActorsView.Refresh(true);
+
         }
 
     }

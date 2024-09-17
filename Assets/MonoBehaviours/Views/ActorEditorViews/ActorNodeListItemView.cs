@@ -36,7 +36,9 @@ public class ActorNodeListItemView : MonoBehaviour {
     private void Start() {
 
         contextMenu.items = new() {
-            ("Rename", Rename)
+            ("Rename", Rename),
+            ("Ungroup", Ungroup),
+
         };
 
         actorNodeListItemFab = view.actorNodeListItemFab;
@@ -161,6 +163,17 @@ public class ActorNodeListItemView : MonoBehaviour {
 
     }
 
+    void Ungroup() {
+
+        if (actor != null) {
+
+            view.controller.UngroupActor(actor);
+
+        }
+
+
+    }
+
     public void OpenGroup() {
 
         if (actorNodes.Count > 0) {
@@ -259,6 +272,13 @@ public class ActorNodeListItemView : MonoBehaviour {
 
         nameText.gameObject.SetActive(true);
         nameField.gameObject.SetActive(false);
+        Main.ignoreAllInputs = false;
+
+    }
+
+    public void OnStartNameType() {
+
+        Main.ignoreAllInputs = true;
 
     }
 

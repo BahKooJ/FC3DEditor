@@ -400,6 +400,8 @@ public class Main : MonoBehaviour {
 
     public void ChangeEditMode(EditMode mode) {
 
+        ignoreAllInputs = false;
+
         if (editMode != null) {
             editMode.OnDestroy();
         }
