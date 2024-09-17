@@ -29,7 +29,8 @@ public class ActorObject : MonoBehaviour {
         contextMenuItems.Add(("Rename", () => { 
             renameTextFeild.OpenPopupTextField(actor.name); 
         }));
-        contextMenuItems.Add(("Group", () => { 
+        contextMenuItems.Add(("Group", () => {
+            controller.StartGroup(actor);
         }));
         contextMenuItems.Add(("Ungroup", () => { 
             controller.UngroupActor(actor);

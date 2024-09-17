@@ -43,7 +43,7 @@ public class ActorEditPanelView : MonoBehaviour {
     public void RefreshActorPropertiesView() {
 
         if (activeActorPropertiesView != null) {
-            activeActorPropertiesView.GetComponent<ActorPropertiesView>().Refresh();
+            activeActorPropertiesView.Refresh();
         }
 
     }

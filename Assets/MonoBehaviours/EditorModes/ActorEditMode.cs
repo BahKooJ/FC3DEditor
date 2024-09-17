@@ -12,10 +12,12 @@ public class ActorEditMode : EditMode {
     public ActorEditPanelView view;
 
     List<ActorObject> actorObjects = new();
+    public Dictionary<int, ActorObject> actorObjectsByID = new();
     List<ActorGroupObject> actorGroupObjects = new();
 
     public AxisControl selectedActorObject = null;
     public FCopActor selectedActor = null;
+    public FCopActor actorToGroup = null;
 
     ActorObject actorToAdd = null;
 
@@ -57,6 +59,7 @@ public class ActorEditMode : EditMode {
                 script.actObjects.Add(createdActObj);
 
                 actorObjects.Add(createdActObj);
+                actorObjectsByID[actor.id] = createdActObj;
 
             }
 
@@ -70,7 +73,10 @@ public class ActorEditMode : EditMode {
 
             if (node.nestedActors.Count == 1) {
 
-                actorObjects.Add(CreateActor(node.nestedActors[0]));
+                var createdActObj = CreateActor(node.nestedActors[0]);
+
+                actorObjects.Add(createdActObj);
+                actorObjectsByID[createdActObj.actor.id] = createdActObj;
 
             }
             else {
@@ -92,6 +98,7 @@ public class ActorEditMode : EditMode {
         }
 
         actorObjects.Clear();
+        actorObjectsByID.Clear();
 
         foreach (var group in actorGroupObjects) {
             Object.Destroy(group.gameObject);
@@ -156,7 +163,11 @@ public class ActorEditMode : EditMode {
 
                     if (didHit) {
 
-                        if (Input.GetMouseButtonDown(1)) {
+                        if (actorToGroup != null) {
+                            GroupActor(actorToGroup, main.level.sceneActors.ActorNodeByID(act.actor.DataID));
+                            actorToGroup = null;
+                        }
+                        else if (Input.GetMouseButtonDown(1)) {
                             ContextMenuUtil.CreateContextMenu(act.contextMenuItems);
                         }
                         else {
@@ -177,6 +188,51 @@ public class ActorEditMode : EditMode {
 
         if (Input.GetButtonDown("Delete")) {
             //DeleteActor();
+        }
+
+    }
+
+    void ValidateGrouping() {
+
+        UnselectActor();
+
+        foreach (var actObj in actorObjects) {
+            actObj.transform.parent = null;
+            actObj.group = null;
+        }
+
+        foreach (var group in actorGroupObjects) {
+            Object.Destroy(group.gameObject);
+        }
+
+        actorGroupObjects.Clear();
+
+        foreach (var node in main.level.sceneActors.positionalGroupedActors) {
+
+            if (node.nestedActors.Count != 1) {
+
+                var groupObj = Object.Instantiate(main.actorGroupObjectFab);
+
+                var script = groupObj.GetComponent<ActorGroupObject>();
+                script.controller = this;
+
+                foreach (var nestNode in node.nestedActors) {
+
+                    var actObj = actorObjectsByID[nestNode.DataID];
+
+                    actObj.transform.SetParent(script.transform, false);
+                    actObj.group = script;
+
+                    script.actObjects.Add(actObj);
+
+                }
+
+                script.Init();
+
+                actorGroupObjects.Add(script);
+
+            }
+
         }
 
     }
@@ -282,7 +338,31 @@ public class ActorEditMode : EditMode {
 
         if (didUngroup) {
 
-            var actorObj = actorObjects.First(obj => obj.actor.DataID == actor.DataID);
+            ValidateGrouping();
+
+            var actorObj = actorObjectsByID[actor.DataID];
+
+            actorObj.SetToCurrentPosition();
+
+            view.activeActorPropertiesView.sceneActorsView.Refresh(true);
+
+        }
+
+    }
+
+    public void StartGroup(FCopActor actor) {
+        actorToGroup = actor;
+    }
+
+    void GroupActor(FCopActor actor, ActorNode toGroup) {
+
+        var didGroup = main.level.sceneActors.PositionalGroupActor(actor, toGroup);
+
+        if (didGroup) {
+
+            ValidateGrouping();
+
+            var actorObj = actorObjectsByID[actor.DataID];
 
             actorObj.SetToCurrentPosition();
 

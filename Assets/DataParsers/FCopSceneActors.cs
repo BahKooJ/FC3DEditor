@@ -55,18 +55,92 @@ namespace FCopParser {
             if (node == null) return false;
 
             var indexOfNode = positionalGroupedActors.IndexOf(node);
-            var didRemove = node.nestedActors.Remove(actor);
-
-            // Debug
-            if (!didRemove) {
-                throw new Exception("Actor was not removed");
-            }
+            node.nestedActors.Remove(actor);
 
             actor.x += 10;
             actor.y += 10;
 
             positionalGroupedActors.Insert(indexOfNode, new ActorNode(ActorGroupType.Position, actor.name, actor));
             return true;
+
+        }
+
+        public bool PositionalGroupActor(FCopActor actor, ActorNode toGroup) {
+
+            ActorNode node;
+
+            node = positionalGroupedActors.FirstOrDefault(n => {
+
+                if (n.nestedActors.Count == 1) {
+                    return n.nestedActors[0].DataID == actor.DataID;
+                }
+                return false;
+
+            });
+
+            if (node == null) {
+
+                node = positionalGroupedActors.FirstOrDefault(n => {
+
+                    foreach (var nestedN in n.nestedActors) {
+
+                        if (nestedN.DataID == actor.DataID) {
+                            return true;
+                        }
+
+                    }
+
+                    return false;
+
+                });
+
+                if (node == null) return false;
+
+                node.nestedActors.Remove(actor);
+
+            }
+            else {
+
+                positionalGroupedActors.Remove(node);
+
+            }
+
+            actor.x = toGroup.nestedActors[0].x;
+            actor.y = toGroup.nestedActors[0].y;
+
+            toGroup.nestedActors.Add(actor);
+            return true;
+
+        }
+
+        public ActorNode ActorNodeByID(int id) {
+
+            ActorNode node;
+
+            node = positionalGroupedActors.FirstOrDefault(n => {
+
+                if (n.nestedActors.Count == 1) {
+                    return n.nestedActors[0].DataID == id;
+                }
+                return false;
+
+            });
+
+            node ??= positionalGroupedActors.FirstOrDefault(n => {
+
+                    foreach (var nestedN in n.nestedActors) {
+
+                        if (nestedN.DataID == id) {
+                            return true;
+                        }
+
+                    }
+
+                    return false;
+
+            });
+
+            return node;
 
         }
 
@@ -77,8 +151,9 @@ namespace FCopParser {
             foreach (var actor in actors) { 
 
                 if (dicPositionalGroupedActors.ContainsKey((actor.x, actor.y, 0))) {
-                    dicPositionalGroupedActors[(actor.x, actor.y, 0)].nestedActors.Add(actor);
-                    dicPositionalGroupedActors[(actor.x, actor.y, 0)].name = "Group";
+                    var value = dicPositionalGroupedActors[(actor.x, actor.y, 0)];
+                    value.nestedActors.Add(actor);
+                    value.name = "Group";
                 }
                 else {
                     dicPositionalGroupedActors[(actor.x, actor.y, 0)] = new ActorNode(ActorGroupType.Position, actor.name, actor);
@@ -118,7 +193,6 @@ namespace FCopParser {
         public List<FCopActor> nestedActors = new();
         public ActorGroupType groupType;
         public string name;
-        public bool isNested = false;
 
         public ActorNode(ActorGroupType groupType, string name, FCopActor actor) {
             this.groupType = groupType;

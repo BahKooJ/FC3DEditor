@@ -16,21 +16,26 @@ public class RotationActorPropertyItemView : MonoBehaviour {
     public FCopActor actor;
     public ActorEditMode controller;
 
+    bool refuseCallback = true;
+
     void Start() {
 
         nameText.text = property.name;
         valueText.text = property.value.parsedRotation.ToString();
         slider.value = property.value.parsedRotation;
 
+        refuseCallback = false;
     }
 
     public void OnSliderChange() {
+
+        if (refuseCallback) return;
 
         property.value.SetRotationDegree(slider.value);
 
         valueText.text = property.value.parsedRotation.ToString();
 
-        controller.selectedActorObject.controlledObject.GetComponent<ActorObject>().RefreshRotation();
+        controller.actorObjectsByID[actor.DataID].RefreshRotation();
 
     }
 
