@@ -121,6 +121,7 @@ public class Main : MonoBehaviour {
         DialogWindowUtil.canvas = canvas;
         ContextMenuUtil.canvas = canvas;
         OpenFileWindowUtil.canvas = canvas;
+        HeadsUpTextUtil.canvas = canvas;
 
         Physics.queriesHitBackfaces = true;
 
@@ -142,6 +143,7 @@ public class Main : MonoBehaviour {
         //TestSphereRayOnLevelMesh();
 
         if (Input.GetKeyDown(KeyCode.Escape) && !isEscMenuOpen) {
+            HeadsUpTextUtil.End();
             OpenEscMenu();
         }
 

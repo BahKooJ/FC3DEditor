@@ -112,6 +112,13 @@ public class ActorEditMode : EditMode {
 
     public void Update() {
 
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+
+            HeadsUpTextUtil.End();
+            actorToGroup = null;
+
+        }
+
         if (selectedActorObject != null) {
 
             // Moves object to cursor
@@ -164,7 +171,7 @@ public class ActorEditMode : EditMode {
                     if (didHit) {
 
                         if (actorToGroup != null) {
-                            GroupActor(actorToGroup, main.level.sceneActors.ActorNodeByID(act.actor.DataID));
+                            GroupActor(main.level.sceneActors.ActorNodeByID(act.actor.DataID));
                             actorToGroup = null;
                         }
                         else if (Input.GetMouseButtonDown(1)) {
@@ -352,23 +359,33 @@ public class ActorEditMode : EditMode {
 
     public void StartGroup(FCopActor actor) {
         actorToGroup = actor;
+        HeadsUpTextUtil.HeadsUp("Select Actor to Group...");
     }
 
-    void GroupActor(FCopActor actor, ActorNode toGroup) {
+    public void GroupActor(ActorNode toGroup) {
 
-        var didGroup = main.level.sceneActors.PositionalGroupActor(actor, toGroup);
+        HeadsUpTextUtil.End();
+
+        if (actorToGroup == null) return;
+
+        var didGroup = main.level.sceneActors.PositionalGroupActor(actorToGroup, toGroup);
 
         if (didGroup) {
 
             ValidateGrouping();
 
-            var actorObj = actorObjectsByID[actor.DataID];
+            var actorObj = actorObjectsByID[actorToGroup.DataID];
 
             actorObj.SetToCurrentPosition();
 
             view.activeActorPropertiesView.sceneActorsView.Refresh(true);
 
         }
+        else {
+            QuickLogHandler.Log("Unable to group actors", LogSeverity.Error);
+        }
+
+        actorToGroup = null;
 
     }
 

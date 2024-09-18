@@ -14,6 +14,7 @@ public class FileManagerMain : MonoBehaviour {
     public GameObject ContextMenu;
     public GameObject ContextMenuItem;
     public GameObject OpenFileWindow;
+    public GameObject HeadsUpText;
 
 
     public static IFFParser iffFile;
@@ -34,6 +35,8 @@ public class FileManagerMain : MonoBehaviour {
 
         OpenFileWindowUtil.prefab = OpenFileWindow;
         OpenFileWindowUtil.canvas = canvas.gameObject;
+
+        HeadsUpTextUtil.prefab = HeadsUpText;
 
     }
 

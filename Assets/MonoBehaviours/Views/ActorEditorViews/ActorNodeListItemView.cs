@@ -24,6 +24,7 @@ public class ActorNodeListItemView : MonoBehaviour {
     // - Parameters -
     public ActorNode node = null;
     public FCopActor actor = null;
+    public ActorNode parent = null;
     public SceneActorsView view;
     public bool forceGroup = false;
 
@@ -37,6 +38,7 @@ public class ActorNodeListItemView : MonoBehaviour {
 
         contextMenu.items = new() {
             ("Rename", Rename),
+            ("Group", StartGroup),
             ("Ungroup", Ungroup),
 
         };
@@ -174,6 +176,23 @@ public class ActorNodeListItemView : MonoBehaviour {
 
     }
 
+    void StartGroup() {
+
+        if (node != null) {
+
+            if (node.nestedActors.Count == 1 && !forceGroup) {
+                view.controller.StartGroup(node.nestedActors[0]);
+            }
+
+        }
+        else {
+
+            view.controller.StartGroup(actor);
+
+        }
+
+    }
+
     public void OpenGroup() {
 
         if (actorNodes.Count > 0) {
@@ -200,6 +219,7 @@ public class ActorNodeListItemView : MonoBehaviour {
 
                 var nodeListItem = obj.GetComponent<ActorNodeListItemView>();
                 nodeListItem.actor = actor;
+                nodeListItem.parent = node;
                 nodeListItem.view = view;
 
                 actorNodes.Add(nodeListItem);
@@ -215,6 +235,31 @@ public class ActorNodeListItemView : MonoBehaviour {
     // - Unity Events -
 
     public void OnClick() {
+
+        if (view.controller.actorToGroup != null) {
+
+            if (forceGroup) {
+                return;
+            }
+
+            if (node != null) {
+
+                view.controller.GroupActor(node);
+
+            }
+            else {
+
+                if (parent != null) {
+
+                    view.controller.GroupActor(parent);
+
+                }
+
+            }
+
+            return;
+
+        }
 
         if (actor != null) {
 

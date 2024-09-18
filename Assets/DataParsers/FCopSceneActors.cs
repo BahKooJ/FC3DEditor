@@ -67,6 +67,8 @@ namespace FCopParser {
 
         public bool PositionalGroupActor(FCopActor actor, ActorNode toGroup) {
 
+            if (toGroup.groupType != ActorGroupType.Position) return false;
+
             ActorNode node;
 
             node = positionalGroupedActors.FirstOrDefault(n => {
