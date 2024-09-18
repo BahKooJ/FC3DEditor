@@ -123,7 +123,7 @@ namespace FCopParser {
             foreach (var rawFile in rawActorFiles) {
                 actors.Add(new FCopActor(rawFile));
             }
-            sceneActors = new FCopSceneActors(actors);
+            sceneActors = new FCopSceneActors(actors, this);
 
             soundEffects = new FCopSoundEffectParser(rawCwavs, rawCshd);
 

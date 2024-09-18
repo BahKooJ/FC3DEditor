@@ -37,6 +37,9 @@ public class ActorPropertiesView : MonoBehaviour {
         }
 
         if (controller.selectedActor == null) {
+            actorName.text = "N/A";
+            idText.text = "N/A";
+            actorTypeText.text = "N/A";
             return;
         }
 

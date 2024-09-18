@@ -8,6 +8,7 @@ namespace FCopParser {
 
     public class FCopSceneActors {
 
+        public FCopLevel level;
         public List<FCopActor> actors;
         public Dictionary<int, FCopActor> actorsByID = new();
 
@@ -15,8 +16,9 @@ namespace FCopParser {
         public Dictionary<int, ActorNode> behaviorGroupedActors = new();
         public List<ActorNode> scriptingGroupedActors;
 
-        public FCopSceneActors(List<FCopActor> actors) {
+        public FCopSceneActors(List<FCopActor> actors, FCopLevel level) {
 
+            this.level = level;
             this.actors = actors;
 
             foreach (var actor in actors) {
@@ -30,9 +32,33 @@ namespace FCopParser {
         public void DeleteActor(FCopActor actor) {
 
             actors.Remove(actor);
+            level.fileManager.files.Remove(actor.rawFile);
 
-            // TODO: Forgot this was a thing tbh, though I think it's better to remove the actual raw file.
-            actor.rawFile.ignore = true;
+            var posNode = ActorNodeByIDPositional(actor.DataID);
+
+            if (posNode.nestedActors.Count == 1) {
+                positionalGroupedActors.Remove(posNode);
+            }
+            else {
+                posNode.nestedActors.Remove(actor);
+            }
+
+            var behNode = ActorNodeByIDBehavior(actor.DataID);
+
+            if (behNode.nestedActors.Count == 1) {
+                behaviorGroupedActors.Remove(behNode.nestedActors[0].actorType);
+            }
+            else {
+                behNode.nestedActors.Remove(actor);
+            }
+            
+            // TODO: script group
+
+        }
+
+        public void DeleteActor(int id) {
+
+            DeleteActor(actorsByID[id]);
 
         }
 
@@ -115,7 +141,7 @@ namespace FCopParser {
 
         }
 
-        public ActorNode ActorNodeByID(int id) {
+        public ActorNode ActorNodeByIDPositional(int id) {
 
             ActorNode node;
 
@@ -141,6 +167,37 @@ namespace FCopParser {
                     return false;
 
             });
+
+            return node;
+
+        }
+
+        public ActorNode ActorNodeByIDBehavior(int id) {
+
+            ActorNode node;
+
+            node = behaviorGroupedActors.FirstOrDefault(pair => {
+
+                if (pair.Value.nestedActors.Count == 1) {
+                    return pair.Value.nestedActors[0].DataID == id;
+                }
+                return false;
+
+            }).Value;
+
+            node ??= behaviorGroupedActors.FirstOrDefault(pair => {
+
+                foreach (var nestedN in pair.Value.nestedActors) {
+
+                    if (nestedN.DataID == id) {
+                        return true;
+                    }
+
+                }
+
+                return false;
+
+            }).Value;
 
             return node;
 

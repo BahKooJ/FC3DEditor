@@ -171,7 +171,7 @@ public class ActorEditMode : EditMode {
                     if (didHit) {
 
                         if (actorToGroup != null) {
-                            GroupActor(main.level.sceneActors.ActorNodeByID(act.actor.DataID));
+                            GroupActor(main.level.sceneActors.ActorNodeByIDPositional(act.actor.DataID));
                             actorToGroup = null;
                         }
                         else if (Input.GetMouseButtonDown(1)) {
@@ -194,7 +194,7 @@ public class ActorEditMode : EditMode {
         }
 
         if (Input.GetButtonDown("Delete")) {
-            //DeleteActor();
+            DeleteActor();
         }
 
     }
@@ -389,7 +389,7 @@ public class ActorEditMode : EditMode {
 
     }
 
-    void DeleteActor() {
+    public void DeleteActor() {
 
         if (selectedActorObject == null) {
             return;
@@ -400,10 +400,36 @@ public class ActorEditMode : EditMode {
         main.level.sceneActors.DeleteActor(actorObject.actor);
 
         actorObjects.Remove(actorObject);
+        actorObjectsByID.Remove(actorObject.actor.DataID);
 
         Object.Destroy(actorObject.gameObject);
 
         UnselectActor();
+
+        ValidateGrouping();
+
+        view.activeActorPropertiesView.Refresh();
+        view.activeActorPropertiesView.sceneActorsView.Refresh(true);
+
+    }
+
+    public void DeleteByID(int id) {
+
+        main.level.sceneActors.DeleteActor(id);
+
+        var actObj = actorObjectsByID[id];
+
+        actorObjects.Remove(actObj);
+        actorObjectsByID.Remove(id);
+
+        Object.Destroy(actObj.gameObject);
+
+        UnselectActor();
+
+        ValidateGrouping();
+
+        view.activeActorPropertiesView.Refresh();
+        view.activeActorPropertiesView.sceneActorsView.Refresh(true);
 
     }
 

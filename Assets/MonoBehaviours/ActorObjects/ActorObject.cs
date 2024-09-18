@@ -36,7 +36,9 @@ public class ActorObject : MonoBehaviour {
             controller.UngroupActor(actor);
         }
         ));
-        contextMenuItems.Add(("Delete", () => { }));
+        contextMenuItems.Add(("Delete", () => { 
+            controller.DeleteByID(actor.id);
+        }));
 
     }
 

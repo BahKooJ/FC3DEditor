@@ -40,6 +40,7 @@ public class ActorNodeListItemView : MonoBehaviour {
             ("Rename", Rename),
             ("Group", StartGroup),
             ("Ungroup", Ungroup),
+            ("Delete", Delete)
 
         };
 
@@ -173,6 +174,23 @@ public class ActorNodeListItemView : MonoBehaviour {
 
         }
 
+
+    }
+
+    void Delete() {
+
+        if (node != null) {
+
+            if (node.nestedActors.Count == 1 && !forceGroup) {
+                view.controller.DeleteByID(node.nestedActors[0].DataID);
+            }
+
+        }
+        else {
+
+            view.controller.DeleteByID(actor.DataID);
+
+        }
 
     }
 
