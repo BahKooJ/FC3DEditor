@@ -239,11 +239,12 @@ namespace FCopParser {
         public FCopActor actor { get; set; }
         public List<ActorProperty> properties { get; set; }
 
+        
 
         public int textureOffset;
 
-        public int offset = 44;
-        public ValueActorProperty numb1;
+        public int debugOffset = 42;
+        public ValueActorProperty debugValue;
 
         public FCopBehavior5(FCopActor actor) {
             this.actor = actor;
@@ -252,16 +253,16 @@ namespace FCopParser {
 
             textureOffset = Utils.BytesToShort(rawFile.data.ToArray(), 42);
 
-            numb1 = new("numb1", Utils.BytesToShort(rawFile.data.ToArray(), offset));
+            debugValue = new("debug", Utils.BytesToShort(rawFile.data.ToArray(), debugOffset));
 
-            properties = new() { numb1 };
+            properties = new() { };
             
         }
 
         public void Compile() {
 
-            actor.rawFile.data.RemoveRange(offset, 2);
-            actor.rawFile.data.InsertRange(offset, BitConverter.GetBytes((short)numb1.value));
+            actor.rawFile.data.RemoveRange(debugOffset, 2);
+            actor.rawFile.data.InsertRange(debugOffset, BitConverter.GetBytes((short)debugValue.value));
 
         }
 
@@ -282,6 +283,9 @@ namespace FCopParser {
 
         public RotationActorProperty baseRotation;
 
+        public int debugOffset = 76;
+        public ValueActorProperty debugValue;
+
         public FCopBehavior8(FCopActor actor) {
             this.actor = actor;
 
@@ -295,7 +299,9 @@ namespace FCopParser {
             headRotation = new("Head Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 64)));
             baseRotation = new("Base Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 78)));
 
-            properties = new() { team, miniMapColor, textureOffset, hostileTowards, headRotation, baseRotation };
+            debugValue = new("debug", Utils.BytesToShort(rawFile.data.ToArray(), debugOffset));
+
+            properties = new() { headRotation, baseRotation };
 
         }
 
@@ -306,6 +312,9 @@ namespace FCopParser {
 
             actor.rawFile.data.RemoveRange(78, 2);
             actor.rawFile.data.InsertRange(78, BitConverter.GetBytes((short)headRotation.value.compiledRotation));
+
+            actor.rawFile.data.RemoveRange(debugOffset, 2);
+            actor.rawFile.data.InsertRange(debugOffset, BitConverter.GetBytes((short)debugValue.value));
 
         }
 
@@ -401,7 +410,7 @@ namespace FCopParser {
             number6 = new("Number 6", Utils.BytesToShort(actor.rawFile.data.ToArray(), 48));
             number7 = new("Number 7", Utils.BytesToShort(actor.rawFile.data.ToArray(), 50));
 
-            properties = new() { number1, number2, number3, number4, number5, number6, number7 };
+            properties = new() {  };
         }
 
 
@@ -483,7 +492,7 @@ namespace FCopParser {
             triggerType = new("Trigger Type", Utils.BytesToShort(actor.rawFile.data.ToArray(), 34));
             actorToTest = new("Trigger Actor", Utils.BytesToInt(actor.rawFile.data.ToArray(), 36));
 
-            properties = new() { hitboxWidth, hitboxHeight, number3, triggerType, actorToTest };
+            properties = new() {  };
 
         }
 

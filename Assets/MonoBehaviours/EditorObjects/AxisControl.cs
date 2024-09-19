@@ -28,6 +28,27 @@ public class AxisControl: MonoBehaviour {
 
         transform.position = controlledObject.transform.position;
 
+        if (controlledObject.GetComponent<Outline>() != null) {
+            return;
+        }
+
+        var addComp = controlledObject.AddComponent<Outline>();
+
+        addComp.OutlineMode = Outline.Mode.OutlineVisible;
+        addComp.OutlineWidth = 6;
+        addComp.OutlineColor = Color.green;
+
+    }
+
+    private void OnDestroy() {
+
+        // FIXME: ok this is just not working
+        if (controlledObject.TryGetComponent<Outline>(out var comp)) {
+
+            Destroy(comp);
+
+        }
+
     }
 
     void Update() {
@@ -53,15 +74,15 @@ public class AxisControl: MonoBehaviour {
 
                 var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-                RaycastHit hit;
-
-                if (Physics.Raycast(ray, out hit, Mathf.Infinity, 8)) {
+                if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, 8)) {
 
                     if (hit.colliderInstanceID == axisX.GetComponent<CapsuleCollider>().GetInstanceID()) {
                         click = Axis.AxisX;
-                    } else if (hit.colliderInstanceID == axisY.GetComponent<CapsuleCollider>().GetInstanceID()) {
+                    }
+                    else if (hit.colliderInstanceID == axisY.GetComponent<CapsuleCollider>().GetInstanceID()) {
                         click = Axis.AxisY;
-                    } else if (hit.colliderInstanceID == axisZ.GetComponent<CapsuleCollider>().GetInstanceID()) {
+                    }
+                    else if (hit.colliderInstanceID == axisZ.GetComponent<CapsuleCollider>().GetInstanceID()) {
                         click = Axis.AxisZ;
                     }
 
