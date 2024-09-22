@@ -625,44 +625,40 @@ namespace FCopParser {
 
         public ActorRotation SetRotationDegree(float newRotation) {
 
-            if (newRotation > 180f) {
-                parsedRotation = 360f - newRotation;
+            var negative = newRotation < 0;
+
+            var newAbsRotation = MathF.Abs(newRotation);
+
+            if (newAbsRotation > 180f) {
+                parsedRotation = 360f - newAbsRotation;
             }
-            if (newRotation < -180f) {
-                parsedRotation = newRotation + 360f;
+            if (newAbsRotation < -180f) {
+                parsedRotation = newAbsRotation + 360f;
             }
 
-            parsedRotation = newRotation;
+            parsedRotation = newAbsRotation;
 
-            compiledRotation = (int)(newRotation / 360f * maxRotation);
+            compiledRotation = (int)(newAbsRotation / 360f * maxRotation);
+
+            if (negative) {
+                parsedRotation = -parsedRotation;
+                compiledRotation = -compiledRotation;
+            }
 
             return this;
 
         }
 
-        public ActorRotation SetRotationParse(float newRotation) {
-
-            parsedRotation = newRotation;
-
-            float degreeRotation = newRotation;
-
-            if (newRotation < 0) {
-
-                degreeRotation = newRotation + 360;
-
-            }
-
-            compiledRotation = (int)(degreeRotation / 360f * maxRotation);
-
-            return this;
-
-        }
 
         public ActorRotation SetRotationCompiled(int newRotation) {
 
-            compiledRotation = newRotation;
+            var negative = newRotation < 0;
 
-            float rotationPrecentage = (float)newRotation / (float)maxRotation;
+            var newAbsRotation = Math.Abs(newRotation);
+
+            compiledRotation = newAbsRotation;
+
+            float rotationPrecentage = (float)newAbsRotation / (float)maxRotation;
 
             float degreeRoation = 360f * rotationPrecentage;
 
@@ -671,6 +667,11 @@ namespace FCopParser {
             }
 
             parsedRotation = degreeRoation;
+
+            if (negative) {
+                parsedRotation = -parsedRotation;
+                compiledRotation = -compiledRotation;
+            }
 
             return this;
 

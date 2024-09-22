@@ -307,7 +307,11 @@ public class ActorEditMode : EditMode {
     public void UnselectActor() {
 
         if (selectedActorObject != null) {
+
+            selectedActorObject.ClearOutlineOnObject();
+
             Object.Destroy(selectedActorObject.gameObject);
+
         }
 
         selectedActor = null;

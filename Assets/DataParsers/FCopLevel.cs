@@ -2037,6 +2037,7 @@ namespace FCopParser {
 
         }
 
+        // FIXME: Huge error caused with auto compression and very many obsolete and redundant code
         public List<TileGraphicsItem> CompileGraphics(Dictionary<ushort, (int, XRGB555)> existingColors) {
 
             var isRect = verticies.Count == 4;
@@ -2048,11 +2049,11 @@ namespace FCopParser {
                 isRect ? 1 : 0,
                 (int)shaders.type);
 
-            var potentialNewShaders = shaders.VerifyCorrectShader();
+            //var potentialNewShaders = shaders.VerifyCorrectShader();
 
-            if (potentialNewShaders != null) {
-                shaders = potentialNewShaders;
-            }
+            //if (potentialNewShaders != null) {
+            //    shaders = potentialNewShaders;
+            //}
 
             var shaderData = new List<byte>();
 

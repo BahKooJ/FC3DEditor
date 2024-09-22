@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1974907385835476664}
   - component: {fileID: 1974907385835476665}
   - component: {fileID: 1974907385835476670}
-  m_Layer: 3
+  m_Layer: 9
   m_Name: Axis Y
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -110,7 +110,7 @@ GameObject:
   - component: {fileID: 1974907385948259391}
   - component: {fileID: 1974907385948259388}
   - component: {fileID: 1974907385948259389}
-  m_Layer: 3
+  m_Layer: 9
   m_Name: Axis X
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -208,7 +208,7 @@ GameObject:
   - component: {fileID: 1974907386304532956}
   - component: {fileID: 1974907386304532957}
   - component: {fileID: 1974907386304532946}
-  m_Layer: 3
+  m_Layer: 9
   m_Name: Axis Z
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -304,7 +304,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1974907386336202756}
   - component: {fileID: 1974907386336202757}
-  m_Layer: 3
+  m_Layer: 9
   m_Name: Axis Control
   m_TagString: Untagged
   m_Icon: {fileID: 0}

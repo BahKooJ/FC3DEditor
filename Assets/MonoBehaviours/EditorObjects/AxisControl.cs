@@ -40,12 +40,15 @@ public class AxisControl: MonoBehaviour {
 
     }
 
-    private void OnDestroy() {
+    public void ClearOutlineOnObject() {
 
-        // FIXME: ok this is just not working
-        if (controlledObject.TryGetComponent<Outline>(out var comp)) {
+        if (controlledObject != null) {
 
-            Destroy(comp);
+            if (controlledObject.TryGetComponent<Outline>(out var comp)) {
+
+                DestroyImmediate(comp);
+
+            }
 
         }
 
@@ -74,7 +77,7 @@ public class AxisControl: MonoBehaviour {
 
                 var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-                if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, 8)) {
+                if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, Main.interfaceObjectsMask)) {
 
                     if (hit.colliderInstanceID == axisX.GetComponent<CapsuleCollider>().GetInstanceID()) {
                         click = Axis.AxisX;

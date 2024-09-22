@@ -31,6 +31,10 @@ public class RotationActorPropertyItemView : MonoBehaviour {
 
         if (refuseCallback) return;
 
+        if (Input.GetKey(KeyCode.LeftShift)) {
+            slider.value -= slider.value % 5;
+        }
+
         property.value.SetRotationDegree(slider.value);
 
         valueText.text = property.value.parsedRotation.ToString();
