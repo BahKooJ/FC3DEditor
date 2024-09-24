@@ -50,7 +50,7 @@ public class ActorEditPanelView : MonoBehaviour {
 
     public void CloseActorPorpertiesView() {
 
-        Destroy(activeActorPropertiesView);
+        Destroy(activeActorPropertiesView.gameObject);
         activeActorPropertiesView = null;
 
     }

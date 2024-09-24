@@ -18,7 +18,7 @@ namespace FCopParser {
         }
 
         public void Compile() {
-
+            
             rpns.Compile();
             emptyOffset = rpns.code.Last().Value.offset;
         }
@@ -26,6 +26,22 @@ namespace FCopParser {
         public void ResetIDAndOffsets() {
             rpns.ResetKeys();
         }
+
+        // Added a debug code I forgot about and now mission files are messed up
+        public void DebugScriptDupeFix() {
+
+            var first = rpns.code.First().Value;
+            var copy = new Dictionary<int, FCopScript>(rpns.code.Skip(1));
+            foreach (var code in copy) {
+
+                if (first.compiledBytes.SequenceEqual(code.Value.compiledBytes)) {
+                    rpns.code.Remove(code.Key);
+                }
+
+            }
+
+        }
+
     }
 
     public class FCopScript {

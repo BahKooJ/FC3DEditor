@@ -369,6 +369,9 @@ namespace FCopParser {
 
                 var sectionData = new List<byte>();
 
+                sectionData.AddRange(BitConverter.GetBytes(width));
+                sectionData.AddRange(BitConverter.GetBytes(height));
+
                 sectionData.AddRange(BitConverter.GetBytes(section.heightMap.Count));
 
                 foreach (var height in section.heightMap) {
@@ -491,7 +494,7 @@ namespace FCopParser {
                 var fileData = new List<byte>();
 
                 foreach (var file in subFile.Value) {
-                    fileData.AddRange(CreateHeader(file, "Fcop" + file.dataFourCC, "", file.data.Count));
+                    fileData.AddRange(CreateHeader(file, "FCop" + file.dataFourCC, "", file.data.Count));
                     fileData.AddRange(file.data);
                 }
 
@@ -505,6 +508,7 @@ namespace FCopParser {
 
             total.AddRange(Encoding.ASCII.GetBytes("Music   "));
             total.AddRange(BitConverter.GetBytes(fileManager.music.Value.Value.Count + 12));
+            total.AddRange(fileManager.music.Value.Key);
             total.AddRange(fileManager.music.Value.Value);
 
             scripting.ResetIDAndOffsets();
@@ -520,37 +524,110 @@ namespace FCopParser {
             var newFileManager = new IFFFileManager();
 
             var i = 0;
-            while (i < data.Count()) {
+
+            IFFDataFile CreateDataFile(int iBeforeHeader) {
 
                 var eightCC = Encoding.Default.GetString(dataArray, i, 8);
                 i += 8;
                 var totalSize = BitConverter.ToInt32(dataArray, i);
                 i += 4;
+                var startingNumber = BitConverter.ToInt32(dataArray, i);
+                i += 4;
+                var dataID = BitConverter.ToInt32(dataArray, i);
+                i += 4;
+                var rpnsRef1 = BitConverter.ToInt32(dataArray, i);
+                i += 4;
+                var rpnsRef2 = BitConverter.ToInt32(dataArray, i);
+                i += 4;
+                var rpnsRef3 = BitConverter.ToInt32(dataArray, i);
+                i += 4;
+                var headerCodeData1 = BitConverter.ToInt32(dataArray, i);
+                i += 4;
+                var headerCodeData2 = BitConverter.ToInt32(dataArray, i);
+                i += 4;
+                var headerCodeSize = BitConverter.ToInt32(dataArray, i);
+                i += 4;
+                var headerCode = data.GetRange(i, headerCodeSize);
+                i += headerCodeSize;
+                var nameSize = BitConverter.ToInt32(dataArray, i);
+                i += 4;
+                var name = Encoding.Default.GetString(dataArray, i, nameSize);
+                i += nameSize;
+
+                var headeSize = i - iBeforeHeader;
+
+                if (eightCC == "SECTION ") {
+                    sections.Add(new FCopLevelSection(data.GetRange(i, totalSize - headeSize), this));
+                    i += totalSize - headeSize;
+                    return null;
+                }
+                else if (eightCC[..4] == "FCop") {
+                    var file = new IFFDataFile(
+                            startingNumber,
+                            data.GetRange(i, totalSize - headeSize),
+                            eightCC.Substring(4, 4),
+                            dataID,
+                            new() { rpnsRef1, rpnsRef2, rpnsRef3 },
+                            new() { headerCodeData1, headerCodeData2 },
+                            headerCode
+                            );
+                    i += totalSize - headeSize;
+                    return file;
+                }
+                else {
+                    throw new Exception("wtf else would it be then?");
+                }
+
+            } 
+
+            while (i < data.Count()) {
+
+                var iBeforeHeader = i;
+
+                // Offset is not moved because it's just to peak what kind of data it is
+                var eightCC = Encoding.Default.GetString(dataArray, i, 8);
 
                 if (eightCC != "SubFile " && eightCC != "Music   ") {
 
-                    var startingNumber = BitConverter.ToInt32(dataArray, i);
+                    CreateDataFile(iBeforeHeader);
+
+                }
+                else if (eightCC == "SubFile ") {
+
+                    i += 8;
+                    var totalSize = BitConverter.ToInt32(dataArray, i);
                     i += 4;
-                    var dataID = BitConverter.ToInt32(dataArray, i);
+                    var fileCount = BitConverter.ToInt32(dataArray, i);
                     i += 4;
-                    var rpnsRef1 = BitConverter.ToInt32(dataArray, i);
+                    var name = data.GetRange(i, 16).ToArray();
+                    i += 16;
+
+                    newFileManager.subFiles[name] = new();
+
+                    foreach (var _f in Enumerable.Range(0, fileCount)) {
+
+                        var file = CreateDataFile(iBeforeHeader);
+
+                        if (file == null) {
+                            throw new Exception("Specialized data found in subfile");
+                        }
+
+                        newFileManager.subFiles[name].Add(file);
+
+                    }
+
+                }
+                else if (eightCC == "Music   ") {
+
+                    i += 8;
+                    var totalSize = BitConverter.ToInt32(dataArray, i);
                     i += 4;
-                    var rpnsRef2 = BitConverter.ToInt32(dataArray, i);
-                    i += 4;
-                    var rpnsRef3 = BitConverter.ToInt32(dataArray, i);
-                    i += 4;
-                    var headerCodeData1 = BitConverter.ToInt32(dataArray, i);
-                    i += 4;
-                    var headerCodeData2 = BitConverter.ToInt32(dataArray, i);
-                    i += 4;
-                    var headerCodeSize = BitConverter.ToInt32(dataArray, i);
-                    i += 4;
-                    var headerCode = data.GetRange(i, headerCodeSize);
-                    i += headerCodeSize;
-                    var nameSize = BitConverter.ToInt32(dataArray, i);
-                    i += 4;
-                    var name = Encoding.Default.GetString(dataArray, i, nameSize);
-                    i += nameSize;
+                    var name = data.GetRange(i, 16).ToArray();
+                    i += 16;
+
+                    var headeSize = i - iBeforeHeader;
+
+                    newFileManager.music = new KeyValuePair<byte[], List<byte>>(name, data.GetRange(i, totalSize - headeSize));
 
                 }
 
@@ -682,24 +759,140 @@ namespace FCopParser {
 
         }
 
-        public FCopLevelSection(List<byte> ncfcSectionData) {
+        public FCopLevelSection(List<byte> ncfcSectionData, FCopLevel level) {
 
             var ncfcSectionDataArray = ncfcSectionData.ToArray();
 
             var i = 0;
 
-            var heightMapDataSize = BitConverter.ToInt32(ncfcSectionDataArray, i);
+            var mapWidth = BitConverter.ToInt32(ncfcSectionDataArray, i);
+            i += 4;
+            var mapHeight = BitConverter.ToInt32(ncfcSectionDataArray, i);
+            i += 4;
+            var heightMapCount = BitConverter.ToInt32(ncfcSectionDataArray, i);
             i += 4;
 
-            if (heightMapDataSize % 3 != 0) {
+            if (heightMapCount != 289) {
                 throw new Exception("Incorrect vertex count");
             }
 
-            var heightMapData = ncfcSectionData.GetRange(i, heightMapDataSize);
+            var heightMapData = ncfcSectionData.GetRange(i, heightMapCount * 3);
 
-            foreach (var heightI in Enumerable.Range(0, heightMapDataSize / 3)) {
-                heightMap.Add(new HeightPoints());
+            foreach (var heightI in Enumerable.Range(0, heightMapCount)) {
+                heightMap.Add(new HeightPoints(heightMapData[heightI * 3], heightMapData[heightI * 3 + 1], heightMapData[heightI * 3 + 2]));
             }
+
+            i += heightMapCount * 3;
+
+            var tileColumnsCount = BitConverter.ToInt32(ncfcSectionDataArray, i);
+            i += 4;
+
+            if (tileColumnsCount != 256) {
+                throw new Exception("Incorrect tile column count");
+            }
+
+            foreach (var _tc in Enumerable.Range(0, tileColumnsCount)) {
+
+                var tileCount = BitConverter.ToInt32(ncfcSectionDataArray, i);
+                i += 4;
+
+                foreach (var _t in Enumerable.Range(0, tileCount)) {
+
+                    var meshID = BitConverter.ToInt32(ncfcSectionDataArray, i);
+                    i += 4;
+                    var culling = BitConverter.ToInt32(ncfcSectionDataArray, i);
+                    i += 4;
+                    var effectIndex = BitConverter.ToInt32(ncfcSectionDataArray, i);
+                    i += 4;
+                    var uvCount = BitConverter.ToInt32(ncfcSectionDataArray, i);
+                    i += 4;
+                    var uvs = new List<int>();
+                    foreach (var _ in Enumerable.Range(0, uvCount)) {
+                        uvs.Add(BitConverter.ToInt32(ncfcSectionDataArray, i));
+                        i += 4;
+                    }
+                    var texturePalette = BitConverter.ToInt32(ncfcSectionDataArray, i);
+                    i += 4;
+                    var isSemiTransparent = BitConverter.ToInt32(ncfcSectionDataArray, i);
+                    i += 4;
+                    var isVectorAnimation = BitConverter.ToInt32(ncfcSectionDataArray, i);
+                    i += 4;
+                    var shaderType = BitConverter.ToInt32(ncfcSectionDataArray, i);
+                    i += 4;
+                    var isQuad = BitConverter.ToInt32(ncfcSectionDataArray, i);
+                    i += 4;
+
+                    TileShaders shader;
+
+                    switch ((VertexColorType)shaderType) {
+                        case VertexColorType.MonoChrome:
+
+                            var monoValue = BitConverter.ToInt32(ncfcSectionDataArray, i);
+                            i += 4;
+
+                            shader = new MonoChromeShader((byte)monoValue, isQuad == 1);
+
+                            break;
+                        case VertexColorType.DynamicMonoChrome:
+
+                            var dynamicMono = new List<int>();
+                            foreach (var _ in Enumerable.Range(0, 4)) {
+                                dynamicMono.Add(BitConverter.ToInt32(ncfcSectionDataArray, i));
+                                i += 4;
+                            }
+
+                            shader = new DynamicMonoChromeShader(dynamicMono, isQuad == 1);
+
+                            break;
+                        case VertexColorType.Color:
+
+                            var colors = new List<XRGB555>();
+                            var colorCount = BitConverter.ToInt32(ncfcSectionDataArray, i);
+                            i += 4;
+
+                            foreach (var _c in Enumerable.Range(0, colorCount)) {
+                                colors.Add(new XRGB555(ncfcSectionData.GetRange(i, 2)));
+                                i += 2;
+                            }
+
+
+                            break;
+                        case VertexColorType.ColorAnimated:
+                            break;
+                    }
+
+                    var animationSpeed = BitConverter.ToInt32(ncfcSectionDataArray, i);
+                    i += 4;
+                    var animatedUVCount = BitConverter.ToInt32(ncfcSectionDataArray, i);
+                    i += 4;
+
+                    var animatedUVs = new List<int>();
+                    foreach (var _a in Enumerable.Range(0, animatedUVCount)) {
+                        animatedUVs.Add(BitConverter.ToInt32(ncfcSectionDataArray, i));
+                        i += 4;
+                    }
+
+                }
+
+            }
+
+            animationVector = new AnimationVector(BitConverter.ToInt32(ncfcSectionDataArray, i), BitConverter.ToInt32(ncfcSectionDataArray, i + 4));
+            i += 8;
+
+            tileEffects = ncfcSectionData.GetRange(i, 4);
+            i += 4;
+
+            var slfxDataCount = BitConverter.ToInt32(ncfcSectionDataArray, i);
+            i += 4;
+
+            if (slfxDataCount != 0) {
+                slfxData = ncfcSectionData.GetRange(i, slfxDataCount);
+                i += slfxDataCount;
+            }
+
+            level.width = mapWidth; 
+            level.height = mapHeight;
+            this.parent = level;
 
         }
 
@@ -2201,6 +2394,24 @@ namespace FCopParser {
             effectIndex = 0;
 
             shaders = new MonoChromeShader(116, verticies.Count == 4);
+
+        }
+
+        public Tile(TileColumn column, int meshID, int culling, int effectIndex, 
+            List<int> uvs, int texturePalette, bool isSemiTransparent, bool isVectorAnimated, 
+            TileShaders shaders, int animationSpeed, List<int> animatedUVs) {
+
+            this.column = column;
+            verticies = MeshType.VerticiesFromID(meshID);
+            this.culling = culling;
+            this.effectIndex = effectIndex;
+            this.uvs = new(uvs);
+            this.texturePalette = texturePalette;
+            this.isSemiTransparent = isSemiTransparent;
+            this.isVectorAnimated = isVectorAnimated;
+            this.shaders = shaders;
+            this.animationSpeed = animationSpeed;
+            this.animatedUVs = new(animatedUVs);
 
         }
 
@@ -3945,6 +4156,16 @@ namespace FCopParser {
 
             };
 
+
+            Apply();
+
+        }
+
+        public DynamicMonoChromeShader(List<int> values, bool isQuad) {
+
+            this.isQuad = isQuad;
+            this.values = values.ToArray();
+            type = VertexColorType.DynamicMonoChrome;
 
             Apply();
 

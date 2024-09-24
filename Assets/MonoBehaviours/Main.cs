@@ -159,6 +159,7 @@ public class Main : MonoBehaviour {
         if (Controls.OnDown("Save")) {
 
             File.WriteAllBytes("foo", level.CompileToNCFCFile().ToArray());
+            level.ReadNCFCFile(File.ReadAllBytes("foo").ToList());
             return;
             Compile();
             counterActions.Clear();
