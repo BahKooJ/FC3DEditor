@@ -19,8 +19,6 @@ namespace FCopParser {
 
         public void Compile() {
 
-            rpns.code[0].compiledBytes.AddRange(rpns.code[0].compiledBytes);
-
             rpns.Compile();
             emptyOffset = rpns.code.Last().Value.offset;
         }

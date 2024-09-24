@@ -157,6 +157,9 @@ public class Main : MonoBehaviour {
         if (ignoreAllInputs) { return; }
 
         if (Controls.OnDown("Save")) {
+
+            File.WriteAllBytes("foo", level.CompileToNCFCFile().ToArray());
+            return;
             Compile();
             counterActions.Clear();
             System.GC.Collect();

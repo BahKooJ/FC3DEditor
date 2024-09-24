@@ -193,8 +193,16 @@ public class ActorEditMode : EditMode {
 
         }
 
+        if (Main.ignoreAllInputs) {
+            return;
+        }
+
         if (Input.GetButtonDown("Delete")) {
             DeleteActor();
+        }
+
+        if (Controls.OnDown("Unselect")) {
+            UnselectActorCompletely();
         }
 
     }
@@ -316,6 +324,24 @@ public class ActorEditMode : EditMode {
 
         selectedActor = null;
         selectedActorObject = null;
+
+    }
+
+    public void UnselectActorCompletely() {
+
+        if (selectedActorObject != null) {
+
+            selectedActorObject.ClearOutlineOnObject();
+
+            Object.Destroy(selectedActorObject.gameObject);
+
+        }
+
+        selectedActor = null;
+        selectedActorObject = null;
+
+        view.activeActorPropertiesView.Refresh();
+        view.activeActorPropertiesView.sceneActorsView.Refresh(true);
 
     }
 

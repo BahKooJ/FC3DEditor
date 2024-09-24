@@ -99,21 +99,25 @@ public class AxisControl: MonoBehaviour {
 
             var pos = transform.position;
 
-            //TODO: Move should scale and keep up with cursor
+            var mousePos = Input.mousePosition;
+            mousePos.z = Camera.main.WorldToScreenPoint(axisX.transform.position).z;
+            var dragPos = Camera.main.ScreenToWorldPoint(mousePos);
+
             switch (click) {
                 case Axis.AxisX:
 
-                    pos.x += (previousMouse.x - Input.mousePosition.x) / 50f;
+
+                    pos.x = dragPos.x;
 
                     break;
                 case Axis.AxisY:
 
-                    pos.y += (Input.mousePosition.y - previousMouse.y) / 50f;
+                    pos.y = dragPos.y;
 
                     break;
                 case Axis.AxisZ:
 
-                    pos.z += (Input.mousePosition.x - previousMouse.x) / 50f;
+                    pos.z = dragPos.z;
 
                     break;
             }
