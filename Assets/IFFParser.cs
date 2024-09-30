@@ -95,16 +95,14 @@ namespace FCopParser {
             parsedData = Parse();
         }
 
-        // If given an IFFFileManager, the object knows the data needs to be compiled
         public IFFParser(IFFFileManager parsedData) {
             this.parsedData = parsedData;
+            this.parsedData.Sort();
         }
 
         // Grabs all the files/data and coverts them into their own files,
         // separating the data and chuncks allowing for other programs to parse the data freely.
         // Returns the IFFFileManage object store the individual files.
-        // TODO: This does not account for fills equal to 4 bytes!
-        // =WIP=
         IFFFileManager Parse() {
 
             var fileMananger = new IFFFileManager();
@@ -275,7 +273,6 @@ namespace FCopParser {
 
         }
 
-        // =VERY WIP=
         public void Compile() {
 
             List<byte> compiledFile = new();

@@ -15,6 +15,7 @@ Inputs = {
 "NavMeshEditMode":"2" "LeftControl""Alpha7"
 "ActorEditMode":"2" "LeftControl""Alpha8"
 "Save":"1" "F5"
+"Compile":"1" "F9"
 "Select":"1" "#0"
 "MultiSelect":"2" "LeftShift""#0"
 "RangeSelect":"3" "LeftAlt""LeftShift""#0"

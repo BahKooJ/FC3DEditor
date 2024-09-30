@@ -140,7 +140,7 @@ public class ShaderEditMode : TileMutatingEditMode {
 
         if (Main.ignoreAllInputs) { return; }
 
-        if (Controls.OnDown("Save")) {
+        if (Controls.OnDown("Save") || Controls.OnDown("Compile")) {
             if (view.activeShaderMapper != null) {
                 view.CloseShaderMapper();
             }

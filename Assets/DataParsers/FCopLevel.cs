@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Unity.VisualScripting;
 
 namespace FCopParser {
 
@@ -64,6 +63,12 @@ namespace FCopParser {
 
             InitData();
 
+        }
+
+        public FCopLevel(byte[] nonCompressedFCopFile) {
+            // Section data is already inited with the read func
+            ReadNCFCFile(nonCompressedFCopFile.ToList());
+            InitData();
         }
 
         void InitData() {
@@ -268,29 +273,51 @@ namespace FCopParser {
                 layout[row].Add(0);
             }
 
-            FCopLevelLayoutParser.Compile(layout, fileManager.files.First(file => {
+            var potentialCptc = fileManager.files.FirstOrDefault(file => {
 
                 return file.dataFourCC == "Cptc";
 
-            }));
-
-            var index = fileManager.files.FindIndex(file => {
-
-                return file.dataFourCC == "Ctil";
-
             });
 
-            fileManager.files.RemoveAll(file => {
+            // NCFC file won't have a Cptc, meaning if it doesn't exist then that kind of file was loaded.
+            // This also mean no Ctils will be present in the file manager.
+            if (potentialCptc != null) {
 
-                return file.dataFourCC == "Ctil";
+                FCopLevelLayoutParser.Compile(layout, potentialCptc);
 
-            });
+                var index = fileManager.files.FindIndex(file => {
 
-            foreach (var group in groupedSections) {
-                var bytes = group.Value.Compile().Compile();
-                var rawFile = new IFFDataFile(2, bytes, "Ctil", group.Key, scripting.emptyOffset);
-                fileManager.files.Insert(index, rawFile);
-                index++;
+                    return file.dataFourCC == "Ctil";
+
+                });
+
+                fileManager.files.RemoveAll(file => {
+
+                    return file.dataFourCC == "Ctil";
+
+                });
+
+                foreach (var group in groupedSections) {
+                    var bytes = group.Value.Compile().Compile();
+                    var rawFile = new IFFDataFile(2, bytes, "Ctil", group.Key, scripting.emptyOffset);
+                    fileManager.files.Insert(index, rawFile);
+                    index++;
+                }
+
+            }
+            else {
+
+                var createdCptcRawFile = new IFFDataFile(2, new(), "Cptc", 1, scripting.emptyOffset);
+                FCopLevelLayoutParser.Compile(layout, createdCptcRawFile);
+
+                fileManager.files.Add(createdCptcRawFile);
+
+                foreach (var group in groupedSections) {
+                    var bytes = group.Value.Compile().Compile();
+                    var rawFile = new IFFDataFile(2, bytes, "Ctil", group.Key, scripting.emptyOffset);
+                    fileManager.files.Add(rawFile);
+                }
+
             }
 
             scripting.ResetIDAndOffsets();
@@ -376,9 +403,9 @@ namespace FCopParser {
 
                 foreach (var height in section.heightMap) {
 
-                    sectionData.Add((byte)height.GetTruePoint(0));
                     sectionData.Add((byte)height.GetTruePoint(1));
                     sectionData.Add((byte)height.GetTruePoint(2));
+                    sectionData.Add((byte)height.GetTruePoint(3));
 
                 }
 
@@ -507,7 +534,7 @@ namespace FCopParser {
             }
 
             total.AddRange(Encoding.ASCII.GetBytes("Music   "));
-            total.AddRange(BitConverter.GetBytes(fileManager.music.Value.Value.Count + 12));
+            total.AddRange(BitConverter.GetBytes(fileManager.music.Value.Value.Count + 28));
             total.AddRange(fileManager.music.Value.Key);
             total.AddRange(fileManager.music.Value.Value);
 
@@ -575,7 +602,7 @@ namespace FCopParser {
                     return file;
                 }
                 else {
-                    throw new Exception("wtf else would it be then?");
+                    throw new Exception("Encountered unkown file");
                 }
 
             } 
@@ -589,7 +616,12 @@ namespace FCopParser {
 
                 if (eightCC != "SubFile " && eightCC != "Music   ") {
 
-                    CreateDataFile(iBeforeHeader);
+                    var file = CreateDataFile(iBeforeHeader);
+
+                    if (file != null) {
+                        newFileManager.files.Add(file);
+                    }
+
 
                 }
                 else if (eightCC == "SubFile ") {
@@ -605,6 +637,9 @@ namespace FCopParser {
                     newFileManager.subFiles[name] = new();
 
                     foreach (var _f in Enumerable.Range(0, fileCount)) {
+
+                        // The index is updated because the subfile header has nothing to do with a data file.
+                        iBeforeHeader = i;
 
                         var file = CreateDataFile(iBeforeHeader);
 
@@ -629,9 +664,14 @@ namespace FCopParser {
 
                     newFileManager.music = new KeyValuePair<byte[], List<byte>>(name, data.GetRange(i, totalSize - headeSize));
 
+                    i += totalSize - headeSize;
+                    break;
+
                 }
 
             }
+
+            fileManager = newFileManager;
 
         }
 
@@ -779,7 +819,7 @@ namespace FCopParser {
             var heightMapData = ncfcSectionData.GetRange(i, heightMapCount * 3);
 
             foreach (var heightI in Enumerable.Range(0, heightMapCount)) {
-                heightMap.Add(new HeightPoints(heightMapData[heightI * 3], heightMapData[heightI * 3 + 1], heightMapData[heightI * 3 + 2]));
+                heightMap.Add(new HeightPoints((sbyte)heightMapData[heightI * 3], (sbyte)heightMapData[heightI * 3 + 1], (sbyte)heightMapData[heightI * 3 + 2]));
             }
 
             i += heightMapCount * 3;
@@ -791,7 +831,19 @@ namespace FCopParser {
                 throw new Exception("Incorrect tile column count");
             }
 
+            var x = 0;
+            var y = 0;
+
             foreach (var _tc in Enumerable.Range(0, tileColumnsCount)) {
+
+                var heights = new List<HeightPoints> {
+                    GetHeightPoint(x, y),
+                    GetHeightPoint(x + 1, y),
+                    GetHeightPoint(x, y + 1),
+                    GetHeightPoint(x + 1, y + 1)
+                };
+
+                var column = new TileColumn(x, y, new(), heights);
 
                 var tileCount = BitConverter.ToInt32(ncfcSectionDataArray, i);
                 i += 4;
@@ -822,7 +874,7 @@ namespace FCopParser {
                     var isQuad = BitConverter.ToInt32(ncfcSectionDataArray, i);
                     i += 4;
 
-                    TileShaders shader;
+                    TileShaders shader = null;
 
                     switch ((VertexColorType)shaderType) {
                         case VertexColorType.MonoChrome:
@@ -855,9 +907,11 @@ namespace FCopParser {
                                 i += 2;
                             }
 
+                            shader = new ColorShader(colors.ToArray(), isQuad == 1);
 
                             break;
                         case VertexColorType.ColorAnimated:
+                            shader = new AnimatedShader(isQuad == 1);
                             break;
                     }
 
@@ -872,6 +926,19 @@ namespace FCopParser {
                         i += 4;
                     }
 
+                    var tile = new Tile(column, meshID, culling, effectIndex, uvs, texturePalette, isSemiTransparent == 1, isVectorAnimation == 1, shader, animationSpeed, animatedUVs);
+
+                    column.tiles.Add(tile);
+
+                }
+
+                tileColumns.Add(column);
+
+                x++;
+
+                if (x == tileColumnsWidth) {
+                    y++;
+                    x = 0;
                 }
 
             }
@@ -939,6 +1006,8 @@ namespace FCopParser {
         // Takes all the higher parsed data and puts them back into their basic data form found in Ctil.
         // This method does all the indexing and compression to allow for FCopLevelParser to convert the data back into binary.
         public FCopLevelSectionParser Compile() {
+
+            culling ??= new LevelCulling();
 
             culling.CalculateCulling(this);
 

@@ -44,13 +44,30 @@ public class FileManagerMain : MonoBehaviour {
 
         var fileContent = File.ReadAllBytes(path);
 
-        try {
-            iffFile = new IFFParser(fileContent);
-        } catch (InvalidFileException) {
-            DialogWindowUtil.Dialog("Select Future Cop mission File", "This file is not a mission file");
+        if (Path.GetExtension(path) == ".ncfc") {
+
+            //try {
+                FileManagerMain.level = new FCopLevel(fileContent);
+            //}
+            //catch {
+            //    DialogWindowUtil.Dialog("Invalid or Corrupted File", "Unable to parse Non-Compressed Future Cop file");
+            //}
+
+        }
+        else {
+
+            try {
+                iffFile = new IFFParser(fileContent);
+            }
+            catch (InvalidFileException) {
+                DialogWindowUtil.Dialog("Select Future Cop mission File", "This file is not a mission file");
+            }
+
+            FileManagerMain.level = new FCopLevel(FileManagerMain.iffFile.parsedData);
+
         }
 
-        FileManagerMain.level = new FCopLevel(FileManagerMain.iffFile.parsedData);
+
         SceneManager.LoadScene("Scenes/LevelEditorScene", LoadSceneMode.Single);
 
     }

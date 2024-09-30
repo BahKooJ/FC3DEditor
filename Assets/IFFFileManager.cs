@@ -2,13 +2,19 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using Unity.VisualScripting;
 
 namespace FCopParser {
 
     // This object will act as the in-between from the IFF file and any parsers of game data/files.
     // This object is planned to convert the game files back to the IFF file format for Future Cop to read.
     public class IFFFileManager {
+
+        public static string[] fileOrderByFourCC = new string[] { 
+            "RPNS", "Cfnt", "Cshd", "Cvkh", "Cvkb", "Cpyr", "Csfx", "Cwav", "Ctos", "Cptc", "Ctil", "Cfun", "Cnet", "Cbmp", "Cdcs", "Cobj", "Cact", "Csac", "Cctr"
+        };
 
         // Game data that are separated and turn into individual files.
         public List<IFFDataFile> files = new List<IFFDataFile>();
@@ -20,6 +26,20 @@ namespace FCopParser {
         public KeyValuePair<byte[], List<byte>>? music = null;
 
         public bool isPS1 = false;
+
+        public void Sort() {
+
+            var newOrder = new List<IFFDataFile>();
+
+            foreach (var fourCC in fileOrderByFourCC) {
+
+                newOrder.AddRange(GetFiles(fourCC));
+
+            }
+
+            files = newOrder;
+
+        }
 
         public void CreateFileList(string path) {
 
@@ -115,6 +135,17 @@ namespace FCopParser {
 
         }
 
+        public IFFDataFile GetFile(string fourCC, int id) {
+            return files.First(file => {
+                return file.dataID == id && file.dataFourCC == fourCC;
+            });
+        }
+
+        public List<IFFDataFile> GetFiles(string fourCC) {
+            return files.Where(file => {
+                return file.dataFourCC == fourCC;
+            }).ToList();
+        }
 
     }
 

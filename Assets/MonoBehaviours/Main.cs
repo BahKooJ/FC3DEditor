@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.XR;
 
 public class Main : MonoBehaviour {
 
@@ -158,9 +159,12 @@ public class Main : MonoBehaviour {
 
         if (Controls.OnDown("Save")) {
 
-            File.WriteAllBytes("foo", level.CompileToNCFCFile().ToArray());
-            level.ReadNCFCFile(File.ReadAllBytes("foo").ToList());
-            return;
+            Save();
+            counterActions.Clear();
+            System.GC.Collect();
+        }
+
+        if (Controls.OnDown("Compile")) {
             Compile();
             counterActions.Clear();
             System.GC.Collect();
@@ -390,6 +394,9 @@ public class Main : MonoBehaviour {
             return;
         }
 
+        // This can be null if loading a ncfc.
+        iffFile ??= new IFFParser(level.fileManager);
+
         iffFile.Compile();
 
         iffFile.parsedData.CreateFileList("Debug file list.txt");
@@ -404,6 +411,43 @@ public class Main : MonoBehaviour {
 
     }
 
+    public void Save() {
+
+        List<byte> bytes = new();
+
+        try {
+
+            bytes = level.CompileToNCFCFile();
+
+        }
+        catch (MeshIDException) {
+            DialogWindowUtil.Dialog("Compile Error: Invalid Level Geometry", "One or more tiles geomtry is invalid." +
+                " This error can be cause by manually changing the height channel of a vertex. The selected tile overlay" +
+                " will be red if the geometry is invalid.");
+            return;
+
+        }
+
+        FreeMove.StopLooking();
+
+        OpenFileWindowUtil.SaveFile("Output", "Level.ncfc", path => {
+
+            if (Path.GetExtension(path) == ".ncfc") {
+
+                File.WriteAllBytes(path, bytes.ToArray());
+
+            }
+            else {
+
+                File.WriteAllBytes(path + ".ncfc", bytes.ToArray());
+
+            }
+
+
+        });
+
+    }
+    
     public void ChangeEditMode(EditMode mode) {
 
         ignoreAllInputs = false;
