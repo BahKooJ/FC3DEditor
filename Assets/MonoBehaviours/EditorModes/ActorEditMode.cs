@@ -125,6 +125,14 @@ public class ActorEditMode : EditMode {
 
         if (selectedActorObject != null) {
 
+            if (selectedActorObject.TestCollision()) {
+                return;
+            }
+
+        }
+
+        if (selectedActorObject != null) {
+
             // Moves object to cursor
             if (Controls.IsDown("MoveToCursor")) {
 

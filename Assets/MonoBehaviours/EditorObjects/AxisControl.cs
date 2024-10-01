@@ -55,14 +55,18 @@ public class AxisControl: MonoBehaviour {
 
     }
 
-    void Update() {
+    public bool TestCollision() {
 
         if (Input.GetMouseButtonUp(0)) {
             preventSelection = false;
         }
 
         if (preventSelection) {
-            return;
+            return false;
+        }
+
+        if (Main.IsMouseOverUI()) {
+            return false;
         }
 
         if (Controls.OnDown("Rotate")) {
@@ -84,25 +88,28 @@ public class AxisControl: MonoBehaviour {
 
             if (click == Axis.None) {
 
+                var didHit = false;
                 var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
                 if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, Main.interfaceObjectsMask)) {
 
                     if (hit.colliderInstanceID == axisX.GetComponent<CapsuleCollider>().GetInstanceID()) {
                         click = Axis.AxisX;
+                        didHit = true;
                     }
                     else if (hit.colliderInstanceID == axisY.GetComponent<CapsuleCollider>().GetInstanceID()) {
                         click = Axis.AxisY;
+                        didHit = true;
                     }
                     else if (hit.colliderInstanceID == axisZ.GetComponent<CapsuleCollider>().GetInstanceID()) {
                         click = Axis.AxisZ;
+                        didHit = true;
                     }
 
                 }
 
                 previousMouse = Input.mousePosition;
-
-                return;
+                return didHit;
 
             }
 
@@ -114,7 +121,6 @@ public class AxisControl: MonoBehaviour {
 
             switch (click) {
                 case Axis.AxisX:
-
 
                     pos.x = dragPos.x;
 
@@ -135,14 +141,20 @@ public class AxisControl: MonoBehaviour {
 
             if (moveCallback(pos)) {
                 transform.position = controlledObject.transform.position;
-            } else {
+            }
+            else {
                 controlledObject.transform.position = pos;
             }
 
             previousMouse = Input.mousePosition;
+            return true;
 
-        } else {
+        }
+        else {
+
             click = Axis.None;
+            return false;
+
         }
 
     }
