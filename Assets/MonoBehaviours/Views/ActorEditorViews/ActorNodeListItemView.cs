@@ -40,8 +40,8 @@ public class ActorNodeListItemView : MonoBehaviour {
             ("Rename", Rename),
             ("Group", StartGroup),
             ("Ungroup", Ungroup),
-            ("Delete", Delete)
-
+            ("Delete", Delete),
+            ("Reorder", ReOrder)
         };
 
         actorNodeListItemFab = view.actorNodeListItemFab;
@@ -208,6 +208,33 @@ public class ActorNodeListItemView : MonoBehaviour {
             view.controller.StartGroup(actor);
 
         }
+
+    }
+
+    void ReOrder() {
+
+        if (node == null) {
+            return;
+        }
+
+        if (node.groupType != ActorGroupType.Position) {
+            return;
+        }
+
+        if (view.lookingToReorder == null) {
+            view.lookingToReorder = this;
+            return;
+        }
+
+        var indexStart = view.actorNodes.IndexOf(view.lookingToReorder);
+        var indexOfThis = view.actorNodes.IndexOf(this);
+
+        view.level.sceneActors.ReorderPositionalGroup(indexStart, indexOfThis);
+
+        view.lookingToReorder = null;
+
+        view.Refresh();
+        view.RequestDelayedScrollPosUpdate();
 
     }
 

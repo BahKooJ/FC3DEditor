@@ -24,10 +24,29 @@ public class SceneActorsView : MonoBehaviour {
     public List<ActorNodeListItemView> actorNodes = new();
     public Dictionary<int, ActorNodeListItemView> actorNodesByID = null;
 
+    public ActorNodeListItemView lookingToReorder = null;
+    public float delayedScrollPos = 0f;
+    public int delayScrollPosCount = -1;
+
     void Start() {
 
+        delayScrollPosCount = -1;
         Refresh();
 
+    }
+
+    private void Update() {
+
+        if (delayScrollPosCount != -1) {
+
+            if (delayScrollPosCount == 0) {
+                contentScrollview.verticalNormalizedPosition = delayedScrollPos;
+            }
+
+            delayScrollPosCount--;
+
+        }
+        
     }
 
     public void ClearList() {
@@ -78,6 +97,11 @@ public class SceneActorsView : MonoBehaviour {
             contentScrollview.verticalNormalizedPosition = scrollPos;
         }
 
+    }
+
+    public void RequestDelayedScrollPosUpdate() {
+        delayedScrollPos = contentScrollview.verticalNormalizedPosition;
+        delayScrollPosCount = 5;
     }
 
     public void RefreshSelection(bool jump) {

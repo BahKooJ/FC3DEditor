@@ -119,6 +119,10 @@ public class ActorEditMode : EditMode {
 
         }
 
+        if (Main.ignoreAllInputs) {
+            return;
+        }
+
         if (selectedActorObject != null) {
 
             // Moves object to cursor
@@ -191,10 +195,6 @@ public class ActorEditMode : EditMode {
             }
 
 
-        }
-
-        if (Main.ignoreAllInputs) {
-            return;
         }
 
         if (Input.GetButtonDown("Delete")) {

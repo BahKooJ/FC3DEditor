@@ -21,11 +21,16 @@ public abstract class Presets {
 
         var file = File.ReadAllText(fileName);
 
+        return ReadUVPresetsContent(file);
+
+    }
+
+    public static UVPresets ReadUVPresetsContent(string file) {
+
         var startIndex = file.IndexOf(UVPresets.tag);
 
-        // This most likely means its the old file format
         if (startIndex == -1) {
-            return UVPresets.ReadFileOld(fileName);
+            return null;
         }
 
         var opened = new List<UVPresets>();
@@ -901,6 +906,12 @@ public abstract class Presets {
 
         var file = File.ReadAllText(fileName);
 
+        ReadString(file);
+
+    }
+
+    public static void ReadString(string file) {
+
         void ReadShaderPresets() {
 
             var startIndex = file.IndexOf(ShaderPresets.tag);
@@ -944,7 +955,7 @@ public abstract class Presets {
                     value += c;
                     continue;
                 }
-                
+
                 if (c == '(') {
 
                     opened.Last().presets.Add(ReadShaderPresetObject(file, i, out i));
@@ -982,7 +993,7 @@ public abstract class Presets {
                 }
 
             }
-        
+
         }
 
         void ReadColorPresets() {
@@ -1070,7 +1081,7 @@ public abstract class Presets {
                         case "VALUE":
 
                             if (c == ')') {
-                                
+
                                 switch (currentColorPreset.type) {
                                     case VertexColorType.MonoChrome:
                                         currentColorPreset.monoValue = Int32.Parse(value);
@@ -1185,7 +1196,7 @@ public abstract class Presets {
 
         }
 
-        uvPresets = ReadUVPresets(fileName);
+        uvPresets = ReadUVPresetsContent(file);
         ReadShaderPresets();
         ReadColorPresets();
         ReadLevelSchematics();
@@ -1193,6 +1204,12 @@ public abstract class Presets {
     }
 
     public static void SaveToFile(string name) {
+
+        File.WriteAllText("Presets/" + name + ".txt", Save());
+
+    }
+
+    public static string Save() {
 
         var total = "";
 
@@ -1211,7 +1228,7 @@ public abstract class Presets {
 
         total += "]}";
 
-        File.WriteAllText("Presets/" + name + ".txt", total);
+        return total;
 
     }
 

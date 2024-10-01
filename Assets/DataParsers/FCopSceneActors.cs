@@ -62,6 +62,14 @@ namespace FCopParser {
 
         }
 
+        public void ReorderPositionalGroup(int index, int newIndex) {
+
+            var movingItem = positionalGroupedActors[index];
+            positionalGroupedActors.RemoveAt(index);
+            positionalGroupedActors.Insert(newIndex, movingItem);
+
+        }
+
         public bool PositionalUngroupActor(FCopActor actor) {
 
             var node = positionalGroupedActors.FirstOrDefault(n => {
@@ -224,6 +232,24 @@ namespace FCopParser {
 
         }
 
+        public void SetPositionalGroup(List<ActorGroup> actorGroups) {
+
+            positionalGroupedActors = new();
+
+            foreach (var group in actorGroups) {
+
+                var actors = new List<FCopActor>();
+
+                foreach (var id in group.actorIDs) {
+                    actors.Add(actorsByID[id]);
+                }
+
+                positionalGroupedActors.Add(new ActorNode(actors, ActorGroupType.Position, group.name));
+
+            }
+
+        }
+
         public void SortActorsByBehavior() {
 
             foreach (var actor in actors) {
@@ -258,12 +284,33 @@ namespace FCopParser {
             this.name = name;
             nestedActors.Add(actor);
         }
+
+        public ActorNode(List<FCopActor> nestedActors, ActorGroupType groupType, string name) {
+            this.nestedActors = nestedActors;
+            this.groupType = groupType;
+            this.name = name;
+        }
+
     }
 
     public enum ActorGroupType {
         Position = 0,
         Behavior = 1,
         Script = 2
+    }
+
+    public struct ActorGroup {
+
+        public string name;
+        public ActorGroupType groupType;
+        public List<int> actorIDs;
+
+        public ActorGroup(string name, ActorGroupType groupType, List<int> actorIDs) {
+            this.name = name;
+            this.groupType = groupType;
+            this.actorIDs = actorIDs;
+        }
+
     }
 
 }

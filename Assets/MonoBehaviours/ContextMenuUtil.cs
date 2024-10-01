@@ -27,7 +27,17 @@ public abstract class ContextMenuUtil {
 
         containerObj.transform.SetParent(canvas.transform, false);
 
-        ((RectTransform)containerObj.transform).anchoredPosition = Input.mousePosition / Main.uiScaleFactor;
+        var rectTrans = (RectTransform)containerObj.transform;
+
+        var pos = Input.mousePosition / Main.uiScaleFactor;
+
+        if (pos.y - 100 < 0) {
+            pos.y -= pos.y - 100;
+
+        }
+
+        rectTrans.anchoredPosition = pos;
+
 
         foreach (var item in items) {
 

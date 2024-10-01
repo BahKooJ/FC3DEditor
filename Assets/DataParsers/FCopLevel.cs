@@ -66,9 +66,8 @@ namespace FCopParser {
         }
 
         public FCopLevel(byte[] nonCompressedFCopFile) {
-            // Section data is already inited with the read func
+            // Data is inited in this read func
             ReadNCFCFile(nonCompressedFCopFile.ToList());
-            InitData();
         }
 
         void InitData() {
@@ -506,6 +505,28 @@ namespace FCopParser {
 
             }
 
+            // Actor groups
+
+            var actorGroupData = new List<byte>();
+
+            foreach (var group in sceneActors.positionalGroupedActors) {
+
+                actorGroupData.AddRange(BitConverter.GetBytes(group.name.Count()));
+                actorGroupData.AddRange(Encoding.ASCII.GetBytes(group.name));
+                actorGroupData.AddRange(BitConverter.GetBytes(group.nestedActors.Count));
+
+                foreach (var nestAct in group.nestedActors) {
+                    actorGroupData.AddRange(BitConverter.GetBytes(nestAct.DataID));
+                }
+
+            }
+
+            total.AddRange(Encoding.ASCII.GetBytes("ACTORGRP"));
+            total.AddRange(BitConverter.GetBytes(actorGroupData.Count + 16));
+            total.AddRange(BitConverter.GetBytes(sceneActors.positionalGroupedActors.Count));
+            total.AddRange(actorGroupData);
+
+            // Everything else
             foreach (var file in fileManager.files) {
 
                 if (file.dataFourCC == "Ctil" || file.dataFourCC == "Cact" || file.dataFourCC == "Csac" || file.dataFourCC == "Cptc") {
@@ -540,6 +561,14 @@ namespace FCopParser {
 
             scripting.ResetIDAndOffsets();
 
+            // Presets
+
+            var presetData = Encoding.ASCII.GetBytes(Presets.Save());
+
+            total.AddRange(Encoding.ASCII.GetBytes("Presets "));
+            total.AddRange(BitConverter.GetBytes(presetData.Count()));
+            total.AddRange(presetData);
+
             return total;
 
         }
@@ -549,6 +578,10 @@ namespace FCopParser {
             var dataArray = data.ToArray();
 
             var newFileManager = new IFFFileManager();
+
+            // key data
+            List<FCopActor> actors = new();
+            List<ActorGroup> actorGroups = new();
 
             var i = 0;
 
@@ -598,7 +631,19 @@ namespace FCopParser {
                             new() { headerCodeData1, headerCodeData2 },
                             headerCode
                             );
+
                     i += totalSize - headeSize;
+
+                    if (eightCC.Substring(4,4) == "Cact" || eightCC.Substring(4, 4) == "Csac") {
+
+                        var actor = new FCopActor(file) {
+                            name = name
+                        };
+
+                        actors.Add(actor);
+
+                    }
+
                     return file;
                 }
                 else {
@@ -614,17 +659,7 @@ namespace FCopParser {
                 // Offset is not moved because it's just to peak what kind of data it is
                 var eightCC = Encoding.Default.GetString(dataArray, i, 8);
 
-                if (eightCC != "SubFile " && eightCC != "Music   ") {
-
-                    var file = CreateDataFile(iBeforeHeader);
-
-                    if (file != null) {
-                        newFileManager.files.Add(file);
-                    }
-
-
-                }
-                else if (eightCC == "SubFile ") {
+                if (eightCC == "SubFile ") {
 
                     i += 8;
                     var totalSize = BitConverter.ToInt32(dataArray, i);
@@ -665,13 +700,117 @@ namespace FCopParser {
                     newFileManager.music = new KeyValuePair<byte[], List<byte>>(name, data.GetRange(i, totalSize - headeSize));
 
                     i += totalSize - headeSize;
+                    
+
+                }
+                else if (eightCC == "Presets ") {
+
+                    i += 8;
+                    var totalSize = BitConverter.ToInt32(dataArray, i);
+                    i += 4;
+
+                    Presets.ReadString(Encoding.ASCII.GetString(data.GetRange(i, totalSize).ToArray()));
+                    i += totalSize;
                     break;
+
+                }
+                else if (eightCC == "ACTORGRP") {
+
+                    i += 8;
+                    var totalSize = BitConverter.ToInt32(dataArray, i);
+                    i += 4;
+                    var groupCount = BitConverter.ToInt32(dataArray, i);
+                    i += 4;
+
+                    foreach (var g in Enumerable.Range(0, groupCount)) {
+
+                        var nameSize = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+                        var name = Encoding.ASCII.GetString(data.GetRange(i, nameSize).ToArray());
+                        i += nameSize;
+                        var actorIDCount = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+
+                        var groupStruct = new ActorGroup(name, ActorGroupType.Position, new());
+
+                        foreach (var a in Enumerable.Range(0, actorIDCount)) {
+                            var id = BitConverter.ToInt32(dataArray, i);
+                            i += 4;
+                            groupStruct.actorIDs.Add(id);
+                        }
+
+                        actorGroups.Add(groupStruct);
+
+                    }
+
+                }
+                else {
+
+                    var file = CreateDataFile(iBeforeHeader);
+
+                    if (file != null) {
+                        newFileManager.files.Add(file);
+                    }
 
                 }
 
             }
 
             fileManager = newFileManager;
+            sceneActors = new FCopSceneActors(actors, this);
+            if (actorGroups.Count != 0) {
+                sceneActors.SetPositionalGroup(actorGroups);
+            }
+
+            // TODO: This data should be replaced on file read.
+            List<IFFDataFile> GetFiles(string fourCC) {
+
+                return fileManager.files.Where(file => {
+
+                    return file.dataFourCC == fourCC;
+
+                }).ToList();
+
+            }
+
+            IFFDataFile GetFile(string fourCC) {
+
+                return fileManager.files.First(file => {
+
+                    return file.dataFourCC == fourCC;
+
+                });
+
+            }
+
+            var rpns = new FCopRPNS(GetFile("RPNS"));
+
+            var cfun = new FCopFunctionParser(GetFile("Cfun"));
+
+            scripting = new FCopScriptingProject(rpns, cfun);
+
+            var rawCwavs = GetFiles("Cwav");
+            var rawCshd = GetFile("Cshd");
+
+            var rawBitmapFiles = GetFiles("Cbmp");
+
+            var rawNavMeshFiles = GetFiles("Cnet");
+
+            var rawObjectFiles = GetFiles("Cobj");
+
+            foreach (var rawFile in rawBitmapFiles) {
+                textures.Add(new FCopTexture(rawFile));
+            }
+
+            foreach (var rawFile in rawNavMeshFiles) {
+                navMeshes.Add(new FCopNavMesh(rawFile));
+            }
+
+            foreach (var rawFile in rawObjectFiles) {
+                objects.Add(new FCopObject(rawFile));
+            }
+
+            soundEffects = new FCopSoundEffectParser(rawCwavs, rawCshd);
 
         }
 

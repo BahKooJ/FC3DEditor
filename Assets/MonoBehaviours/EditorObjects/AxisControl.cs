@@ -23,6 +23,7 @@ public class AxisControl: MonoBehaviour {
     public Func<Vector3, bool> moveCallback = (par) => { return false; };
     public Func<float, bool> rotateCallback = (par) => { return false; };
 
+    bool preventSelection = true;
 
     void Start() {
 
@@ -55,6 +56,14 @@ public class AxisControl: MonoBehaviour {
     }
 
     void Update() {
+
+        if (Input.GetMouseButtonUp(0)) {
+            preventSelection = false;
+        }
+
+        if (preventSelection) {
+            return;
+        }
 
         if (Controls.OnDown("Rotate")) {
             rotate = true;
