@@ -60,7 +60,7 @@ namespace FCopParser {
                 });
 
                 var nextNodeIndex = 3;
-                foreach (var index in node.nextNode) {
+                foreach (var index in node.nextNodeIndexes) {
 
                     bitfield.bitNumbers[nextNodeIndex].number = index;
 
@@ -108,7 +108,7 @@ namespace FCopParser {
         public static int invalid = 1023;
 
         public int index;
-        public int[] nextNode = new int[3];
+        public int[] nextNodeIndexes = new int[3];
         public int x;
         public int y;
         public bool isStartingPoint;
@@ -120,9 +120,9 @@ namespace FCopParser {
             this.index = index;
             this.unknown = unknown;
             this.unknown2 = unknown2;
-            this.nextNode[0] = nextNodeA;
-            this.nextNode[1] = nextNodeB;
-            this.nextNode[2] = nextNodeC;
+            this.nextNodeIndexes[0] = nextNodeA;
+            this.nextNodeIndexes[1] = nextNodeB;
+            this.nextNodeIndexes[2] = nextNodeC;
             this.x = x;
             this.y = y;
             this.isStartingPoint = isStartingPoint;

@@ -1,22 +1,26 @@
 ﻿
 
 using FCopParser;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public class NavNodePoint : MonoBehaviour {
 
-    static float yPadding = 0.3f;
+    static float yPadding = 0.1f;
 
+    // - Unity Refs -
     public SphereCollider sphereCollider;
 
+    // - Parameters -
     public NavNode node;
-
     public NavMeshEditMode controller;
 
-    public LineRenderer[] nextNodeLines = new LineRenderer[3] { null, null, null };
-
+    [HideInInspector]
+    public List<LineRenderer> nextNodeLines = new();
+    [HideInInspector]
     public List<NavNodePoint> previousPoints = new();
 
     void Start() {
@@ -27,9 +31,7 @@ public class NavNodePoint : MonoBehaviour {
 
         transform.position = new Vector3(node.x / 32f, 100f, -(node.y / 32f));
 
-        RaycastHit hit;
-
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, Mathf.Infinity, 1)) {
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, Mathf.Infinity, 1)) {
 
             var pos = transform.position;
 
@@ -37,7 +39,8 @@ public class NavNodePoint : MonoBehaviour {
 
             transform.position = pos;
 
-        } else {
+        }
+        else {
             print("No floor found: " + transform.position.x.ToString() + " " + transform.position.z.ToString());
         }
 
@@ -60,68 +63,149 @@ public class NavNodePoint : MonoBehaviour {
 
     public void RefreshLines() {
 
-        foreach (var index in Enumerable.Range(0, nextNodeLines.Count())) {
+        ValidateCorrectNextNodes();
 
-            if (node.nextNode[index] == NavNode.invalid && nextNodeLines[index] != null) {
-                Destroy(nextNodeLines[index].gameObject);
-                nextNodeLines[index] = null;
-            }
+        if (nextNodeLines.Count == 0) {
 
-            if (node.nextNode[index] != NavNode.invalid && nextNodeLines[index] == null) {
+            var nextNodeI = 0;
+            foreach (var nodeIndex in node.nextNodeIndexes) {
 
-                if (node.nextNode[index] == node.index) {
-                    ClearPaths();
-                    return;
+                if (nodeIndex != NavNode.invalid) {
+
+                    nextNodeLines.Add(InitLine(nodeIndex, nextNodeI));
+
+                }
+                else {
+
+                    // Even though the next index is invalid, the space needs to be filled up so things line up.
+                    nextNodeLines.Add(null);
+
                 }
 
-                var lineObject = Object.Instantiate(controller.main.line3d);
-
-                var lineRenderer = lineObject.GetComponent<LineRenderer>();
-
-                nextNodeLines[index] = lineRenderer;
-
-                controller.lines.Add(lineObject);
-
+                nextNodeI++;
             }
 
-            var line = nextNodeLines[index];
+        }
+        else {
 
-            if (line != null) {
+            var nextNodeI = 0;
+            foreach (var nodeIndex in node.nextNodeIndexes) {
 
-                var nextNode = controller.navNodes[node.nextNode[index]];
+                if (nodeIndex != NavNode.invalid) {
 
-                line.SetPosition(0, transform.position);
+                    var line = nextNodeLines[nextNodeI];
 
-                line.SetPosition(1, nextNode.transform.position);
+                    if (line == null) {
+                        nextNodeLines[nextNodeI] = InitLine(nodeIndex, nextNodeI);
+                    }
+                    else {
 
-                switch (index) {
-                    case 0:
-                        line.startColor = Color.blue;
-                        line.endColor = Color.blue;
-                        break;
-                    case 1:
-                        line.startColor = Color.green;
-                        line.endColor = Color.green;
-                        break;
-                    case 2:
-                        line.startColor = Color.red;
-                        line.endColor = Color.red;
-                        break;
+                        line.SetPosition(0, transform.position);
+
+                        line.SetPosition(1, controller.navNodes[nodeIndex].transform.position);
+
+                    }
+
                 }
 
+                nextNodeI++;
             }
 
         }
 
     }
 
-    public void ClearPaths() {
+    void ValidateCorrectNextNodes() {
 
-        foreach (var index in Enumerable.Range(0, node.nextNode.Count())) {
+        foreach (var nodeIndex in node.nextNodeIndexes) {
 
-            node.nextNode[index] = NavNode.invalid;
+            if (nodeIndex == node.index) {
+                ClearPaths();
+                return;
+            }
 
         }
+
+    }
+
+    public bool AreAllPathsUsed() {
+
+        foreach (var nodeIndex in node.nextNodeIndexes) {
+
+            if (nodeIndex == NavNode.invalid) {
+                return false;
+            }
+
+        }
+
+        return true;
+
+    }
+
+    public bool AlreadyContainsPath(int index) {
+
+        foreach (var nodeIndex in node.nextNodeIndexes) {
+
+            if (nodeIndex == index) {
+                return true;
+            }
+
+        }
+
+        return false;
+
+    }
+
+    LineRenderer InitLine(int nodeIndex, int nextNodeIndex) {
+
+        var nextNode = controller.navNodes[nodeIndex];
+
+        var lineObject = Object.Instantiate(controller.main.line3d);
+
+        var lineRenderer = lineObject.GetComponent<LineRenderer>();
+
+        lineRenderer.SetPosition(0, transform.position);
+
+        lineRenderer.SetPosition(1, nextNode.transform.position);
+
+        switch (nextNodeIndex) {
+            case 0:
+                lineRenderer.startColor = Color.blue;
+                lineRenderer.endColor = Color.blue;
+                break;
+            case 1:
+                lineRenderer.startColor = Color.green;
+                lineRenderer.endColor = Color.green;
+                break;
+            case 2:
+                lineRenderer.startColor = Color.red;
+                lineRenderer.endColor = Color.red;
+                break;
+        }
+
+        return lineRenderer;
+
+    }
+
+    public void ClearPaths() {
+
+        foreach (var index in Enumerable.Range(0, node.nextNodeIndexes.Count())) {
+
+            node.nextNodeIndexes[index] = NavNode.invalid;
+
+        }
+
+        foreach (var line in nextNodeLines) {
+
+            if (line != null) {
+
+                Object.Destroy(line.gameObject);
+
+            }
+
+        }
+
+        nextNodeLines.Clear();
 
         RefreshLines();
 

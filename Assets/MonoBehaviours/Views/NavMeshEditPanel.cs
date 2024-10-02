@@ -33,11 +33,7 @@ public class NavMeshEditPanel : MonoBehaviour {
 
     public void AddNode() {
 
-        controller.UnselectNode();
-
-        var obj = Instantiate(controller.main.NavMeshPoint);
-        var script = obj.GetComponent<NavNodePoint>();
-        controller.navNodeToAdd = script;
+        controller.StartNodeToAdd();
 
     }
 
@@ -54,7 +50,7 @@ public class NavMeshEditPanel : MonoBehaviour {
 
     public void ChangeNavMesh(int index) {
 
-        controller.selectedNavMesh = index;
+        controller.selectedNavMeshIndex = index;
         controller.OnDestroy();
         controller.OnCreateMode();
 

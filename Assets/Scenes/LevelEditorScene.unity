@@ -1201,7 +1201,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
-  message: Tile Add Mode
+  message: Play Mode
 --- !u!114 &679014473
 MonoBehaviour:
   m_ObjectHideFlags: 0

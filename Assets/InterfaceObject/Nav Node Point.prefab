@@ -111,8 +111,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sphereCollider: {fileID: 9037256266016245241}
-  nextNodeLines:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  nextNodeLines: []
   previousPoints: []
