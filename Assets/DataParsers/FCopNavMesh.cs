@@ -7,19 +7,18 @@ using System.Linq;
 namespace FCopParser {
 
     // TODO: Turns out the starting node is not just a bool but has more going on with it.
-    public class FCopNavMesh {
+    public class FCopNavMesh : FCopAsset {
 
         const int nodeCountOffset = 14;
         const int nodesOffset = 16;
 
         static List<byte> fourCC = new List<byte>() { 78, 116, 68, 79 };
 
-        public IFFDataFile rawFile;
-
         public List<NavNode> nodes = new();
 
-        public FCopNavMesh(IFFDataFile rawFile) {
-            this.rawFile = rawFile;
+        public FCopNavMesh(IFFDataFile rawFile) : base(rawFile) {
+
+            name = "NavMesh " + DataID;
 
             int nodeCount = Utils.BytesToShort(rawFile.data.ToArray(),nodeCountOffset);
 

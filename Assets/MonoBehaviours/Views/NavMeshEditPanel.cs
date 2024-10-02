@@ -1,27 +1,22 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class NavMeshEditPanel : MonoBehaviour {
 
+    public Toggle isStartToggle;
+    public CustomDropdown navMeshDropdown;
+
     public NavMeshEditMode controller;
 
-    public GameObject navMeshButton;
-
-    public GameObject listView;
-
-    public Toggle isStartToggle;
 
     void Start() {
 
-        foreach (var index in Enumerable.Range(0, controller.main.level.navMeshes.Count)) {
+        foreach (var navMesh in controller.main.level.navMeshes) {
 
-            var button = Instantiate(navMeshButton);
-            var script = button.GetComponent<NavMeshButton>();
-            script.index = index;
-            script.controller = this;
-
-            button.transform.SetParent(listView.transform, false);
+            navMeshDropdown.AddItem(navMesh.name);
 
         }
 
@@ -75,6 +70,12 @@ public class NavMeshEditPanel : MonoBehaviour {
     public void CopyNavNodeCoords() {
 
         controller.CopyNavNodeCoords();
+
+    }
+
+    public void OnDropdownChange() {
+
+        ChangeNavMesh(navMeshDropdown.value);
 
     }
 

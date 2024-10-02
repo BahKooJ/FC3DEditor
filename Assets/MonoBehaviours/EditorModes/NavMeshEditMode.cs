@@ -3,7 +3,6 @@ using FCopParser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -386,6 +385,12 @@ public class NavMeshEditMode : EditMode {
         Object.Destroy(pathToAdd.Value.Item2.gameObject);
 
         pathToAdd = null;
+
+    }
+
+    public void RenameNavMesh(string newName, int index) {
+
+        main.level.navMeshes[index].name = newName;
 
     }
 
