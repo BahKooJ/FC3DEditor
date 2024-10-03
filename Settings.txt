@@ -46,6 +46,8 @@ Inputs = {
 "ResetLevelSchematic":"1" "R"
 "EnableRotateLevelSchematic":"1" "T"
 "EnableMirrorLevelSchematic":"1" "G"
+"AddNavNode":"1" "G"
+"ClearNavPaths":"1" "R"
 }
 RenderMode = "Pixelated";
 MouseSensitivity = "3";

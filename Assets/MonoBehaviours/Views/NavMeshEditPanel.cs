@@ -34,12 +34,7 @@ public class NavMeshEditPanel : MonoBehaviour {
 
     public void ClearPaths() {
 
-        if (controller.selectedNavNode == null) {
-            return;
-        }
-
-        var script = controller.selectedNavNode.controlledObject.GetComponent<NavNodePoint>();
-        script.ClearPaths();
+        controller.ClearPaths();
 
     }
 
@@ -50,7 +45,7 @@ public class NavMeshEditPanel : MonoBehaviour {
         controller.OnCreateMode();
 
     }
-
+    // TODO: No logic should be in the view!
     public void OnValueChangeStartToggle() {
 
         if (controller == null) { return; }

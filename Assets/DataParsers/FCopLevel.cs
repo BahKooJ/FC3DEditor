@@ -383,6 +383,7 @@ namespace FCopParser {
 
             foreach (var navMesh in navMeshes) {
                 navMesh.Compile();
+                CreateHeaderWithFile(navMesh.rawFile, "FCopCnet", navMesh.name);
             }
 
             foreach (var texture in textures) {
@@ -529,7 +530,11 @@ namespace FCopParser {
             // Everything else
             foreach (var file in fileManager.files) {
 
-                if (file.dataFourCC == "Ctil" || file.dataFourCC == "Cact" || file.dataFourCC == "Csac" || file.dataFourCC == "Cptc") {
+                if (file.dataFourCC == "Ctil" || 
+                    file.dataFourCC == "Cact" || 
+                    file.dataFourCC == "Csac" || 
+                    file.dataFourCC == "Cptc" ||
+                    file.dataFourCC == "Cnet") {
                     continue;
                 }
 
@@ -581,6 +586,7 @@ namespace FCopParser {
 
             // key data
             List<FCopActor> actors = new();
+            List<FCopNavMesh> navMeshes = new();
             List<ActorGroup> actorGroups = new();
 
             var i = 0;
@@ -641,6 +647,15 @@ namespace FCopParser {
                         };
 
                         actors.Add(actor);
+
+                    }
+                    else if (eightCC.Substring(4, 4) == "Cnet") {
+
+                        var navMesh = new FCopNavMesh(file) {
+                            name = name
+                        };
+
+                        navMeshes.Add(navMesh);
 
                     }
 
@@ -761,6 +776,7 @@ namespace FCopParser {
             if (actorGroups.Count != 0) {
                 sceneActors.SetPositionalGroup(actorGroups);
             }
+            this.navMeshes = navMeshes;
 
             // TODO: This data should be replaced on file read.
             List<IFFDataFile> GetFiles(string fourCC) {
@@ -794,16 +810,10 @@ namespace FCopParser {
 
             var rawBitmapFiles = GetFiles("Cbmp");
 
-            var rawNavMeshFiles = GetFiles("Cnet");
-
             var rawObjectFiles = GetFiles("Cobj");
 
             foreach (var rawFile in rawBitmapFiles) {
                 textures.Add(new FCopTexture(rawFile));
-            }
-
-            foreach (var rawFile in rawNavMeshFiles) {
-                navMeshes.Add(new FCopNavMesh(rawFile));
             }
 
             foreach (var rawFile in rawObjectFiles) {

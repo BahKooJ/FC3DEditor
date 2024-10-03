@@ -107,10 +107,17 @@ public class NavMeshEditMode : EditMode {
             return;
         }
 
+        if (Controls.OnDown("AddNavNode")) {
+            StartNodeToAdd();
+        }
+
+        if (Controls.OnDown("ClearNavPaths")) {
+            ClearPaths();
+        }
+
         if (Controls.OnDown("Unselect")) {
             UnselectNode();
         }
-        
 
         if (pathToAdd != null) {
 
@@ -385,6 +392,17 @@ public class NavMeshEditMode : EditMode {
         Object.Destroy(pathToAdd.Value.Item2.gameObject);
 
         pathToAdd = null;
+
+    }
+
+    public void ClearPaths() {
+
+        if (selectedNavNode == null) {
+            return;
+        }
+
+        var script = selectedNavNode.controlledObject.GetComponent<NavNodePoint>();
+        script.ClearPaths();
 
     }
 
