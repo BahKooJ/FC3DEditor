@@ -44,8 +44,7 @@ public class ActorObject : MonoBehaviour {
 
     public void ChangePosition(Vector3 pos) {
 
-        actor.x = Mathf.RoundToInt(pos.x * 8192f);
-        actor.y = Mathf.RoundToInt(pos.z * -8192f);
+        controller.ChangeActorPosition(actor, pos);
 
         SetToCurrentPosition();
 

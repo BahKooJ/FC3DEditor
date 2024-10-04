@@ -53,7 +53,7 @@ public class ActorEditMode : EditMode {
             foreach (var actor in actors) {
 
                 var createdActObj = CreateActor(actor, script);
-                
+
                 createdActObj.transform.SetParent(script.transform, false);
 
                 script.actObjects.Add(createdActObj);
@@ -86,7 +86,7 @@ public class ActorEditMode : EditMode {
             }
 
         }
-        
+
     }
 
     public void OnDestroy() {
@@ -136,17 +136,9 @@ public class ActorEditMode : EditMode {
             // Moves object to cursor
             if (Controls.IsDown("MoveToCursor")) {
 
-                var hitPos = main.CursorOnLevelMesh();
+                MoveActorToCursor();
 
-                if (hitPos != null) {
-
-                    selectedActorObject.moveCallback((Vector3)hitPos);
-
-                    selectedActorObject.transform.position = selectedActorObject.controlledObject.transform.position;
-
-                }
-
-            } 
+            }
 
         }
 
@@ -212,6 +204,46 @@ public class ActorEditMode : EditMode {
         if (Controls.OnDown("Unselect")) {
             UnselectActorCompletely();
         }
+
+    }
+
+    public void StartGroup(FCopActor actor) {
+        actorToGroup = actor;
+        HeadsUpTextUtil.HeadsUp("Select Actor to Group...");
+    }
+
+    #region Selection And GameObjects
+
+    public void UnselectActorCompletely() {
+
+        if (selectedActorObject != null) {
+
+            selectedActorObject.ClearOutlineOnObject();
+
+            Object.Destroy(selectedActorObject.gameObject);
+
+        }
+
+        selectedActor = null;
+        selectedActorObject = null;
+
+        view.activeActorPropertiesView.Refresh();
+        view.activeActorPropertiesView.sceneActorsView.Refresh(true);
+
+    }
+
+    public void UnselectActor() {
+
+        if (selectedActorObject != null) {
+
+            selectedActorObject.ClearOutlineOnObject();
+
+            Object.Destroy(selectedActorObject.gameObject);
+
+        }
+
+        selectedActor = null;
+        selectedActorObject = null;
 
     }
 
@@ -294,7 +326,7 @@ public class ActorEditMode : EditMode {
 
         selectedActorObject = script;
         selectedActor = actorObject.actor;
-        
+
         view.RefreshActorPropertiesView();
 
     }
@@ -311,7 +343,7 @@ public class ActorEditMode : EditMode {
     public void MoveToActor(int id) {
 
         ActorObject actorObj;
-        
+
         actorObj = actorObjects.First(obj => obj.actor.DataID == id);
 
         Camera.main.transform.position = actorObj.transform.position;
@@ -320,112 +352,9 @@ public class ActorEditMode : EditMode {
 
     }
 
-    public void UnselectActor() {
+    #endregion
 
-        if (selectedActorObject != null) {
-
-            selectedActorObject.ClearOutlineOnObject();
-
-            Object.Destroy(selectedActorObject.gameObject);
-
-        }
-
-        selectedActor = null;
-        selectedActorObject = null;
-
-    }
-
-    public void UnselectActorCompletely() {
-
-        if (selectedActorObject != null) {
-
-            selectedActorObject.ClearOutlineOnObject();
-
-            Object.Destroy(selectedActorObject.gameObject);
-
-        }
-
-        selectedActor = null;
-        selectedActorObject = null;
-
-        view.activeActorPropertiesView.Refresh();
-        view.activeActorPropertiesView.sceneActorsView.Refresh(true);
-
-    }
-
-    public void RenameActor(FCopActor actor, string newName) {
-
-        actor.name = newName;
-
-        if (selectedActor != null) {
-
-            if (selectedActor.DataID == actor.DataID) {
-
-                if (view.activeActorPropertiesView != null) {
-                    view.activeActorPropertiesView.RefreshName();
-                }
-
-            }
-
-        }
-
-        var nodeView = view.activeActorPropertiesView.sceneActorsView.GetNodeItemByID(actor.DataID);
-
-        if (nodeView != null) {
-            nodeView.RefreshName();
-        }
-
-    }
-
-    public void UngroupActor(FCopActor actor) {
-
-        var didUngroup = main.level.sceneActors.PositionalUngroupActor(actor);
-
-        if (didUngroup) {
-
-            ValidateGrouping();
-
-            var actorObj = actorObjectsByID[actor.DataID];
-
-            actorObj.SetToCurrentPosition();
-
-            view.activeActorPropertiesView.sceneActorsView.Refresh(true);
-
-        }
-
-    }
-
-    public void StartGroup(FCopActor actor) {
-        actorToGroup = actor;
-        HeadsUpTextUtil.HeadsUp("Select Actor to Group...");
-    }
-
-    public void GroupActor(ActorNode toGroup) {
-
-        HeadsUpTextUtil.End();
-
-        if (actorToGroup == null) return;
-
-        var didGroup = main.level.sceneActors.PositionalGroupActor(actorToGroup, toGroup);
-
-        if (didGroup) {
-
-            ValidateGrouping();
-
-            var actorObj = actorObjectsByID[actorToGroup.DataID];
-
-            actorObj.SetToCurrentPosition();
-
-            view.activeActorPropertiesView.sceneActorsView.Refresh(true);
-
-        }
-        else {
-            QuickLogHandler.Log("Unable to group actors", LogSeverity.Error);
-        }
-
-        actorToGroup = null;
-
-    }
+    #region Model Mutating
 
     public void DeleteActor() {
 
@@ -486,5 +415,110 @@ public class ActorEditMode : EditMode {
 
     }
 
+    public void GroupActor(ActorNode toGroup) {
+
+        HeadsUpTextUtil.End();
+
+        if (actorToGroup == null) return;
+
+        var didGroup = main.level.sceneActors.PositionalGroupActor(actorToGroup, toGroup);
+
+        if (didGroup) {
+
+            ValidateGrouping();
+
+            var actorObj = actorObjectsByID[actorToGroup.DataID];
+
+            actorObj.SetToCurrentPosition();
+
+            view.activeActorPropertiesView.sceneActorsView.Refresh(true);
+
+        }
+        else {
+            QuickLogHandler.Log("Unable to group actors", LogSeverity.Error);
+        }
+
+        actorToGroup = null;
+
+    }
+
+    public void UngroupActor(FCopActor actor) {
+
+        var didUngroup = main.level.sceneActors.PositionalUngroupActor(actor);
+
+        if (didUngroup) {
+
+            ValidateGrouping();
+
+            var actorObj = actorObjectsByID[actor.DataID];
+
+            actorObj.SetToCurrentPosition();
+
+            view.activeActorPropertiesView.sceneActorsView.Refresh(true);
+
+        }
+
+    }
+
+    public void RenameActor(FCopActor actor, string newName) {
+
+        actor.name = newName;
+
+        if (selectedActor != null) {
+
+            if (selectedActor.DataID == actor.DataID) {
+
+                if (view.activeActorPropertiesView != null) {
+                    view.activeActorPropertiesView.RefreshName();
+                }
+
+            }
+
+        }
+
+        var nodeView = view.activeActorPropertiesView.sceneActorsView.GetNodeItemByID(actor.DataID);
+
+        if (nodeView != null) {
+            nodeView.RefreshName();
+        }
+
+    }
+
+    public void ChangeActorPosition(FCopActor actor, Vector3 pos) {
+        actor.x = Mathf.RoundToInt(pos.x * 8192f);
+        actor.y = Mathf.RoundToInt(pos.z * -8192f);
+    }
+
+    void MoveActorToCursor() {
+
+        var hitPos = main.CursorOnLevelMesh();
+
+        if (hitPos != null) {
+
+            selectedActorObject.moveCallback((Vector3)hitPos);
+
+            selectedActorObject.transform.position = selectedActorObject.controlledObject.transform.position;
+
+        }
+
+    }
+
+    #endregion
+
+    #region Counter-Actions
+
+    public class ActorPositionCounterAction : CounterAction {
+
+        public int savedX;
+        public int savedY;
+        public FCopActor modifiedActor;
+
+        public void Action() {
+            
+        }
+
+    }
+
+    #endregion
 
 }
