@@ -436,13 +436,19 @@ public class NavMeshEditMode : EditMode {
 
     }
 
-    public void ClearNavMesh() {
+    public void ClearNavMesh(int index) {
 
-        SelectedNavMesh.nodes.Clear();
+        DialogWindowUtil.Dialog("Clear Nav Mesh", "Are you sure you would like to clear this nav mesh? This cannot be undone.", () => {
 
-        OnDestroy();
+            main.level.navMeshes[index].nodes.Clear();
 
-        OnCreateMode();
+            OnDestroy();
+
+            OnCreateMode();
+
+            return true;
+
+        });
 
     }
 

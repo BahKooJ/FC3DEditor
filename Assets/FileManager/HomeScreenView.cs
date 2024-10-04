@@ -17,7 +17,7 @@ public class HomeScreenView : MonoBehaviour {
 
     public void OnClickCreateFile() {
 
-        OpenFileWindowUtil.OpenFile("MissionFiles", "", file => main.CreateMission(file));
+        main.OpenMapOpenerView();
 
     }
 

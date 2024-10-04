@@ -16,7 +16,7 @@ public class NavMeshListItemView : MonoBehaviour {
 
         contextMenu.items = new() {
             ("Rename", StartRenaming),
-            ("Clear", () => { })
+            ("Clear", Clear)
         };
 
     }
@@ -30,6 +30,12 @@ public class NavMeshListItemView : MonoBehaviour {
         inputField.text = label.text;
 
         inputField.Select();
+
+    }
+
+    void Clear() {
+
+        view.controller.ClearNavMesh(dropdownListItem.index);
 
     }
 

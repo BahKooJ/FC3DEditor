@@ -70,6 +70,14 @@ namespace FCopParser {
             ReadNCFCFile(nonCompressedFCopFile.ToList());
         }
 
+        public FCopLevel(int width, int height, byte[] nonCompressedFCopFile) {
+
+            ReadNCFCFile(nonCompressedFCopFile.ToList());
+
+            ClearLevelData(width, height);
+
+        }
+
         void InitData() {
 
             List<IFFDataFile> GetFiles(string fourCC) {
@@ -188,6 +196,31 @@ namespace FCopParser {
             }
         
 
+
+        }
+
+        public void ClearLevelData(int width, int height) {
+
+            sections.Clear();
+
+            this.width = width + 8;
+            this.height = height + 8;
+
+            // + 8s are there for the out of bounds padding, 4 sections on either side.
+            foreach (var y in Enumerable.Range(0, height + 8)) {
+
+                foreach (var x in Enumerable.Range(0, width + 8)) {
+
+                    if (x >= 4 && x < width + 4 && y >= 4 && y < height + 4) {
+                        sections.Add(FCopLevelSection.CreateEmpty(-120, -100, -80));
+                    }
+                    else {
+                        sections.Add(FCopLevelSection.CreateEmpty(20, -128, -128));
+                    }
+
+                }
+
+            }
 
         }
 

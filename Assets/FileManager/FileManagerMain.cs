@@ -40,52 +40,80 @@ public class FileManagerMain : MonoBehaviour {
 
     }
 
+    public FCopLevel GetFile(string path) {
+
+        var fileContent = File.ReadAllBytes(path);
+
+        if (Path.GetExtension(path) == ".ncfc") {
+
+            try {
+
+                return new FCopLevel(fileContent);
+
+            }
+            catch {
+
+                DialogWindowUtil.Dialog("Invalid or Corrupted File", "Unable to parse Non-Compressed Future Cop file");
+                return null;
+
+            }
+
+        }
+        else {
+
+            try { 
+
+                iffFile = new IFFParser(fileContent);
+                return new FCopLevel(iffFile.parsedData);
+
+            }
+            catch (InvalidFileException) {
+
+                DialogWindowUtil.Dialog("Select Future Cop mission File", "This file is not a mission file");
+                return null;
+
+            }
+
+
+        }
+
+    }
+
     public void OpenFile(string path) {
 
         var fileContent = File.ReadAllBytes(path);
 
         if (Path.GetExtension(path) == ".ncfc") {
 
-            //try {
-                FileManagerMain.level = new FCopLevel(fileContent);
-            //}
-            //catch {
-            //    DialogWindowUtil.Dialog("Invalid or Corrupted File", "Unable to parse Non-Compressed Future Cop file");
-            //}
+            try {
+
+                level = new FCopLevel(fileContent);
+                SceneManager.LoadScene("Scenes/LevelEditorScene", LoadSceneMode.Single);
+
+            }
+            catch {
+                DialogWindowUtil.Dialog("Invalid or Corrupted File", "Unable to parse Non-Compressed Future Cop file");
+            }
 
         }
         else {
 
             try {
+
                 iffFile = new IFFParser(fileContent);
+                level = new FCopLevel(iffFile.parsedData);
+                SceneManager.LoadScene("Scenes/LevelEditorScene", LoadSceneMode.Single);
+
             }
             catch (InvalidFileException) {
                 DialogWindowUtil.Dialog("Select Future Cop mission File", "This file is not a mission file");
             }
 
-            FileManagerMain.level = new FCopLevel(FileManagerMain.iffFile.parsedData);
-
         }
-
-
-        SceneManager.LoadScene("Scenes/LevelEditorScene", LoadSceneMode.Single);
 
     }
 
-    public void CreateMission(string path) {
-
-        var fileContent = File.ReadAllBytes(path);
-
-        try {
-            iffFile = new IFFParser(fileContent);
-        }
-        catch (InvalidFileException) {
-            DialogWindowUtil.Dialog("Select Future Cop mission File", "This file is not a mission file");
-        }
-
-        foreach (Transform child in canvas) {
-            Destroy(child.gameObject);
-        }
+    public void OpenMapOpenerView() {
 
         var view = Instantiate(MapOpenerView);
         view.GetComponent<MapOpenerView>().main = this;

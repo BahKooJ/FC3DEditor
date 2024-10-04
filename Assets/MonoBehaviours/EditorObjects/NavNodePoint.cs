@@ -164,6 +164,8 @@ public class NavNodePoint : MonoBehaviour {
 
         var lineRenderer = lineObject.GetComponent<LineRenderer>();
 
+        lineRenderer.material.SetTextureScale("_MainTex", new Vector2(3f ,1f));
+
         lineRenderer.SetPosition(0, transform.position);
 
         lineRenderer.SetPosition(1, nextNode.transform.position);

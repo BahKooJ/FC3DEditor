@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 // I'm at my limit with Unity's built in dropdown that I'm just gonna write my own because I think it'll be fast than trying to work with that nightmare
 public class CustomDropdown : MonoBehaviour {
@@ -13,6 +14,7 @@ public class CustomDropdown : MonoBehaviour {
     public GameObject contentList;
     public Transform contentTransform;
     public TMP_Text label;
+    public UnityEvent onValueChanged;
 
     public List<string> items = new();
     public int value = 0;
@@ -57,6 +59,11 @@ public class CustomDropdown : MonoBehaviour {
         value = index;
         UpdateLabel();
         contentList.SetActive(false);
+
+        if (onValueChanged != null) {
+            onValueChanged.Invoke();
+        }
+
     }
 
     public void UpdateLabel() {
