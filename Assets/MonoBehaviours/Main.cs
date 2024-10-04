@@ -176,6 +176,10 @@ public class Main : MonoBehaviour {
             counterActionAddedOnCurrentSelectHold = false;
         }
 
+        if (Input.GetKeyDown(KeyCode.F12)) {
+            canvas.SetActive(!canvas.activeSelf);
+        }
+
         // Temp
         uiScaleFactor = uiScaler.scaleFactor;
 
