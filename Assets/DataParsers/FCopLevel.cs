@@ -1208,6 +1208,7 @@ namespace FCopParser {
             var colorIndex = 0;
 
             List<Chunk> chunks = new List<Chunk>() { new Chunk(0,0) };
+            List<(TileColumn column, int tileIndex)> columnWithIndex = new();
 
             foreach (var point in heightMap) {
                 heightPoints.Add(point.Compile());
@@ -1257,6 +1258,8 @@ namespace FCopParser {
 
             }
 
+            // Compresses all the tiles and adds them to the tile array
+            // Data is tracked for the third bitfield (tile count, tiles index)
             foreach (var chunk in chunks) {
 
                 foreach (var column in chunk.tileColumns) {
@@ -1506,7 +1509,9 @@ namespace FCopParser {
 
                     var lastCTile = sortedTiles.Last();
                     lastCTile.isEndInColumnArray = 1;
-                    sortedTiles[sortedTiles.Count - 1] = lastCTile;
+                    sortedTiles[^1] = lastCTile;
+
+                    columnWithIndex.Add((column, tiles.Count));
 
                     tiles.AddRange(sortedTiles);
 
@@ -1514,41 +1519,16 @@ namespace FCopParser {
 
             }
 
-            // Because the tiles are now no longer sorted left to right, it finds the correct index of the tiles for the columns.
-            var previousOffsetFromChunk = new Dictionary<int, int>() { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 } };
-            var previousChunkY = 0;
-            foreach (var column in tileColumns) {
+            if (tiles.Count > 1024) {
+                throw new MaxTilesExceeded();
+            }
 
-                var tileOffset = 0;
+            var sortedColumnsWithIndex = columnWithIndex.OrderBy(item => item.column.y).ThenBy(item => item.column.x).ToList();
 
-                var offsetChunkX = column.x / 4;
-                var offsetChunkY = column.y / 4;
+            foreach (var item in sortedColumnsWithIndex) {
 
-                if (previousChunkY != offsetChunkY) {
-
-                    foreach (var i in Enumerable.Range(0, 4)) {
-                        previousOffsetFromChunk[i] = 0;
-                    }
-
-                    previousChunkY = offsetChunkY;
-
-                }
-
-                if (!(offsetChunkX == 0 && offsetChunkY == 0)) {
-                    var previousChunks = chunks.GetRange(0, (offsetChunkY * 4) + offsetChunkX);
-
-                    foreach (var chunk in previousChunks) {
-                        tileOffset += chunk.Count();
-                    }
-
-                }
-
-                var offsetTotal = previousOffsetFromChunk[offsetChunkX] + tileOffset;
-
-                var bitField = new ThirdSectionBitfield(column.tiles.Count, offsetTotal);
+                var bitField = new ThirdSectionBitfield(item.column.tiles.Count, item.tileIndex);
                 thirdSectionBitfields.Add(bitField);
-
-                previousOffsetFromChunk[offsetChunkX] += column.tiles.Count;
 
             }
 

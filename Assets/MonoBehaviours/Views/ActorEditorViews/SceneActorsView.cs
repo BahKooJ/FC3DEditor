@@ -106,11 +106,13 @@ public class SceneActorsView : MonoBehaviour {
 
     public void RefreshSelection(bool jump) {
 
+
+
         foreach (var actorNode in actorNodes) {
             
             if (actorNode.node.nestedActors.Count > 1 || actorNode.forceGroup) {
 
-                if (actorNode.actorNodes.Count == 0) {
+                if (actorNode.actorNodes.Count == 0 && controller.selectedActor != null) {
 
                     foreach (var act in actorNode.node.nestedActors) {
 

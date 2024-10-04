@@ -21,6 +21,8 @@ public class ActorEditMode : EditMode {
 
     ActorObject actorToAdd = null;
 
+    static int counterActionID = 0;
+
     public ActorEditMode(Main main) {
         this.main = main;
     }
@@ -123,6 +125,12 @@ public class ActorEditMode : EditMode {
             return;
         }
 
+        if (Controls.OnUp("MoveToCursor") || Controls.OnUp("Select") || Input.GetMouseButtonUp(0)) {
+
+            counterActionID++;
+
+        }
+
         if (selectedActorObject != null) {
 
             if (selectedActorObject.TestCollision()) {
@@ -139,6 +147,7 @@ public class ActorEditMode : EditMode {
                 MoveActorToCursor();
 
             }
+
 
         }
 
@@ -183,7 +192,6 @@ public class ActorEditMode : EditMode {
                         }
                         else {
                             SelectActor(act);
-                            view.activeActorPropertiesView.sceneActorsView.RefreshSelection(true);
                         }
 
                         break;
@@ -215,6 +223,8 @@ public class ActorEditMode : EditMode {
     #region Selection And GameObjects
 
     public void UnselectActorCompletely() {
+
+        AddActorSelectCounterAction(selectedActor.DataID);
 
         if (selectedActorObject != null) {
 
@@ -292,7 +302,32 @@ public class ActorEditMode : EditMode {
 
     }
 
+    public void RefreshSelectedActorPosition() {
+
+        if (selectedActorObject != null) {
+
+            // WTF DO YOU WANT FROM ME UNITY???
+            // "Unity objects should not use null propagation" Ok odd guess I'll do it the verbos wa- OH WAIT
+            // "GetComponent allocates even if no component is found."
+            // FINE GUESS I'LL DO WHATEVER TF THIS IS
+
+            if (selectedActorObject.controlledObject.TryGetComponent<ActorObject>(out var actorObj)) {
+                actorObj.SetToCurrentPosition();
+            }
+
+            if (selectedActorObject.controlledObject.TryGetComponent<ActorGroupObject>(out var groupObj)) {
+                groupObj.SetToCurrentPosition();
+            }
+
+            selectedActorObject.transform.position = selectedActorObject.controlledObject.transform.position;
+
+        }
+
+    }
+
     public void SelectActor(ActorObject actorObject) {
+
+        AddActorSelectCounterAction(selectedActor?.DataID);
 
         UnselectActor();
 
@@ -328,6 +363,7 @@ public class ActorEditMode : EditMode {
         selectedActor = actorObject.actor;
 
         view.RefreshActorPropertiesView();
+        view.activeActorPropertiesView.sceneActorsView.RefreshSelection(false);
 
     }
 
@@ -336,7 +372,6 @@ public class ActorEditMode : EditMode {
         var actorObj = actorObjects.First(obj => obj.actor.DataID == id);
 
         SelectActor(actorObj);
-        view.activeActorPropertiesView.sceneActorsView.RefreshSelection(false);
 
     }
 
@@ -349,6 +384,21 @@ public class ActorEditMode : EditMode {
         Camera.main.transform.position = actorObj.transform.position;
 
         Camera.main.transform.position = Camera.main.transform.position + (Camera.main.transform.forward * -4);
+
+    }
+
+    // Calls "ChangeActorPosition" which is model mutating
+    void MoveActorToCursor() {
+
+        var hitPos = main.CursorOnLevelMesh();
+
+        if (hitPos != null) {
+
+            selectedActorObject.moveCallback((Vector3)hitPos);
+
+            selectedActorObject.transform.position = selectedActorObject.controlledObject.transform.position;
+
+        }
 
     }
 
@@ -485,19 +535,24 @@ public class ActorEditMode : EditMode {
     }
 
     public void ChangeActorPosition(FCopActor actor, Vector3 pos) {
+
+        AddActorPositionCounterAction(actor.x, actor.y, actor, counterActionID);
+
         actor.x = Mathf.RoundToInt(pos.x * 8192f);
         actor.y = Mathf.RoundToInt(pos.z * -8192f);
+
     }
 
-    void MoveActorToCursor() {
+    // This is for grouping
+    public void ChangeActorsPosition(List<FCopActor> actors, Vector3 pos) {
 
-        var hitPos = main.CursorOnLevelMesh();
+        // Assuming all actors have the same position.
+        AddMultiActorPositionCounterAction(actors[0].x, actors[0].y, actors, counterActionID);
 
-        if (hitPos != null) {
+        foreach (var actor in actors) {
 
-            selectedActorObject.moveCallback((Vector3)hitPos);
-
-            selectedActorObject.transform.position = selectedActorObject.controlledObject.transform.position;
+            actor.x = Mathf.RoundToInt(pos.x * 8192f);
+            actor.y = Mathf.RoundToInt(pos.z * -8192f);
 
         }
 
@@ -505,6 +560,8 @@ public class ActorEditMode : EditMode {
 
     #endregion
 
+    // DO NOT SAVE ACTOR OBJECTS BECAUSE THEY GET DESTROYED
+    // SAVING THEM WILL CAUSE MEMORY LEAKS AND CRASHES
     #region Counter-Actions
 
     public class ActorPositionCounterAction : CounterAction {
@@ -512,10 +569,143 @@ public class ActorEditMode : EditMode {
         public int savedX;
         public int savedY;
         public FCopActor modifiedActor;
+        // Because it runs a func every frame to move and it needs to add a counter action,
+        // it needs a way to know if a counter action was already added.
+        // Since a type can't be used, an ID will be provided instead.
+        // This isn't super interchangable but it works.
+        public int id;
+
+        public ActorPositionCounterAction(int savedX, int savedY, FCopActor modifiedActor, int id) {
+            this.savedX = savedX;
+            this.savedY = savedY;
+            this.modifiedActor = modifiedActor;
+            this.id = id;
+        }
 
         public void Action() {
-            
+
+            if (Main.editMode is not ActorEditMode) {
+                return;
+            }
+
+            var editMode = (ActorEditMode)Main.editMode;
+
+            modifiedActor.x = savedX; 
+            modifiedActor.y = savedY;
+
+            editMode.RefreshSelectedActorPosition();
+
         }
+
+    }
+
+    public class MultiActorPositionCounterAction : CounterAction {
+
+        public int savedX;
+        public int savedY;
+        public List<FCopActor> modifiedActors;
+        public int id;
+
+        public MultiActorPositionCounterAction(int savedX, int savedY, List<FCopActor> modifiedActors, int id) {
+            this.savedX = savedX;
+            this.savedY = savedY;
+            this.modifiedActors = modifiedActors;
+            this.id = id;
+        }
+
+        public void Action() {
+
+            if (Main.editMode is not ActorEditMode) {
+                return;
+            }
+
+            var editMode = (ActorEditMode)Main.editMode;
+
+            foreach (var actor in modifiedActors) {
+                actor.x = savedX;
+                actor.y = savedY;
+            }
+
+            editMode.RefreshSelectedActorPosition();
+
+        }
+
+    }
+
+    public class ActorSelectCounterAction : CounterAction {
+
+        public int? selectedActorID;
+
+        public ActorSelectCounterAction(int? selectedActorID) {
+            this.selectedActorID = selectedActorID;
+        }
+
+        public void Action() {
+
+            if (Main.editMode is not ActorEditMode) {
+                return;
+            }
+
+            var editMode = (ActorEditMode)Main.editMode;
+
+            editMode.UnselectActor();
+
+            if (selectedActorID != null) {
+                editMode.SelectActor(editMode.actorObjectsByID[(int)selectedActorID]);
+            }
+            else {
+                editMode.view.activeActorPropertiesView.sceneActorsView.RefreshSelection(false);
+            }
+
+        }
+
+    }
+
+    static void AddActorPositionCounterAction(int savedX, int savedY, FCopActor modifiedActor, int id) {
+
+        var last = Main.counterActions.Last();
+
+        if (last is ActorPositionCounterAction posCounterAction) {
+
+            if (posCounterAction.id != id) {
+
+                Main.AddCounterAction(new ActorPositionCounterAction(savedX, savedY, modifiedActor, id));
+
+            }
+
+        }
+        else {
+
+            Main.AddCounterAction(new ActorPositionCounterAction(savedX, savedY, modifiedActor, id));
+
+        }
+
+    }
+
+    static void AddMultiActorPositionCounterAction(int savedX, int savedY, List<FCopActor> modifiedActors, int id) {
+
+        var last = Main.counterActions.Last();
+
+        if (last is MultiActorPositionCounterAction posCounterAction) {
+
+            if (posCounterAction.id != id) {
+
+                Main.AddCounterAction(new MultiActorPositionCounterAction(savedX, savedY, modifiedActors, id));
+
+            }
+
+        }
+        else {
+
+            Main.AddCounterAction(new MultiActorPositionCounterAction(savedX, savedY, modifiedActors, id));
+
+        }
+
+    }
+
+    static void AddActorSelectCounterAction(int? selectedActorID) {
+
+        Main.AddCounterAction(new ActorSelectCounterAction(selectedActorID));
 
     }
 

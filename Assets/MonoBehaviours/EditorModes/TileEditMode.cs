@@ -743,7 +743,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
         var sortedSelectedItems = new List<TileSelection>(selectedItems);
 
-        sortedSelectedItems = sortedSelectedItems.OrderBy(item => item.columnWorldX).ThenBy(item => item.columnWorldY).ToList();
+        sortedSelectedItems = sortedSelectedItems.OrderBy(item => item.columnWorldY).ThenBy(item => item.columnWorldX).ToList();
 
         // Creates a empty grid space of the width and height of selection.
         // This is done by taking the lowest cord selected tile to the highest.

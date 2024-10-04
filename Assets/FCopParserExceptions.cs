@@ -36,4 +36,12 @@ namespace FCopParser {
         } 
     }
 
+    public class MaxTilesExceeded : Exception {
+
+        public MaxTilesExceeded() {
+
+        }
+
+    }
+
 }

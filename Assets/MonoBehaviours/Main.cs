@@ -381,12 +381,14 @@ public class Main : MonoBehaviour {
 
         try {
             level.Compile();
-        } catch (MeshIDException) {
+        } 
+        catch (MeshIDException) {
             DialogWindowUtil.Dialog("Compile Error: Invalid Level Geometry", "One or more tiles geomtry is invalid." +
                 " This error can be cause by manually changing the height channel of a vertex. The selected tile overlay" +
                 " will be red if the geometry is invalid.");
             return;
-        } catch (TextureArrayMaxExceeded) {
+        } 
+        catch (TextureArrayMaxExceeded) {
             DialogWindowUtil.Dialog("Compile Error: Unique Tile Texture Mapping Exceeded", "The max of 1024 UVs have been exceeded in one or more sections. " +
                 "Please report this error");
             return;
@@ -394,6 +396,11 @@ public class Main : MonoBehaviour {
         catch (GraphicsArrayMaxExceeded) {
             DialogWindowUtil.Dialog("Compile Error: Unique Tile Graphics Exceeded", "The max of 1024 Tile Graphics have been exceeded in one or more sections. " +
                 "This should be very rare, please report this error");
+            return;
+        }
+        catch (MaxTilesExceeded) {
+            DialogWindowUtil.Dialog("Compile Error: Max Tiles in Section Exceeded", "The max of 1024 tiles per section has been exceed in one or more sections." +
+                " Be sure to always use a quad tile whenever possible.");
             return;
         }
 

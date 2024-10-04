@@ -119,6 +119,8 @@ namespace FCopParser {
 
                 foreach (ThirdSectionBitfield thirdSectionItem in thirdSectionBitfields) {
 
+                    // Well this sucks
+                    // Because the offset to tiles is only 10 bits long the max number of tiles is 1024.
                     var bitFeild = new BitField(16, new List<BitNumber> {
                         new BitNumber(6,thirdSectionItem.number1), new BitNumber(10,thirdSectionItem.number2)
                     });
