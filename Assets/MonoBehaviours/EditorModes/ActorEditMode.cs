@@ -1,7 +1,9 @@
 ﻿
 using FCopParser;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditorInternal;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -29,48 +31,6 @@ public class ActorEditMode : EditMode {
 
     public void OnCreateMode() {
 
-        ActorObject CreateActor(FCopActor actor, ActorGroupObject group = null) {
-
-            var nodeObject = Object.Instantiate(main.BlankActor);
-
-            var script = nodeObject.GetComponent<ActorObject>();
-
-            script.actor = actor;
-            script.controller = this;
-            script.group = group;
-
-            script.Create();
-
-            return script;
-
-        }
-
-        void CreateGroup(List<FCopActor> actors) {
-
-            var groupObj = Object.Instantiate(main.actorGroupObjectFab);
-
-            var script = groupObj.GetComponent<ActorGroupObject>();
-            script.controller = this;
-
-            foreach (var actor in actors) {
-
-                var createdActObj = CreateActor(actor, script);
-
-                createdActObj.transform.SetParent(script.transform, false);
-
-                script.actObjects.Add(createdActObj);
-
-                actorObjects.Add(createdActObj);
-                actorObjectsByID[actor.id] = createdActObj;
-
-            }
-
-            script.Init();
-
-            actorGroupObjects.Add(script);
-
-        }
-
         foreach (var node in main.level.sceneActors.positionalGroupedActors) {
 
             if (node.nestedActors.Count == 1) {
@@ -88,6 +48,48 @@ public class ActorEditMode : EditMode {
             }
 
         }
+
+    }
+
+    public ActorObject CreateActor(FCopActor actor, ActorGroupObject group = null) {
+
+        var nodeObject = Object.Instantiate(main.BlankActor);
+
+        var script = nodeObject.GetComponent<ActorObject>();
+
+        script.actor = actor;
+        script.controller = this;
+        script.group = group;
+
+        script.Create();
+
+        return script;
+
+    }
+
+    void CreateGroup(List<FCopActor> actors) {
+
+        var groupObj = Object.Instantiate(main.actorGroupObjectFab);
+
+        var script = groupObj.GetComponent<ActorGroupObject>();
+        script.controller = this;
+
+        foreach (var actor in actors) {
+
+            var createdActObj = CreateActor(actor, script);
+
+            createdActObj.transform.SetParent(script.transform, false);
+
+            script.actObjects.Add(createdActObj);
+
+            actorObjects.Add(createdActObj);
+            actorObjectsByID[actor.id] = createdActObj;
+
+        }
+
+        script.Init();
+
+        actorGroupObjects.Add(script);
 
     }
 
@@ -325,7 +327,7 @@ public class ActorEditMode : EditMode {
 
     }
 
-    public void SelectActor(ActorObject actorObject) {
+    public void SelectActor(ActorObject actorObject, bool jump = true) {
 
         AddActorSelectCounterAction(selectedActor?.DataID);
 
@@ -363,7 +365,7 @@ public class ActorEditMode : EditMode {
         selectedActor = actorObject.actor;
 
         view.RefreshActorPropertiesView();
-        view.activeActorPropertiesView.sceneActorsView.RefreshSelection(false);
+        view.activeActorPropertiesView.sceneActorsView.RefreshSelection(jump);
 
     }
 
@@ -371,7 +373,7 @@ public class ActorEditMode : EditMode {
 
         var actorObj = actorObjects.First(obj => obj.actor.DataID == id);
 
-        SelectActor(actorObj);
+        SelectActor(actorObj, false);
 
     }
 
@@ -384,6 +386,18 @@ public class ActorEditMode : EditMode {
         Camera.main.transform.position = actorObj.transform.position;
 
         Camera.main.transform.position = Camera.main.transform.position + (Camera.main.transform.forward * -4);
+
+    }
+
+    // Used for making actors objects during edit mode runtime.
+    public void CreateNewActor(FCopActor actor) {
+
+        var createdActObj = CreateActor(actor);
+
+        actorObjects.Add(createdActObj);
+        actorObjectsByID[createdActObj.actor.id] = createdActObj;
+
+        ValidateGrouping();
 
     }
 
@@ -412,25 +426,22 @@ public class ActorEditMode : EditMode {
             return;
         }
 
-        var actorObject = selectedActorObject.controlledObject.GetComponent<ActorObject>();
-
-        main.level.sceneActors.DeleteActor(actorObject.actor);
-
-        actorObjects.Remove(actorObject);
-        actorObjectsByID.Remove(actorObject.actor.DataID);
-
-        Object.Destroy(actorObject.gameObject);
-
-        UnselectActor();
-
-        ValidateGrouping();
-
-        view.activeActorPropertiesView.Refresh();
-        view.activeActorPropertiesView.sceneActorsView.Refresh(true);
+        DeleteByID(selectedActor.DataID);
 
     }
 
     public void DeleteByID(int id) {
+
+        var posNode = main.level.sceneActors.ActorNodeByIDPositional(id);
+        var actor = main.level.sceneActors.actorsByID[id];
+
+        if (posNode.nestedActors.Count > 1) {
+            AddActorDeleteCounterAction(actor, posNode);
+        }
+        else {
+            AddActorDeleteCounterAction(actor, null);
+
+        }
 
         main.level.sceneActors.DeleteActor(id);
 
@@ -661,6 +672,71 @@ public class ActorEditMode : EditMode {
 
     }
 
+    public class ActorPropertyCounterAction : CounterAction {
+
+        public ActorProperty property;
+        public int value;
+
+        public ActorPropertyCounterAction(ActorProperty property, int value) {
+            this.property = property;
+            this.value = value;
+        }
+
+        public void Action() {
+
+            var editMode = (ActorEditMode)Main.editMode;
+
+            switch (property) {
+
+                case ValueActorProperty:
+                    var valueProp = (ValueActorProperty)property;
+                    valueProp.value = value;
+                    break;
+                case EnumDataActorProperty:
+                    var enumProp = (EnumDataActorProperty)property;
+                    enumProp.caseValue = (Enum)Enum.ToObject(enumProp.caseValue.GetType(), value);
+                    break;
+                case RotationActorProperty:
+                    var rotationProp = (RotationActorProperty)property;
+                    rotationProp.value.SetRotationCompiled(value);
+                    editMode.actorObjectsByID[editMode.selectedActor.DataID].RefreshRotation();
+                    break;
+            }
+
+
+            editMode.view.RefreshActorPropertiesView();
+
+        }
+
+    }
+
+    public class ActorDeleteCounterAction : CounterAction {
+
+        public FCopActor deletedActor;
+        public ActorNode associatedNode;
+
+        public ActorDeleteCounterAction(FCopActor deletedActor, ActorNode associatedNode) {
+            this.deletedActor = deletedActor;
+            this.associatedNode = associatedNode;
+        }
+
+        public void Action() {
+
+            if (Main.editMode is not ActorEditMode) {
+                return;
+            }
+
+            var editMode = (ActorEditMode)Main.editMode;
+
+            editMode.main.level.sceneActors.AddActor(deletedActor, associatedNode);
+
+            // No need to add group because group is validated for sceneActors.
+            editMode.CreateNewActor(deletedActor);
+
+        }
+
+    }
+
     static void AddActorPositionCounterAction(int savedX, int savedY, FCopActor modifiedActor, int id) {
 
         var last = Main.counterActions.Last();
@@ -706,6 +782,33 @@ public class ActorEditMode : EditMode {
     static void AddActorSelectCounterAction(int? selectedActorID) {
 
         Main.AddCounterAction(new ActorSelectCounterAction(selectedActorID));
+
+    }
+
+    public static void AddActorPropertyCounterAction(ActorProperty property) {
+
+        switch(property) {
+
+            case ValueActorProperty:
+                var valueProp = (ValueActorProperty)property;
+                Main.AddCounterAction(new ActorPropertyCounterAction(valueProp, valueProp.value));
+                break;
+            case EnumDataActorProperty:
+                var enumProp = (EnumDataActorProperty)property;
+                Main.AddCounterAction(new ActorPropertyCounterAction(enumProp, Convert.ToInt32(enumProp.caseValue)));
+                break;
+            case RotationActorProperty:
+                var rotationProp = (RotationActorProperty)property;
+                Main.AddCounterAction(new ActorPropertyCounterAction(rotationProp, rotationProp.value.compiledRotation));
+                break;
+
+        }
+
+    }
+
+    static void AddActorDeleteCounterAction(FCopActor deletedActor, ActorNode associatedNode) {
+
+        Main.AddCounterAction(new ActorDeleteCounterAction(deletedActor, associatedNode));
 
     }
 

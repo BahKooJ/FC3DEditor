@@ -29,6 +29,10 @@ public class RotationActorPropertyItemView : MonoBehaviour {
 
     public void OnSliderChange() {
 
+        if (!Main.counterActionAddedOnCurrentSelectHold) {
+            ActorEditMode.AddActorPropertyCounterAction(property);
+        }
+
         if (refuseCallback) return;
 
         if (Input.GetKey(KeyCode.LeftShift)) {

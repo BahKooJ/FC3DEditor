@@ -46,6 +46,8 @@ public class EnumDataActorPropertyItemView: MonoBehaviour {
 
     public void OnChange() {
 
+        ActorEditMode.AddActorPropertyCounterAction(property);
+
         property.caseValue = (Enum)values.GetValue(caseDropDown.value);
 
     }

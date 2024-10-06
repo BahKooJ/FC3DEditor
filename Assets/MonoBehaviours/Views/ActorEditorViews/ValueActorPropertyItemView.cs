@@ -24,12 +24,14 @@ public class ValueActorPropertyItemView : MonoBehaviour {
 
     public void OnFinishTyping() {
 
+        ActorEditMode.AddActorPropertyCounterAction(property);
+
         var value = Int32.Parse(valueField.text);
 
         if (value > Int16.MaxValue) {
             value = Int16.MaxValue;
-        } else if (value < Int32.MinValue) {
-            value = Int32.MinValue;
+        } else if (value < Int16.MinValue) {
+            value = Int16.MinValue;
         }
 
         property.value = value;

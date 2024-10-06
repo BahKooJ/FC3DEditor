@@ -29,9 +29,31 @@ namespace FCopParser {
             SortActorsByBehavior();
         }
 
+        public void AddActor(FCopActor actor, ActorNode toGroup) {
+
+            actors.Add(actor);
+            actorsByID[actor.DataID] = actor;
+
+            if (toGroup != null) {
+                PositionalGroupActor(actor, toGroup);
+            }
+            else {
+                positionalGroupedActors.Add(new ActorNode(ActorGroupType.Position, actor.name, actor));
+            }
+
+            if (behaviorGroupedActors.ContainsKey(actor.actorType)) {
+                behaviorGroupedActors[actor.actorType].nestedActors.Add(actor);
+            }
+            else {
+                behaviorGroupedActors[actor.actorType] = new ActorNode(ActorGroupType.Position, "Group " + actor.actorType, actor);
+            }
+
+        }
+
         public void DeleteActor(FCopActor actor) {
 
             actors.Remove(actor);
+            actorsByID.Remove(actor.DataID);
             level.fileManager.files.Remove(actor.rawFile);
 
             var posNode = ActorNodeByIDPositional(actor.DataID);
@@ -105,6 +127,7 @@ namespace FCopParser {
 
             ActorNode node;
 
+            // Makes sure there's no dupes.
             node = positionalGroupedActors.FirstOrDefault(n => {
 
                 if (n.nestedActors.Count == 1) {
@@ -130,9 +153,11 @@ namespace FCopParser {
 
                 });
 
-                if (node == null) return false;
+                if (node != null) {
 
-                node.nestedActors.Remove(actor);
+                    node.nestedActors.Remove(actor);
+
+                }
 
             }
             else {
