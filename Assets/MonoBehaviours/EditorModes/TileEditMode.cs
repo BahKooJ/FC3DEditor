@@ -1123,6 +1123,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
     // This is to avoid memory leaks.
 
     public class TileEffectChangeCounterAction : CounterAction {
+        public string name { get; set; }
 
         FCopLevelSection modifiedSection;
         byte value;
@@ -1132,6 +1133,8 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
             this.modifiedSection = modifiedSection;
             this.value = value;
             this.index = index;
+
+            name = "Tile Effect Change";
         }
 
         public void Action() {
@@ -1143,6 +1146,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
     }
 
     public class MultiTileEffectChangeCounterAction : CounterAction {
+        public string name { get; set; }
 
         List<TileEffectChangeCounterAction> counterActions = new();
 
@@ -1157,6 +1161,8 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
                     ));
 
             }
+
+            name = "Tile Effect Changes";
 
         }
         public void Action() {
@@ -1186,6 +1192,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
     }
 
     public class RemoveTileCounterAction : CounterAction {
+        public string name { get; set; }
 
         Tile removedTile;
         TileColumn column;
@@ -1193,6 +1200,8 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
         public RemoveTileCounterAction(Tile removedTile, TileColumn column) {
             this.removedTile = removedTile;
             this.column = column;
+
+            name = "Tile Removed";
         }
 
         public void Action() {
@@ -1206,6 +1215,8 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     public class MultiRemoveTileCounterAction : CounterAction {
 
+        public string name { get; set; }
+
         List<RemoveTileCounterAction> removedTileCounterActions = new();
 
         public MultiRemoveTileCounterAction(List<TileSelection> items) {
@@ -1215,6 +1226,8 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
                 removedTileCounterActions.Add(new RemoveTileCounterAction(item.tile, item.column));
 
             }
+
+            name = "Removed Tiles";
 
         }
 
@@ -1246,12 +1259,17 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
     public class PassiveAddTileCounterAction : CounterAction {
 
+        public string name { get; set; }
+
         Tile addedTile;
         TileColumn columnAddedTo;
 
         public PassiveAddTileCounterAction(Tile addedTile, TileColumn columnAddedTo) {
             this.addedTile = addedTile;
             this.columnAddedTo = columnAddedTo;
+
+            name = "Tile Added";
+
         }
 
         public void Action() {
@@ -1263,6 +1281,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
     }
 
     public class TileExtrudeCounterAction : CounterAction {
+        public string name { get; set; }
 
         List<CounterAction> counterActions = new();
         HashSet<LevelMesh> affectedSections;
@@ -1270,6 +1289,9 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
         public TileExtrudeCounterAction(List<CounterAction> counterActions, HashSet<LevelMesh> affectedSections) {
             this.counterActions = counterActions;
             this.affectedSections = affectedSections;
+
+            name = "Tile Extrude";
+
         }
 
         public void Action() {

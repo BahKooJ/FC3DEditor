@@ -127,6 +127,12 @@ namespace FCopParser {
             this.isStartingPoint = isStartingPoint;
         }
 
+        public NavNode Clone() {
+
+            return new NavNode(index, unknown, unknown2, x, y, isStartingPoint, nextNodeIndexes[0], nextNodeIndexes[1], nextNodeIndexes[2]);
+
+        }
+
     }
 
 }

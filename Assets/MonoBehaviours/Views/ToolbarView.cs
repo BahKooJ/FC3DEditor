@@ -256,6 +256,8 @@ public class ToolbarView: MonoBehaviour {
 
     public class ChangeEditModeCounterAction : CounterAction {
 
+        public string name { get; set; }
+
         Type editModeType;
         ToolbarView toolbar;
 
@@ -263,6 +265,8 @@ public class ToolbarView: MonoBehaviour {
 
             editModeType = type;
             this.toolbar = toolbar;
+
+            name = "Edit Mode Change";
 
         }
 

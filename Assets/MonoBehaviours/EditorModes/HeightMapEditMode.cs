@@ -535,6 +535,8 @@ public class HeightMapEditMode : EditMode {
 
     public class HeightSelectionSaveStateCounterAction : CounterAction {
 
+        public string name { get; set; }
+
         public class HeightPointSaveState {
 
             public HeightPoints heightPoints;
@@ -543,6 +545,7 @@ public class HeightMapEditMode : EditMode {
             public HeightPointSaveState(HeightPoints heightPoints, int channel) {
                 this.heightPoints = heightPoints;
                 this.channel = channel;
+
             }
 
         }
@@ -553,8 +556,10 @@ public class HeightMapEditMode : EditMode {
 
             this.selectedPoints = new(selectedPoints);
 
+            name = "Height Map Selection";
+
         }
-        
+
         public void Action() {
 
             if (Main.editMode is not HeightMapEditMode) {
@@ -591,10 +596,14 @@ public class HeightMapEditMode : EditMode {
 
     public class SectionSelectionSaveStateCounterAction : CounterAction {
 
+        public string name { get; set; }
+
         LevelMesh selectedLevelMesh;
 
         public SectionSelectionSaveStateCounterAction(LevelMesh selectedLevelMesh) {
             this.selectedLevelMesh = selectedLevelMesh;
+
+            name = "Section Selection";
         }
 
         public void Action() {

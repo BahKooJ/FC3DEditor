@@ -816,6 +816,8 @@ public class TileAddMode : EditMode {
 
     public class AddTileCounterAction : CounterAction {
 
+        public string name { get; set; }
+
         Tile addedTile;
         TileColumn columnAddedTo;
         LevelMesh sectionAddedTo;
@@ -824,6 +826,8 @@ public class TileAddMode : EditMode {
             this.addedTile = addedTile;
             this.columnAddedTo = columnAddedTo;
             this.sectionAddedTo = section;
+
+            name = "Tile Add";
         }
 
         public void Action() {
@@ -838,12 +842,16 @@ public class TileAddMode : EditMode {
 
     public class MultiAddTileCounterAction : CounterAction {
 
+        public string name { get; set; }
+
         List<Tile> tilesAdded;
         HashSet<LevelMesh> affectedSections;
 
         public MultiAddTileCounterAction(List<Tile> tilesAdded, HashSet<LevelMesh> affectedSections) {
             this.tilesAdded = tilesAdded;
             this.affectedSections = affectedSections;
+
+            name = "Added Tiles";
         }
 
         public void Action() {
@@ -866,6 +874,8 @@ public class TileAddMode : EditMode {
 
     public class SchematicAddCounterAction : CounterAction {
 
+        public string name { get; set; }
+
         List<SectionSaveStateCounterAction> savedSections = new();
 
         public SchematicAddCounterAction(List<LevelMesh> sectionMeshes) {
@@ -874,6 +884,7 @@ public class TileAddMode : EditMode {
                 savedSections.Add(new SectionSaveStateCounterAction(section));
             }
 
+            name = "Schematic Placement";
         }
 
         public void Action() {

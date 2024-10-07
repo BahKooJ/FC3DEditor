@@ -9,11 +9,15 @@ using System.Linq;
 // THIS WILL CAUSE MEMEORY LEAKS AND DOUBLE EDITMODES!
 public interface CounterAction {
 
+    public string name { get; set; }
+
     public void Action();
 
 }
 
 public class MultiCounterAction : CounterAction {
+
+    public string name { get; set; }
 
     List<CounterAction> counterActions = new();
     Action additionalAction;
@@ -23,6 +27,8 @@ public class MultiCounterAction : CounterAction {
         this.counterActions = counterActions;
 
         this.additionalAction = additionalAction;
+
+        name = "Multiple Changes";
     }
 
     public void Action() {
@@ -39,6 +45,8 @@ public class MultiCounterAction : CounterAction {
 
 public class TileSaveStateCounterAction : CounterAction {
 
+    public string name { get; set; }
+
     Tile saveStateTile;
     public Tile tile;
     Action additionalAction;
@@ -48,6 +56,8 @@ public class TileSaveStateCounterAction : CounterAction {
         this.saveStateTile = tile.Clone();
 
         this.additionalAction = additionalAction;
+
+        name = "Tile Changes";
     }
 
     public TileSaveStateCounterAction(Tile tile) {
@@ -66,6 +76,8 @@ public class TileSaveStateCounterAction : CounterAction {
 
 public class MultiTileSaveStateCounterAction : CounterAction {
 
+    public string name { get; set; }
+
     List<TileSaveStateCounterAction> saveStateTiles = new();
     Action additionalAction;
 
@@ -76,6 +88,9 @@ public class MultiTileSaveStateCounterAction : CounterAction {
         }
 
         this.additionalAction = additionalAction;
+
+        name = "Changed Tiles";
+
     }
 
     public void Action() {
@@ -85,11 +100,14 @@ public class MultiTileSaveStateCounterAction : CounterAction {
         }
 
         additionalAction();
+
     }
 
 }
 
 public class SelectionSaveStateCounterAction : CounterAction {
+
+    public string name { get; set; }
 
     HashSet<LevelMesh> selectedSections = new();
     List<TileSelection> selectedItems = new();
@@ -100,6 +118,8 @@ public class SelectionSaveStateCounterAction : CounterAction {
         this.selectedSections = new(editMode.selectedSections);
         this.selectedItems = new(editMode.selectedItems);
         this.additionalAction = additionalAction;
+
+        name = "Tile Selection";
 
     }
 
@@ -122,6 +142,8 @@ public class SelectionSaveStateCounterAction : CounterAction {
 
 public class HeightMapSaveStateCounterAction : CounterAction {
 
+    public string name { get; set; }
+
     HeightPoints savedHeights;
     HeightPoints heights;
     Action additionalAction;
@@ -131,6 +153,8 @@ public class HeightMapSaveStateCounterAction : CounterAction {
         savedHeights = heights.Clone();
         this.heights = heights;
         this.additionalAction = additionalAction;
+
+        name = "Height Map Changes";
 
     }
 
@@ -145,6 +169,8 @@ public class HeightMapSaveStateCounterAction : CounterAction {
 
 public class MultiHeightMapSaveStateCounterAction : CounterAction {
 
+    public string name { get; set; }
+
     List<HeightMapSaveStateCounterAction> saveStateHeights = new();
     Action additionalAction;
 
@@ -155,6 +181,8 @@ public class MultiHeightMapSaveStateCounterAction : CounterAction {
         }
 
         this.additionalAction = additionalAction;
+
+        name = "Height Map Changes";
     }
 
     public void Action() {
@@ -170,6 +198,8 @@ public class MultiHeightMapSaveStateCounterAction : CounterAction {
 
 public class NonSelectiveMultiTileSaveStateCounterAction : CounterAction {
 
+    public string name { get; set; }
+
     HashSet<LevelMesh> levelMeshes = new HashSet<LevelMesh>();
     List<TileSaveStateCounterAction> saveStateTiles = new();
     Action additionalAction;
@@ -182,6 +212,8 @@ public class NonSelectiveMultiTileSaveStateCounterAction : CounterAction {
         }
 
         this.additionalAction = additionalAction;
+
+        name = "Tile Changes";
     }
 
     public NonSelectiveMultiTileSaveStateCounterAction(TileSelection item, Action additionalAction) {
@@ -191,6 +223,8 @@ public class NonSelectiveMultiTileSaveStateCounterAction : CounterAction {
 
 
         this.additionalAction = additionalAction;
+
+        name = "Tile Changes";
 
     }
 
@@ -224,6 +258,8 @@ public class NonSelectiveMultiTileSaveStateCounterAction : CounterAction {
 
 public class SectionSaveStateCounterAction : CounterAction {
 
+    public string name { get; set; }
+
     FCopLevelSection sectionSaveState;
     LevelMesh section;
 
@@ -231,6 +267,8 @@ public class SectionSaveStateCounterAction : CounterAction {
 
         sectionSaveState = section.section.Clone();
         this.section = section;
+
+        name = "Section Changes";
 
     }
 

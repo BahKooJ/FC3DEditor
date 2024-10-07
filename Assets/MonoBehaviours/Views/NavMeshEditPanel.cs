@@ -40,6 +40,8 @@ public class NavMeshEditPanel : MonoBehaviour {
 
     public void ChangeNavMesh(int index) {
 
+        Main.ClearCounterActions();
+
         controller.selectedNavMeshIndex = index;
         controller.OnDestroy();
         controller.OnCreateMode();

@@ -3,7 +3,6 @@ using FCopParser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditorInternal;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -432,16 +431,9 @@ public class ActorEditMode : EditMode {
 
     public void DeleteByID(int id) {
 
-        var posNode = main.level.sceneActors.ActorNodeByIDPositional(id);
         var actor = main.level.sceneActors.actorsByID[id];
-
-        if (posNode.nestedActors.Count > 1) {
-            AddActorDeleteCounterAction(actor, posNode);
-        }
-        else {
-            AddActorDeleteCounterAction(actor, null);
-
-        }
+        
+        AddActorDeleteCounterAction(actor);
 
         main.level.sceneActors.DeleteActor(id);
 
@@ -571,11 +563,15 @@ public class ActorEditMode : EditMode {
 
     #endregion
 
-    // DO NOT SAVE ACTOR OBJECTS BECAUSE THEY GET DESTROYED
-    // SAVING THEM WILL CAUSE MEMORY LEAKS AND CRASHES
+    // TODO: Convert to state-like saving
+    // So many values would need to be saved in order to a nonsave state undo.
+    // Many methods would need to change and data passed simply for undo which would also break
+    // architecture. Undo will remain incomplete until a save state undo can be made.
     #region Counter-Actions
 
     public class ActorPositionCounterAction : CounterAction {
+
+        public string name { get; set; }
 
         public int savedX;
         public int savedY;
@@ -591,6 +587,8 @@ public class ActorEditMode : EditMode {
             this.savedY = savedY;
             this.modifiedActor = modifiedActor;
             this.id = id;
+
+            name = "Actor Position Change";
         }
 
         public void Action() {
@@ -612,6 +610,8 @@ public class ActorEditMode : EditMode {
 
     public class MultiActorPositionCounterAction : CounterAction {
 
+        public string name { get; set; }
+
         public int savedX;
         public int savedY;
         public List<FCopActor> modifiedActors;
@@ -622,6 +622,8 @@ public class ActorEditMode : EditMode {
             this.savedY = savedY;
             this.modifiedActors = modifiedActors;
             this.id = id;
+
+            name = "Actor Position Change";
         }
 
         public void Action() {
@@ -645,10 +647,15 @@ public class ActorEditMode : EditMode {
 
     public class ActorSelectCounterAction : CounterAction {
 
+        public string name { get; set; }
+
         public int? selectedActorID;
 
         public ActorSelectCounterAction(int? selectedActorID) {
             this.selectedActorID = selectedActorID;
+
+            name = "Actor Selection";
+
         }
 
         public void Action() {
@@ -674,12 +681,17 @@ public class ActorEditMode : EditMode {
 
     public class ActorPropertyCounterAction : CounterAction {
 
+        public string name { get; set; }
+
         public ActorProperty property;
         public int value;
 
         public ActorPropertyCounterAction(ActorProperty property, int value) {
             this.property = property;
             this.value = value;
+
+            name = "Actor Property Change";
+
         }
 
         public void Action() {
@@ -712,12 +724,15 @@ public class ActorEditMode : EditMode {
 
     public class ActorDeleteCounterAction : CounterAction {
 
-        public FCopActor deletedActor;
-        public ActorNode associatedNode;
+        public string name { get; set; }
 
-        public ActorDeleteCounterAction(FCopActor deletedActor, ActorNode associatedNode) {
+        public FCopActor deletedActor;
+
+        public ActorDeleteCounterAction(FCopActor deletedActor) {
             this.deletedActor = deletedActor;
-            this.associatedNode = associatedNode;
+
+            name = "Actor Deletion";
+
         }
 
         public void Action() {
@@ -728,10 +743,12 @@ public class ActorEditMode : EditMode {
 
             var editMode = (ActorEditMode)Main.editMode;
 
-            editMode.main.level.sceneActors.AddActor(deletedActor, associatedNode);
+            editMode.main.level.sceneActors.AddActor(deletedActor, null);
 
             // No need to add group because group is validated for sceneActors.
             editMode.CreateNewActor(deletedActor);
+
+            editMode.view.activeActorPropertiesView.sceneActorsView.Refresh();
 
         }
 
@@ -806,9 +823,9 @@ public class ActorEditMode : EditMode {
 
     }
 
-    static void AddActorDeleteCounterAction(FCopActor deletedActor, ActorNode associatedNode) {
+    static void AddActorDeleteCounterAction(FCopActor deletedActor) {
 
-        Main.AddCounterAction(new ActorDeleteCounterAction(deletedActor, associatedNode));
+        Main.AddCounterAction(new ActorDeleteCounterAction(deletedActor));
 
     }
 

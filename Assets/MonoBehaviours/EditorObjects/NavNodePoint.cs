@@ -48,8 +48,7 @@ public class NavNodePoint : MonoBehaviour {
 
     public void ChangePosition(Vector3 pos) {
 
-        node.x = Mathf.RoundToInt(pos.x * 32f);
-        node.y = Mathf.RoundToInt(pos.z * -32f);
+        controller.ChangePosition(node, pos);
 
         Create();
 
@@ -191,17 +190,11 @@ public class NavNodePoint : MonoBehaviour {
 
     public void ClearPaths() {
 
-        foreach (var index in Enumerable.Range(0, node.nextNodeIndexes.Count())) {
-
-            node.nextNodeIndexes[index] = NavNode.invalid;
-
-        }
-
         foreach (var line in nextNodeLines) {
 
             if (line != null) {
 
-                Object.Destroy(line.gameObject);
+                Destroy(line.gameObject);
 
             }
 

@@ -221,6 +221,8 @@ public class TextureTransparentMapper : MonoBehaviour {
 
     public class TransparencyDrawCounterAction : CounterAction {
 
+        public string name { get; set; }
+
         Texture2D savedTextureState;
         Texture2D originalTexture;
 
@@ -231,6 +233,8 @@ public class TextureTransparentMapper : MonoBehaviour {
             savedTextureState = new Texture2D(originalTexture.width, originalTexture.height);
             savedTextureState.SetPixels(originalTexture.GetPixels());
             savedTextureState.Apply();
+
+            name = "Transparency Draw";
 
         }
 

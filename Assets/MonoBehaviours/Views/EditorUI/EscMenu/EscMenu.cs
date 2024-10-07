@@ -93,14 +93,14 @@ public class EscMenu : MonoBehaviour {
     public void OnClickSave() {
         DeactivateAllViews();
         main.Save();
-        Main.counterActions.Clear();
-        
+        Main.ClearCounterActions();
+
     }
 
     public void OnClickCompile() {
         DeactivateAllViews();
         main.Compile();
-        Main.counterActions.Clear();
+        Main.ClearCounterActions();
     }
 
     public void OnClickSavePresets() {

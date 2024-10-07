@@ -40,6 +40,13 @@ public class Main : MonoBehaviour {
 
     }
 
+    public static void ClearCounterActions() {
+
+        QuickLogHandler.Log("Undo history cleared.", LogSeverity.Info);
+        counterActions.Clear();
+
+    }
+
     public static void PopCounterAction() {
         counterActions.RemoveAt(counterActions.Count - 1);
     }
@@ -208,10 +215,10 @@ public class Main : MonoBehaviour {
 
         if (counterActions.Count > 0) {
 
+            QuickLogHandler.Log("Undo " + counterActions.Last().name , LogSeverity.Success);
+
             counterActions.Last().Action();
             counterActions.RemoveAt(counterActions.Count - 1);
-
-            QuickLogHandler.Log("Undo", LogSeverity.Success);
 
         }
 
@@ -463,6 +470,11 @@ public class Main : MonoBehaviour {
         ignoreAllInputs = false;
 
         if (editMode != null) {
+
+            if (editMode is ActorEditMode) {
+                ClearCounterActions();
+            }
+
             editMode.OnDestroy();
         }
 
@@ -534,7 +546,7 @@ public class Main : MonoBehaviour {
 
             ClearStaticData();
             toolbar.SelectHeightMapEditMode();
-            counterActions.Clear();
+            Main.ClearCounterActions();
 
             foreach (var obj in sectionMeshes) {
                 Destroy(obj.gameObject);

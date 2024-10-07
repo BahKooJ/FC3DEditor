@@ -554,6 +554,8 @@ public class TextureEditMode : TileMutatingEditMode {
 
     public class VectorAnimationCounterAction : CounterAction {
 
+        public string name { get; set; }
+
         List<LevelMesh> modifiedSections;
         int saveX;
         int saveY;
@@ -562,6 +564,8 @@ public class TextureEditMode : TileMutatingEditMode {
             this.modifiedSections = modifiedSections.ToList();
             this.saveX = saveX;
             this.saveY = saveY;
+
+            name = "Vector Animation Change";
         }
 
         public void Action() {
