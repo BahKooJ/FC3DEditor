@@ -15,7 +15,7 @@ public class TextFieldPopupView : MonoBehaviour {
 
         Main.ignoreAllInputs = true;
 
-        ((RectTransform)transform).anchoredPosition = Input.mousePosition;
+        ((RectTransform)transform).anchoredPosition = Input.mousePosition / Main.uiScaleFactor;
 
         textField.Select();
     }

@@ -2763,23 +2763,15 @@ namespace FCopParser {
 
         }
 
-        // FIXME: Huge error caused with auto compression and very many obsolete and redundant code
         public List<TileGraphicsItem> CompileGraphics(Dictionary<ushort, (int, XRGB555)> existingColors) {
 
             var isRect = verticies.Count == 4;
 
-            var graphic = new TileGraphics(graphics.lightingInfo,
-                texturePalette,
-                isVectorAnimated ? 1 : 0,
-                isSemiTransparent ? 1 : 0,
-                isRect ? 1 : 0,
-                (int)shaders.type);
+            var potentialNewShaders = shaders.VerifyCorrectShader();
 
-            //var potentialNewShaders = shaders.VerifyCorrectShader();
-
-            //if (potentialNewShaders != null) {
-            //    shaders = potentialNewShaders;
-            //}
+            if (potentialNewShaders != null) {
+                shaders = potentialNewShaders;
+            }
 
             var shaderData = new List<byte>();
 
@@ -2789,8 +2781,8 @@ namespace FCopParser {
                 shaderData = shaders.Compile();
             }
 
-
             var graphicItems = new List<TileGraphicsItem>();
+            var graphic = new TileGraphics(graphics.lightingInfo, texturePalette, isVectorAnimated ? 1 : 0, isSemiTransparent ? 1 : 0, isRect ? 1 : 0, (int)shaders.type);
 
             // If no shader data just uses the existing data
             if (shaderData.Count == 0) {
@@ -2809,14 +2801,12 @@ namespace FCopParser {
                 if (shaderData.Count > 1) {
 
                     foreach (var i in Enumerable.Range(0, shaderData.Count / 2)) {
-                        graphicItems.Add(new TileGraphicsMetaData(shaderData.GetRange((i * 2), 2)));
+                        graphicItems.Add(new TileGraphicsMetaData(shaderData.GetRange(i * 2, 2)));
                     }
 
                 }
 
             }
-
-
 
             return graphicItems;
 

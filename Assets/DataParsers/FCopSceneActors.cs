@@ -283,7 +283,7 @@ namespace FCopParser {
                     behaviorGroupedActors[actor.actorType].nestedActors.Add(actor);
                 }
                 else {
-                    behaviorGroupedActors[actor.actorType] = new ActorNode(ActorGroupType.Position, "Group " + actor.actorType, actor);
+                    behaviorGroupedActors[actor.actorType] = new ActorNode(ActorGroupType.Behavior, "Group " + actor.actorType, actor);
                 }
 
             }

@@ -7,6 +7,8 @@ using Object = UnityEngine.Object;
 
 public abstract class ContextMenuUtil {
 
+    const float width = 200f;
+
     // Prefabs
     public static GameObject container;
     public static GameObject contextMenuItem;
@@ -29,8 +31,18 @@ public abstract class ContextMenuUtil {
 
         var rectTrans = (RectTransform)containerObj.transform;
 
+        // Off screen test.
+        // Not really sure why but don't scale the width or height.
         var pos = Input.mousePosition / Main.uiScaleFactor;
+        var scaledScreenWidth = Screen.width / Main.uiScaleFactor;
 
+        if (pos.x + width > scaledScreenWidth) {
+            var dif = pos.x + width - scaledScreenWidth;
+            pos.x -= dif;
+        }
+
+        // Since it's a content size fitter, it has to process the height.
+        // Until I can figure something else out here's a magic number.
         if (pos.y - 100 < 0) {
             pos.y -= pos.y - 100;
 

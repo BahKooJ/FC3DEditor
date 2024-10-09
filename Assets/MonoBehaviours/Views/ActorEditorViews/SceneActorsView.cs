@@ -106,8 +106,6 @@ public class SceneActorsView : MonoBehaviour {
 
     public void RefreshSelection(bool jump) {
 
-
-
         foreach (var actorNode in actorNodes) {
             
             if (actorNode.node.nestedActors.Count > 1 || actorNode.forceGroup) {
@@ -140,12 +138,12 @@ public class SceneActorsView : MonoBehaviour {
 
     public ActorNodeListItemView GetNodeItemByID(int id) {
 
-        if (actorNodesByID == null) {
-            return null;
-        }
+        if (actorNodesByID != null) {
 
-        if (actorNodesByID.ContainsKey(id)) {
-            return actorNodesByID[id];
+            if (actorNodesByID.ContainsKey(id)) {
+                return actorNodesByID[id];
+            }
+
         }
 
         foreach (var node in actorNodes) {

@@ -84,13 +84,13 @@ public class TextureUVMapper : MonoBehaviour {
         exportcontextMenu.items = new() {
             ("Export Bitmap", ExportTexture),
             ("Export Color Palette", ExportColorPalette),
-            ("Export Cbmp (BMP and Palette)", ExportCbmp)
+            ("Export BMP and Palette", ExportCbmp)
         };
 
         importcontextMenu.items = new() {
             ("Import Bitmap", ImportTexture),
             ("Import Color Palette", ImportColorPalette),
-            ("Import Cbmp (BMP and Palette)", ImportCbmp)
+            ("Import BMP and Palette", ImportCbmp)
         };
 
     }
@@ -157,6 +157,7 @@ public class TextureUVMapper : MonoBehaviour {
 
     }
 
+    // UV Drag
     private void LateUpdate() {
 
         if (Input.GetMouseButton(0) && IsCursorInTexturePallete() && !refusedUVDrag) {
@@ -168,7 +169,18 @@ public class TextureUVMapper : MonoBehaviour {
             EventSystem.current.RaycastAll(pointerData, results);
 
             if (results.Count > 0) {
-                if (results[0].gameObject.name != texturePaletteImage.name) return;
+
+                // The UV node is infront of the palette. We still want to drag even if the node is over the cursor.
+                // That is, as long as it's not the first thing clicked on. But that's what refusedUVDrag is for.
+                if (results[0].gameObject.GetComponent<TextureCoordinatePoint>() != null) {
+
+                    if (results[1].gameObject.name != texturePaletteImage.name) return;
+
+                }
+                else {
+                    if (results[0].gameObject.name != texturePaletteImage.name) return;
+                }
+                
             }
             else {
                 return;

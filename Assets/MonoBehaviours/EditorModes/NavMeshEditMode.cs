@@ -366,7 +366,15 @@ public class NavMeshEditMode : EditMode {
 
         if (selectedNavNode != null) {
 
+            QuickLogHandler.Log("Nav Node coordinates copied", LogSeverity.Success);
+
             copiedNavNodeCoords = selectedNavNode.controlledObject.transform.position;
+
+        }
+        else {
+
+            QuickLogHandler.Log("No Nav Node selected", LogSeverity.Info);
+
 
         }
 

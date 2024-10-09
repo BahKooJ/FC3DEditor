@@ -48,7 +48,7 @@ public class ActorNodeListItemView : MonoBehaviour {
 
         if (node != null) {
 
-            if (node.nestedActors.Count == 1) {
+            if (node.nestedActors.Count == 1 && node.groupType == ActorGroupType.Position) {
                 nameText.text = node.nestedActors[0].name;
             }
             else {
