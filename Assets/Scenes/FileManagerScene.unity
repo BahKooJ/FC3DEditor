@@ -161,6 +161,7 @@ MonoBehaviour:
   ContextMenuItem: {fileID: 4118889749630939980, guid: 6a6c4871c74e75e49b6a09c0e323f1b4, type: 3}
   OpenFileWindow: {fileID: 3388687106751044216, guid: b13e7f6bb30b1aa4489b25d16feb2697, type: 3}
   HeadsUpText: {fileID: 408212628420670406, guid: 0625f0625dabf4047b54f94abf1bf626, type: 3}
+  LoadingScreen: {fileID: 408212628420670406, guid: 5ec1236e992c97b4cb63c335279d1649, type: 3}
 --- !u!4 &421108730
 Transform:
   m_ObjectHideFlags: 0

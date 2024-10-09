@@ -123,12 +123,16 @@ public class Main : MonoBehaviour {
 
     public static EditMode editMode;
 
+    // Auto save
+    float autoSaveTimer;
+
     void Start() {
 
         DialogWindowUtil.canvas = canvas;
         ContextMenuUtil.canvas = canvas;
         OpenFileWindowUtil.canvas = canvas;
         HeadsUpTextUtil.canvas = canvas;
+        LoadingScreenUtil.canvas = canvas;
 
         Physics.queriesHitBackfaces = true;
 
@@ -147,7 +151,12 @@ public class Main : MonoBehaviour {
 
     void Update() {
 
-        //TestSphereRayOnLevelMesh();
+        autoSaveTimer += Time.deltaTime;
+
+        if (autoSaveTimer >= 360f) {
+            AutoSave();
+            autoSaveTimer = 0f;
+        }
 
         if (Input.GetKeyDown(KeyCode.Escape) && !isEscMenuOpen) {
             HeadsUpTextUtil.End();
@@ -185,6 +194,20 @@ public class Main : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.F12)) {
             canvas.SetActive(!canvas.activeSelf);
+        }
+
+        if (Controls.OnDown("JumpToCursor")) {
+
+            var pos = CursorOnLevelMesh();
+
+            if (pos != null) {
+
+                Camera.main.transform.position = (Vector3)pos;
+
+                Camera.main.transform.position = Camera.main.transform.position + (Camera.main.transform.forward * -4);
+
+            }
+
         }
 
         // Temp
@@ -260,14 +283,22 @@ public class Main : MonoBehaviour {
     }
 
     void ClearStaticData() {
+
         HeightMapEditMode.selectedColumn = null;
         HeightMapEditMode.selectedSection = null;
+        HeightMapEditMode.keepHeightsOnTop = false;
 
+        TileAddMode.placementSetting = TileAddMode.SchematicPlacementSetting.Exact;
+        TileAddMode.removeAllTilesOnSchematicPlacement = false;
         TileAddMode.selectedTilePreset = null;
         TileAddMode.selectedSchematic = null;
 
-        TileEditMode.savedSelections = new();
-        TileEditMode.savedSectionSelections = new();
+        NavMeshEditMode.copiedNavNodeCoords = null;
+
+        ShaderEditMode.showColorPresets = false;
+
+        TextureEditMode.openUVMapperByDefault = false;
+
     }
 
     public void DisableMainCamera() {
@@ -462,6 +493,26 @@ public class Main : MonoBehaviour {
 
 
         });
+
+    }
+
+    public void AutoSave() {
+
+        List<byte> bytes = new();
+
+        try {
+
+            bytes = level.CompileToNCFCFile();
+
+        }
+        catch {
+
+            QuickLogHandler.Log("Auto save failed", LogSeverity.Warning);
+
+        }
+
+        File.WriteAllBytes("fce_autosave.ncfc", bytes.ToArray());
+        QuickLogHandler.Log("Auto save complete", LogSeverity.Success);
 
     }
     

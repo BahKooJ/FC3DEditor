@@ -6,6 +6,7 @@ Inputs = {
 "CameraUp":"1" "E"
 "CameraDown":"1" "Q"
 "CameraEnable":"1" "#3"
+"JumpToCursor":"1" "F1"
 "HeightMapEditMode":"2" "LeftControl""Alpha1"
 "TileEditMode":"2" "LeftControl""Alpha2"
 "TileAddMode":"2" "LeftControl""Alpha3"

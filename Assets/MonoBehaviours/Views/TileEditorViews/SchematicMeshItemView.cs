@@ -1,7 +1,4 @@
-﻿
-
-using System.Xml.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
 

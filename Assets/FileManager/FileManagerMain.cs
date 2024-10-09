@@ -15,6 +15,7 @@ public class FileManagerMain : MonoBehaviour {
     public GameObject ContextMenuItem;
     public GameObject OpenFileWindow;
     public GameObject HeadsUpText;
+    public GameObject LoadingScreen;
 
 
     public static IFFParser iffFile;
@@ -37,6 +38,9 @@ public class FileManagerMain : MonoBehaviour {
         OpenFileWindowUtil.canvas = canvas.gameObject;
 
         HeadsUpTextUtil.prefab = HeadsUpText;
+
+        LoadingScreenUtil.prefab = LoadingScreen;
+        LoadingScreenUtil.canvas = canvas.gameObject;
 
     }
 
@@ -86,12 +90,13 @@ public class FileManagerMain : MonoBehaviour {
         if (Path.GetExtension(path) == ".ncfc") {
 
             try {
-
+                LoadingScreenUtil.Show();
                 level = new FCopLevel(fileContent);
                 SceneManager.LoadScene("Scenes/LevelEditorScene", LoadSceneMode.Single);
 
             }
             catch {
+                LoadingScreenUtil.End();
                 DialogWindowUtil.Dialog("Invalid or Corrupted File", "Unable to parse Non-Compressed Future Cop file");
             }
 
@@ -99,13 +104,14 @@ public class FileManagerMain : MonoBehaviour {
         else {
 
             try {
-
+                LoadingScreenUtil.Show();
                 iffFile = new IFFParser(fileContent);
                 level = new FCopLevel(iffFile.parsedData);
                 SceneManager.LoadScene("Scenes/LevelEditorScene", LoadSceneMode.Single);
 
             }
             catch (InvalidFileException) {
+                LoadingScreenUtil.End();
                 DialogWindowUtil.Dialog("Select Future Cop mission File", "This file is not a mission file");
             }
 

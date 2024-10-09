@@ -124,11 +124,43 @@ public class OpenFileWindowView : MonoBehaviour {
             return;
         }
 
-        confirmAction(directory + "\\" + fileField.text);
+        if (!isOpen) {
+            
+            if (File.Exists(directory + "\\" + fileField.text)) {
 
-        Destroy(gameObject);
+                DialogWindowUtil.Dialog("File Already Exists", "Are you sure you would like to overwrite file?", () => {
+                    confirmAction(directory + "\\" + fileField.text);
 
-        Main.ignoreAllInputs = false;
+                    Destroy(gameObject);
+
+                    Main.ignoreAllInputs = false;
+
+                    return true;
+                });
+
+            }
+            else {
+
+                confirmAction(directory + "\\" + fileField.text);
+
+                Destroy(gameObject);
+
+                Main.ignoreAllInputs = false;
+
+            }
+
+        }
+        else {
+
+            confirmAction(directory + "\\" + fileField.text);
+
+            Destroy(gameObject);
+
+            Main.ignoreAllInputs = false;
+
+        }
+        
+
 
     }
 

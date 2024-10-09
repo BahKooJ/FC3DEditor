@@ -1,5 +1,4 @@
 using FCopParser;
-using System;
 using System.IO;
 using TMPro;
 using UnityEngine;
@@ -98,6 +97,8 @@ public class MapOpenerView : MonoBehaviour {
         if (selectedLevel == null) {
             return;
         }
+
+        LoadingScreenUtil.Show();
 
         var width = (int)widthSlider.value;
         var height = (int)heightSlider.value;

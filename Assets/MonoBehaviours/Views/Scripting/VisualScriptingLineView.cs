@@ -1,7 +1,4 @@
-﻿
-
-using FCopParser;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 

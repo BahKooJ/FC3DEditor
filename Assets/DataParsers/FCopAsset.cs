@@ -1,8 +1,4 @@
-﻿
-
-using FCopParser;
-
-namespace FCopParser {
+﻿namespace FCopParser {
     public abstract class FCopAsset {
 
         public IFFDataFile rawFile;
