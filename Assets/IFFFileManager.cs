@@ -146,6 +146,26 @@ namespace FCopParser {
             }).ToList();
         }
 
+        public void ReplaceFile(string fourCC, int id, List<byte> data) {
+
+            var file = files.First(file => {
+                return file.dataID == id && file.dataFourCC == fourCC;
+            });
+
+            file.data = data;
+
+        }
+
+        public void DeleteFile(string fourCC, int id) {
+
+            var fileToDelete = files.First(file => {
+                return file.dataID == id && file.dataFourCC == fourCC;
+            });
+
+            files.Remove(fileToDelete);
+
+        }
+
     }
 
     // Object for storing important meta data to a game file.

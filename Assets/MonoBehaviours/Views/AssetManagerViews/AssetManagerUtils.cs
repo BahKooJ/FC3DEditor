@@ -26,10 +26,12 @@ public class AssetFile {
 
     public FCopAsset asset;
     public AssetType assetType;
+    public AssetDirectory directory;
 
-    public AssetFile(FCopAsset asset, AssetType assetType) {
+    public AssetFile(FCopAsset asset, AssetType assetType, AssetDirectory directory) {
         this.asset = asset;
         this.assetType = assetType;
+        this.directory = directory;
     }
 
 }

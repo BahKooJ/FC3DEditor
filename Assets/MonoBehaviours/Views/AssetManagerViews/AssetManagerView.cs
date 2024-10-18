@@ -34,7 +34,7 @@ public class AssetManagerView : MonoBehaviour {
         foreach (var item in level.soundEffects.soundEffects) {
 
             foreach (var sound in item.Value) {
-                soundDir.files.Add(new AssetFile(sound, AssetType.WavSound));
+                soundDir.files.Add(new AssetFile(sound, AssetType.WavSound, soundDir));
             }
 
         }
@@ -43,7 +43,7 @@ public class AssetManagerView : MonoBehaviour {
 
         foreach (var texture in level.textures) {
 
-            textureDir.files.Add(new AssetFile(texture, AssetType.Texture));
+            textureDir.files.Add(new AssetFile(texture, AssetType.Texture, textureDir));
 
         }
 
@@ -51,7 +51,7 @@ public class AssetManagerView : MonoBehaviour {
 
         foreach (var obj in level.objects) {
 
-            objectDir.files.Add(new AssetFile(obj, AssetType.Object));
+            objectDir.files.Add(new AssetFile(obj, AssetType.Object, objectDir));
 
         }
 
@@ -63,6 +63,10 @@ public class AssetManagerView : MonoBehaviour {
 
         Refresh();
 
+    }
+
+    public void DeleteFile(AssetFile fileItem) {
+        currentDirectory.files.Remove(fileItem);
     }
 
     public void Refresh() {

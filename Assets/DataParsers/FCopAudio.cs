@@ -39,7 +39,8 @@ namespace FCopParser {
                 var metaDataStruct = new SoundMetaData(
                     BitConverter.ToInt16(cshd.data.ToArray(), offset),
                     BitConverter.ToInt16(cshd.data.ToArray(), offset + 2),
-                    BitConverter.ToInt16(cshd.data.ToArray(), offset + 4),
+                    cshd.data[4],
+                    cshd.data[5],
                     cshd.data[6],
                     cshd.data[7],
                     BitConverter.ToInt32(cshd.data.ToArray(), offset + 8)
@@ -66,15 +67,17 @@ namespace FCopParser {
 
             public int groupID; // 16-bit
             public int dataID; // 16-bit
-            public int unknown1; // 16-bit
+            public int unknown1; // 8-bit
+            public int soundLimit; // 8-bit
             public int doesLoop; // 8-bit
             public int unknown2; // 8-bit
             public int scriptingID; // 32-bit
 
-            public SoundMetaData(int groupID, int dataID, int unknown1, int doesLoop, int unknown2, int scriptingID) {
+            public SoundMetaData(int groupID, int dataID, int unknown1, int soundLimit, int doesLoop, int unknown2, int scriptingID) {
                 this.groupID = groupID;
                 this.dataID = dataID;
                 this.unknown1 = unknown1;
+                this.soundLimit = soundLimit;
                 this.doesLoop = doesLoop;
                 this.unknown2 = unknown2;
                 this.scriptingID = scriptingID;
@@ -93,6 +96,7 @@ namespace FCopParser {
         public int groupID;
         public int scriptingID;
         public bool isLoop;
+        public int soundLimit;
         public int unknown1;
         public int unknown2;
 
@@ -102,6 +106,7 @@ namespace FCopParser {
             this.scriptingID = soundMetaData.scriptingID;
             this.isLoop = soundMetaData.doesLoop == 1;
             this.unknown1 = soundMetaData.unknown1;
+            this.soundLimit = soundMetaData.soundLimit;
             this.unknown2 = soundMetaData.unknown2;
             this.name = "Sound Effect " + rawFile.dataID.ToString();
             this.rawDataHasHeader = true;
@@ -127,7 +132,7 @@ namespace FCopParser {
                 return rawFile.data.GetRange(44, rawFile.data.Count() - 44).ToArray();
             }
             else {
-                return rawFile.data.ToArray(); ;
+                return rawFile.data.ToArray();
             }
 
         }

@@ -199,6 +199,25 @@ namespace FCopParser {
 
         }
 
+        // TODO: Alright this is a little bit of a problem, data files live in two places.
+        // One it lives in the file manager, and two if it's important, is stored on the FCopLevel.
+        // Well now when adding and delete both need to be updated. 
+        //
+        // Compile works by changing the rawFile ref, nothing is really added or removed in the file manager.
+        // That is unless it's specifically stated like with Cptc. This should be changed so that it makes a file manager on compilation.
+        // This means that files now only live in one place instead of being separated into two.
+        public void DeleteAsset(string fourCC, int id) {
+
+            if (fourCC == "Cobj") {
+                objects.RemoveAll(obj => {
+                    return obj.DataID == id;
+                });
+            }
+
+            fileManager.DeleteFile(fourCC, id);
+
+        }
+
         public void ClearLevelData(int width, int height) {
 
             sections.Clear();
