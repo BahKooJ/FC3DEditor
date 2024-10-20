@@ -61,6 +61,12 @@ namespace FCopParser {
 
         }
 
+        public IFFDataFile Compile() {
+
+            return rawFile;
+
+        }
+
         void FindStartChunkOffset() {
 
             offsets.Clear();

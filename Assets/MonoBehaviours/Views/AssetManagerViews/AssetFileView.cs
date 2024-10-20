@@ -81,9 +81,9 @@ public class AssetFileView : MonoBehaviour {
 
     void Import() {
 
-        OpenFileWindowUtil.OpenFile("Output/Exports", file.asset.rawFile.dataFourCC + file.asset.DataID, path => {
-            view.level.fileManager.ReplaceFile(file.asset.rawFile.dataFourCC, file.asset.DataID, File.ReadAllBytes(path).ToList());
-        });
+        //OpenFileWindowUtil.OpenFile("Output/Exports", file.asset.rawFile.dataFourCC + file.asset.DataID, path => {
+        //    view.level.fileManager.ReplaceFile(file.asset.rawFile.dataFourCC, file.asset.DataID, File.ReadAllBytes(path).ToList());
+        //});
 
     }
 

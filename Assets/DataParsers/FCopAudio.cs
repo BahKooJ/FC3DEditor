@@ -7,27 +7,25 @@ using System.Linq;
 namespace FCopParser {
 
 
-    public class FCopSoundEffectParser {
+    public class FCopAudioParser {
 
         public Dictionary<int, List<FCopAudio>> soundEffects = new();
+        public List<FCopStream> soundStreams = new();
 
-        public List<IFFDataFile> rawCwavs;
-        public IFFDataFile rawCshdFile;
+        IFFDataFile cshd;
 
-        public FCopSoundEffectParser(List<IFFDataFile> cwavs, IFFDataFile cshd) {
+        public FCopAudioParser(List<IFFDataFile> cwavs, IFFDataFile cshd, List<SubFile> subFiles) {
 
-            rawCwavs = cwavs;
-            rawCshdFile = cshd;
+            this.cshd = cshd;
 
             IFFDataFile GetCwav(int id) {
-                return rawCwavs.First(file => { return file.dataID == id; });
+                return cwavs.First(file => { return file.dataID == id; });
             }
 
             var soundMetaDataStructCount = BitConverter.ToInt16(cshd.data.ToArray(), 6);
 
-            // This is here for debugging purposes to see if it's ever true
             if (soundMetaDataStructCount != cwavs.Count) {
-                throw new Exception("Sound meta data and cwav count does not match");
+                throw new Exception("Sound meta data and Cwav count does not match");
 
             }
 
@@ -60,8 +58,54 @@ namespace FCopParser {
 
             }
 
+            foreach (var stream in subFiles) {
+
+                soundStreams.Add(new FCopStream(stream));
+
+            }
+
         }
 
+        public List<IFFDataFile> CompileSoundEffects() {
+
+            var total = new List<IFFDataFile>();
+
+            total.Add(cshd);
+
+            foreach (var sounds in soundEffects.Values) {
+
+                foreach (var sound in sounds) {
+                    total.Add(sound.rawFile);
+                }
+
+            }
+
+            return total;
+        }
+
+        public List<SubFile> CompileStreams() {
+
+            var total = new List<SubFile>();
+
+            foreach (var stream in soundStreams) {
+
+                var subFile = new SubFile(stream.name);
+
+                if (stream.miniAnimation != null) {
+
+                    subFile.files.Add(stream.miniAnimation.rawFile);
+
+                }
+
+                subFile.files.Add(stream.sound.rawFile);
+
+                total.Add(subFile);
+
+            }
+
+            return total;
+
+        }
 
         public struct SoundMetaData {
 
@@ -93,6 +137,8 @@ namespace FCopParser {
         public int bitrate;
         public int sampleRate;
         public int channelCount;
+
+        // Cwav
         public int groupID;
         public int scriptingID;
         public bool isLoop;
@@ -101,7 +147,7 @@ namespace FCopParser {
         public int unknown2;
 
         // Cwav
-        public FCopAudio(IFFDataFile rawFile, FCopSoundEffectParser.SoundMetaData soundMetaData) : base(rawFile) {
+        public FCopAudio(IFFDataFile rawFile, FCopAudioParser.SoundMetaData soundMetaData) : base(rawFile) {
             this.groupID = soundMetaData.groupID;
             this.scriptingID = soundMetaData.scriptingID;
             this.isLoop = soundMetaData.doesLoop == 1;
@@ -113,6 +159,13 @@ namespace FCopParser {
             this.bitrate = 16;
             this.sampleRate = 22050;
 
+        }
+
+        public FCopAudio(IFFDataFile rawFile, string streamName) : base(rawFile) {
+            this.name = streamName + " Sound";
+            this.rawDataHasHeader = false;
+            this.bitrate = 8;
+            this.sampleRate = 22050;
         }
 
         public byte[] GetFormattedAudio() {
@@ -139,5 +192,32 @@ namespace FCopParser {
 
     }
 
+    // SWVR
+    public class FCopStream {
+
+        public string name;
+
+        public FCopAudio sound;
+        public FCopMiniAnimation miniAnimation = null;
+
+        public FCopStream(SubFile subFile) {
+
+            name = subFile.name;
+
+            var rawSound = subFile.files.FirstOrDefault(file => file.dataFourCC == "snds");
+            
+            var rawAnm = subFile.files.FirstOrDefault(file => file.dataFourCC == "canm");
+
+            if (rawSound != null) {
+                sound = new FCopAudio(rawSound, subFile.name);
+            }
+
+            if (rawAnm != null) {
+                miniAnimation = new FCopMiniAnimation(rawAnm);
+            }
+
+        }
+
+    }
 
 }

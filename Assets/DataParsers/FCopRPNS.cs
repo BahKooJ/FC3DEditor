@@ -43,7 +43,7 @@ namespace FCopParser {
 
         }
 
-        public void Compile() {
+        public IFFDataFile Compile() {
 
             var total = new List<byte>();
 
@@ -59,6 +59,8 @@ namespace FCopParser {
             }
 
             rawFile.data = total;
+
+            return rawFile;
 
         }
 

@@ -17,10 +17,16 @@ namespace FCopParser {
             emptyOffset = rpns.code.Last().Key;
         }
 
-        public void Compile() {
-            
-            rpns.Compile();
+        public List<IFFDataFile> Compile() {
+
+            List<IFFDataFile> total = new() {
+                rpns.Compile(),
+                functionParser.Compile()
+            };
+
             emptyOffset = rpns.code.Last().Value.offset;
+
+            return total;
         }
 
         public void ResetIDAndOffsets() {

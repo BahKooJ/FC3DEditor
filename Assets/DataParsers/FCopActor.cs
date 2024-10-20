@@ -96,7 +96,7 @@ namespace FCopParser {
 
         }
 
-        virtual public void Compile() {
+        public IFFDataFile Compile() {
 
             rawFile.data.RemoveRange(yOffset, 4);
             rawFile.data.InsertRange(yOffset, BitConverter.GetBytes(y));
@@ -106,6 +106,8 @@ namespace FCopParser {
             if (behavior != null) {
                 behavior.Compile();
             }
+
+            return rawFile;
 
         }
 

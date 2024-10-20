@@ -112,7 +112,6 @@ public class Main : MonoBehaviour {
 
     public ToolbarView toolbar;
 
-    IFFParser iffFile;
     public FCopLevel level;
 
     public List<LevelMesh> sectionMeshes = new();
@@ -136,7 +135,6 @@ public class Main : MonoBehaviour {
 
         Physics.queriesHitBackfaces = true;
 
-        iffFile = FileManagerMain.iffFile;
         level = FileManagerMain.level;
 
         Application.targetFrameRate = 60;
@@ -417,8 +415,10 @@ public class Main : MonoBehaviour {
 
     public void Compile() {
 
+        IFFFileManager compiledFileManager = null;
+
         try {
-            level.Compile();
+            compiledFileManager = level.Compile();
         } 
         catch (MeshIDException) {
             DialogWindowUtil.Dialog("Compile Error: Invalid Level Geometry", "One or more tiles geomtry is invalid." +
@@ -442,8 +442,11 @@ public class Main : MonoBehaviour {
             return;
         }
 
-        // This can be null if loading a ncfc.
-        iffFile ??= new IFFParser(level.fileManager);
+        if (compiledFileManager == null) {
+            return;
+        }
+
+        var iffFile = new IFFParser(compiledFileManager);
 
         iffFile.Compile();
 

@@ -472,7 +472,7 @@ namespace FCopParser {
 
         }
 
-        public void Compile() {
+        public IFFDataFile Compile() {
 
             //var counts = CreateColorPalette();
 
@@ -480,7 +480,7 @@ namespace FCopParser {
 
             // Not yet...
             if (isColorIndexed) {
-                return;
+                return null;
             }
 
             var total = new List<byte>();
@@ -517,6 +517,8 @@ namespace FCopParser {
 
             rawFile.data = total;
             rawFile.modified = true;
+
+            return rawFile;
 
         }
 

@@ -16,13 +16,13 @@ namespace FCopParser {
         };
 
         // Game data that are separated and turn into individual files.
-        public List<IFFDataFile> files = new List<IFFDataFile>();
+        public List<IFFDataFile> files = new();
 
         // Sub folders/files inside the IFF file that are separated.
-        public Dictionary<byte[], List<IFFDataFile>> subFiles = new Dictionary<byte[], List<IFFDataFile>>();
+        public List<SubFile> subFiles = new();
 
         // Nothing but the music, the key is the name of the song.
-        public KeyValuePair<byte[], List<byte>>? music = null;
+        public MusicFile music = null;
 
         public bool isPS1 = false;
 
@@ -70,21 +70,12 @@ namespace FCopParser {
             foreach (var subFile in subFiles) {
 
                 total += "Sub File: ";
-
-                foreach (var c in subFile.Key) {
-
-                    if (c != 0) {
-                        total += Encoding.Default.GetString(new byte[] { c });
-                    }
-                    else {
-                        break;
-                    }
-
-                }
+                
+                total += subFile.name;
 
                 total += "\n";
 
-                foreach (var file in subFile.Value) {
+                foreach (var file in subFile.files) {
 
                     total += file.dataFourCC + " " +
                         file.startNumber + " " +
@@ -119,16 +110,7 @@ namespace FCopParser {
 
             total += "Music: ";
 
-            foreach (var c in music.Value.Key) {
-
-                if (c != 0) {
-                    total += Encoding.Default.GetString(new byte[] { c });
-                }
-                else {
-                    break;
-                }
-
-            }
+            total += music.name;
 
             File.WriteAllText(path, total);
 
@@ -233,6 +215,107 @@ namespace FCopParser {
             additionalData.AddRange(headerCode);
 
             return additionalData;
+
+        }
+
+    }
+
+    public class SubFile {
+
+        public string name = "";
+        public List<IFFDataFile> files = new();
+
+        public SubFile(byte[] encodedName) {
+
+            foreach (var b in encodedName) {
+
+                if (b == 0) {
+                    break;
+                }
+
+                name += Encoding.Default.GetString(new byte[] { b });
+
+            }
+
+        }
+
+        public SubFile(string name) {
+            this.name = name;
+        }
+
+        public SubFile(string name, List<IFFDataFile> files) {
+            this.name = name;
+            this.files = files;
+        }
+
+        public byte[] CompileName() {
+
+            var bytes = Encoding.ASCII.GetBytes(name).ToList();
+
+            if (bytes.Count < 16) {
+
+                while (bytes.Count != 16) {
+                    bytes.Add(0);
+                }
+
+            }
+            // This should never be the case but throwing it in just in case
+            else if (bytes.Count > 16) {
+                bytes = bytes.GetRange(0, 16);
+            }
+
+            return bytes.ToArray();
+
+        }
+
+    }
+
+    public class MusicFile {
+
+        public string name = "";
+        public List<byte> data = new();
+
+        public MusicFile(string name) {
+            this.name = name;
+        }
+
+        public MusicFile(string name, List<byte> data) : this(name) {
+            this.data = data;
+        }
+
+        public MusicFile(byte[] encodedName, List<byte> data) {
+
+            foreach (var b in encodedName) {
+
+                if (b == 0) {
+                    break;
+                }
+
+                name += Encoding.Default.GetString(new byte[] { b });
+
+            }
+
+            this.data = data;
+
+        }
+
+        public byte[] CompileName() {
+
+            var bytes = Encoding.ASCII.GetBytes(name).ToList();
+
+            if (bytes.Count < 16) {
+
+                while (bytes.Count != 16) {
+                    bytes.Add(0);
+                }
+
+            }
+            // This should never be the case but throwing it in just in case
+            else if (bytes.Count > 16) {
+                bytes = bytes.GetRange(0, 16);
+            }
+
+            return bytes.ToArray();
 
         }
 

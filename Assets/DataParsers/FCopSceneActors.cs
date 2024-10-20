@@ -51,7 +51,6 @@ namespace FCopParser {
 
             actors.Remove(actor);
             actorsByID.Remove(actor.DataID);
-            level.fileManager.files.Remove(actor.rawFile);
 
             var posNode = ActorNodeByIDPositional(actor.DataID);
 
@@ -287,10 +286,16 @@ namespace FCopParser {
 
         }
 
-        public void Compile() {
+        public List<IFFDataFile> Compile() {
+
+            var total = new List<IFFDataFile>();
+
             foreach (var actor in actors) {
-                actor.Compile();
+                total.Add(actor.Compile());
             }
+
+            return total;
+
         }
 
     }

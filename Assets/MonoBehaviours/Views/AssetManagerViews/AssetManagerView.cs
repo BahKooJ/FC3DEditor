@@ -31,7 +31,7 @@ public class AssetManagerView : MonoBehaviour {
 
         var soundDir = new AssetDirectory(AssetType.WavSound, true, "Sound Effects", root);
 
-        foreach (var item in level.soundEffects.soundEffects) {
+        foreach (var item in level.audio.soundEffects) {
 
             foreach (var sound in item.Value) {
                 soundDir.files.Add(new AssetFile(sound, AssetType.WavSound, soundDir));

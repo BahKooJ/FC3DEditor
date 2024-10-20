@@ -4,30 +4,26 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Unity.VisualScripting;
 
 namespace FCopParser {
 
-    // =WIP=
+    // Takes everything in IFFFileMananger and converts it to higher parsed data.
+    // Object also manages sections and level layout
     public class FCopLevel {
 
         public int width;
         public int height;
 
         public List<FCopLevelSection> sections = new();
-
-        public FCopSoundEffectParser soundEffects;
-
+        public FCopAudioParser audio;
         public List<FCopTexture> textures = new();
-
         public List<FCopNavMesh> navMeshes = new();
-
         public List<FCopObject> objects = new();
-
         public FCopScriptingProject scripting;
-
         public FCopSceneActors sceneActors;
 
-        public IFFFileManager fileManager;
+        IFFFileManager fileManager;
 
         public FCopLevel(IFFFileManager fileManager) {
 
@@ -139,7 +135,7 @@ namespace FCopParser {
             }
             sceneActors = new FCopSceneActors(actors, this);
 
-            soundEffects = new FCopSoundEffectParser(rawCwavs, rawCshd);
+            audio = new FCopAudioParser(rawCwavs, rawCshd, fileManager.subFiles);
 
         }
 
@@ -243,9 +239,11 @@ namespace FCopParser {
 
         }
 
-        public void Compile() {
+        public IFFFileManager Compile() {
 
-            scripting.Compile();
+            IFFFileManager newFileManager = new();
+
+            newFileManager.files.AddRange(scripting.Compile());
 
             // Updates all rpns offsets for existing files.
             foreach (var rawFile in fileManager.files) {
@@ -267,15 +265,25 @@ namespace FCopParser {
 
             }
 
+            newFileManager.files.AddRange(audio.CompileSoundEffects());
+            newFileManager.subFiles = audio.CompileStreams();
+
+            // TODO: Music
+            newFileManager.music = fileManager.music;
+
             foreach (var navMesh in navMeshes) {
-                navMesh.Compile();
+                newFileManager.files.Add(navMesh.Compile());
             }
 
             foreach (var texture in textures) {
-                texture.Compile();
+                newFileManager.files.Add(texture.Compile());
             }
 
-            sceneActors.Compile();
+            foreach (var obj in objects) {
+                newFileManager.files.Add(obj.Compile());
+            }
+
+            newFileManager.files.AddRange(sceneActors.Compile());
 
             List<List<int>> layout = new() { new() };
 
@@ -324,54 +332,31 @@ namespace FCopParser {
                 layout[row].Add(0);
             }
 
-            var potentialCptc = fileManager.files.FirstOrDefault(file => {
+            var createdCptcRawFile = new IFFDataFile(2, new(), "Cptc", 1, scripting.emptyOffset);
+            FCopLevelLayoutParser.Compile(layout, createdCptcRawFile);
 
-                return file.dataFourCC == "Cptc";
+            newFileManager.files.Add(createdCptcRawFile);
 
-            });
-
-            // NCFC file won't have a Cptc, meaning if it doesn't exist then that kind of file was loaded.
-            // This also mean no Ctils will be present in the file manager.
-            if (potentialCptc != null) {
-
-                FCopLevelLayoutParser.Compile(layout, potentialCptc);
-
-                var index = fileManager.files.FindIndex(file => {
-
-                    return file.dataFourCC == "Ctil";
-
-                });
-
-                fileManager.files.RemoveAll(file => {
-
-                    return file.dataFourCC == "Ctil";
-
-                });
-
-                foreach (var group in groupedSections) {
-                    var bytes = group.Value.Compile().Compile();
-                    var rawFile = new IFFDataFile(2, bytes, "Ctil", group.Key, scripting.emptyOffset);
-                    fileManager.files.Insert(index, rawFile);
-                    index++;
-                }
-
-            }
-            else {
-
-                var createdCptcRawFile = new IFFDataFile(2, new(), "Cptc", 1, scripting.emptyOffset);
-                FCopLevelLayoutParser.Compile(layout, createdCptcRawFile);
-
-                fileManager.files.Add(createdCptcRawFile);
-
-                foreach (var group in groupedSections) {
-                    var bytes = group.Value.Compile().Compile();
-                    var rawFile = new IFFDataFile(2, bytes, "Ctil", group.Key, scripting.emptyOffset);
-                    fileManager.files.Add(rawFile);
-                }
-
+            foreach (var group in groupedSections) {
+                var bytes = group.Value.Compile().Compile();
+                var rawFile = new IFFDataFile(2, bytes, "Ctil", group.Key, scripting.emptyOffset);
+                newFileManager.files.Add(rawFile);
             }
 
             scripting.ResetIDAndOffsets();
+
+            // TODO: Ctos
+            var dataAccountedFor = new List<string>() { "RPNS", "Cshd", "Cwav", "Cptc", "Ctil", "Cfun", "Cnet", "Cbmp", "Cobj", "Cact", "Csac" };
+
+            var floatingFiles = fileManager.files.Where(file => !dataAccountedFor.Contains(file.dataFourCC));
+
+            newFileManager.files.AddRange(floatingFiles);
+
+            newFileManager.Sort();
+
+            fileManager = newFileManager;
+
+            return newFileManager;
 
         }
 
@@ -598,23 +583,23 @@ namespace FCopParser {
 
                 var fileData = new List<byte>();
 
-                foreach (var file in subFile.Value) {
+                foreach (var file in subFile.files) {
                     fileData.AddRange(CreateHeader(file, "FCop" + file.dataFourCC, "", file.data.Count));
                     fileData.AddRange(file.data);
                 }
 
                 total.AddRange(Encoding.ASCII.GetBytes("SubFile "));
                 total.AddRange(BitConverter.GetBytes(fileData.Count + 32));
-                total.AddRange(BitConverter.GetBytes(subFile.Value.Count));
-                total.AddRange(subFile.Key);
+                total.AddRange(BitConverter.GetBytes(subFile.files.Count));
+                total.AddRange(subFile.CompileName());
                 total.AddRange(fileData);
 
             }
 
             total.AddRange(Encoding.ASCII.GetBytes("Music   "));
-            total.AddRange(BitConverter.GetBytes(fileManager.music.Value.Value.Count + 28));
-            total.AddRange(fileManager.music.Value.Key);
-            total.AddRange(fileManager.music.Value.Value);
+            total.AddRange(BitConverter.GetBytes(fileManager.music.data.Count + 28));
+            total.AddRange(fileManager.music.CompileName());
+            total.AddRange(fileManager.music.data);
 
             scripting.ResetIDAndOffsets();
 
@@ -736,7 +721,7 @@ namespace FCopParser {
                     var name = data.GetRange(i, 16).ToArray();
                     i += 16;
 
-                    newFileManager.subFiles[name] = new();
+                    newFileManager.subFiles.Add(new SubFile(name));
 
                     foreach (var _f in Enumerable.Range(0, fileCount)) {
 
@@ -749,7 +734,7 @@ namespace FCopParser {
                             throw new Exception("Specialized data found in subfile");
                         }
 
-                        newFileManager.subFiles[name].Add(file);
+                        newFileManager.subFiles.Last().files.Add(file);
 
                     }
 
@@ -764,7 +749,7 @@ namespace FCopParser {
 
                     var headeSize = i - iBeforeHeader;
 
-                    newFileManager.music = new KeyValuePair<byte[], List<byte>>(name, data.GetRange(i, totalSize - headeSize));
+                    newFileManager.music = new MusicFile(name, data.GetRange(i, totalSize - headeSize));
 
                     i += totalSize - headeSize;
                     
@@ -872,7 +857,7 @@ namespace FCopParser {
                 objects.Add(new FCopObject(rawFile));
             }
 
-            soundEffects = new FCopSoundEffectParser(rawCwavs, rawCshd);
+            audio = new FCopAudioParser(rawCwavs, rawCshd, fileManager.subFiles);
 
         }
 

@@ -106,25 +106,33 @@ namespace FCopParser {
 
             var fileMananger = new IFFFileManager();
 
-            IFFDataFile? file = null;
+            IFFDataFile file = null;
             var dataChunksToAdd = 0;
 
-            byte[]? subFileName = null;
+            SubFile openedSubFile = null;
 
             foreach (ChunkHeader header in offsets) {
 
                 if (header.fourCCDeclaration == FourCC.SWVR) {
 
-                    subFileName = header.subFileName;
+                    if (openedSubFile != null) {
+
+                        if (openedSubFile.files.Count != 0) {
+                            fileMananger.subFiles.Add(openedSubFile);
+                        }
+
+                    }
+
+                    openedSubFile = new SubFile(header.subFileName);
 
                 } 
                 else if (header.fourCCDeclaration == FourCC.MSIC) {
 
                     if (fileMananger.music == null) {
 
-                        fileMananger.music = new KeyValuePair<byte[], List<byte>>(subFileName!, new List<byte>());
+                        fileMananger.music = new MusicFile(openedSubFile.name);
 
-                        fileMananger.music.Value.Value.AddRange(CopyOfRange(header.index + 28, header.index + header.chunkSize).ToList());
+                        fileMananger.music.data.AddRange(CopyOfRange(header.index + 28, header.index + header.chunkSize).ToList());
 
                     } 
                     else {
@@ -132,7 +140,7 @@ namespace FCopParser {
                         //todo: Magic number 28 is the size of the music header, there are two numbers after the header that are unknown
                         //update: I know what they are now but I'm too lazy to refactor. They are 3 numbers, chunk count, chunk iteration, and the size divided by 2
 
-                        fileMananger.music.Value.Value.AddRange(CopyOfRange(header.index + 28, header.index + header.chunkSize).ToList());
+                        fileMananger.music.data.AddRange(CopyOfRange(header.index + 28, header.index + header.chunkSize).ToList());
 
                     }
 
@@ -140,7 +148,7 @@ namespace FCopParser {
                 // PS1
                 else if (header.fourCCDeclaration == FourCC.VAGB) {
 
-                    if (subFileName == null) {
+                    if (openedSubFile == null) {
                         throw new Exception("This should only be inside of of a SWVR?");
                     }
 
@@ -149,17 +157,12 @@ namespace FCopParser {
                         header.fourCCDeclaration, 0, 0
                         );
 
-                    if (!fileMananger.subFiles.ContainsKey(subFileName)) {
-                        fileMananger.subFiles[subFileName] = new List<IFFDataFile> { vagbFile };
-                    }
-                    else {
-                        fileMananger.subFiles[subFileName].Add(vagbFile);
-                    }
+                    openedSubFile.files.Add(vagbFile);
 
                 }
                 else if (header.fourCCDeclaration == FourCC.CANM) {
 
-                    if (subFileName == null) {
+                    if (openedSubFile == null) {
                         throw new Exception("This should only be inside of of a SWVR?");
                     }
 
@@ -168,12 +171,7 @@ namespace FCopParser {
                         header.fourCCDeclaration, 0, 0
                         );
 
-                    if (!fileMananger.subFiles.ContainsKey(subFileName)) {
-                        fileMananger.subFiles[subFileName] = new List<IFFDataFile> { camnFile };
-                    }
-                    else {
-                        fileMananger.subFiles[subFileName].Add(camnFile);
-                    }
+                    openedSubFile.files.Add(camnFile);
 
                 }
                 else if (header.fourCCDeclaration == FourCC.VAGM) {
@@ -182,9 +180,9 @@ namespace FCopParser {
 
                     if (fileMananger.music == null) {
 
-                        fileMananger.music = new KeyValuePair<byte[], List<byte>>(subFileName!, new List<byte>());
+                        fileMananger.music = new MusicFile(openedSubFile.name);
 
-                        fileMananger.music.Value.Value.AddRange(CopyOfRange(header.index + 28, header.index + header.chunkSize).ToList());
+                        fileMananger.music.data.AddRange(CopyOfRange(header.index + 28, header.index + header.chunkSize).ToList());
 
                     }
                     else {
@@ -192,7 +190,7 @@ namespace FCopParser {
                         //todo: Magic number 28 is the size of the music header, there are two numbers after the header that are unknown
                         //update: I know what they are now but I'm too lazy to refactor. They are 3 numbers, chunk count, chunk iteration, and the size divided by 2
 
-                        fileMananger.music.Value.Value.AddRange(CopyOfRange(header.index + 28, header.index + header.chunkSize).ToList());
+                        fileMananger.music.data.AddRange(CopyOfRange(header.index + 28, header.index + header.chunkSize).ToList());
 
                     }
 
@@ -243,13 +241,9 @@ namespace FCopParser {
 
                     if (dataChunksToAdd == 0) {
 
-                        if (subFileName != null) {
+                        if (openedSubFile != null) {
 
-                            if (!fileMananger.subFiles.ContainsKey(subFileName)) {
-                                fileMananger.subFiles[subFileName] = new List<IFFDataFile> { file };
-                            } else {
-                                fileMananger.subFiles[subFileName].Add(file);
-                            }
+                            openedSubFile.files.Add(file);
 
                             file = null;
 
@@ -439,19 +433,13 @@ namespace FCopParser {
                 subFileHeader.AddRange(BitConverter.GetBytes(36));
                 subFileHeader.AddRange(new List<byte>() { 0, 0, 0, 0, 0, 0, 0, 0 });
                 subFileHeader.AddRange(FourCC.FILEbytes);
-                subFileHeader.AddRange(subFile.Key);
-
-                // After the file name there's some data that I don't know what does yet, so this is just filling in the space
-                // CORRECTION: IT'S IMPORTANT
-                //while (subFileHeader.Count < 36) {
-                //    subFileHeader.Add(0);
-                //}
+                subFileHeader.AddRange(subFile.CompileName());
 
                 // No need to check for fills, because the remainder was already filled
                 compiledFile.AddRange(subFileHeader);
                 current24kSectionSize += 36;
 
-                foreach (var file in subFile.Value) {
+                foreach (var file in subFile.files) {
 
                     if (file.dataFourCC == FourCC.VAGB) {
 
@@ -464,7 +452,7 @@ namespace FCopParser {
 
 
 
-                        if (subFile.Value.Count > 1) {
+                        if (subFile.files.Count > 1) {
                             FILLCheck(chunkHeader.Count + file.data.Count);
                         }
 
@@ -485,7 +473,7 @@ namespace FCopParser {
                         chunkHeader.AddRange(new List<byte>() { 0, 0, 0, 0, 0, 0, 0, 0 });
                         chunkHeader.AddRange(FourCC.MDECbytes);
 
-                        if (subFile.Value.Count > 1) {
+                        if (subFile.files.Count > 1) {
                             FILLCheck(chunkHeader.Count + file.data.Count);
                         }
 
@@ -516,18 +504,12 @@ namespace FCopParser {
             musicfileHeader.AddRange(BitConverter.GetBytes(36));
             musicfileHeader.AddRange(new List<byte>() { 0, 0, 0, 0, 0, 0, 0, 0 });
             musicfileHeader.AddRange(FourCC.FILEbytes);
-            musicfileHeader.AddRange(parsedData.music!.Value.Key);
-
-            // After the file name there's some data that I don't know what does yet, so this is just filling in the space
-            // CORRECTION: IT'S IMPORTANT
-            //while (musicfileHeader.Count < 36) {
-            //    musicfileHeader.Add(0);
-            //}
+            musicfileHeader.AddRange(parsedData.music.CompileName());
 
             compiledFile.AddRange(musicfileHeader);
             current24kSectionSize += 36;
 
-            var musicDataSize = parsedData.music.Value.Value.Count();
+            var musicDataSize = parsedData.music.data.Count();
 
             var chunkedMusicOffset = 0;
 
@@ -580,14 +562,14 @@ namespace FCopParser {
                     FILLCheck(chunkSize + musicHeaderLength);
                     current24kSectionSize += chunkSize + musicHeaderLength;
                     MakeMusicHeader(chunkSize + musicHeaderLength);
-                    compiledFile.AddRange(parsedData.music.Value.Value.GetRange(chunkedMusicOffset, chunkSize));
+                    compiledFile.AddRange(parsedData.music.data.GetRange(chunkedMusicOffset, chunkSize));
 
                 } else {
 
                     FILLCheck(currentMusicChunkSize);
                     current24kSectionSize += currentMusicChunkSize;
                     MakeMusicHeader(currentMusicChunkSize);
-                    compiledFile.AddRange(parsedData.music.Value.Value.GetRange(chunkedMusicOffset, currentMusicChunkSizeWithoutHeader));
+                    compiledFile.AddRange(parsedData.music.data.GetRange(chunkedMusicOffset, currentMusicChunkSizeWithoutHeader));
 
                     chunkedMusicOffset += currentMusicChunkSizeWithoutHeader;
 
