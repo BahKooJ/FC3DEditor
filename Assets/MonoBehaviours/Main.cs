@@ -151,7 +151,7 @@ public class Main : MonoBehaviour {
 
         autoSaveTimer += Time.deltaTime;
 
-        if (autoSaveTimer >= 360f) {
+        if (autoSaveTimer >= 600f) {
             AutoSave();
             autoSaveTimer = 0f;
         }

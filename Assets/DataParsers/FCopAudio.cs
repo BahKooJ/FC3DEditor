@@ -6,15 +6,15 @@ using System.Linq;
 
 namespace FCopParser {
 
-
     public class FCopAudioParser {
 
         public Dictionary<int, List<FCopAudio>> soundEffects = new();
         public List<FCopStream> soundStreams = new();
+        public FCopAudio music;
 
         IFFDataFile cshd;
 
-        public FCopAudioParser(List<IFFDataFile> cwavs, IFFDataFile cshd, List<SubFile> subFiles) {
+        public FCopAudioParser(List<IFFDataFile> cwavs, IFFDataFile cshd, List<SubFile> subFiles, MusicFile musicFile) {
 
             this.cshd = cshd;
 
@@ -37,10 +37,10 @@ namespace FCopParser {
                 var metaDataStruct = new SoundMetaData(
                     BitConverter.ToInt16(cshd.data.ToArray(), offset),
                     BitConverter.ToInt16(cshd.data.ToArray(), offset + 2),
-                    cshd.data[4],
-                    cshd.data[5],
-                    cshd.data[6],
-                    cshd.data[7],
+                    cshd.data[offset + 4],
+                    cshd.data[offset + 5],
+                    cshd.data[offset + 6],
+                    cshd.data[offset + 7],
                     BitConverter.ToInt32(cshd.data.ToArray(), offset + 8)
                     );
 
@@ -64,23 +64,178 @@ namespace FCopParser {
 
             }
 
+            music = new FCopAudio(musicFile);
+
         }
 
-        public List<IFFDataFile> CompileSoundEffects() {
+        public IFFDataFile CompileSoundHeader() {
 
-            var total = new List<IFFDataFile>();
+            var total = new List<byte>();
 
-            total.Add(cshd);
+            var waves = GetWaves();
 
-            foreach (var sounds in soundEffects.Values) {
+            total.AddRange(BitConverter.GetBytes((short)4));
+            total.AddRange(BitConverter.GetBytes((short)1));
+            total.AddRange(BitConverter.GetBytes((short)50));
+            total.AddRange(BitConverter.GetBytes((short)waves.Count));
+            total.AddRange(BitConverter.GetBytes((short)10));
 
-                foreach (var sound in sounds) {
-                    total.Add(sound.rawFile);
+            foreach (var wave in waves) {
+
+                total.AddRange(BitConverter.GetBytes((short)wave.groupID));
+                total.AddRange(BitConverter.GetBytes((short)wave.DataID));
+                total.Add((byte)wave.unknown1);
+                total.Add((byte)wave.soundLimit);
+                total.Add((byte)(wave.isLoop ? 1 : 0));
+                total.Add((byte)wave.unknown2);
+                total.AddRange(BitConverter.GetBytes(wave.scriptingID));
+
+            }
+
+            total.Add(32);
+            total.Add(32);
+
+            cshd.data = total;
+
+            return cshd;
+
+        }
+
+        // Ctos is a sort of header file for SWVR chunks, it has offsets to all SWVR chunks relative to the start of the data.
+        // Meaning that the first SWVR chunk would be at offset 0.
+        // HOWEVER these offsets are made after compression, so it includes fills, chunks and all that garbage.
+        // So in order to properly make a Ctos it needs to mimic making a IFF file
+        public IFFDataFile CreateCtos(int emptyRPNSOffset) {
+
+            int swvrHeaderSize = 36;
+            int shdrHeaderSize = 60;
+
+            var i = 0;
+            var current24kSectionSize = 0;
+
+            void FILLCheck(int nextDataSize) {
+
+                if (current24kSectionSize == IFFParser.iffFileSectionSize) {
+                    current24kSectionSize = 0;
+                    return;
+                }
+
+                if (current24kSectionSize + nextDataSize > IFFParser.iffFileSectionSize) {
+
+                    var difference = IFFParser.iffFileSectionSize - current24kSectionSize;
+
+                    i += difference;
+
+                    current24kSectionSize = 0;
+
+                }
+
+            }
+
+            void FILLRemain() {
+
+                if (current24kSectionSize == IFFParser.iffFileSectionSize) {
+                    current24kSectionSize = 0;
+                    return;
+                }
+
+                var difference = IFFParser.iffFileSectionSize - current24kSectionSize;
+
+                i += difference;
+
+                current24kSectionSize = 0;
+
+            }
+
+            void AddToIterator(int value) {
+                FILLCheck(value);
+                current24kSectionSize += value;
+                i += value;
+            }
+
+            var offsets = new List<int>();
+
+            var subFiles = CompileStreams();
+
+            foreach (var subFile in subFiles) {
+
+                offsets.Add(i);
+
+                AddToIterator(swvrHeaderSize);
+
+                foreach (var file in subFile.files) {
+
+                    AddToIterator(shdrHeaderSize);
+
+                    var dataSize = file.data.Count;
+
+                    var dataChunkCount = IFFParser.DataChunksBySize(dataSize);
+
+                    var chunkedDataOffset = 0;
+
+                    foreach (int _ in Enumerable.Range(0, dataChunkCount)) {
+
+                        if (chunkedDataOffset + IFFParser.dataChunkSizeWithoutHeader > dataSize) {
+
+                            var chunkHeader = new List<byte>();
+
+                            var chunkSize = dataSize - chunkedDataOffset;
+
+                            AddToIterator(chunkSize + IFFParser.chunkHeaderLength);
+
+                        }
+                        else {
+
+                            AddToIterator(IFFParser.dataChunkSize);
+
+                            chunkedDataOffset += IFFParser.dataChunkSizeWithoutHeader;
+
+                        }
+
+                    }
+
+
+                }
+
+                FILLRemain();
+
+            }
+
+            var total = new List<byte>();
+
+            // FourCC SOTt
+            total.AddRange(new List<byte>() { 83, 79, 84, 116 });
+            // Size
+            total.AddRange(BitConverter.GetBytes(16 + (offsets.Count * 12)));
+            total.AddRange(BitConverter.GetBytes(1));
+            total.AddRange(BitConverter.GetBytes(offsets.Count));
+
+            foreach (var offset in offsets) {
+
+                total.AddRange(BitConverter.GetBytes(offset));
+                total.AddRange(BitConverter.GetBytes(0));
+                total.AddRange(BitConverter.GetBytes(0));
+
+            }
+
+            return new IFFDataFile(2, total, "Ctos", 1, emptyRPNSOffset);
+
+        }
+
+        public List<FCopAudio> GetWaves() {
+
+            List<FCopAudio> total = new();
+
+            foreach (var sound in soundEffects) {
+
+                foreach (var s in sound.Value) {
+                    total.Add(s);
                 }
 
             }
 
             return total;
+
         }
 
         public List<SubFile> CompileStreams() {
@@ -104,6 +259,12 @@ namespace FCopParser {
             }
 
             return total;
+
+        }
+
+        public MusicFile CompileMusic() {
+
+            return new MusicFile(music.name, music.rawFile.data);
 
         }
 
@@ -162,10 +323,20 @@ namespace FCopParser {
         }
 
         public FCopAudio(IFFDataFile rawFile, string streamName) : base(rawFile) {
-            this.name = streamName + " Sound";
+            this.name = streamName;
             this.rawDataHasHeader = false;
             this.bitrate = 8;
             this.sampleRate = 22050;
+        }
+
+        public FCopAudio(MusicFile musicFile) : base(null) {
+
+            rawFile = new IFFDataFile(0, musicFile.data, "MSIC", 1, -1);
+            this.name = musicFile.name;
+            this.rawDataHasHeader = false;
+            this.bitrate = 8;
+            this.sampleRate = 14212;
+
         }
 
         public byte[] GetFormattedAudio() {

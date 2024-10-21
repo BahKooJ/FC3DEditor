@@ -46,13 +46,13 @@ namespace FCopParser {
         }
 
         // The normal length of a chunk header.
-        const int chunkHeaderLength = 20;
+        public const int chunkHeaderLength = 20;
 
         // The maximum size of a SDAT chunk
-        const int dataChunkSize = 4096;
+        public const int dataChunkSize = 4096;
 
         // The maximum size of a SDAT chunk not including the size of the header
-        const int dataChunkSizeWithoutHeader = 4076;
+        public const int dataChunkSizeWithoutHeader = 4076;
 
         // The length of the MSIC chunk
         const int musicHeaderLength = 28;
@@ -75,7 +75,7 @@ namespace FCopParser {
 
         // All chunks in the IFF file must fill a perfeck 24KB size.
         // If a chunk exends a 24KB section, a FILL chunk must be made to fill in the remaining space
-        const int iffFileSectionSize = 24576;
+        public const int iffFileSectionSize = 24576;
 
         // ---Parsing---
 
@@ -713,7 +713,7 @@ namespace FCopParser {
             return new string(charArray);
         }
 
-        int DataChunksBySize(int size, int chunkSize = 4096, int headerLength = 20) {
+        public static int DataChunksBySize(int size, int chunkSize = 4096, int headerLength = 20) {
 
             var total = size / (chunkSize - headerLength);
             if (size % (chunkSize - headerLength) != 0) {

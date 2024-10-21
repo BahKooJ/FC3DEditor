@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Unity.VisualScripting;
 
 namespace FCopParser {
 
@@ -135,7 +134,7 @@ namespace FCopParser {
             }
             sceneActors = new FCopSceneActors(actors, this);
 
-            audio = new FCopAudioParser(rawCwavs, rawCshd, fileManager.subFiles);
+            audio = new FCopAudioParser(rawCwavs, rawCshd, fileManager.subFiles, fileManager.music);
 
         }
 
@@ -195,13 +194,6 @@ namespace FCopParser {
 
         }
 
-        // TODO: Alright this is a little bit of a problem, data files live in two places.
-        // One it lives in the file manager, and two if it's important, is stored on the FCopLevel.
-        // Well now when adding and delete both need to be updated. 
-        //
-        // Compile works by changing the rawFile ref, nothing is really added or removed in the file manager.
-        // That is unless it's specifically stated like with Cptc. This should be changed so that it makes a file manager on compilation.
-        // This means that files now only live in one place instead of being separated into two.
         public void DeleteAsset(string fourCC, int id) {
 
             if (fourCC == "Cobj") {
@@ -239,13 +231,10 @@ namespace FCopParser {
 
         }
 
-        public IFFFileManager Compile() {
+        List<string> dataAccountedFor = new List<string>() { "RPNS", "Cshd", "Cwav", "Ctos", "Cptc", "Ctil", "Cfun", "Cnet", "Cbmp", "Cobj", "Cact", "Csac", "Cctr" };
 
-            IFFFileManager newFileManager = new();
+        void UpdateRPNSOffsets() {
 
-            newFileManager.files.AddRange(scripting.Compile());
-
-            // Updates all rpns offsets for existing files.
             foreach (var rawFile in fileManager.files) {
 
                 var preCompileRefs = rawFile.rpnsReferences;
@@ -265,11 +254,23 @@ namespace FCopParser {
 
             }
 
-            newFileManager.files.AddRange(audio.CompileSoundEffects());
-            newFileManager.subFiles = audio.CompileStreams();
+        }
 
-            // TODO: Music
-            newFileManager.music = fileManager.music;
+        public IFFFileManager Compile() {
+
+            IFFFileManager newFileManager = new();
+
+            newFileManager.files.AddRange(scripting.Compile());
+
+            UpdateRPNSOffsets();
+
+            newFileManager.files.Add(audio.CompileSoundHeader());
+
+            foreach (var wav in audio.GetWaves()) {
+                newFileManager.files.Add(wav.rawFile);
+            }
+
+            newFileManager.files.Add(audio.CreateCtos(scripting.emptyOffset));
 
             foreach (var navMesh in navMeshes) {
                 newFileManager.files.Add(navMesh.Compile());
@@ -345,12 +346,21 @@ namespace FCopParser {
 
             scripting.ResetIDAndOffsets();
 
-            // TODO: Ctos
-            var dataAccountedFor = new List<string>() { "RPNS", "Cshd", "Cwav", "Cptc", "Ctil", "Cfun", "Cnet", "Cbmp", "Cobj", "Cact", "Csac" };
-
             var floatingFiles = fileManager.files.Where(file => !dataAccountedFor.Contains(file.dataFourCC));
 
             newFileManager.files.AddRange(floatingFiles);
+
+            // Cctr
+            // I'm not really sure what ctr does, however, all the data is the exact same (other than GlblData) throughout the mission files.
+            // So I guess I don't really need to care, I'll just throw this in here.
+            newFileManager.files.Add(new IFFDataFile(1, 
+                new() { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2B, 0x01, 0x64, 0x1B, 0x38, 0x01, 0x2B, 0x6F, 0xE6 }, 
+                "Cctr", 1, scripting.emptyOffset));
+
+            // SWVRs
+            newFileManager.subFiles = audio.CompileStreams();
+
+            newFileManager.music = audio.CompileMusic();
 
             newFileManager.Sort();
 
@@ -360,6 +370,8 @@ namespace FCopParser {
 
         }
 
+        // Ctos and Cctr is not saved into the file because it contains no useful data and is boilerplate for Future Cop.
+        // Both will be made when the level compiles.
         public List<byte> CompileToNCFCFile() {
 
             var total = new List<byte>();
@@ -396,38 +408,35 @@ namespace FCopParser {
 
             }
 
-            scripting.Compile();
+            // TODO: Function and script files
+            var scriptingFiles = scripting.Compile();
+            foreach (var file in scriptingFiles) {
 
-            // Updates all rpns offsets for existing files.
-            foreach (var rawFile in fileManager.files) {
-
-                var preCompileRefs = rawFile.rpnsReferences;
-
-                rawFile.rpnsReferences = new();
-
-                // Remember that the actual compiled offset is stored on the script object
-                foreach (var rpnsRef in preCompileRefs) {
-                    if (rpnsRef == -1) {
-                        rawFile.rpnsReferences.Add(-1);
-                    }
-                    else {
-                        rawFile.rpnsReferences.Add(scripting.rpns.code[rpnsRef].offset);
-                    }
-
-                }
+                CreateHeaderWithFile(file, "FCop" + file.dataFourCC, "");
 
             }
 
+            UpdateRPNSOffsets();
+
+            CreateHeaderWithFile(audio.CompileSoundHeader(), "FCopCshd", "");
+
+            foreach (var wav in audio.GetWaves()) {
+                CreateHeaderWithFile(wav.rawFile, "FCopCwav", wav.name);
+            }
+
+
+
             foreach (var navMesh in navMeshes) {
-                navMesh.Compile();
-                CreateHeaderWithFile(navMesh.rawFile, "FCopCnet", navMesh.name);
+                CreateHeaderWithFile(navMesh.Compile(), "FCopCnet", navMesh.name);
             }
 
             foreach (var texture in textures) {
-                texture.Compile();
+                CreateHeaderWithFile(texture.Compile(), "FCopCbmp", texture.name);
             }
 
-            sceneActors.Compile();
+            foreach (var obj in objects) {
+                CreateHeaderWithFile(obj.Compile(), "FCopCobj", obj.name);
+            }
 
             foreach (var section in sections) {
 
@@ -537,14 +546,15 @@ namespace FCopParser {
 
             }
 
+            sceneActors.Compile();
+
             foreach (var actor in sceneActors.actors) {
 
                 CreateHeaderWithFile(actor.rawFile, "FCop" + actor.rawFile.dataFourCC, actor.name);
 
             }
 
-            // Actor groups
-
+            #region Actor Groups
             var actorGroupData = new List<byte>();
 
             foreach (var group in sceneActors.positionalGroupedActors) {
@@ -563,15 +573,12 @@ namespace FCopParser {
             total.AddRange(BitConverter.GetBytes(actorGroupData.Count + 16));
             total.AddRange(BitConverter.GetBytes(sceneActors.positionalGroupedActors.Count));
             total.AddRange(actorGroupData);
+            #endregion
 
-            // Everything else
+            #region Everything Else
             foreach (var file in fileManager.files) {
 
-                if (file.dataFourCC == "Ctil" || 
-                    file.dataFourCC == "Cact" || 
-                    file.dataFourCC == "Csac" || 
-                    file.dataFourCC == "Cptc" ||
-                    file.dataFourCC == "Cnet") {
+                if (dataAccountedFor.Contains(file.dataFourCC)) {
                     continue;
                 }
 
@@ -579,7 +586,9 @@ namespace FCopParser {
 
             }
 
-            foreach (var subFile in fileManager.subFiles) {
+            var subFiles = audio.CompileStreams();
+
+            foreach (var subFile in subFiles) {
 
                 var fileData = new List<byte>();
 
@@ -596,10 +605,13 @@ namespace FCopParser {
 
             }
 
+            var musicFile = audio.CompileMusic();
+
             total.AddRange(Encoding.ASCII.GetBytes("Music   "));
-            total.AddRange(BitConverter.GetBytes(fileManager.music.data.Count + 28));
-            total.AddRange(fileManager.music.CompileName());
-            total.AddRange(fileManager.music.data);
+            total.AddRange(BitConverter.GetBytes(musicFile.data.Count + 28));
+            total.AddRange(musicFile.CompileName());
+            total.AddRange(musicFile.data);
+            #endregion
 
             scripting.ResetIDAndOffsets();
 
@@ -624,7 +636,13 @@ namespace FCopParser {
             // key data
             List<FCopActor> actors = new();
             List<FCopNavMesh> navMeshes = new();
+            List<FCopObject> objects = new();
+            List<FCopTexture> textures = new();
+            List<IFFDataFile> rawCwavs = new();
+            IFFDataFile rawCshd = null;
             List<ActorGroup> actorGroups = new();
+            FCopRPNS rpns = null;
+            FCopFunctionParser funParser = null;
 
             var i = 0;
 
@@ -695,8 +713,39 @@ namespace FCopParser {
                         navMeshes.Add(navMesh);
 
                     }
+                    else if (eightCC.Substring(4, 4) == "Cobj") {
 
+                        var obj = new FCopObject(file) {
+                            name = name
+                        };
+
+                        objects.Add(obj);
+
+                    }
+                    else if (eightCC.Substring(4, 4) == "Cbmp") {
+
+                        var texture = new FCopTexture(file) {
+                            name = name
+                        };
+
+                        textures.Add(texture);
+
+                    }
+                    else if (eightCC.Substring(4, 4) == "Cwav") {
+                        rawCwavs.Add(file);
+                    }
+                    else if (eightCC.Substring(4, 4) == "Cshd") {
+                        rawCshd = file;
+                    }
+                    else if (eightCC.Substring(4, 4) == "RPNS") {
+                        rpns = new FCopRPNS(file);
+                    }
+                    else if (eightCC.Substring(4, 4) == "Cfun") {
+                        funParser = new FCopFunctionParser(file);
+                    }
+                    
                     return file;
+
                 }
                 else {
                     throw new Exception("Encountered unkown file");
@@ -814,50 +863,12 @@ namespace FCopParser {
                 sceneActors.SetPositionalGroup(actorGroups);
             }
             this.navMeshes = navMeshes;
+            this.objects = objects;
+            this.textures = textures;
 
-            // TODO: This data should be replaced on file read.
-            List<IFFDataFile> GetFiles(string fourCC) {
+            scripting = new FCopScriptingProject(rpns, funParser);
 
-                return fileManager.files.Where(file => {
-
-                    return file.dataFourCC == fourCC;
-
-                }).ToList();
-
-            }
-
-            IFFDataFile GetFile(string fourCC) {
-
-                return fileManager.files.First(file => {
-
-                    return file.dataFourCC == fourCC;
-
-                });
-
-            }
-
-            var rpns = new FCopRPNS(GetFile("RPNS"));
-
-            var cfun = new FCopFunctionParser(GetFile("Cfun"));
-
-            scripting = new FCopScriptingProject(rpns, cfun);
-
-            var rawCwavs = GetFiles("Cwav");
-            var rawCshd = GetFile("Cshd");
-
-            var rawBitmapFiles = GetFiles("Cbmp");
-
-            var rawObjectFiles = GetFiles("Cobj");
-
-            foreach (var rawFile in rawBitmapFiles) {
-                textures.Add(new FCopTexture(rawFile));
-            }
-
-            foreach (var rawFile in rawObjectFiles) {
-                objects.Add(new FCopObject(rawFile));
-            }
-
-            audio = new FCopAudioParser(rawCwavs, rawCshd, fileManager.subFiles);
+            audio = new FCopAudioParser(rawCwavs, rawCshd, fileManager.subFiles, newFileManager.music);
 
         }
 
@@ -4786,12 +4797,13 @@ namespace FCopParser {
                 var newShader = new DynamicMonoChromeShader();
                 newShader.isQuad = isQuad;
 
+                // Remember that regardless of shape, monochrome will always store 4 vertex colors
                 if (!isQuad) {
                     monoValues.Add(0);
                 }
 
                 var quadMonoPosToColor = new int[] { 3, 1, 0, 2 };
-                var triangleMonoPosToColor = new int[] { 1, 0, 2 };
+                var triangleMonoPosToColor = new int[] { 1, 0, 2, 3 };
 
                 var orderedMonoValues = new List<int>();
 
