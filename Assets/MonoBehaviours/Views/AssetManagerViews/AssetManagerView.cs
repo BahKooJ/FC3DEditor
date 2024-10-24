@@ -170,5 +170,10 @@ public class AssetManagerView : MonoBehaviour {
 
     }
 
+    public void OnClickDone() {
+
+        Destroy(gameObject);
+
+    }
 
 }

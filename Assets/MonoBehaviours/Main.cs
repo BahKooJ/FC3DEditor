@@ -97,6 +97,7 @@ public class Main : MonoBehaviour {
     public GameObject axisControl;
 
     public GameObject escMenuPrefab;
+    public GameObject assetManagerPrefab;
 
     // Temp
     public GameObject boundsPrefab;

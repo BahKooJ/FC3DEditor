@@ -242,6 +242,23 @@ public class ToolbarView: MonoBehaviour {
 
     }
 
+    public void OpenAssetManager() {
+
+        var existingAssetManager = FindAnyObjectByType<AssetManagerView>();
+
+        if (existingAssetManager != null) {
+            Destroy(existingAssetManager.gameObject);
+        }
+
+        var obj = Instantiate(controller.assetManagerPrefab);
+        obj.transform.SetParent(controller.canvas.transform, false);
+
+        var assetManager = obj.GetComponent<AssetManagerView>();
+
+        assetManager.level = controller.level;
+
+    }
+
     public void SelectPlayMode() {
 
         Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));

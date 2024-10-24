@@ -65,9 +65,9 @@ public class ActorObject : MonoBehaviour {
         SetToCurrentPosition();
 
         // 98 and 99 are the weapon models. They keep breaking the mesh collider in ObjectMesh so for now I'll just skip them.
-        if (actor.actorType == 98 || actor.actorType == 99) {
-            return;
-        }
+        //if (actor.actorType == 98 || actor.actorType == 99) {
+        //    return;
+        //}
 
         foreach (var resRef in actor.resourceReferences) {
 
@@ -79,7 +79,7 @@ public class ActorObject : MonoBehaviour {
 
                 var script = gameObject.GetComponent<ObjectMesh>();
 
-                script.controller = controller.main;
+                script.levelTexturePallet = controller.main.levelTexturePallet;
 
                 script.fCopObject = obj;
 

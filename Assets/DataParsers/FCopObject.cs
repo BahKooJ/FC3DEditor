@@ -1,9 +1,11 @@
 ﻿
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static FCopParser.FCopObject;
 
 namespace FCopParser {
 
@@ -45,10 +47,12 @@ namespace FCopParser {
 
         public List<ChunkHeader> offsets = new();
 
+        public List<Primitive> primitives = new();
+        public List<Vertex> vertices = new();
+        public List<Surface> surfaces = new();
+        public Dictionary<int, Surface> surfaceByCompiledOffset = new();
 
-        public List<FCopPolygon> polygons = new();
-        public List<FCopVertex> vertices = new();
-        public List<FCopUVMap> uvMaps = new();
+        public List<Triangle> triangles = new();
 
         public FCopObject(IFFDataFile rawFile) : base(rawFile) {
 
@@ -56,8 +60,10 @@ namespace FCopParser {
             
             FindStartChunkOffset();
             ParseVertices();
-            ParsePolygons();
-            ParseUVMaps();
+            ParsePrimitives();
+            ParseSurfaces();
+
+            CreateTriangles();
 
         }
 
@@ -76,7 +82,7 @@ namespace FCopParser {
             while (offset < rawFile.data.Count) {
 
                 var fourCC = BytesToStringReversed(offset, 4);
-                var size = BytesToInt(offset + 4);
+                var size = BitConverter.ToInt32(rawFile.data.ToArray(), offset + 4);
 
                 offsets.Add(new ChunkHeader(offset, fourCC, size));
 
@@ -86,7 +92,7 @@ namespace FCopParser {
 
         }
 
-        void ParsePolygons() {
+        void ParsePrimitives() {
 
             var header = offsets.First(header => {
                 return header.fourCCDeclaration == FourCC.threeDQL;
@@ -94,21 +100,20 @@ namespace FCopParser {
 
             var bytes = rawFile.data.GetRange(header.index, header.chunkSize);
 
-            var polyCount = Utils.BytesToInt(bytes.ToArray(), 12);
+            var polyCount = BitConverter.ToInt32(bytes.ToArray(), 12);
 
             var offset = 16;
 
             foreach (var i in Enumerable.Range(0, polyCount)) {
 
-                polygons.Add(new FCopPolygon(
-                    bytes[offset],
-                    bytes[offset + 1],
-                    Utils.BytesToShort(bytes.ToArray(), offset + 2),
-                    new List<int>() { bytes[offset + 4], bytes[offset + 5], bytes[offset + 6], bytes[offset + 7] },
-                    new List<int>() { bytes[offset + 8], bytes[offset + 9], bytes[offset + 10], bytes[offset + 11] }
-                    ));;
+                var metaDataBitfield = bytes.GetRange(offset, 2);
+                offset += 2;
+                var surfaceIndex = BitConverter.ToInt16(bytes.ToArray(), offset);
+                offset += 2;
+                var iData = bytes.GetRange(offset, 8);
+                offset += 8;
 
-                offset += 12;
+                primitives.Add(new Primitive(metaDataBitfield, surfaceIndex, iData.ToArray()));
 
             }
 
@@ -128,11 +133,11 @@ namespace FCopParser {
 
             foreach (var i in Enumerable.Range(0, vertexCount)) {
 
-                vertices.Add(new FCopVertex(
-                    Utils.BytesToShort(bytes.ToArray(), offset),
-                    Utils.BytesToShort(bytes.ToArray(), offset + 2),
-                    Utils.BytesToShort(bytes.ToArray(), offset + 4),
-                    Utils.BytesToShort(bytes.ToArray(), offset + 6)
+                vertices.Add(new Vertex(
+                    BitConverter.ToInt16(bytes.ToArray(), offset),
+                    BitConverter.ToInt16(bytes.ToArray(), offset + 2),
+                    BitConverter.ToInt16(bytes.ToArray(), offset + 4),
+                    BitConverter.ToInt16(bytes.ToArray(), offset + 6)
                     ));
 
                 offset += 8;
@@ -141,7 +146,11 @@ namespace FCopParser {
 
         }
 
-        void ParseUVMaps() {
+        void ParseSurfaces() {
+
+            int headerSize = 12;
+            int colorSize = 4;
+            int colorTextureSize = 16;
 
             var header = offsets.First(header => {
                 return header.fourCCDeclaration == FourCC.threeDTL;
@@ -149,47 +158,143 @@ namespace FCopParser {
 
             var bytes = rawFile.data.GetRange(header.index, header.chunkSize);
 
-            var uvMapCount = (header.chunkSize - 12) / 16;
-
             var offset = 12;
 
-            foreach (var i in Enumerable.Range(0, uvMapCount)) {
+            while (offset < bytes.Count) {
 
-                uvMaps.Add(new FCopUVMap(
-                    Utils.BytesToInt(bytes.ToArray(), offset + 12),
-                    new List<int> { bytes[offset + 4], bytes[offset + 6], bytes[offset + 8], bytes[offset + 10] },
-                    new List<int> { bytes[offset + 5], bytes[offset + 7], bytes[offset + 9], bytes[offset + 11] }
-                    ));
+                var surfaceType = (SurfaceType)bytes[offset];
+                offset++;
+                var red = bytes[offset];
+                offset++;
+                var green = bytes[offset];
+                offset++;
+                var blue = bytes[offset];
+                offset++;
 
-                offset += 16;
+                if (surfaceType != SurfaceType.Color) {
+
+                    var uvs = new List<UV>();
+
+                    uvs.Add(new UV(bytes[offset], bytes[offset + 1]));
+                    offset += 2;
+                    uvs.Add(new UV(bytes[offset], bytes[offset + 1]));
+                    offset += 2;
+                    uvs.Add(new UV(bytes[offset], bytes[offset + 1]));
+                    offset += 2;
+                    uvs.Add(new UV(bytes[offset], bytes[offset + 1]));
+                    offset += 2;
+
+                    var texturePalette = BitConverter.ToInt32(bytes.ToArray(), offset);
+                    offset += 4;
+
+                    var surface = new Surface(surfaceType, red, green, blue, new UVMap(texturePalette, uvs.ToArray()));
+
+                    surfaces.Add(surface);
+                    surfaceByCompiledOffset[offset - headerSize - colorTextureSize] = surface;
+                }
+                else {
+
+                    var surface = new Surface(surfaceType, red, green, blue, null);
+
+                    surfaces.Add(surface);
+                    surfaceByCompiledOffset[offset - headerSize - colorSize] = surface;
+
+                }
 
             }
 
 
         }
 
-        string Reverse(string s) {
-            char[] charArray = s.ToCharArray();
-            Array.Reverse(charArray);
-            return new string(charArray);
-        }
+        void CreateTriangles() {
 
-        int BytesToInt(int offset) {
-            return BitConverter.ToInt32(rawFile.data.ToArray(), offset);
+            var total = new List<Triangle>();
+
+            foreach (var primitive in primitives) {
+
+                if (primitive.type != PrimitiveType.Tri && primitive.type != PrimitiveType.Quad) {
+                    continue;
+                }
+
+                var surface = surfaceByCompiledOffset[primitive.surfaceIndex];
+
+                var verts = new List<Vertex>();
+                List<UV> uvs = new();
+                List<float[]> colors = new();
+                var texturePalette = 0;
+
+                void CreateTriangle(int[] vertOrder) {
+
+                    verts.Add(vertices[primitive.associatedData[vertOrder[0]]]);
+                    verts.Add(vertices[primitive.associatedData[vertOrder[1]]]);
+                    verts.Add(vertices[primitive.associatedData[vertOrder[2]]]);
+
+                    if (surface.uvMap != null) {
+
+                        uvs.Add(surface.uvMap.Value.uvs[vertOrder[0]]);
+                        uvs.Add(surface.uvMap.Value.uvs[vertOrder[1]]);
+                        uvs.Add(surface.uvMap.Value.uvs[vertOrder[2]]);
+
+                        texturePalette = surface.uvMap.Value.texturePaletteIndex;
+
+                    }
+                    else {
+
+                        uvs.Add(new UV(0, 0));
+                        uvs.Add(new UV(0, 0));
+                        uvs.Add(new UV(0, 0));
+
+                    }
+
+                    colors.Add(new float[] { surface.red / 255f, surface.green / 255f, surface.blue / 255f });
+                    colors.Add(new float[] { surface.red / 255f, surface.green / 255f, surface.blue / 255f });
+                    colors.Add(new float[] { surface.red / 255f, surface.green / 255f, surface.blue / 255f });
+
+                    triangles.Add(new Triangle(verts.ToArray(), uvs.ToArray(), colors.ToArray(), texturePalette));
+
+                }
+
+                if (primitive.type == PrimitiveType.Tri) {
+
+                    CreateTriangle(new int[] { 0, 1, 2 });
+
+                }
+                else if (primitive.type == PrimitiveType.Quad) {
+
+                    CreateTriangle(new int[] { 0, 1, 2 });
+
+                    verts.Clear();
+                    uvs.Clear();
+                    colors.Clear();
+                    texturePalette = 0;
+
+                    CreateTriangle(new int[] { 2, 3, 0 });
+
+                }
+
+            }
+
         }
 
         string BytesToStringReversed(int offset, int length) {
+
+            string Reverse(string s) {
+                char[] charArray = s.ToCharArray();
+                Array.Reverse(charArray);
+                return new string(charArray);
+            }
+
             return Reverse(Encoding.Default.GetString(rawFile.data.ToArray(), offset, length));
         }
 
-        public class FCopVertex {
+        public struct Vertex {
 
             public int x;
             public int y;
             public int z;
             public int w;
 
-            public FCopVertex(int x, int y, int z, int w) {
+            public Vertex(int x, int y, int z, int w) {
                 this.x = x;
                 this.y = y;
                 this.z = z;
@@ -198,39 +303,103 @@ namespace FCopParser {
 
         }
 
-        public class FCopPolygon {
+        public struct Primitive {
 
-            public int num1; // 8 bit
-            public int num2; // 8 bit
+            public PrimitiveType type;
+            public int surfaceIndex;
+            public byte[] associatedData;
 
-            public int textureIndex; // 16 bit
+            public Primitive(List<byte> metaDatabitfeild, int surfaceIndex, byte[] associatedData) {
 
-            public List<int> vertices;
-            public List<int> normals;
+                var bitField = new BitArray(metaDatabitfeild.ToArray());
 
-            public FCopPolygon(int num1, int num2, int textureIndex, List<int> vertices, List<int> normals) {
-                this.num1 = num1;
-                this.num2 = num2;
-                this.textureIndex = textureIndex;
-                this.vertices = vertices;
-                this.normals = normals;
+                var unknown1 = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 0, 3));
+                var material = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 3, 7));
+                var textureEnabled = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 7, 8));
+                var primitiveType = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 8, 11));
+                var unknown2 = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 11, 15));
+                var isReflective = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 15, 16));
+
+                type = (PrimitiveType)primitiveType;
+
+                this.surfaceIndex = surfaceIndex;
+                this.associatedData = associatedData;
+
             }
 
         }
 
-        public class FCopUVMap {
+        public struct Surface {
 
-            public int textureResourceIndex;
+            public SurfaceType type;
+            public int red;
+            public int green;
+            public int blue;
+            public UVMap? uvMap;
 
-            public List<int> x;
-            public List<int> y;
+            public Surface(SurfaceType type, int red, int green, int blue, UVMap? uvMap) {
+                this.type = type;
+                this.red = red;
+                this.green = green;
+                this.blue = blue;
+                this.uvMap = uvMap;
+            }
 
-            public FCopUVMap(int textureResourceIndex, List<int> x, List<int> y) {
-                this.textureResourceIndex = textureResourceIndex;
+        }
+
+        public struct UVMap {
+
+            public int texturePaletteIndex;
+
+            public UV[] uvs;
+
+            public UVMap(int texturePaletteIndex, UV[] uvs) {
+                this.texturePaletteIndex = texturePaletteIndex;
+                this.uvs = uvs;
+            }
+
+        }
+
+        public struct UV {
+
+            public int x;
+            public int y;
+
+            public UV(int x, int y) {
                 this.x = x;
                 this.y = y;
             }
 
+        }
+
+        public struct Triangle {
+
+            public Vertex[] vertices;
+            public UV[] uvs;
+            public float[][] colors;
+            public int texturePaletteIndex;
+
+            public Triangle(Vertex[] vertices, UV[] uvs, float[][] colors, int texturePaletteIndex) {
+                this.vertices = vertices;
+                this.uvs = uvs;
+                this.colors = colors;
+                this.texturePaletteIndex = texturePaletteIndex;
+            }
+
+        }
+
+        public enum SurfaceType {
+            Color = 1,
+            Texture = 2,
+            ColorTexture = 3
+        }
+
+        public enum PrimitiveType {
+            Star = 0,
+            Tri = 3,
+            Quad = 4,
+            Billboard = 5,
+            Line = 7
         }
 
     }

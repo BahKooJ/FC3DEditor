@@ -1,4 +1,5 @@
 using FCopParser;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,11 +8,10 @@ public class ObjectMesh : MonoBehaviour {
 
     const float scale = 512f;
 
+    // - Parameters -
     public FCopObject fCopObject;
-
     public int textureOffset;
-
-    public Main controller;
+    public Texture levelTexturePallet;
 
     Mesh mesh;
     Material material;
@@ -32,21 +32,26 @@ public class ObjectMesh : MonoBehaviour {
             Generate();
         } catch {
             failed = true;
-            return;
-        }
-
-        var verticesSet = new HashSet<Vector3>(vertices);
-
-        if (verticesSet.Count < 3) {
-            failed = true;
         }
 
         if (!failed) {
 
-            maxY = vertices.Max(v => { return v.y; });
-            minY = vertices.Min(v => { return v.y; });
+            if (vertices.Count > 0) {
 
-        } else {
+                maxY = vertices.Max(v => { return v.y; });
+                minY = vertices.Min(v => { return v.y; });
+
+            }
+            else {
+
+                Debug.LogWarning("Object has no vertices: " + fCopObject.rawFile.dataID);
+
+                failed = true;
+
+            }
+
+        }
+        else {
 
             Debug.LogWarning("Failed to create mesh for object " + fCopObject.rawFile.dataID);
 
@@ -59,10 +64,9 @@ public class ObjectMesh : MonoBehaviour {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
         meshCollider = GetComponent<MeshCollider>();
-
         material = GetComponent<MeshRenderer>().material;
 
-        material.mainTexture = controller.levelTexturePallet;
+        material.mainTexture = levelTexturePallet;
 
         if (vertices.Count == 0 && failed == false) {
             Create();
@@ -87,90 +91,113 @@ public class ObjectMesh : MonoBehaviour {
 
         var vertexIndex = 0;
 
-        void AddVertex(FCopObject.FCopVertex vertex) {
+        foreach (var triangle in fCopObject.triangles) {
 
-            vertices.Add(new Vector3(vertex.x / scale, vertex.y / scale, vertex.z / scale));
+            foreach (var vert in triangle.vertices) {
+                vertices.Add(new Vector3(vert.x / scale, vert.y / scale, vert.z / scale));
+            }
+            foreach (var uv in triangle.uvs) {
 
-        }
-
-        void AddSingleTextureCoord(FCopObject.FCopUVMap uvMap, int index) {
-
-            var x = (uvMap.x[index] + TextureCoordinate.GetXPixel(textureOffset)) / 256f;
-            var y = (uvMap.y[index] + TextureCoordinate.GetYPixel(textureOffset) + (256 * uvMap.textureResourceIndex)) / 2580f;
-
-            textureCords.Add(new Vector2(x, y));
-
-        }
-
-        void GenerateTriangle(FCopObject.FCopPolygon polygon) {
-
-            if (polygon.textureIndex / 16 >= fCopObject.uvMaps.Count) {
-                failed = true;
-                return;
+                var x = (uv.x + TextureCoordinate.GetXPixel(textureOffset)) / 256f;
+                var y = (uv.y + TextureCoordinate.GetYPixel(textureOffset) + (256 * triangle.texturePaletteIndex)) / 2580f;
+                textureCords.Add(new Vector2(x, y));
 
             }
-
-            var uvMap = fCopObject.uvMaps[polygon.textureIndex / 16];
-
-            AddVertex(fCopObject.vertices[polygon.vertices[0]]);
-            AddVertex(fCopObject.vertices[polygon.vertices[1]]);
-            AddVertex(fCopObject.vertices[polygon.vertices[2]]);
-            AddVertex(fCopObject.vertices[polygon.vertices[3]]);
-
-            AddSingleTextureCoord(uvMap, 0);
-            AddSingleTextureCoord(uvMap, 1);
-            AddSingleTextureCoord(uvMap, 2);
-            AddSingleTextureCoord(uvMap, 3);
 
             triangles.Add(vertexIndex);
             triangles.Add(vertexIndex + 1);
             triangles.Add(vertexIndex + 2);
 
-            vertexIndex += 4;
+            vertexIndex += 3;
 
         }
 
-        void GenerateSquare(FCopObject.FCopPolygon polygon) {
+        
 
-            if (polygon.textureIndex / 16 >= fCopObject.uvMaps.Count) {
-                failed = true;
-                return;
+        //void AddVertex(FCopObject.FCopVertex vertex) {
 
-            }
+        //    vertices.Add(new Vector3(vertex.x / scale, vertex.y / scale, vertex.z / scale));
 
-            var uvMap = fCopObject.uvMaps[polygon.textureIndex / 16];
+        //}
 
-            AddVertex(fCopObject.vertices[polygon.vertices[0]]);
-            AddVertex(fCopObject.vertices[polygon.vertices[1]]);
-            AddVertex(fCopObject.vertices[polygon.vertices[2]]);
-            AddVertex(fCopObject.vertices[polygon.vertices[3]]);
+        //void AddSingleTextureCoord(FCopObject.FCopUVMap uvMap, int index) {
 
-            AddSingleTextureCoord(uvMap, 0);
-            AddSingleTextureCoord(uvMap, 1);
-            AddSingleTextureCoord(uvMap, 2);
-            AddSingleTextureCoord(uvMap, 3);
+        //    var x = (uvMap.x[index] + TextureCoordinate.GetXPixel(textureOffset)) / 256f;
+        //    var y = (uvMap.y[index] + TextureCoordinate.GetYPixel(textureOffset) + (256 * uvMap.textureResourceIndex)) / 2580f;
 
-            triangles.Add(vertexIndex);
-            triangles.Add(vertexIndex + 1);
-            triangles.Add(vertexIndex + 2);
+        //    textureCords.Add(new Vector2(x, y));
 
-            triangles.Add(vertexIndex + 2);
-            triangles.Add(vertexIndex + 3);
-            triangles.Add(vertexIndex);
+        //}
 
-            vertexIndex += 4;
+        //void GenerateTriangle(FCopObject.FCopPolygon polygon) {
 
-        }
+        //    if (polygon.textureIndex / 16 >= fCopObject.uvMaps.Count) {
+        //        failed = true;
+        //        return;
 
-        foreach (var polygon in fCopObject.polygons) {
+        //    }
 
-            if ((polygon.num1 & 0x07) == 3) {
-                GenerateTriangle(polygon);
-            } else {
-                GenerateSquare(polygon);
-            }
+        //    var uvMap = fCopObject.uvMaps[polygon.textureIndex / 16];
 
-        }
+        //    AddVertex(fCopObject.vertices[polygon.vertices[0]]);
+        //    AddVertex(fCopObject.vertices[polygon.vertices[1]]);
+        //    AddVertex(fCopObject.vertices[polygon.vertices[2]]);
+        //    AddVertex(fCopObject.vertices[polygon.vertices[3]]);
+
+        //    AddSingleTextureCoord(uvMap, 0);
+        //    AddSingleTextureCoord(uvMap, 1);
+        //    AddSingleTextureCoord(uvMap, 2);
+        //    AddSingleTextureCoord(uvMap, 3);
+
+        //    triangles.Add(vertexIndex);
+        //    triangles.Add(vertexIndex + 1);
+        //    triangles.Add(vertexIndex + 2);
+
+        //    vertexIndex += 4;
+
+        //}
+
+        //void GenerateSquare(FCopObject.FCopPolygon polygon) {
+
+        //    if (polygon.textureIndex / 16 >= fCopObject.uvMaps.Count) {
+        //        failed = true;
+        //        return;
+
+        //    }
+
+        //    var uvMap = fCopObject.uvMaps[polygon.textureIndex / 16];
+
+        //    AddVertex(fCopObject.vertices[polygon.vertices[0]]);
+        //    AddVertex(fCopObject.vertices[polygon.vertices[1]]);
+        //    AddVertex(fCopObject.vertices[polygon.vertices[2]]);
+        //    AddVertex(fCopObject.vertices[polygon.vertices[3]]);
+
+        //    AddSingleTextureCoord(uvMap, 0);
+        //    AddSingleTextureCoord(uvMap, 1);
+        //    AddSingleTextureCoord(uvMap, 2);
+        //    AddSingleTextureCoord(uvMap, 3);
+
+        //    triangles.Add(vertexIndex);
+        //    triangles.Add(vertexIndex + 1);
+        //    triangles.Add(vertexIndex + 2);
+
+        //    triangles.Add(vertexIndex + 2);
+        //    triangles.Add(vertexIndex + 3);
+        //    triangles.Add(vertexIndex);
+
+        //    vertexIndex += 4;
+
+        //}
+
+        //foreach (var polygon in fCopObject.polygons) {
+
+        //    if ((polygon.num1 & 0x07) == 3) {
+        //        GenerateTriangle(polygon);
+        //    } else {
+        //        GenerateSquare(polygon);
+        //    }
+
+        //}
 
     }
 
