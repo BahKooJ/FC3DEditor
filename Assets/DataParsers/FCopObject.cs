@@ -54,6 +54,7 @@ namespace FCopParser {
 
         public List<Triangle> triangles = new();
 
+
         public FCopObject(IFFDataFile rawFile) : base(rawFile) {
 
             name = "Object " + DataID.ToString();
@@ -385,6 +386,13 @@ namespace FCopParser {
                 this.colors = colors;
                 this.texturePaletteIndex = texturePaletteIndex;
             }
+
+        }
+
+        public struct Billboard {
+
+            public Vertex position;
+            public int length;
 
         }
 
