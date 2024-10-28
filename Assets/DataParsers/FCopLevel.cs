@@ -194,15 +194,93 @@ namespace FCopParser {
 
         }
 
-        public void DeleteAsset(string fourCC, int id) {
+        public void DeleteAsset(AssetType assetType, int id) {
 
-            if (fourCC == "Cobj") {
-                objects.RemoveAll(obj => {
-                    return obj.DataID == id;
-                });
+            switch (assetType) {
+                case AssetType.WavSound:
+                    // TODO
+                    break;
+
+                case AssetType.Object:
+
+                    var obj = objects.First(o => o.DataID == id);
+
+                    objects.Remove(obj);
+
+                    break;
+                case AssetType.SndsSound:
+                    // TODO
+                    break;
+
             }
 
-            fileManager.DeleteFile(fourCC, id);
+        }
+
+        public void ImportAsset(AssetType assetType, int id, byte[] newData) {
+
+            switch (assetType) {
+                case AssetType.WavSound:
+
+                    audio.ImportWave(id, newData);
+
+                    break;
+                case AssetType.Texture:
+
+                    var texture = textures.First(t => t.DataID == id);
+
+                    texture.ImportCbmp(newData);
+
+                    break;
+                case AssetType.Object:
+
+                    var obj = objects.First(o => o.DataID == id);
+
+                    obj.Import(newData);
+
+                    break;
+                case AssetType.SndsSound:
+                    // TODO
+                    break;
+                case AssetType.Music:
+                    
+                    audio.music.rawFile.data = newData.ToList();
+
+                    break;
+                case AssetType.MiniAnimation:
+                    // ...TODO..?
+                    break;
+                case AssetType.Mixed:
+                    // ...TODO..?
+                    break;
+            }
+
+        }
+
+        public FCopAsset AddAsset(AssetType assetType, byte[] newData) {
+
+            switch (assetType) {
+                case AssetType.WavSound:
+                    return null;
+
+                case AssetType.Object:
+
+                    var maxID = objects.Max(o => o.DataID);
+
+                    var rawFile = new IFFDataFile(2, newData.ToList(), "Cobj", maxID + 1, scripting.emptyOffset);
+
+                    var obj = new FCopObject(rawFile);
+
+                    objects.Add(obj);
+
+                    return obj;
+
+                case AssetType.SndsSound:
+                    return null;
+
+
+            }
+
+            return null;
 
         }
 
@@ -732,6 +810,7 @@ namespace FCopParser {
 
                     }
                     else if (eightCC.Substring(4, 4) == "Cwav") {
+                        // TODO: Give name
                         rawCwavs.Add(file);
                     }
                     else if (eightCC.Substring(4, 4) == "Cshd") {

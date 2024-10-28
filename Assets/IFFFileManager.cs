@@ -310,7 +310,6 @@ namespace FCopParser {
                 }
 
             }
-            // This should never be the case but throwing it in just in case
             else if (bytes.Count > 16) {
                 bytes = bytes.GetRange(0, 16);
             }

@@ -11,6 +11,7 @@ public class ActorPropertiesView : MonoBehaviour {
     public GameObject rotationActorPropertyItem;
     public GameObject enumDataActorPropertyItem;
     public GameObject actorScriptCallItem;
+    public GameObject actorAssetRefItem;
 
     //View refs
     public Transform propertiesContent;
@@ -89,6 +90,13 @@ public class ActorPropertiesView : MonoBehaviour {
 
         }
 
+
+        var actorAssetRefView = Instantiate(actorAssetRefItem);
+
+        actorAssetRefView.GetComponent<ActorAssetReferencesView>().controller = controller;
+        actorAssetRefView.GetComponent<ActorAssetReferencesView>().actor = controller.selectedActor;
+
+        actorAssetRefView.transform.SetParent(propertiesContent, false);
 
         var actorScriptView = Instantiate(actorScriptCallItem);
 

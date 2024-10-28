@@ -20,12 +20,12 @@ namespace FCopParser {
 
         }
 
-        public struct FCopResource {
+        public struct Resource {
 
             public string fourCC;
             public int id;
 
-            public FCopResource(string fourCC, int id) {
+            public Resource(string fourCC, int id) {
                 this.fourCC = fourCC;
                 this.id = id;
             }
@@ -44,7 +44,7 @@ namespace FCopParser {
         public int x;
         public int y;
 
-        public List<FCopResource> resourceReferences = new();
+        public List<Resource> resourceReferences = new();
 
         public FCopActorBehavior behavior;
         public FCopActor(IFFDataFile rawFile): base(rawFile) {
@@ -128,7 +128,7 @@ namespace FCopParser {
                 var fourCC = Reverse(Encoding.Default.GetString(bytes.ToArray(), offset, 4));
                 var id = BitConverter.ToInt32(bytes.ToArray(), offset + 4);
 
-                resourceReferences.Add(new FCopResource(fourCC, id));
+                resourceReferences.Add(new Resource(fourCC, id));
 
                 offset += 8;
 
@@ -365,16 +365,37 @@ namespace FCopParser {
         public FCopActor actor { get; set; }
         public List<ActorProperty> properties { get; set; }
 
-
+        public ValueActorProperty unknown1;
+        public ValueActorProperty unknown2;
+        public ValueActorProperty health;
+        public ValueActorProperty collideDamage;
+        public ValueActorProperty unknown3;
+        public ValueActorProperty unknown4;
+        public ValueActorProperty unknown5;
+        public ValueActorProperty unknown6;
+        public ValueActorProperty unknown7;
         public RotationActorProperty rotation;
+        public ValueActorProperty unknown8;
+
 
         public FCopBehavior11(FCopActor actor) {
             this.actor = actor;
 
+            var rawFile = actor.rawFile;
+            unknown1 = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 28));
+            unknown2 = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 30));
+            health = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 32));
+            collideDamage = new("Collide Damage", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 34));
+            unknown3 = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 36));
+            unknown4 = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 38));
+            unknown5 = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 40));
+            unknown6 = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 42));
+            unknown7 = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 44));
             rotation = new("Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 46)));
+            unknown8 = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 48));
 
             properties = new() { rotation };
-        
+
         }
 
         public void Compile() {

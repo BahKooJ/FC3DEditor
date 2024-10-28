@@ -29,7 +29,6 @@ public class AssetFileView : MonoBehaviour {
             ("Delete", Delete),
             ("Export", Export),
             ("Import", Import),
-            ("Add", () => { })
             };
         }
         else {
@@ -60,7 +59,7 @@ public class AssetFileView : MonoBehaviour {
         DialogWindowUtil.Dialog("Delete File", "Are you sure you would like to delete this file? Asset files are normally used by actors" +
             " and the game itself. Deleting an asset file may cause the level to no longer work.", () => {
 
-            view.level.DeleteAsset(file.asset.rawFile.dataFourCC, file.asset.DataID);
+            view.level.DeleteAsset(file.assetType, file.asset.DataID);
             view.DeleteFile(file);
 
             view.Refresh();
@@ -73,7 +72,7 @@ public class AssetFileView : MonoBehaviour {
 
     void Export() {
 
-        OpenFileWindowUtil.SaveFile("Output/Exports", file.asset.rawFile.dataFourCC + file.asset.DataID, path => {
+        OpenFileWindowUtil.SaveFile("FCEAssets", file.asset.rawFile.dataFourCC + file.asset.DataID, path => {
             File.WriteAllBytes(path, file.asset.rawFile.data.ToArray());
         });
 
@@ -81,11 +80,14 @@ public class AssetFileView : MonoBehaviour {
 
     void Import() {
 
-        //OpenFileWindowUtil.OpenFile("Output/Exports", file.asset.rawFile.dataFourCC + file.asset.DataID, path => {
-        //    view.level.fileManager.ReplaceFile(file.asset.rawFile.dataFourCC, file.asset.DataID, File.ReadAllBytes(path).ToList());
-        //});
+        OpenFileWindowUtil.OpenFile("FCEAssets", "", path => {
+            view.level.ImportAsset(file.assetType, file.asset.DataID, File.ReadAllBytes(path));
+            view.Refresh();
+        });
 
     }
+
+
 
     public void OnClick() {
 

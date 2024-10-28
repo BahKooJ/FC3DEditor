@@ -26,6 +26,7 @@ public class ScriptingPanelView : MonoBehaviour {
     void Start() {
 
         assetManager.level = level;
+        assetManager.main = FindAnyObjectByType<Main>();
 
         Refresh();
 

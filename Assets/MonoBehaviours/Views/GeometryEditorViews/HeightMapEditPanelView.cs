@@ -19,6 +19,8 @@ public class HeightMapEditPanelView: MonoBehaviour {
     }
 
     void Update() {
+
+        if (Main.ignoreAllInputs) return;
         
         if (Controls.OnDown("KeepVerticesOnTop")) {
             OnClickKeepVerticiesOnTopToggle();

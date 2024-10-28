@@ -25,7 +25,7 @@ public class SoundPlayerView : MonoBehaviour {
 
         refuseCallback = true;
 
-        bitCountText.text = audio.bitrate.ToString() + "-Bit";
+        bitCountText.text = audio.bitrate.ToString() + "-Bit " + audio.channelCount.ToString() + "-Channel";
         sampleRateText.text = audio.sampleRate.ToString();
 
         if (audio.bitrate == 8) {
@@ -69,7 +69,7 @@ public class SoundPlayerView : MonoBehaviour {
         }
 
         // Create AudioClip
-        var audioClip = AudioClip.Create("clip", samples.Count(), 1, audio.sampleRate, false);
+        var audioClip = AudioClip.Create("clip", samples.Count() / audio.channelCount, audio.channelCount, audio.sampleRate, false);
         audioClip.SetData(samples.ToArray(), 0);
 
         audioPlayer.clip = audioClip;
@@ -98,7 +98,7 @@ public class SoundPlayerView : MonoBehaviour {
     string CreateTimeString(float seconds) {
 
         var minuteCount = (int)(MathF.Floor(seconds) / 60f);
-        var secondCount = (int)(MathF.Floor(seconds));
+        var secondCount = (int)MathF.Floor(seconds) - (minuteCount * 60);
         var pointSecondsCount = MathF.Round(seconds % 1f, 1);
 
         var minString = minuteCount.ToString();

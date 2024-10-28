@@ -117,4 +117,24 @@ namespace FCopParser {
 
     }
 
+    public enum AssetType {
+        WavSound,
+        Texture,
+        Object,
+        SndsSound,
+        Music,
+        MiniAnimation,
+        Mixed
+    }
+
+    public class IncorrectFileFormat : Exception {
+
+        public AssetType assetType;
+
+        public IncorrectFileFormat(AssetType assetType) {
+            this.assetType = assetType;
+        }
+
+    }
+
 }

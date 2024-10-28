@@ -828,7 +828,7 @@ public class TextureUVMapper : MonoBehaviour {
 
         if (!controller.HasSelection) { return; }
 
-        OpenFileWindowUtil.SaveFile("Textures", "Bitmap Texture", path => {
+        OpenFileWindowUtil.SaveFile("FCEAssets/Textures", "Bitmap Texture", path => {
 
             var bitmap = controller.main.level.textures[controller.FirstTile.texturePalette].BitmapWithHeader();
 
@@ -842,7 +842,7 @@ public class TextureUVMapper : MonoBehaviour {
 
         if (!controller.HasSelection) { return; }
 
-        OpenFileWindowUtil.SaveFile("Textures\\Color Palettes", "Color Palette", path => {
+        OpenFileWindowUtil.SaveFile("FCEAssets/Textures/Color Palettes", "Color Palette", path => {
 
             var data = controller.main.level.textures[controller.FirstTile.texturePalette].CbmpColorPaletteData();
 
@@ -856,7 +856,7 @@ public class TextureUVMapper : MonoBehaviour {
 
         if (!controller.HasSelection) { return; }
 
-        OpenFileWindowUtil.SaveFile("Textures\\Cbmp", "Cbmp", path => {
+        OpenFileWindowUtil.SaveFile("FCEAssets/Textures/Cbmp", "Cbmp", path => {
 
             var data = controller.main.level.textures[controller.FirstTile.texturePalette].rawFile.data;
 
@@ -870,7 +870,7 @@ public class TextureUVMapper : MonoBehaviour {
 
         if (!controller.HasSelection) { return; }
 
-        OpenFileWindowUtil.OpenFile("Textures", "", path => {
+        OpenFileWindowUtil.OpenFile("FCEAssets/Textures", "", path => {
 
             var texture = controller.main.level.textures[controller.FirstTile.texturePalette];
 
@@ -895,7 +895,7 @@ public class TextureUVMapper : MonoBehaviour {
 
         if (!controller.HasSelection) { return; }
 
-        OpenFileWindowUtil.OpenFile("Textures\\Color Palettes", "", path => {
+        OpenFileWindowUtil.OpenFile("FCEAssets/Textures/Color Palettes", "", path => {
 
             var texture = controller.main.level.textures[controller.FirstTile.texturePalette];
 
@@ -909,7 +909,7 @@ public class TextureUVMapper : MonoBehaviour {
 
         if (!controller.HasSelection) { return; }
 
-        OpenFileWindowUtil.OpenFile("Textures\\Cbmp", "", path => {
+        OpenFileWindowUtil.OpenFile("FCEAssets/Textures/Cbmp", "", path => {
 
             var texture = controller.main.level.textures[controller.FirstTile.texturePalette];
 

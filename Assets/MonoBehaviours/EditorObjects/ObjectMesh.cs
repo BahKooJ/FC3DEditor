@@ -59,7 +59,10 @@ public class ObjectMesh : MonoBehaviour {
 
     }
 
+    bool alreadyCreated = false;
     void Start() {
+
+        if (alreadyCreated) return;
 
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
@@ -84,6 +87,36 @@ public class ObjectMesh : MonoBehaviour {
             meshCollider.sharedMesh = mesh;
 
         }
+
+    }
+
+    public void ForceMake() {
+
+        mesh = new Mesh();
+        GetComponent<MeshFilter>().mesh = mesh;
+        meshCollider = GetComponent<MeshCollider>();
+        material = GetComponent<MeshRenderer>().material;
+
+        material.mainTexture = levelTexturePallet;
+
+        if (vertices.Count == 0 && failed == false) {
+            Create();
+        }
+
+        if (!failed) {
+
+            mesh.vertices = vertices.ToArray();
+            mesh.triangles = triangles.ToArray();
+
+            mesh.uv = textureCords.ToArray();
+
+            mesh.RecalculateNormals();
+
+            meshCollider.sharedMesh = mesh;
+
+        }
+
+        alreadyCreated = true;
 
     }
 

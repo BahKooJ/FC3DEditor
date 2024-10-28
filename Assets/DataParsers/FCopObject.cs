@@ -74,6 +74,26 @@ namespace FCopParser {
 
         }
 
+        public void Import(byte[] newData) {
+
+            rawFile.data = newData.ToList();
+
+            offsets = new();
+            primitives = new();
+            vertices = new();
+            surfaces = new();
+            surfaceByCompiledOffset = new();
+            triangles = new();
+
+            FindStartChunkOffset();
+            ParseVertices();
+            ParsePrimitives();
+            ParseSurfaces();
+
+            CreateTriangles();
+
+        }
+
         void FindStartChunkOffset() {
 
             offsets.Clear();

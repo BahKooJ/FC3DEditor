@@ -256,6 +256,7 @@ public class ToolbarView: MonoBehaviour {
         var assetManager = obj.GetComponent<AssetManagerView>();
 
         assetManager.level = controller.level;
+        assetManager.main = controller;
 
     }
 

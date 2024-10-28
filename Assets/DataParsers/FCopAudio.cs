@@ -14,6 +14,7 @@ namespace FCopParser {
 
         IFFDataFile cshd;
 
+        // TODO: This whole storing sound effects by group id is wierd and I don't like it.
         public FCopAudioParser(List<IFFDataFile> cwavs, IFFDataFile cshd, List<SubFile> subFiles, MusicFile musicFile) {
 
             this.cshd = cshd;
@@ -238,6 +239,14 @@ namespace FCopParser {
 
         }
 
+        public void ImportWave(int id, byte[] newData) {
+
+            var wave = GetWaves().First(wav => wav.DataID == id);
+
+            wave.rawFile.data = newData.ToList();
+
+        }
+
         public List<SubFile> CompileStreams() {
 
             var total = new List<SubFile>();
@@ -319,6 +328,7 @@ namespace FCopParser {
             this.rawDataHasHeader = true;
             this.bitrate = 16;
             this.sampleRate = 22050;
+            this.channelCount = 1;
 
         }
 
@@ -327,6 +337,8 @@ namespace FCopParser {
             this.rawDataHasHeader = false;
             this.bitrate = 8;
             this.sampleRate = 22050;
+            this.channelCount = 1;
+
         }
 
         public FCopAudio(MusicFile musicFile) : base(null) {
@@ -336,6 +348,7 @@ namespace FCopParser {
             this.rawDataHasHeader = false;
             this.bitrate = 8;
             this.sampleRate = 14212;
+            this.channelCount = 2;
 
         }
 

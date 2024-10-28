@@ -36,12 +36,3 @@ public class AssetFile {
 
 }
 
-public enum AssetType {
-    WavSound,
-    Texture,
-    Object,
-    SndsSound,
-    Music,
-    MiniAnimation,
-    Mixed
-}

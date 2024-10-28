@@ -1,6 +1,8 @@
 using FCopParser;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
+
 
 public class AssetManagerView : MonoBehaviour {
 
@@ -10,13 +12,16 @@ public class AssetManagerView : MonoBehaviour {
 
     public GameObject soundPlayer;
     public GameObject soundPropertiesPrefab;
+    public GameObject objectPropertiesPrefab;
 
     // - Unity Refs -
     public Transform fileContent;
     public Transform inspectorContent;
-    
+    public ContextMenuHandler contextMenu;
+
     // - Parameters -
     public FCopLevel level;
+    public Main main;
 
     List<AssetDirectoryView> directories = new();
     List<AssetFileView> files = new();
@@ -59,6 +64,8 @@ public class AssetManagerView : MonoBehaviour {
         root.directories.Add(textureDir);
         root.directories.Add(objectDir);
 
+        root.files.Add(new AssetFile(level.audio.music, AssetType.Music, root));
+
         currentDirectory = root;
 
         Refresh();
@@ -70,6 +77,20 @@ public class AssetManagerView : MonoBehaviour {
     }
 
     public void Refresh() {
+
+        if (currentDirectory.canAddFiles) {
+
+            contextMenu.items = new() {
+                ("Add", AddRaw),
+                ("Add Parsed", () => { })
+            };
+
+        }
+        else {
+            contextMenu.items = new() { };
+        }
+
+
 
         foreach (var dir in directories) {
             Destroy(dir.gameObject);
@@ -123,6 +144,8 @@ public class AssetManagerView : MonoBehaviour {
 
         }
 
+        ClearInspectorContent();
+
     }
 
     public void ClearInspectorContent() {
@@ -142,11 +165,37 @@ public class AssetManagerView : MonoBehaviour {
 
         ClearInspectorContent();
 
-        if (file.assetType == AssetType.WavSound) {
-            InstanciateSoundPlayer((FCopAudio)file.asset);
-            InstanciateSoundProperties((FCopAudio)file.asset);
-
+        switch (file.assetType) {
+            case AssetType.WavSound:
+                InstanciateSoundPlayer((FCopAudio)file.asset);
+                InstanciateSoundProperties((FCopAudio)file.asset);
+                break;
+            case AssetType.Texture:
+                break;
+            case AssetType.Object:
+                InstanciateObjectProperties((FCopObject)file.asset);
+                break;
+            case AssetType.SndsSound:
+                break;
+            case AssetType.Music:
+                InstanciateSoundPlayer((FCopAudio)file.asset);
+                break;
+            case AssetType.MiniAnimation:
+                break;
+            case AssetType.Mixed:
+                break;
         }
+
+
+    }
+
+    void AddRaw() {
+
+        OpenFileWindowUtil.OpenFile("FCEAssets", "", path => {
+            var newFile = level.AddAsset(currentDirectory.storedAssets, File.ReadAllBytes(path));
+            currentDirectory.files.Add(new AssetFile(newFile, currentDirectory.storedAssets, currentDirectory));
+            Refresh();
+        });
 
     }
 
@@ -167,6 +216,17 @@ public class AssetManagerView : MonoBehaviour {
 
         var script = obj.GetComponent<SoundEffectPropertiesView>();
         script.audioAsset = fcopAudio;
+
+    }
+
+    void InstanciateObjectProperties(FCopObject fCopObject) {
+
+        var obj = Instantiate(objectPropertiesPrefab);
+        obj.transform.SetParent(inspectorContent.transform, false);
+
+        var script = obj.GetComponent<ObjectPropertiesView>();
+        script.main = main;
+        script.fCopObject = fCopObject;
 
     }
 
