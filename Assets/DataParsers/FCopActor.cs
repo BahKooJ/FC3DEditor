@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Unity.VisualScripting;
 
 namespace FCopParser {
 
@@ -47,6 +48,9 @@ namespace FCopParser {
         public List<Resource> resourceReferences = new();
 
         public FCopActorBehavior behavior;
+
+        public List<byte> tSACData = null;
+
         public FCopActor(IFFDataFile rawFile): base(rawFile) {
 
             name = "Actor " + DataID;
@@ -93,19 +97,77 @@ namespace FCopParser {
                     break;
             }
 
+            var tSAC = offsets.FirstOrDefault(h => h.fourCCDeclaration == FourCC.tSAC);
+
+            if (tSAC != null) {
+                tSACData = rawFile.data.GetRange(tSAC.index, tSAC.chunkSize);
+            }
 
         }
 
         public IFFDataFile Compile() {
 
-            rawFile.data.RemoveRange(yOffset, 4);
-            rawFile.data.InsertRange(yOffset, BitConverter.GetBytes(y));
-            rawFile.data.RemoveRange(xOffset, 4);
-            rawFile.data.InsertRange(xOffset, BitConverter.GetBytes(x));
+            var total = new List<byte>();
 
+            total.AddRange(BitConverter.GetBytes(DataID));
+            total.AddRange(BitConverter.GetBytes(actorType));
+            total.AddRange(BitConverter.GetBytes(y));
+            total.AddRange(BitConverter.GetBytes(0));
+            total.AddRange(BitConverter.GetBytes(x));
+
+
+            var didBehaviorCompile = false;
             if (behavior != null) {
-                behavior.Compile();
+                var data = behavior.Compile();
+
+                if (data != null) {
+
+                    total.AddRange(data);
+                    didBehaviorCompile = true;
+
+                }
+
             }
+
+            if (!didBehaviorCompile) {
+
+                var tACT = offsets.FirstOrDefault(h => h.fourCCDeclaration == FourCC.tACT);
+
+                total.AddRange(rawFile.data.GetRange(tACT.index + 28, tACT.chunkSize - 28));
+
+            }
+
+            var actSize = total.Count + 8;
+
+            var refTotal = new List<byte>();
+
+            foreach (var r in resourceReferences) {
+
+                refTotal.AddRange(Encoding.ASCII.GetBytes(Reverse(r.fourCC)));
+                refTotal.AddRange(BitConverter.GetBytes(r.id));
+
+            }
+
+            total.AddRange(Encoding.ASCII.GetBytes(Reverse(FourCC.aRSL)));
+            total.AddRange(BitConverter.GetBytes(refTotal.Count + 12));
+            total.AddRange(BitConverter.GetBytes(DataID));
+            total.AddRange(refTotal);
+
+            if (tSACData != null) {
+                total.AddRange(tSACData);
+            }
+
+            var totalWithHeader = new List<byte>();
+
+            totalWithHeader.AddRange(Encoding.ASCII.GetBytes(Reverse(FourCC.tACT)));
+            totalWithHeader.AddRange(BitConverter.GetBytes(actSize));
+            totalWithHeader.AddRange(total);
+
+            if (totalWithHeader.Count != rawFile.data.Count) {
+                throw new Exception("Compiled size doesn't equal original");
+            }
+
+            rawFile.data = totalWithHeader;
 
             return rawFile;
 
@@ -177,8 +239,8 @@ namespace FCopParser {
         public FCopActor actor { get; set; }
         public List<ActorProperty> properties { get; set; }
 
-        public void Compile() {
-
+        public List<byte> Compile() {
+            return null;
         }
 
 
@@ -206,15 +268,15 @@ namespace FCopParser {
 
             var rawFile = actor.rawFile;
 
-            unknownNumber1 = new("unknownNumber1", Utils.BytesToShort(rawFile.data.ToArray(), 28));
-            unknownNumber2 = new("unknownNumber1", Utils.BytesToShort(rawFile.data.ToArray(), 30));
-            playerHealth = new("Player Health", Utils.BytesToShort(rawFile.data.ToArray(), 32));
+            unknownNumber1 = new("unknownNumber1", Utils.BytesToShort(rawFile.data.ToArray(), 28), BitCount.Bit16);
+            unknownNumber2 = new("unknownNumber1", Utils.BytesToShort(rawFile.data.ToArray(), 30), BitCount.Bit16);
+            playerHealth = new("Player Health", Utils.BytesToShort(rawFile.data.ToArray(), 32), BitCount.Bit16);
             unknownNumber3 = Utils.BytesToShort(rawFile.data.ToArray(), 34);
-            team = new("Team", (PlayerTeam)Utils.BytesToShort(rawFile.data.ToArray(), 36));
-            minimapColor = new("Minimap Color", Utils.BytesToShort(rawFile.data.ToArray(), 38));
+            team = new("Team", (PlayerTeam)Utils.BytesToShort(rawFile.data.ToArray(), 36), BitCount.Bit16);
+            minimapColor = new("Minimap Color", Utils.BytesToShort(rawFile.data.ToArray(), 38), BitCount.Bit16);
             unknownNumber4 = Utils.BytesToShort(rawFile.data.ToArray(), 40);
-            uvOffset = new("UV Offset", Utils.BytesToShort(rawFile.data.ToArray(), 42));
-            facing = new("Facing", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 44)));
+            uvOffset = new("UV Offset", Utils.BytesToShort(rawFile.data.ToArray(), 42), BitCount.Bit16);
+            facing = new("Facing", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 44)), BitCount.Bit16);
             unknownNumber5 = Utils.BytesToShort(rawFile.data.ToArray(), 46);
 
             properties = new() { unknownNumber1, unknownNumber2, playerHealth, team, minimapColor, uvOffset, facing };
@@ -255,7 +317,7 @@ namespace FCopParser {
 
             textureOffset = Utils.BytesToShort(rawFile.data.ToArray(), 42);
 
-            debugValue = new("debug", Utils.BytesToShort(rawFile.data.ToArray(), debugOffset));
+            debugValue = new("debug", Utils.BytesToShort(rawFile.data.ToArray(), debugOffset), BitCount.Bit16);
 
             properties = new() { };
             
@@ -293,17 +355,17 @@ namespace FCopParser {
 
             var rawFile = actor.rawFile;
 
-            team = new("Team", Utils.BytesToShort(rawFile.data.ToArray(), 36) == 1 ? Team.Red : Team.Blue);
-            miniMapColor = new("Minimap Color", Utils.BytesToShort(rawFile.data.ToArray(), 38) == 1 ? Team.Red : Team.Blue);
-            textureOffset = new("UV Offset", Utils.BytesToShort(rawFile.data.ToArray(), 42));
-            hostileTowards = new("Attacks Team", Utils.BytesToShort(rawFile.data.ToArray(), 50) == 1 ? Team.Red : Team.Blue);
+            team = new("Team", Utils.BytesToShort(rawFile.data.ToArray(), 36) == 1 ? Team.Red : Team.Blue, BitCount.Bit16);
+            miniMapColor = new("Minimap Color", Utils.BytesToShort(rawFile.data.ToArray(), 38) == 1 ? Team.Red : Team.Blue, BitCount.Bit16);
+            textureOffset = new("UV Offset", Utils.BytesToShort(rawFile.data.ToArray(), 42), BitCount.Bit16);
+            hostileTowards = new("Attacks Team", Utils.BytesToShort(rawFile.data.ToArray(), 50) == 1 ? Team.Red : Team.Blue, BitCount.Bit16);
 
-            headRotation = new("Head Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 64)));
-            baseRotation = new("Base Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 78)));
+            headRotation = new("Head Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 64)), BitCount.Bit16);
+            baseRotation = new("Base Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 78)), BitCount.Bit16);
 
-            debugValue = new("debug", Utils.BytesToShort(rawFile.data.ToArray(), debugOffset));
+            debugValue = new("debug", Utils.BytesToShort(rawFile.data.ToArray(), debugOffset), BitCount.Bit16);
 
-            properties = new() { headRotation, baseRotation };
+            properties = new() { headRotation, baseRotation, new ValueActorProperty("boom", Utils.BytesToShort(rawFile.data.ToArray(), 40), BitCount.Bit16) };
 
         }
 
@@ -341,8 +403,8 @@ namespace FCopParser {
 
             textureOffset = Utils.BytesToShort(rawFile.data.ToArray(), 42);
 
-            potentialSpawnLocation = new("Spawn Location?", Utils.BytesToInt(actor.rawFile.data.ToArray(), 88));
-            idkWhatThisIs = new("wtf is this?", Utils.BytesToShort(actor.rawFile.data.ToArray(), 64));
+            potentialSpawnLocation = new("Spawn Location?", Utils.BytesToInt(actor.rawFile.data.ToArray(), 88), BitCount.Bit16);
+            idkWhatThisIs = new("wtf is this?", Utils.BytesToShort(actor.rawFile.data.ToArray(), 64), BitCount.Bit16);
 
             properties = new() { potentialSpawnLocation, idkWhatThisIs };
 
@@ -377,31 +439,41 @@ namespace FCopParser {
         public RotationActorProperty rotation;
         public ValueActorProperty unknown8;
 
-
         public FCopBehavior11(FCopActor actor) {
             this.actor = actor;
 
             var rawFile = actor.rawFile;
-            unknown1 = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 28));
-            unknown2 = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 30));
-            health = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 32));
-            collideDamage = new("Collide Damage", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 34));
-            unknown3 = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 36));
-            unknown4 = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 38));
-            unknown5 = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 40));
-            unknown6 = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 42));
-            unknown7 = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 44));
-            rotation = new("Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 46)));
-            unknown8 = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 48));
+            unknown1 = new("unknown1", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 28), BitCount.Bit16);
+            unknown2 = new("unknown2", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 30), BitCount.Bit16);
+            health = new("Health", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 32), BitCount.Bit16);
+            collideDamage = new("Collide Damage", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 34), BitCount.Bit16);
+            unknown3 = new("unknown3", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 36), BitCount.Bit16);
+            unknown4 = new("unknown4", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 38), BitCount.Bit16);
+            unknown5 = new("Explosion effect", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 40), BitCount.Bit16);
+            unknown6 = new("unknown6", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 42), BitCount.Bit16);
+            unknown7 = new("unknown7", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 44), BitCount.Bit16);
+            rotation = new("Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 46)), BitCount.Bit16);
+            unknown8 = new("unknown8", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 48), BitCount.Bit16);
 
-            properties = new() { rotation };
+            properties = new() { unknown1, unknown2, health, collideDamage, unknown3, unknown4, unknown5, unknown6, unknown7, rotation, unknown8 };
 
         }
 
-        public void Compile() {
+        public List<byte> Compile() {
 
-            actor.rawFile.data.RemoveRange(46, 2);
-            actor.rawFile.data.InsertRange(46, BitConverter.GetBytes((short)rotation.value.compiledRotation));
+            var total = new List<byte>();
+
+            foreach (var p in properties) {
+
+                total.AddRange(p.Compile());
+
+            }
+
+            // For some reason with props, there's a property that's always 0.
+            total.Add(0);
+            total.Add(0);
+
+            return total;
 
         }
 
@@ -425,13 +497,13 @@ namespace FCopParser {
         public FCopBehavior14(FCopActor actor) {
             this.actor = actor;
 
-            number1 = new("Number 1", Utils.BytesToShort(actor.rawFile.data.ToArray(), 28));
-            number2 = new("Number 2", Utils.BytesToShort(actor.rawFile.data.ToArray(), 30));
-            number3 = new("Number 3", Utils.BytesToShort(actor.rawFile.data.ToArray(), 32));
-            number4 = new("Number 4", Utils.BytesToShort(actor.rawFile.data.ToArray(), 44));
-            number5 = new("Number 5", Utils.BytesToShort(actor.rawFile.data.ToArray(), 46));
-            number6 = new("Number 6", Utils.BytesToShort(actor.rawFile.data.ToArray(), 48));
-            number7 = new("Number 7", Utils.BytesToShort(actor.rawFile.data.ToArray(), 50));
+            number1 = new("Number 1", Utils.BytesToShort(actor.rawFile.data.ToArray(), 28), BitCount.Bit16);
+            number2 = new("Number 2", Utils.BytesToShort(actor.rawFile.data.ToArray(), 30), BitCount.Bit16);
+            number3 = new("Number 3", Utils.BytesToShort(actor.rawFile.data.ToArray(), 32), BitCount.Bit16);
+            number4 = new("Number 4", Utils.BytesToShort(actor.rawFile.data.ToArray(), 44), BitCount.Bit16);
+            number5 = new("Number 5", Utils.BytesToShort(actor.rawFile.data.ToArray(), 46), BitCount.Bit16);
+            number6 = new("Number 6", Utils.BytesToShort(actor.rawFile.data.ToArray(), 48), BitCount.Bit16);
+            number7 = new("Number 7", Utils.BytesToShort(actor.rawFile.data.ToArray(), 50), BitCount.Bit16);
 
             properties = new() {  };
         }
@@ -476,8 +548,8 @@ namespace FCopParser {
         public FCopBehavior36(FCopActor actor) {
             this.actor = actor;
 
-            headRotation = new("Head Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 64)));
-            baseRotation = new("Base Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 78)));
+            headRotation = new("Head Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 64)), BitCount.Bit16);
+            baseRotation = new("Base Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 78)), BitCount.Bit16);
 
             properties = new() { headRotation, baseRotation };
         }
@@ -509,10 +581,10 @@ namespace FCopParser {
         public FCopBehavior95(FCopActor actor) {
             this.actor = actor;
 
-            hitboxWidth = new ("Hit Box Width", Utils.BytesToShort(actor.rawFile.data.ToArray(), 28));
-            hitboxHeight = new("Hit Box Height", Utils.BytesToShort(actor.rawFile.data.ToArray(), 30));
-            number3 = new("Property 3", Utils.BytesToShort(actor.rawFile.data.ToArray(), 32));
-            triggerType = new("Trigger Type", Utils.BytesToShort(actor.rawFile.data.ToArray(), 34));
+            hitboxWidth = new ("Hit Box Width", Utils.BytesToShort(actor.rawFile.data.ToArray(), 28), BitCount.Bit16);
+            hitboxHeight = new("Hit Box Height", Utils.BytesToShort(actor.rawFile.data.ToArray(), 30), BitCount.Bit16);
+            number3 = new("Property 3", Utils.BytesToShort(actor.rawFile.data.ToArray(), 32), BitCount.Bit16);
+            triggerType = new("Trigger Type", Utils.BytesToShort(actor.rawFile.data.ToArray(), 34), BitCount.Bit16);
             actorToTest = new("Trigger Actor", Utils.BytesToInt(actor.rawFile.data.ToArray(), 36));
 
             properties = new() {  };
@@ -538,7 +610,7 @@ namespace FCopParser {
             var offset = 28;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Utils.BytesToShort(rawFile.data.ToArray(), offset));
+                var property = new ValueActorProperty("value " + offset.ToString(), Utils.BytesToShort(rawFile.data.ToArray(), offset), BitCount.Bit16);
                 property.fileOffset = offset;
                 properties.Add(property);
                 offset += 2;
@@ -566,17 +638,40 @@ namespace FCopParser {
 
         public string name { get; set; }
         public int fileOffset { get; set; }
+        public BitCount bitCount { get; set; }
+
+        public int GetCompiledValue();
+
+        public List<byte> Compile() {
+
+            var value = GetCompiledValue();
+
+            return bitCount switch {
+                BitCount.Bit8 => new() { (byte)value },
+                BitCount.Bit16 => BitConverter.GetBytes((short)value).ToList(),
+                BitCount.Bit32 => BitConverter.GetBytes(value).ToList(),
+                _ => BitConverter.GetBytes((short)value).ToList(),
+            };
+
+        }
+
     }
 
     public class ValueActorProperty: ActorProperty { 
         public string name { get; set; }
         public int fileOffset { get; set; }
+        public BitCount bitCount { get; set; }
+
+        public int GetCompiledValue() {
+            return value;
+        }
 
         public int value;
 
-        public ValueActorProperty(string name, int value) {
+        public ValueActorProperty(string name, int value, BitCount bitCount) {
             this.name = name;
             this.value = value;
+            this.bitCount = bitCount;
         }
 
     }
@@ -584,6 +679,11 @@ namespace FCopParser {
     public class IDReferenceActorProperty: ActorProperty {
         public string name { get; set; }
         public int fileOffset { get; set; }
+        public BitCount bitCount { get; set; }
+
+        public int GetCompiledValue() {
+            return value;
+        }
 
         public int value;
 
@@ -597,12 +697,18 @@ namespace FCopParser {
     public class EnumDataActorProperty: ActorProperty {
         public string name { get; set; }
         public int fileOffset { get; set; }
+        public BitCount bitCount { get; set; }
+
+        public int GetCompiledValue() {
+            return 0;
+        }
 
         public Enum caseValue;
 
-        public EnumDataActorProperty(string name, Enum caseValue) {
+        public EnumDataActorProperty(string name, Enum caseValue, BitCount bitCount) {
             this.name = name;
             this.caseValue = caseValue;
+            this.bitCount = bitCount;
         }
 
     }
@@ -610,6 +716,11 @@ namespace FCopParser {
     public class RangeActorProperty: ActorProperty {
         public string name { get; set; }
         public int fileOffset { get; set; }
+        public BitCount bitCount { get; set; }
+
+        public int GetCompiledValue() {
+            return value;
+        }
 
         public int value;
 
@@ -628,12 +739,18 @@ namespace FCopParser {
     public class RotationActorProperty: ActorProperty {
         public string name { get; set; }
         public int fileOffset { get; set; }
+        public BitCount bitCount { get; set; }
 
         public ActorRotation value;
 
-        public RotationActorProperty(string name, ActorRotation value) {
+        public int GetCompiledValue() {
+            return value.compiledRotation;
+        }
+
+        public RotationActorProperty(string name, ActorRotation value, BitCount bitCount) {
             this.name = name;
             this.value = value;
+            this.bitCount = bitCount;
         }
 
     }
@@ -704,6 +821,12 @@ namespace FCopParser {
             return a.SetRotationDegree(a.parsedRotation + b);
         }
 
+    }
+
+    public enum BitCount {
+        Bit8 = 8,
+        Bit16 = 16,
+        Bit32 = 32
     }
 
     public enum Team {
