@@ -17,15 +17,19 @@ public class ActorAssetReferencesView : MonoBehaviour {
 
 
     private void Start() {
-        
+
+        var i = 0;
         foreach (var r in actor.resourceReferences) {
 
             var obj = Instantiate(listItem);
             obj.transform.SetParent(listContent, false);
             obj.SetActive(true);
             var item = obj.GetComponent<ActorAssetReferencesItemView>();
-            item.resourceRef = r;
-
+            item.view = this;
+            item.main = controller.main;
+            item.fcopActor = actor;
+            item.refIndex = i;
+            i++;
         }
 
 

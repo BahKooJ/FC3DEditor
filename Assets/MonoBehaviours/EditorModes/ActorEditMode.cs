@@ -223,6 +223,12 @@ public class ActorEditMode : EditMode {
 
     #region Selection And GameObjects
 
+    public void RequestActorRefresh(int id) {
+
+        actorObjectsByID[id].Refresh();
+
+    }
+
     public void UnselectActorCompletely() {
 
         AddActorSelectCounterAction(selectedActor.DataID);

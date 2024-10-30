@@ -87,8 +87,6 @@ public class AssetFileView : MonoBehaviour {
 
     }
 
-
-
     public void OnClick() {
 
         view.OnSelectAsset(file);

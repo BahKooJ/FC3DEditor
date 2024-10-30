@@ -236,6 +236,9 @@ namespace FCopParser {
 
     public interface FCopActorBehavior {
 
+        public int expectedRawFileSize { get; set; }
+        public string[] assetRefNames { get; set; }
+        public AssetType[] assetRefType { get; set; }
         public FCopActor actor { get; set; }
         public List<ActorProperty> properties { get; set; }
 
@@ -247,6 +250,9 @@ namespace FCopParser {
     }
 
     public class FCopBehavior1 : FCopActorBehavior {
+        public int expectedRawFileSize { get; set; }
+        public string[] assetRefNames { get; set; }
+        public AssetType[] assetRefType { get; set; }
 
         public FCopActor actor { get; set; }
         public List<ActorProperty> properties { get; set; }
@@ -299,6 +305,9 @@ namespace FCopParser {
     }
 
     public class FCopBehavior5 : FCopActorBehavior {
+        public int expectedRawFileSize { get; set; }
+        public string[] assetRefNames { get; set; }
+        public AssetType[] assetRefType { get; set; }
 
         public FCopActor actor { get; set; }
         public List<ActorProperty> properties { get; set; }
@@ -333,6 +342,9 @@ namespace FCopParser {
     }
 
     public class FCopBehavior8 : FCopActorBehavior {
+        public int expectedRawFileSize { get; set; }
+        public string[] assetRefNames { get; set; }
+        public AssetType[] assetRefType { get; set; }
 
         public FCopActor actor { get; set; }
         public List<ActorProperty> properties { get; set; }
@@ -386,6 +398,9 @@ namespace FCopParser {
     }
 
     public class FCopBehavior9 : FCopActorBehavior {
+        public int expectedRawFileSize { get; set; }
+        public string[] assetRefNames { get; set; }
+        public AssetType[] assetRefType { get; set; }
 
         public FCopActor actor { get; set; }
         public List<ActorProperty> properties { get; set; }
@@ -423,6 +438,9 @@ namespace FCopParser {
     }
 
     public class FCopBehavior11 : FCopActorBehavior {
+        public int expectedRawFileSize { get; set; }
+        public string[] assetRefNames { get; set; }
+        public AssetType[] assetRefType { get; set; }
 
         public FCopActor actor { get; set; }
         public List<ActorProperty> properties { get; set; }
@@ -437,10 +455,13 @@ namespace FCopParser {
         public ValueActorProperty unknown6;
         public ValueActorProperty unknown7;
         public RotationActorProperty rotation;
-        public ValueActorProperty unknown8;
+        public ValueActorProperty heightOffset;
 
         public FCopBehavior11(FCopActor actor) {
             this.actor = actor;
+
+            assetRefNames = new string[] { "Object", "Destroyed Object" };
+            assetRefType = new AssetType[] { AssetType.Object, AssetType.Object };
 
             var rawFile = actor.rawFile;
             unknown1 = new("unknown1", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 28), BitCount.Bit16);
@@ -453,9 +474,9 @@ namespace FCopParser {
             unknown6 = new("unknown6", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 42), BitCount.Bit16);
             unknown7 = new("unknown7", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 44), BitCount.Bit16);
             rotation = new("Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 46)), BitCount.Bit16);
-            unknown8 = new("unknown8", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 48), BitCount.Bit16);
+            heightOffset = new("Height Offset", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 48), BitCount.Bit16);
 
-            properties = new() { unknown1, unknown2, health, collideDamage, unknown3, unknown4, unknown5, unknown6, unknown7, rotation, unknown8 };
+            properties = new() { unknown1, unknown2, health, collideDamage, unknown3, unknown4, unknown5, unknown6, unknown7, rotation, heightOffset };
 
         }
 
@@ -480,6 +501,9 @@ namespace FCopParser {
     }
 
     public class FCopBehavior14 : FCopActorBehavior {
+        public int expectedRawFileSize { get; set; }
+        public string[] assetRefNames { get; set; }
+        public AssetType[] assetRefType { get; set; }
 
         public FCopActor actor { get; set; }
         public List<ActorProperty> properties { get; set; }
@@ -516,6 +540,9 @@ namespace FCopParser {
     }
 
     public class FCopBehavior28 : FCopActorBehavior {
+        public int expectedRawFileSize { get; set; }
+        public string[] assetRefNames { get; set; }
+        public AssetType[] assetRefType { get; set; }
 
         public FCopActor actor { get; set; }
         public List<ActorProperty> properties { get; set; }
@@ -535,6 +562,9 @@ namespace FCopParser {
     }
 
     public class FCopBehavior36 : FCopActorBehavior {
+        public int expectedRawFileSize { get; set; }
+        public string[] assetRefNames { get; set; }
+        public AssetType[] assetRefType { get; set; }
 
         public FCopActor actor { get; set; }
         public List<ActorProperty> properties { get; set; }
@@ -567,6 +597,9 @@ namespace FCopParser {
     }
 
     public class FCopBehavior95 : FCopActorBehavior {
+        public int expectedRawFileSize { get; set; }
+        public string[] assetRefNames { get; set; }
+        public AssetType[] assetRefType { get; set; }
 
         public FCopActor actor { get; set; }
         public List<ActorProperty> properties { get; set; }
@@ -594,6 +627,9 @@ namespace FCopParser {
     }
 
     public class FCopBehavior99 : FCopActorBehavior {
+        public int expectedRawFileSize { get; set; }
+        public string[] assetRefNames { get; set; }
+        public AssetType[] assetRefType { get; set; }
 
         public FCopActor actor { get; set; }
         public List<ActorProperty> properties { get; set; }

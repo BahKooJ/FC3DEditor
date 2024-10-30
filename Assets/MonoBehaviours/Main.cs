@@ -98,6 +98,8 @@ public class Main : MonoBehaviour {
 
     public GameObject escMenuPrefab;
     public GameObject assetManagerPrefab;
+    public GameObject miniAssetManagerPrefab;
+
 
     // Temp
     public GameObject boundsPrefab;
@@ -133,6 +135,8 @@ public class Main : MonoBehaviour {
         OpenFileWindowUtil.canvas = canvas;
         HeadsUpTextUtil.canvas = canvas;
         LoadingScreenUtil.canvas = canvas;
+        MiniAssetManagerUtil.canvas = canvas;
+        MiniAssetManagerUtil.prefab = miniAssetManagerPrefab;
 
         Physics.queriesHitBackfaces = true;
 

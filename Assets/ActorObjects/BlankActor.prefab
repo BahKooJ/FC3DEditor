@@ -48,6 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actCollider: {fileID: 586320845033451150}
   renameTextFeild: {fileID: 6673128335193514363}
+  placeholderCube: {fileID: 8775187337990704097}
   group: {fileID: 0}
   objects: []
 --- !u!114 &6673128335193514363

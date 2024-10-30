@@ -2311,6 +2311,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Asset Manager Window
       objectReference: {fileID: 0}
+    - target: {fileID: 3399766673076906555, guid: 5f10661846b707244a9d972a571a924f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5034767195390374454, guid: 5f10661846b707244a9d972a571a924f, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0

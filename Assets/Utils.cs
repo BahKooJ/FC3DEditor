@@ -121,6 +121,7 @@ namespace FCopParser {
         WavSound,
         Texture,
         Object,
+        NavMesh,
         SndsSound,
         Music,
         MiniAnimation,

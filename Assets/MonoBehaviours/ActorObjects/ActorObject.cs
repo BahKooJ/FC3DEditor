@@ -10,10 +10,12 @@ public class ActorObject : MonoBehaviour {
     // - Unity Refs -
     public Collider actCollider;
     public TextFieldPopupHandler renameTextFeild;
+    public GameObject placeholderCube;
 
     // - Parameters -
     public ActorEditMode controller;
     public FCopActor actor;
+    [HideInInspector]
     public ActorGroupObject group = null;
 
     public List<ObjectMesh> objects = new();
@@ -71,6 +73,7 @@ public class ActorObject : MonoBehaviour {
                 var obj = controller.main.level.objects.First(obj => { return obj.rawFile.dataID == resRef.id; });
 
                 var gameObject = Instantiate(controller.main.ObjectMesh);
+                gameObject.transform.SetParent(transform, false);
 
                 var script = gameObject.GetComponent<ObjectMesh>();
                 script.levelTexturePallet = controller.main.levelTexturePallet;
@@ -80,12 +83,8 @@ public class ActorObject : MonoBehaviour {
 
                 if (!script.failed) {
 
-                    var cube = transform.Find("Cube");
-
-                    if (cube != null) {
-                        Destroy(cube.gameObject);
-                        actCollider = null;
-                    }
+                    placeholderCube.SetActive(false);
+                    actCollider = null;
 
                     objects.Add(script);
 
@@ -95,7 +94,6 @@ public class ActorObject : MonoBehaviour {
 
                 }
 
-                gameObject.transform.SetParent(transform, false);
 
             }
 
@@ -115,6 +113,24 @@ public class ActorObject : MonoBehaviour {
         }
 
         SetRotation();
+
+    }
+
+    public void Refresh() {
+
+        foreach (Transform tran in transform) {
+
+            if (tran.gameObject != placeholderCube) {
+                DestroyImmediate(tran.gameObject);
+            }
+
+        }
+
+        objects.Clear();
+
+        placeholderCube.SetActive(true);
+
+        Create();
 
     }
 
