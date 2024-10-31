@@ -136,14 +136,37 @@ public class ActorObject : MonoBehaviour {
 
     public void SetToCurrentPosition() {
 
-        transform.position = new Vector3(actor.x / 8192f, 100f, -(actor.y / 8192f));
+        Vector3 castDirection = Vector3.down;
+        float startingHeight = 100f;
 
-        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, Mathf.Infinity, 1)) {
+
+        if (actor.behavior is FCopHeightOffseting groundCast) {
+
+            switch (groundCast.GetGroundCast()) {
+                case ActorGroundCast.Highest:
+                    break;
+                case ActorGroundCast.Lowest:
+                    castDirection = Vector3.up;
+                    startingHeight = -100f;
+                    break;
+                case ActorGroundCast.Default:
+                    break;
+            }
+
+        }
+
+        transform.position = new Vector3(actor.x / 8192f, startingHeight, -(actor.y / 8192f));
+
+        if (Physics.Raycast(transform.position, castDirection, out RaycastHit hit, Mathf.Infinity, 1)) {
 
             var pos = transform.position;
 
             pos.y = hit.point.y;
 
+            if (actor.behavior is FCopHeightOffseting offset) {
+                pos.y += offset.GetHeight() / 8192f;
+            }
+            
             transform.position = pos;
 
         }

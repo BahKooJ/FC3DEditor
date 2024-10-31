@@ -249,6 +249,20 @@ namespace FCopParser {
 
     }
 
+    public interface FCopObjectMutating {
+
+
+
+    }
+
+    public interface FCopHeightOffseting {
+
+        public int GetHeight();
+
+        public ActorGroundCast GetGroundCast();
+
+    }
+
     public class FCopBehavior1 : FCopActorBehavior {
         public int expectedRawFileSize { get; set; }
         public string[] assetRefNames { get; set; }
@@ -437,7 +451,7 @@ namespace FCopParser {
 
     }
 
-    public class FCopBehavior11 : FCopActorBehavior {
+    public class FCopBehavior11 : FCopActorBehavior, FCopHeightOffseting {
         public int expectedRawFileSize { get; set; }
         public string[] assetRefNames { get; set; }
         public AssetType[] assetRefType { get; set; }
@@ -452,8 +466,8 @@ namespace FCopParser {
         public ValueActorProperty unknown3;
         public ValueActorProperty unknown4;
         public ValueActorProperty unknown5;
-        public ValueActorProperty unknown6;
-        public ValueActorProperty unknown7;
+        public ValueActorProperty textureOffset;
+        public EnumDataActorProperty groundCast;
         public RotationActorProperty rotation;
         public ValueActorProperty heightOffset;
 
@@ -471,13 +485,21 @@ namespace FCopParser {
             unknown3 = new("unknown3", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 36), BitCount.Bit16);
             unknown4 = new("unknown4", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 38), BitCount.Bit16);
             unknown5 = new("Explosion effect", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 40), BitCount.Bit16);
-            unknown6 = new("unknown6", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 42), BitCount.Bit16);
-            unknown7 = new("unknown7", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 44), BitCount.Bit16);
+            textureOffset = new("Texture Offset", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 42), BitCount.Bit16);
+            groundCast = new("Ground Cast", (ActorGroundCast)BitConverter.ToInt16(actor.rawFile.data.ToArray(), 44), BitCount.Bit16);
             rotation = new("Rotation", new ActorRotation().SetRotationCompiled(Utils.BytesToShort(actor.rawFile.data.ToArray(), 46)), BitCount.Bit16);
             heightOffset = new("Height Offset", BitConverter.ToInt16(actor.rawFile.data.ToArray(), 48), BitCount.Bit16);
 
-            properties = new() { unknown1, unknown2, health, collideDamage, unknown3, unknown4, unknown5, unknown6, unknown7, rotation, heightOffset };
+            properties = new() { unknown1, unknown2, health, collideDamage, unknown3, unknown4, unknown5, textureOffset, groundCast, rotation, heightOffset };
 
+        }
+
+        public int GetHeight() {
+            return heightOffset.value;
+        }
+
+        public ActorGroundCast GetGroundCast() {
+            return (ActorGroundCast)groundCast.caseValue;
         }
 
         public List<byte> Compile() {
@@ -736,7 +758,7 @@ namespace FCopParser {
         public BitCount bitCount { get; set; }
 
         public int GetCompiledValue() {
-            return 0;
+            return (int)(ActorGroundCast)caseValue;
         }
 
         public Enum caseValue;
@@ -875,6 +897,13 @@ namespace FCopParser {
         Blue = 2,
         Unknown1 = 31,
         Unknown2 = 543
+    }
+
+    public enum ActorGroundCast {
+        Highest = 0,
+        Lowest = 1,
+        Default = 255
+
     }
 
 }
