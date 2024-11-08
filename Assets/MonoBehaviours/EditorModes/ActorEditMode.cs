@@ -174,6 +174,10 @@ public class ActorEditMode : EditMode {
 
                         foreach (var obj in act.objects) {
 
+                            if (obj == null) {
+                                continue;
+                            }
+
                             if (hit.colliderInstanceID == obj.meshCollider.GetInstanceID()) {
                                 didHit = true;
                             }

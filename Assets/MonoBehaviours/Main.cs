@@ -128,6 +128,29 @@ public class Main : MonoBehaviour {
     // Auto save
     float autoSaveTimer;
 
+    void _Debug() {
+
+        var actorEditMode = (ActorEditMode)editMode;
+
+        var actors = level.sceneActors.actors.Where(a => a.actorType == 11).ToList();
+
+        var actors2 = actors.Where(a => (((FCopBehavior11)a.behavior).health.value) > 0).ToList();
+        var x = 5;
+        var y = -5;
+        foreach (var a in actors2) {
+
+            actorEditMode.actorObjectsByID[a.DataID].ChangePosition(new Vector3(x, 0, y));
+
+            x += 3;
+
+            if (x > 128) {
+                x = 5;
+                y -= 5;
+            }
+        }
+
+    }
+
     void Start() {
 
         DialogWindowUtil.canvas = canvas;
@@ -172,6 +195,12 @@ public class Main : MonoBehaviour {
         }
 
         editMode.Update();
+
+        if (Input.GetKeyDown(KeyCode.F10)) {
+
+            _Debug();
+        }
+
 
         if (ignoreAllInputs) { return; }
 

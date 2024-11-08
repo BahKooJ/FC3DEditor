@@ -8,6 +8,7 @@ public class ActorPropertiesView : MonoBehaviour {
 
     //Prefabs
     public GameObject valueActorPropertyItem;
+    public GameObject toggleActorPropertyItem;
     public GameObject rotationActorPropertyItem;
     public GameObject enumDataActorPropertyItem;
     public GameObject actorScriptCallItem;
@@ -59,6 +60,17 @@ public class ActorPropertiesView : MonoBehaviour {
                     view.GetComponent<ValueActorPropertyItemView>().controller = controller;
                     view.GetComponent<ValueActorPropertyItemView>().property = (ValueActorProperty)property;
                     view.GetComponent<ValueActorPropertyItemView>().actor = controller.selectedActor;
+
+                    view.transform.SetParent(propertiesContent, false);
+
+                }
+                else if (property is ToggleActorProperty) {
+
+                    var view = Instantiate(toggleActorPropertyItem);
+
+                    view.GetComponent<ToggleActorPropertyItemView>().controller = controller;
+                    view.GetComponent<ToggleActorPropertyItemView>().property = (ToggleActorProperty)property;
+                    view.GetComponent<ToggleActorPropertyItemView>().actor = controller.selectedActor;
 
                     view.transform.SetParent(propertiesContent, false);
 

@@ -2222,6 +2222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   valueActorPropertyItem: {fileID: 5020871495025236756, guid: 156eb5e6c3b12e447a2ff00467b84019, type: 3}
+  toggleActorPropertyItem: {fileID: 5020871495025236756, guid: 0f9c6d12a13ad704c9add71e16efdaed, type: 3}
   rotationActorPropertyItem: {fileID: 5020871495025236756, guid: 84d30b4b6a16dbe4493b0cf700dc686b, type: 3}
   enumDataActorPropertyItem: {fileID: 5020871495025236756, guid: 4ee95e0a21fa2fa4da6aa1aadf787a5b, type: 3}
   actorScriptCallItem: {fileID: 1977952715223143764, guid: 9f98ec791f44dc0479e50929f36e6564, type: 3}

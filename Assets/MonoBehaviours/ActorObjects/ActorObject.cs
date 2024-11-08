@@ -92,8 +92,14 @@ public class ActorObject : MonoBehaviour {
 
                     Debug.LogWarning("Object on Actor: " + actor.actorType + " failed to create");
 
+                    objects.Add(null);
+
                 }
 
+            }
+            else {
+
+                objects.Add(null);
 
             }
 
@@ -101,13 +107,8 @@ public class ActorObject : MonoBehaviour {
 
         if (actor.behavior is FCopBehavior36 || actor.behavior is FCopBehavior8) {
 
-            if (objects.Count != 2) {
-                Debug.LogWarning("Actor script 36/8 doesn't have 2 models?");
-                return;
-            }
-
             var headPos = objects[0].transform.localPosition;
-            headPos.y = objects[1].maxY;
+            headPos.y = objects[2].maxY;
             objects[0].transform.localPosition = headPos;
 
         }
@@ -178,31 +179,25 @@ public class ActorObject : MonoBehaviour {
 
     void SetRotation() {
 
-        switch (actor.behavior) {
+        if (actor.behavior is FCopObjectMutating objectMutating) {
 
-            case FCopBehavior8:
-                var script8 = (FCopBehavior8)actor.behavior;
+            var rotations = objectMutating.GetRotations();
 
-                objects[0].transform.localRotation = Quaternion.Euler(0f, script8.headRotation.value.parsedRotation, 0f);
-                objects[1].transform.localRotation = Quaternion.Euler(0f, script8.baseRotation.value.parsedRotation, 0f);
+            foreach (var rot in rotations) {
 
-                break;
-            case FCopBehavior11:
-                var script11 = (FCopBehavior11)actor.behavior;
+                foreach (var i in rot.affectedRefIndexes) {
 
-                objects[0].transform.localRotation = Quaternion.Euler(0f, script11.rotation.value.parsedRotation, 0f);
+                    var potentialObject = objects[i];
 
-                break;
-            case FCopBehavior36:
-                var script36 = (FCopBehavior36)actor.behavior;
+                    if (potentialObject != null) {
+                        potentialObject.transform.localRotation = Quaternion.Euler(0f, rot.value.parsedRotation, 0f);
+                    }
 
-                objects[0].transform.localRotation = Quaternion.Euler(0f, script36.headRotation.value.parsedRotation, 0f);
-                objects[1].transform.localRotation = Quaternion.Euler(0f, script36.baseRotation.value.parsedRotation, 0f);
+                }
 
-                break;
+            }
 
         }
-
 
     }
 
@@ -213,7 +208,7 @@ public class ActorObject : MonoBehaviour {
             case FCopBehavior5:
                 return ((FCopBehavior5)actor.behavior).textureOffset;
             case FCopBehavior8:
-                return ((FCopBehavior8)actor.behavior).textureOffset.value;
+                return ((FCopBehavior8)actor.behavior).uvOffset.value;
             case FCopBehavior9:
                 return ((FCopBehavior9)actor.behavior).textureOffset;
             case FCopBehavior28:
