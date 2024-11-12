@@ -46,8 +46,8 @@ public class ActorPropertiesView : MonoBehaviour {
         }
 
         actorName.text = controller.selectedActor.name;
-        idText.text = controller.selectedActor.id.ToString();
-        actorTypeText.text = controller.selectedActor.actorType.ToString();
+        idText.text = controller.selectedActor.DataID.ToString();
+        actorTypeText.text = controller.selectedActor.behaviorType.ToString();
 
         if (controller.selectedActor.behavior != null && controller.selectedActor.behavior.properties != null) {
 

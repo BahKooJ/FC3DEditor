@@ -132,9 +132,9 @@ public class Main : MonoBehaviour {
 
         var actorEditMode = (ActorEditMode)editMode;
 
-        var actors = level.sceneActors.actors.Where(a => a.actorType == 11).ToList();
+        var actors = level.sceneActors.actors.Where(a => a.behaviorType == ActorBehavior.DynamicProp).ToList();
 
-        var actors2 = actors.Where(a => (((FCopBehavior11)a.behavior).health.value) > 0).ToList();
+        var actors2 = actors.Where(a => (((FCopBehavior11)a.behavior).u_unknown15.value) > 0).ToList();
         var x = 5;
         var y = -5;
         foreach (var a in actors2) {

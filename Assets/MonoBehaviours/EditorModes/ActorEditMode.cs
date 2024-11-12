@@ -34,10 +34,10 @@ public class ActorEditMode : EditMode {
 
             if (node.nestedActors.Count == 1) {
 
-                var createdActObj = CreateActor(node.nestedActors[0]);
+                var createdActObj = CreateActorObject(node.nestedActors[0]);
 
                 actorObjects.Add(createdActObj);
-                actorObjectsByID[createdActObj.actor.id] = createdActObj;
+                actorObjectsByID[createdActObj.actor.DataID] = createdActObj;
 
             }
             else {
@@ -50,7 +50,7 @@ public class ActorEditMode : EditMode {
 
     }
 
-    public ActorObject CreateActor(FCopActor actor, ActorGroupObject group = null) {
+    public ActorObject CreateActorObject(FCopActor actor, ActorGroupObject group = null) {
 
         var nodeObject = Object.Instantiate(main.BlankActor);
 
@@ -75,14 +75,14 @@ public class ActorEditMode : EditMode {
 
         foreach (var actor in actors) {
 
-            var createdActObj = CreateActor(actor, script);
+            var createdActObj = CreateActorObject(actor, script);
 
             createdActObj.transform.SetParent(script.transform, false);
 
             script.actObjects.Add(createdActObj);
 
             actorObjects.Add(createdActObj);
-            actorObjectsByID[actor.id] = createdActObj;
+            actorObjectsByID[actor.DataID] = createdActObj;
 
         }
 
@@ -216,6 +216,18 @@ public class ActorEditMode : EditMode {
 
         if (Controls.OnDown("Unselect")) {
             UnselectActorCompletely();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha0)) {
+
+            var hitPos = main.CursorOnLevelMesh();
+
+            if (hitPos != null) {
+
+                CreateActor(ActorBehavior.DynamicProp, hitPos.Value);
+
+            }
+
         }
 
     }
@@ -399,12 +411,12 @@ public class ActorEditMode : EditMode {
     }
 
     // Used for making actors objects during edit mode runtime.
-    public void CreateNewActor(FCopActor actor) {
+    public void AddNewActorObject(FCopActor actor) {
 
-        var createdActObj = CreateActor(actor);
+        var createdActObj = CreateActorObject(actor);
 
         actorObjects.Add(createdActObj);
-        actorObjectsByID[createdActObj.actor.id] = createdActObj;
+        actorObjectsByID[createdActObj.actor.DataID] = createdActObj;
 
         ValidateGrouping();
 
@@ -428,6 +440,22 @@ public class ActorEditMode : EditMode {
     #endregion
 
     #region Model Mutating
+
+    public void CreateActor(ActorBehavior behavior, Vector3 pos) {
+
+        var newActor = new FCopActor(
+            main.level.sceneActors.FindNextID(), 
+            main.level.scripting.emptyOffset,
+            behavior,
+            Mathf.RoundToInt(pos.x * 8192f),
+            Mathf.RoundToInt(pos.z * -8192f)
+            );
+
+        main.level.sceneActors.AddActor(newActor, null);
+
+        AddNewActorObject(newActor);
+
+    }
 
     public void DeleteActor() {
 
@@ -756,7 +784,7 @@ public class ActorEditMode : EditMode {
             editMode.main.level.sceneActors.AddActor(deletedActor, null);
 
             // No need to add group because group is validated for sceneActors.
-            editMode.CreateNewActor(deletedActor);
+            editMode.AddNewActorObject(deletedActor);
 
             editMode.view.activeActorPropertiesView.sceneActorsView.Refresh();
 

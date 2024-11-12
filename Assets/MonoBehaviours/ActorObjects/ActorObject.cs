@@ -39,7 +39,7 @@ public class ActorObject : MonoBehaviour {
         }
         ));
         contextMenuItems.Add(("Delete", () => { 
-            controller.DeleteByID(actor.id);
+            controller.DeleteByID(actor.DataID);
         }));
 
     }
@@ -90,7 +90,7 @@ public class ActorObject : MonoBehaviour {
 
                 } else {
 
-                    Debug.LogWarning("Object on Actor: " + actor.actorType + " failed to create");
+                    Debug.LogWarning("Object on Actor: " + actor.behaviorType + " failed to create");
 
                     objects.Add(null);
 
@@ -203,18 +203,11 @@ public class ActorObject : MonoBehaviour {
 
     int SetTextureOffset() {
 
-        switch (actor.behavior) {
-
-            case FCopBehavior5:
-                return ((FCopBehavior5)actor.behavior).textureOffset;
-            case FCopBehavior8:
-                return ((FCopBehavior8)actor.behavior).uvOffset.value;
-            case FCopBehavior9:
-                return ((FCopBehavior9)actor.behavior).textureOffset;
-            case FCopBehavior28:
-                return ((FCopBehavior28)actor.behavior).textureOffset;
-            default:
-                return 0;
+        if (actor.behavior is FCopEntity e) {
+            return e.uvOffset.value;
+        }
+        else {
+            return 0;
         }
     
     }

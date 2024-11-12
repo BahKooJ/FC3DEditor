@@ -25,6 +25,28 @@ namespace FCopParser {
             SortActorsByPosition();
             SortActorsByBehavior();
         }
+        
+        public int FindNextID() {
+
+            var actorsByAscending = actors.OrderBy(a => a.DataID).ToList();
+
+
+            var previousID = actorsByAscending[0].DataID;
+            foreach (var actor in actorsByAscending) {
+
+                if (actor.DataID == previousID + 1 || actor.DataID == previousID) {
+                    previousID = actor.DataID;
+                    continue;
+                }
+                else {
+                    return previousID + 1;
+                }
+
+            }
+
+            return actorsByAscending.Last().DataID + 1;
+
+        }
 
         public void AddActor(FCopActor actor, ActorNode toGroup) {
 
@@ -38,11 +60,11 @@ namespace FCopParser {
                 positionalGroupedActors.Add(new ActorNode(ActorGroupType.Position, actor.name, actor));
             }
 
-            if (behaviorGroupedActors.ContainsKey(actor.actorType)) {
-                behaviorGroupedActors[actor.actorType].nestedActors.Add(actor);
+            if (behaviorGroupedActors.ContainsKey((int)actor.behaviorType)) {
+                behaviorGroupedActors[(int)actor.behaviorType].nestedActors.Add(actor);
             }
             else {
-                behaviorGroupedActors[actor.actorType] = new ActorNode(ActorGroupType.Position, "Group " + actor.actorType, actor);
+                behaviorGroupedActors[(int)actor.behaviorType] = new ActorNode(ActorGroupType.Position, "Group " + (int)actor.behaviorType, actor);
             }
 
         }
@@ -64,7 +86,7 @@ namespace FCopParser {
             var behNode = ActorNodeByIDBehavior(actor.DataID);
 
             if (behNode.nestedActors.Count == 1) {
-                behaviorGroupedActors.Remove(behNode.nestedActors[0].actorType);
+                behaviorGroupedActors.Remove((int)behNode.nestedActors[0].behaviorType);
             }
             else {
                 behNode.nestedActors.Remove(actor);
@@ -275,11 +297,11 @@ namespace FCopParser {
 
             foreach (var actor in actors) {
 
-                if (behaviorGroupedActors.ContainsKey(actor.actorType)) {
-                    behaviorGroupedActors[actor.actorType].nestedActors.Add(actor);
+                if (behaviorGroupedActors.ContainsKey((int)actor.behaviorType)) {
+                    behaviorGroupedActors[(int)actor.behaviorType].nestedActors.Add(actor);
                 }
                 else {
-                    behaviorGroupedActors[actor.actorType] = new ActorNode(ActorGroupType.Behavior, "Group " + actor.actorType, actor);
+                    behaviorGroupedActors[(int)actor.behaviorType] = new ActorNode(ActorGroupType.Behavior, "Group " + actor.behaviorType, actor);
                 }
 
             }

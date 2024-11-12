@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Unity.VisualScripting;
 
 namespace FCopParser {
 
@@ -40,8 +39,7 @@ namespace FCopParser {
 
         public List<ChunkHeader> offsets = new();
 
-        public int id;
-        public int actorType;
+        public ActorBehavior behaviorType;
         public int x;
         public int y;
 
@@ -57,45 +55,80 @@ namespace FCopParser {
 
             FindStartChunkOffset();
 
-            id = Utils.BytesToInt(rawFile.data.ToArray(), 8);
-            actorType = Utils.BytesToInt(rawFile.data.ToArray(), 12);
+            behaviorType = (ActorBehavior)Utils.BytesToInt(rawFile.data.ToArray(), 12);
             y = Utils.BytesToInt(rawFile.data.ToArray(), 16);
             x = Utils.BytesToInt(rawFile.data.ToArray(), 24);
 
             ParseResourceReferences();
 
-            switch (actorType) {
-                case 1:
+            switch (behaviorType) {
+                case ActorBehavior.Player:
                     behavior = new FCopBehavior1(this);
                     break;
-                case 5:
+                case ActorBehavior.PathedEntity:
                     behavior = new FCopBehavior5(this);
                     break;
-                case 8:
+                case ActorBehavior.StationaryEntity: 
+                    behavior = new FCopBehavior6(this);
+                    break;
+                case ActorBehavior.Turret:
                     behavior = new FCopBehavior8(this);
                     break;
-                case 9:
+                case ActorBehavior.Aircraft:
                     behavior = new FCopBehavior9(this);
                     break;
-                case 11:
+                case ActorBehavior.Elevator:
+                    behavior = new FCopBehavior10(this);
+                    break;
+                case ActorBehavior.DynamicProp:
                     behavior = new FCopBehavior11(this);
                     break;
-                case 14:
+                case ActorBehavior.CollidableProp:
+                    behavior = new FCopBehavior12(this);
+                    break;
+                case ActorBehavior.UniversalTrigger:
                     behavior = new FCopBehavior14(this);
                     break;
-                case 28:
+                case ActorBehavior.FloatingItem:
+                    behavior = new FCopBehavior16(this);
+                    break;
+                case ActorBehavior.PathedTurret:
+                    behavior = new FCopBehavior20(this);
+                    break;
+                case ActorBehavior.MovableProp:
+                    behavior = new FCopBehavior25(this);
+                    break;
+                case ActorBehavior.Behavior26:
+                    behavior = new FCopBehavior26(this);
+                    break;
+                case ActorBehavior.Behavior27:
+                    behavior = new FCopBehavior27(this);
+                    break;
+                case ActorBehavior.Behavior28:
                     behavior = new FCopBehavior28(this);
                     break;
-                case 36:
+                case ActorBehavior.Behavior30:
+                    behavior = new FCopBehavior30(this);
+                    break;
+                case ActorBehavior.Reloader:
+                    behavior = new FCopBehavior32(this);
+                    break;
+                case ActorBehavior.Behavior33:
+                    behavior = new FCopBehavior33(this);
+                    break;
+                case ActorBehavior.Behavior36:
                     behavior = new FCopBehavior36(this);
                     break;
-                case 95:
+                case ActorBehavior.Behavior37:
+                    behavior = new FCopBehavior37(this);
+                    break;
+                case ActorBehavior.Trigger:
                     behavior = new FCopBehavior95(this);
                     break;
-                case 96:
+                case ActorBehavior.StaticProp:
                     behavior = new FCopBehavior96(this);
                     break;
-                case 99:
+                case ActorBehavior.PlayerWeapon:
                     behavior = new FCopBehavior99(this);
                     break;
             }
@@ -108,16 +141,35 @@ namespace FCopParser {
 
         }
 
+        public FCopActor(int id, int nullRPNSRef, ActorBehavior behavior, int x, int y) : base(null) {
+
+            name = "Actor " + id;
+
+            behaviorType = behavior;
+            this.x = x;
+            this.y = y;
+
+            switch (behavior) {
+                case ActorBehavior.DynamicProp:
+                    resourceReferences.Add(new Resource("NULL", 0));
+                    resourceReferences.Add(new Resource("NULL", 0));
+
+                    rawFile = new IFFDataFile(3, new(), "Cact", id, nullRPNSRef);
+                    this.behavior = new FCopBehavior11();
+                    break;
+            }
+
+        }
+
         public IFFDataFile Compile() {
 
             var total = new List<byte>();
 
             total.AddRange(BitConverter.GetBytes(DataID));
-            total.AddRange(BitConverter.GetBytes(actorType));
+            total.AddRange(BitConverter.GetBytes((int)behaviorType));
             total.AddRange(BitConverter.GetBytes(y));
             total.AddRange(BitConverter.GetBytes(0));
             total.AddRange(BitConverter.GetBytes(x));
-
 
             var didBehaviorCompile = false;
             if (behavior != null) {
@@ -166,7 +218,7 @@ namespace FCopParser {
             totalWithHeader.AddRange(BitConverter.GetBytes(actSize));
             totalWithHeader.AddRange(total);
 
-            if (totalWithHeader.Count != rawFile.data.Count) {
+            if (totalWithHeader.Count != rawFile.data.Count && rawFile.data.Count != 0) {
                 throw new Exception("Compiled size doesn't equal original");
             }
 
@@ -259,6 +311,7 @@ namespace FCopParser {
         public FCopActor actor { get; set; }
         public List<ActorProperty> properties { get; set; }
 
+        // - Tags -
         public ToggleActorProperty isInvincible;
         public ToggleActorProperty playerPhysics;
         public ToggleActorProperty disableRendering;
@@ -286,7 +339,59 @@ namespace FCopParser {
         public ToggleActorProperty disableTeam;
         public ToggleActorProperty unknown14;
 
-        public List<ActorProperty> InitTags(List<byte> data) {
+        // - Properties -
+        public ValueActorProperty health;
+        public ValueActorProperty collideDamage;
+        public ValueActorProperty u_team;
+        public EnumDataActorProperty mapIconColor;
+        public ValueActorProperty u_unknown15;
+        public ValueActorProperty u_explosion;
+        public ValueActorProperty uvOffset;
+
+        // 28 is the offset to the properties, it skips the fourCC and coordinates.
+        protected int offset = 28;
+
+        protected int Read16() {
+
+            var value = BitConverter.ToInt16(actor.rawFile.data.ToArray(), offset);
+            offset += 2;
+            return value;
+
+        }
+
+        protected int Read8() {
+
+            var value = actor.rawFile.data[offset];
+            offset += 1;
+            return value;
+
+        }
+
+        public FCopEntity(FCopActor actor) {
+            this.actor = actor;
+
+            properties = new();
+
+            properties.AddRange(InitTags());
+
+            properties.AddRange(InitEntityProperties());
+
+        }
+
+        public FCopEntity() {
+
+            properties = new();
+
+            properties.AddRange(InitEmptyTags());
+
+            properties.AddRange(InitEmptyEntityProperties());
+
+
+        }
+
+        List<ActorProperty> InitTags() {
+
+            var data = actor.rawFile.data.GetRange(offset, 4);
 
             isInvincible = new("Is Invincible", (data[0] & 0x80) == 0x80, BitCount.Bit1);
             playerPhysics = new("Player Physics", (data[0] & 0x40) == 0x40, BitCount.Bit1);
@@ -315,6 +420,8 @@ namespace FCopParser {
             disableTeam = new("disableTeam", (data[2] & 0x02) == 0x02, BitCount.Bit1);
             unknown14 = new("unknown14", (data[2] & 0x01) == 0x01, BitCount.Bit1);
 
+            offset += 4;
+
             // Items are reversed so they compile correctly.
             return new List<ActorProperty>() {
                 disableTargeting,
@@ -342,7 +449,104 @@ namespace FCopParser {
                 unknown13,
                 unknown12,
                 unknown11,
-                unknown10
+                unknown10,
+
+                new FillerActorProperty(0, BitCount.Bit8)
+            };
+
+        }
+
+        List<ActorProperty> InitEmptyTags() {
+
+            isInvincible = new("Is Invincible", false, BitCount.Bit1);
+            playerPhysics = new("Player Physics", false, BitCount.Bit1);
+            disableRendering = new("Disable Rendering", false, BitCount.Bit1);
+            unknown1 = new("unknown1", false, BitCount.Bit1);
+            unknown2 = new("unknown2", false, BitCount.Bit1);
+            disableAllCollision = new("Disable Collision", false, BitCount.Bit1);
+            unknown3 = new("unknown3", false, BitCount.Bit1);
+            disableTargeting = new("disableTargeting", false, BitCount.Bit1);
+
+            unknown4 = new("unknown4", false, BitCount.Bit1);
+            unknown5 = new("unknown5", false, BitCount.Bit1);
+            unknown6 = new("unknown6", false, BitCount.Bit1);
+            disableDestroyedActorCollision = new("Disable Destroyed Collision", false, BitCount.Bit1);
+            unknown7 = new("unknown7", false, BitCount.Bit1);
+            unknown8 = new("unknown8", false, BitCount.Bit1);
+            hurtBySameTeam = new("hurtBySameTeam", false, BitCount.Bit1);
+            unknown9 = new("unknown9", false, BitCount.Bit1);
+
+            unknown10 = new("unknown10", false, BitCount.Bit1);
+            unknown11 = new("unknown11", false, BitCount.Bit1);
+            unknown12 = new("unknown12", false, BitCount.Bit1);
+            unknown13 = new("unknown13", false, BitCount.Bit1);
+            shadows = new("Has Shadow", false, BitCount.Bit1);
+            disableExplosionEffects = new("Disable Explosion", false, BitCount.Bit1);
+            disableTeam = new("disableTeam", false, BitCount.Bit1);
+            unknown14 = new("unknown14", false, BitCount.Bit1);
+
+            // Items are reversed so they compile correctly.
+            return new List<ActorProperty>() {
+                disableTargeting,
+                unknown3,
+                disableAllCollision,
+                unknown2,
+                unknown1,
+                disableRendering,
+                playerPhysics,
+                isInvincible,
+
+                unknown9,
+                hurtBySameTeam,
+                unknown8,
+                unknown7,
+                disableDestroyedActorCollision,
+                unknown6,
+                unknown5,
+                unknown4,
+
+                unknown14,
+                disableTeam,
+                disableExplosionEffects,
+                shadows,
+                unknown13,
+                unknown12,
+                unknown11,
+                unknown10,
+
+                new FillerActorProperty(0, BitCount.Bit8)
+            };
+
+        }
+
+        List<ActorProperty> InitEntityProperties() {
+
+            health = new("Health", Read16(), BitCount.Bit16);
+            collideDamage = new("Collide Damage", Read16(), BitCount.Bit16);
+            u_team = new("Team (Unknown)", Read16(), BitCount.Bit16);
+            mapIconColor = new("Map Icon Color", (MapIconColor)Read8(), BitCount.Bit8);
+            u_unknown15 = new("u_unknown15", Read8(), BitCount.Bit8);
+            u_explosion = new("Explosion (Unknown)", Read16(), BitCount.Bit16);
+            uvOffset = new("UV Offset", Read16(), BitCount.Bit16);
+
+            return new List<ActorProperty>() {
+                health, collideDamage, u_team, mapIconColor, u_unknown15, u_explosion, uvOffset
+            };
+
+        }
+
+        List<ActorProperty> InitEmptyEntityProperties() {
+
+            health = new("Health", 0, BitCount.Bit16);
+            collideDamage = new("Collide Damage", 0, BitCount.Bit16);
+            u_team = new("Team (Unknown)", 0, BitCount.Bit16);
+            mapIconColor = new("Map Icon Color", MapIconColor.None, BitCount.Bit8);
+            u_unknown15 = new("u_unknown15", 0, BitCount.Bit8);
+            u_explosion = new("Explosion (Unknown)", 0, BitCount.Bit16);
+            uvOffset = new("UV Offset", 0, BitCount.Bit16);
+
+            return new List<ActorProperty>() {
+                health, collideDamage, u_team, mapIconColor, u_unknown15, u_explosion, uvOffset
             };
 
         }
@@ -410,68 +614,19 @@ namespace FCopParser {
 
     }
 
-    public class FCopBehavior1 : FCopActorBehavior, FCopObjectMutating {
-        public int expectedRawFileSize { get; set; }
-        public string[] assetRefNames { get; set; }
-        public AssetType[] assetRefType { get; set; }
+    public class FCopBehavior1 : FCopEntity, FCopObjectMutating {
 
-        public FCopActor actor { get; set; }
-        public List<ActorProperty> properties { get; set; }
-
-        public ValueActorProperty unknownNumber1;
-        public ValueActorProperty unknownNumber2;
-        public ValueActorProperty playerHealth;
-        public ValueActorProperty collideDamage;
-        public ValueActorProperty team;
-        public ValueActorProperty minimapColor;
-        public ValueActorProperty unknownNumber4;
-        public ValueActorProperty uvOffset;
         // FIXME: for some odd reason players facing can be negative. Allow the property to be negative
         public RotationActorProperty rotation;
 
-        public FCopBehavior1(FCopActor actor) {
-            this.actor = actor;
+        public FCopBehavior1(FCopActor actor) : base(actor) {
 
-            var rawFile = actor.rawFile;
-            var offset = 28;
-
-            int Read16() {
-
-                var value = BitConverter.ToInt16(actor.rawFile.data.ToArray(), offset);
-                offset += 2;
-                return value;
-
-            }
-
-            int Read8() {
-
-                var value = BitConverter.ToInt16(actor.rawFile.data.ToArray(), offset);
-                offset += 1;
-                return value;
-
-            }
-
-            unknownNumber1 = new("unknownNumber1", Read16(), BitCount.Bit16);
-            unknownNumber2 = new("unknownNumber2", Read16(), BitCount.Bit16);
-            playerHealth = new("Player Health", Read16(), BitCount.Bit16);
-            collideDamage = new("Collide Damage", Read16(), BitCount.Bit16);
-            team = new("Team", Read16(), BitCount.Bit16);
-            minimapColor = new("Minimap Color", Read16(), BitCount.Bit16);
-            unknownNumber4 = new("unknownNumber4", Read16(), BitCount.Bit16);
-            uvOffset = new("UV Offset", Read16(), BitCount.Bit16);
             rotation = new("Rotation", new ActorRotation().SetRotationCompiled(Read16()), BitCount.Bit16, new int[] { 0, 2, 3, 4, 5 });
 
-            properties = new() { 
-                unknownNumber1, 
-                unknownNumber2, 
-                playerHealth, 
-                collideDamage, 
-                team, 
-                minimapColor,
-                unknownNumber4,
-                uvOffset, 
-                rotation,
-            };
+            properties.Add(rotation);
+            // Implies ground cast but Future Cop won't react except with 0x01 which will crash. Leaving at default 0xFF
+            properties.Add(new FillerActorProperty(0, BitCount.Bit8));
+            properties.Add(new FillerActorProperty(0xFF, BitCount.Bit8));
 
         }
 
@@ -483,58 +638,35 @@ namespace FCopParser {
             return new RotationActorProperty[] { rotation };
         }
 
-        public List<byte> Compile() {
+    }
 
-            var total = new List<byte>();
+    public class FCopBehavior5 : FCopEntity {
 
-            foreach (var p in properties) {
+        public FCopBehavior5(FCopActor actor): base(actor) {
 
-                total.AddRange(p.Compile());
+            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
 
+            foreach (var i in Enumerable.Range(0, propertyCount)) {
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
+                property.fileOffset = offset;
+                properties.Add(property);
             }
-
-            // Implies ground cast but Future Cop won't react except with 0x01 which will crash. Leaving at default 0xFF
-            total.Add(0);
-            total.Add(0xFF);
-
-            return total;
 
         }
 
     }
 
-    public class FCopBehavior5 : FCopActorBehavior {
-        public int expectedRawFileSize { get; set; }
-        public string[] assetRefNames { get; set; }
-        public AssetType[] assetRefType { get; set; }
+    public class FCopBehavior6 : FCopEntity {
 
-        public FCopActor actor { get; set; }
-        public List<ActorProperty> properties { get; set; }
+        public FCopBehavior6(FCopActor actor) : base(actor) {
 
-        
+            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
 
-        public int textureOffset;
-
-        public int debugOffset = 42;
-        public ValueActorProperty debugValue;
-
-        public FCopBehavior5(FCopActor actor) {
-            this.actor = actor;
-
-            var rawFile = actor.rawFile;
-
-            textureOffset = Utils.BytesToShort(rawFile.data.ToArray(), 42);
-
-            debugValue = new("debug", Utils.BytesToShort(rawFile.data.ToArray(), debugOffset), BitCount.Bit16);
-
-            properties = new() { };
-            
-        }
-
-        public void Compile() {
-
-            actor.rawFile.data.RemoveRange(debugOffset, 2);
-            actor.rawFile.data.InsertRange(debugOffset, BitConverter.GetBytes((short)debugValue.value));
+            foreach (var i in Enumerable.Range(0, propertyCount)) {
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
+                property.fileOffset = offset;
+                properties.Add(property);
+            }
 
         }
 
@@ -542,14 +674,9 @@ namespace FCopParser {
 
     public class FCopBehavior8 : FCopEntity, FCopObjectMutating {
 
-        public ValueActorProperty health;
-        public ValueActorProperty collideDamage;
-        public ValueActorProperty team;
-        public ValueActorProperty potentialMinimapColor;
-        public ValueActorProperty explosionEffect;
-        public ValueActorProperty uvOffset;
-        public ValueActorProperty unknown3;
+        public ValueActorProperty weaponID;
         public ValueActorProperty unknown4;
+        public ValueActorProperty u_weaponCollision;
         public ValueActorProperty unknown5;
         public ValueActorProperty unknown6;
         public ValueActorProperty unknown7;
@@ -566,41 +693,14 @@ namespace FCopParser {
         public ValueActorProperty unknown16;
         public RotationActorProperty baseRotation;
 
-        public FCopBehavior8(FCopActor actor) {
-            this.actor = actor;
+        public FCopBehavior8(FCopActor actor) : base(actor) {
 
-            var rawFile = actor.rawFile;
-            var offset = 28;
+            assetRefNames = new string[] { "Head Object", "Object", "Base Object", "Destroyed Object" };
+            assetRefType = new AssetType[] { AssetType.Object, AssetType.Object, AssetType.Object, AssetType.Object };
 
-            int Read16() {
-
-                var value = BitConverter.ToInt16(actor.rawFile.data.ToArray(), offset);
-                offset += 2;
-                return value;
-
-            }
-
-            int Read8() {
-
-                var value = actor.rawFile.data[offset];
-                offset += 1;
-                return value;
-
-            }
-
-            properties = new();
-            properties.AddRange(this.InitTags(rawFile.data.GetRange(offset, 3)));
-            properties.Add(new FillerActorProperty(0, BitCount.Bit8));
-            offset += 4;
-
-            health = new("Health", Read16(), BitCount.Bit16);
-            collideDamage = new("Collide Damage", Read16(), BitCount.Bit16);
-            team = new("team", Read16(), BitCount.Bit16);
-            potentialMinimapColor = new("potentialMinimapColor", Read16(), BitCount.Bit16);
-            explosionEffect = new("explosionEffect", Read16(), BitCount.Bit16);
-            uvOffset = new("uvOffset", Read16(), BitCount.Bit16);
-            unknown3 = new("unknown3", Read16(), BitCount.Bit16);
-            unknown4 = new("unknown4", Read16(), BitCount.Bit16);
+            weaponID = new("Weapon ID", Read16(), BitCount.Bit16);
+            unknown4 = new("unknown4", Read8(), BitCount.Bit8);
+            u_weaponCollision = new("u_weaponCollision", Read8(), BitCount.Bit8);
             unknown5 = new("unknown5", Read16(), BitCount.Bit16);
             unknown6 = new("attack?", Read16(), BitCount.Bit16);
             unknown7 = new("unknown7", Read16(), BitCount.Bit16);
@@ -620,14 +720,9 @@ namespace FCopParser {
             baseRotation = new("Base Rotation", new ActorRotation().SetRotationCompiled(Read16()), BitCount.Bit16, new int[] { 2 });
 
             properties.AddRange(new List<ActorProperty>() {
-                health,
-                collideDamage,
-                team,
-                potentialMinimapColor,
-                explosionEffect,
-                uvOffset,
-                unknown3,
+                weaponID,
                 unknown4,
+                u_weaponCollision,
                 unknown5,
                 unknown6,
                 unknown7,
@@ -658,41 +753,33 @@ namespace FCopParser {
 
     }
 
-    public class FCopBehavior9 : FCopActorBehavior {
-        public int expectedRawFileSize { get; set; }
-        public string[] assetRefNames { get; set; }
-        public AssetType[] assetRefType { get; set; }
+    public class FCopBehavior9 : FCopEntity {
 
-        public FCopActor actor { get; set; }
-        public List<ActorProperty> properties { get; set; }
+        public FCopBehavior9(FCopActor actor) : base(actor) {
 
+            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
 
-        public int textureOffset;
-
-        public ValueActorProperty potentialSpawnLocation;
-        public ValueActorProperty idkWhatThisIs;
-
-        public FCopBehavior9(FCopActor actor) {
-            this.actor = actor;
-
-            var rawFile = actor.rawFile;
-
-            textureOffset = Utils.BytesToShort(rawFile.data.ToArray(), 42);
-
-            potentialSpawnLocation = new("Spawn Location?", Utils.BytesToInt(actor.rawFile.data.ToArray(), 88), BitCount.Bit16);
-            idkWhatThisIs = new("wtf is this?", Utils.BytesToShort(actor.rawFile.data.ToArray(), 64), BitCount.Bit16);
-
-            properties = new() { potentialSpawnLocation, idkWhatThisIs };
+            foreach (var i in Enumerable.Range(0, propertyCount)) {
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
+                property.fileOffset = offset;
+                properties.Add(property);
+            }
 
         }
 
-        public void Compile() {
+    }
 
-            actor.rawFile.data.RemoveRange(64, 2);
-            actor.rawFile.data.InsertRange(64, BitConverter.GetBytes((short)idkWhatThisIs.value));
+    public class FCopBehavior10 : FCopEntity {
 
-            actor.rawFile.data.RemoveRange(88, 4);
-            actor.rawFile.data.InsertRange(88, BitConverter.GetBytes(potentialSpawnLocation.value));
+        public FCopBehavior10(FCopActor actor) : base(actor) {
+
+            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+
+            foreach (var i in Enumerable.Range(0, propertyCount)) {
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
+                property.fileOffset = offset;
+                properties.Add(property);
+            }
 
         }
 
@@ -700,58 +787,36 @@ namespace FCopParser {
 
     public class FCopBehavior11 : FCopEntity, FCopHeightOffseting, FCopObjectMutating {
 
-        public ValueActorProperty health;
-        public ValueActorProperty collideDamage;
-        public ValueActorProperty unknown3;
-        public ValueActorProperty unknown4;
-        public ValueActorProperty explosion;
-        public ValueActorProperty uvOffset;
-
         public EnumDataActorProperty groundCast;
         public RotationActorProperty rotation;
         public ValueActorProperty heightOffset;
 
-        public FCopBehavior11(FCopActor actor) {
-            this.actor = actor;
+        public FCopBehavior11(FCopActor actor) : base(actor) {
 
             assetRefNames = new string[] { "Object", "Destroyed Object" };
             assetRefType = new AssetType[] { AssetType.Object, AssetType.Object };
 
-            var rawFile = actor.rawFile;
-            var offset = 28;
-
-            int Read16() {
-
-                var value = BitConverter.ToInt16(actor.rawFile.data.ToArray(), offset);
-                offset += 2;
-                return value;
-
-            }
-
-            int Read8() {
-
-                var value = actor.rawFile.data[offset];
-                offset += 1;
-                return value;
-
-            }
-
-            properties = new();
-            properties.AddRange(this.InitTags(rawFile.data.GetRange(offset, 3)));
-            properties.Add(new FillerActorProperty(0, BitCount.Bit8));
-            offset += 4;
-
-            health = new("Health", Read16(), BitCount.Bit16);
-            collideDamage = new("Collide Damage", Read16(), BitCount.Bit16);
-            unknown3 = new("unknown3", Read16(), BitCount.Bit16);
-            unknown4 = new("unknown4", Read16(), BitCount.Bit16);
-            explosion = new("Explosion effect", Read16(), BitCount.Bit16);
-            uvOffset = new("UV Offset", Read16(), BitCount.Bit16);
             groundCast = new("Ground Cast", (ActorGroundCast)Read16(), BitCount.Bit16);
             rotation = new("Rotation", new ActorRotation().SetRotationCompiled(Read16()), BitCount.Bit16, new int[] { 0, 1 });
             heightOffset = new("Height Offset", Read16(), BitCount.Bit16);
 
-            properties.AddRange(new List<ActorProperty>() { health, collideDamage, unknown3, unknown4, explosion, uvOffset, groundCast, rotation, heightOffset });
+            properties.AddRange(new List<ActorProperty>() { groundCast, rotation, heightOffset });
+
+            // For some reason with props, there's a property that's always 0.
+            properties.Add(new FillerActorProperty(0, BitCount.Bit16));
+
+        }
+
+        public FCopBehavior11() : base() {
+
+            assetRefNames = new string[] { "Object", "Destroyed Object" };
+            assetRefType = new AssetType[] { AssetType.Object, AssetType.Object };
+
+            groundCast = new("Ground Cast", ActorGroundCast.Highest, BitCount.Bit16);
+            rotation = new("Rotation", new ActorRotation().SetRotationCompiled(0), BitCount.Bit16, new int[] { 0, 1 });
+            heightOffset = new("Height Offset", 0, BitCount.Bit16);
+
+            properties.AddRange(new List<ActorProperty>() { groundCast, rotation, heightOffset });
 
             // For some reason with props, there's a property that's always 0.
             properties.Add(new FillerActorProperty(0, BitCount.Bit16));
@@ -772,6 +837,22 @@ namespace FCopParser {
 
         public RotationActorProperty[] GetRotations() {
             return new RotationActorProperty[] { rotation };
+        }
+
+    }
+
+    public class FCopBehavior12 : FCopEntity {
+
+        public FCopBehavior12(FCopActor actor) : base(actor) {
+
+            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+
+            foreach (var i in Enumerable.Range(0, propertyCount)) {
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
+                property.fileOffset = offset;
+                properties.Add(property);
+            }
+
         }
 
     }
@@ -815,23 +896,145 @@ namespace FCopParser {
 
     }
 
-    public class FCopBehavior28 : FCopActorBehavior {
-        public int expectedRawFileSize { get; set; }
-        public string[] assetRefNames { get; set; }
-        public AssetType[] assetRefType { get; set; }
+    public class FCopBehavior16 : FCopEntity {
 
-        public FCopActor actor { get; set; }
-        public List<ActorProperty> properties { get; set; }
+        public FCopBehavior16(FCopActor actor) : base(actor) {
 
+            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
 
-        public int textureOffset;
+            foreach (var i in Enumerable.Range(0, propertyCount)) {
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
+                property.fileOffset = offset;
+                properties.Add(property);
+            }
 
-        public FCopBehavior28(FCopActor actor) {
-            this.actor = actor;
+        }
 
-            var rawFile = actor.rawFile;
+    }
 
-            textureOffset = Utils.BytesToShort(rawFile.data.ToArray(), 42);
+    public class FCopBehavior20 : FCopEntity {
+
+        public FCopBehavior20(FCopActor actor) : base(actor) {
+
+            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+
+            foreach (var i in Enumerable.Range(0, propertyCount)) {
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
+                property.fileOffset = offset;
+                properties.Add(property);
+            }
+
+        }
+
+    }
+
+    public class FCopBehavior25 : FCopEntity {
+
+        public FCopBehavior25(FCopActor actor) : base(actor) {
+
+            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+
+            foreach (var i in Enumerable.Range(0, propertyCount)) {
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
+                property.fileOffset = offset;
+                properties.Add(property);
+            }
+
+        }
+
+    }
+
+    public class FCopBehavior26 : FCopEntity {
+
+        public FCopBehavior26(FCopActor actor) : base(actor) {
+
+            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+
+            foreach (var i in Enumerable.Range(0, propertyCount)) {
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
+                property.fileOffset = offset;
+                properties.Add(property);
+            }
+
+        }
+
+    }
+
+    public class FCopBehavior27 : FCopEntity {
+
+        public FCopBehavior27(FCopActor actor) : base(actor) {
+
+            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+
+            foreach (var i in Enumerable.Range(0, propertyCount)) {
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
+                property.fileOffset = offset;
+                properties.Add(property);
+            }
+
+        }
+
+    }
+
+    public class FCopBehavior28 : FCopEntity {
+
+        public FCopBehavior28(FCopActor actor) : base(actor) {
+
+            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+
+            foreach (var i in Enumerable.Range(0, propertyCount)) {
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
+                property.fileOffset = offset;
+                properties.Add(property);
+            }
+
+        }
+
+    }
+
+    public class FCopBehavior30 : FCopEntity {
+
+        public FCopBehavior30(FCopActor actor) : base(actor) {
+
+            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+
+            foreach (var i in Enumerable.Range(0, propertyCount)) {
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
+                property.fileOffset = offset;
+                properties.Add(property);
+            }
+
+        }
+
+    }
+
+    public class FCopBehavior32 : FCopEntity {
+
+        public FCopBehavior32(FCopActor actor) : base(actor) {
+
+            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+
+            foreach (var i in Enumerable.Range(0, propertyCount)) {
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
+                property.fileOffset = offset;
+                properties.Add(property);
+            }
+
+        }
+
+    }
+
+    public class FCopBehavior33 : FCopEntity {
+
+        public FCopBehavior33(FCopActor actor) : base(actor) {
+
+            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+
+            foreach (var i in Enumerable.Range(0, propertyCount)) {
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
+                property.fileOffset = offset;
+                properties.Add(property);
+            }
 
         }
 
@@ -867,6 +1070,22 @@ namespace FCopParser {
 
             actor.rawFile.data.RemoveRange(78, 2);
             actor.rawFile.data.InsertRange(78, BitConverter.GetBytes((short)headRotation.value.compiledRotation));
+
+        }
+
+    }
+
+    public class FCopBehavior37 : FCopEntity {
+
+        public FCopBehavior37(FCopActor actor) : base(actor) {
+
+            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+
+            foreach (var i in Enumerable.Range(0, propertyCount)) {
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
+                property.fileOffset = offset;
+                properties.Add(property);
+            }
 
         }
 
@@ -1283,6 +1502,106 @@ namespace FCopParser {
         Bit32 = 32
     }
 
+    public enum MapIconColor {
+        None = 0,
+        Red = 1,
+        Blue = 2,
+        Green = 3,
+        Cyan = 4,
+        Yellow = 5,
+        Magenta = 6,
+        White = 7,
+        Gold = 8,
+        DarkRed = 9,
+        DarkBlue = 10,
+        DarkGreen = 11,
+        DarkCyan = 12,
+        DarkYellow = 13,
+        DarkMagenta = 14,
+        Gray = 15,
+        Orange = 16,
+        RedPulse = 17,
+        BlueWhitePulse = 18,
+        GreenPulse = 19,
+        Pink = 20,
+        Silver = 21,
+        Sage = 22,
+        FlashingRed = 23,
+        FlashingBlue = 24,
+        FlashingGreen = 25,
+        FlashingCyan = 26,
+        FlashingYellow = 27,
+        FlashingMagenta = 28,
+        FlashingWhite = 29,
+        FlashingOrange = 30,
+        FlashingGray = 31,
+        BlackTri = 32,
+        RedTri = 33,
+        BlueTri = 34,
+        GreenTri = 35,
+        CyanTri = 36,
+        YellowTri = 37,
+        MagentaTri = 38,
+        WhiteTri = 39,
+        GoldTri = 40,
+        DarkRedTri = 41,
+        DarkBlueTri = 42,
+        DarkGreenTri = 43,
+        DarkCyanTri = 44,
+        DarkYellowTri = 45,
+        DarkMagentaTri = 46,
+        GrayTri = 47,
+        OrangeTri = 48,
+        RedPulseTri = 49,
+        BlueWhitePulseTri = 50,
+        GreenPulseTri = 51,
+        PinkTri = 52,
+        SilverTri = 53,
+        SageTri = 54,
+        FlashingRedTri = 55,
+        FlashingBlueTri = 56,
+        FlashingGreenTri = 57,
+        FlashingCyanTri = 58,
+        FlashingYellowTri = 59,
+        FlashingMagentaTri = 60,
+        FlashingWhiteTri = 61,
+        FlashingOrangeTri = 62,
+        FlashingGrayTri = 63,
+        BlackDiamond = 64,
+        RedDiamond = 65,
+        BlueDiamond = 66,
+        GreenDiamond = 67,
+        CyanDiamond = 68,
+        YellowDiamond = 69,
+        MagentaDiamond = 70,
+        WhiteDiamond = 71,
+        GoldDiamond = 72,
+        DarkRedDiamond = 73,
+        DarkBlueDiamond = 74,
+        DarkGreenDiamond = 75,
+        DarkCyanDiamond = 76,
+        DarkYellowDiamond = 77,
+        DarkMagentaDiamond = 78,
+        GrayDiamond = 79,
+        OrangeDiamond = 80,
+        RedPulseDiamond = 81,
+        BlueWhitePulseDiamond = 82,
+        GreenPulseDiamond = 83,
+        PinkDiamond = 84,
+        SilverDiamond = 85,
+        SageDiamond = 86,
+        FlashingRedDiamond = 87,
+        FlashingBlueDiamond = 88,
+        FlashingGreenDiamond = 89,
+        FlashingCyanDiamond = 90,
+        FlashingYellowDiamond = 91,
+        FlashingMagentaDiamond = 92,
+        FlashingWhiteDiamond = 93,
+        FlashingOrangeDiamond = 94,
+        FlashingGrayDiamond = 95,
+        CyanDiamondClone = 204,
+    }
+
     public enum Team {
         Red = 1,
         Blue = 2
@@ -1299,6 +1618,48 @@ namespace FCopParser {
         Highest = 0,
         Lowest = 1,
         Default = 255
+
+    }
+
+    public enum ActorBehavior {
+
+        Player = 1,
+        PathedEntity = 5,
+        StationaryEntity = 6,
+        Turret = 8,
+        Aircraft = 9,
+        Elevator = 10,
+        DynamicProp = 11,
+        CollidableProp = 12,
+        UniversalTrigger = 14,
+        FloatingItem = 16,
+        PathedTurret = 20,
+        MovableProp = 25,
+        Behavior26 = 26,
+        Behavior27 = 27,
+        Behavior28 = 28,
+        Behavior29 = 29,
+        Behavior30 = 30,
+        Behavior31 = 31,
+        Reloader = 32,
+        Behavior33 = 33,
+        Behavior34 = 34,
+        Behavior35 = 35,
+        Behavior36 = 36,
+        Behavior37 = 37,
+        Behavior87 = 87,
+        Behavior88 = 88,
+        Behavior89 = 89,
+        Behavior90 = 90,
+        Behavior91 = 91,
+        Behavior92 = 92,
+        Behavior93 = 93,
+        Behavior94 = 94,
+        Trigger = 95,
+        StaticProp = 96,
+        Fog = 97,
+        Weapon = 98,
+        PlayerWeapon = 99
 
     }
 
