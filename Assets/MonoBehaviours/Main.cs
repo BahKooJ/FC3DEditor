@@ -130,24 +130,24 @@ public class Main : MonoBehaviour {
 
     void _Debug() {
 
-        var actorEditMode = (ActorEditMode)editMode;
+        //var actorEditMode = (ActorEditMode)editMode;
 
-        var actors = level.sceneActors.actors.Where(a => a.behaviorType == ActorBehavior.DynamicProp).ToList();
+        //var actors = level.sceneActors.actors.Where(a => a.behaviorType == ActorBehavior.DynamicProp).ToList();
 
-        var actors2 = actors.Where(a => (((FCopBehavior11)a.behavior).u_unknown15.value) > 0).ToList();
-        var x = 5;
-        var y = -5;
-        foreach (var a in actors2) {
+        //var actors2 = actors.Where(a => (((FCopBehavior11)a.behavior).u_unknown15.value) > 0).ToList();
+        //var x = 5;
+        //var y = -5;
+        //foreach (var a in actors2) {
 
-            actorEditMode.actorObjectsByID[a.DataID].ChangePosition(new Vector3(x, 0, y));
+        //    actorEditMode.actorObjectsByID[a.DataID].ChangePosition(new Vector3(x, 0, y));
 
-            x += 3;
+        //    x += 3;
 
-            if (x > 128) {
-                x = 5;
-                y -= 5;
-            }
-        }
+        //    if (x > 128) {
+        //        x = 5;
+        //        y -= 5;
+        //    }
+        //}
 
     }
 

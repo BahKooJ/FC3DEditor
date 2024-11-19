@@ -165,7 +165,7 @@ public class ActorObject : MonoBehaviour {
             pos.y = hit.point.y;
 
             if (actor.behavior is FCopHeightOffseting offset) {
-                pos.y += offset.GetHeight() / 8192f;
+                pos.y += offset.GetHeight() / (float)offset.heightMultiplier;
             }
             
             transform.position = pos;
@@ -204,7 +204,7 @@ public class ActorObject : MonoBehaviour {
     int SetTextureOffset() {
 
         if (actor.behavior is FCopEntity e) {
-            return e.uvOffset.value;
+            return e.GetUVOffset();
         }
         else {
             return 0;
