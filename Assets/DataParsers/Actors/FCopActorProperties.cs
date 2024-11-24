@@ -125,15 +125,17 @@ namespace FCopParser {
 
         public int[] affectedRefIndexes;
         public ActorRotation value;
+        public Axis axis;
 
         public int GetCompiledValue() {
             return value.compiledRotation;
         }
 
-        public RotationActorProperty(string name, ActorRotation value, BitCount bitCount, int[] affectedRefIndexes) {
+        public RotationActorProperty(string name, ActorRotation value, BitCount bitCount, Axis axis, int[] affectedRefIndexes) {
             this.name = name;
             this.value = value;
             this.bitCount = bitCount;
+            this.axis = axis;
             this.affectedRefIndexes = affectedRefIndexes;
         }
 
@@ -168,25 +170,9 @@ namespace FCopParser {
 
         public ActorRotation SetRotationDegree(float newRotation) {
 
-            var negative = newRotation < 0;
+            parsedRotation = newRotation;
 
-            var newAbsRotation = MathF.Abs(newRotation);
-
-            if (newAbsRotation > 180f) {
-                parsedRotation = 360f - newAbsRotation;
-            }
-            if (newAbsRotation < -180f) {
-                parsedRotation = newAbsRotation + 360f;
-            }
-
-            parsedRotation = newAbsRotation;
-
-            compiledRotation = (int)(newAbsRotation / 360f * maxRotation);
-
-            if (negative) {
-                parsedRotation = -parsedRotation;
-                compiledRotation = -compiledRotation;
-            }
+            compiledRotation = (int)(newRotation / 360f * maxRotation);
 
             return this;
 
@@ -195,26 +181,12 @@ namespace FCopParser {
 
         public ActorRotation SetRotationCompiled(int newRotation) {
 
-            var negative = newRotation < 0;
-
-            var newAbsRotation = Math.Abs(newRotation);
-
-            compiledRotation = newAbsRotation;
-
-            float rotationPrecentage = (float)newAbsRotation / (float)maxRotation;
+            float rotationPrecentage = (float)newRotation / (float)maxRotation;
 
             float degreeRoation = 360f * rotationPrecentage;
 
-            if (degreeRoation > 180f) {
-                parsedRotation = 360f - degreeRoation;
-            }
-
+            compiledRotation = newRotation;
             parsedRotation = degreeRoation;
-
-            if (negative) {
-                parsedRotation = -parsedRotation;
-                compiledRotation = -compiledRotation;
-            }
 
             return this;
 
@@ -350,6 +322,25 @@ namespace FCopParser {
         Lowest = 1,
         Default = 255
 
+    }
+
+    public enum ElevatorStops {
+        Two = 2,
+        Three = 3,
+    }
+
+    public enum ElevatorStartingPoint {
+        First = 1,
+        Second = 2,
+        Third = 3
+    }
+
+    public enum ElevatorTrigger {
+        Implied = 0,
+        ActionOnly = 1,
+        Unknown2 = 2,
+        Unknown3 = 3,
+        Unknown4 = 4
     }
 
 }

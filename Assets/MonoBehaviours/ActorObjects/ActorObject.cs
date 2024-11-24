@@ -179,6 +179,14 @@ public class ActorObject : MonoBehaviour {
 
     void SetRotation() {
 
+        foreach (var obj in objects) {
+
+            if (obj != null) {
+                obj.transform.localRotation = Quaternion.identity;
+            }
+
+        }
+
         if (actor.behavior is FCopObjectMutating objectMutating) {
 
             var rotations = objectMutating.GetRotations();
@@ -190,7 +198,23 @@ public class ActorObject : MonoBehaviour {
                     var potentialObject = objects[i];
 
                     if (potentialObject != null) {
-                        potentialObject.transform.localRotation = Quaternion.Euler(0f, rot.value.parsedRotation, 0f);
+
+                        var objRot = potentialObject.transform.localRotation.eulerAngles;
+
+                        switch (rot.axis) {
+                            case Axis.X:
+                                objRot.x = -rot.value.parsedRotation;
+                                break;
+                            case Axis.Y:
+                                objRot.y = rot.value.parsedRotation;
+                                break;
+                            case Axis.Z:
+                                objRot.z = -rot.value.parsedRotation;
+                                break;
+                        }
+
+                        potentialObject.transform.localRotation = Quaternion.Euler(objRot);
+
                     }
 
                 }

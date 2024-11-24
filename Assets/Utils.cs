@@ -128,6 +128,12 @@ namespace FCopParser {
         Mixed
     }
 
+    public enum Axis {
+        X = 0,
+        Y = 1,
+        Z = 2
+    }
+
     public class IncorrectFileFormat : Exception {
 
         public AssetType assetType;
