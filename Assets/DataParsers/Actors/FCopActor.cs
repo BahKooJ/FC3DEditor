@@ -61,120 +61,123 @@ namespace FCopParser {
 
             ParseResourceReferences();
 
+            var tACTSize = BitConverter.ToInt32(rawFile.data.ToArray(), 4);
+            var propertyData = rawFile.data.GetRange(28, tACTSize - 28);
+
             switch (behaviorType) {
                 case ActorBehavior.Player:
-                    behavior = new FCopBehavior1(this);
+                    behavior = new FCopBehavior1(this, propertyData);
                     break;
                 case ActorBehavior.PathedEntity:
-                    behavior = new FCopBehavior5(this);
+                    behavior = new FCopBehavior5(this, propertyData);
                     break;
                 case ActorBehavior.StationaryEntity: 
-                    behavior = new FCopBehavior6(this);
+                    behavior = new FCopBehavior6(this, propertyData);
                     break;
                 case ActorBehavior.Turret:
-                    behavior = new FCopBehavior8(this);
+                    behavior = new FCopBehavior8(this, propertyData);
                     break;
                 case ActorBehavior.Aircraft:
-                    behavior = new FCopBehavior9(this);
+                    behavior = new FCopBehavior9(this, propertyData);
                     break;
                 case ActorBehavior.Elevator:
-                    behavior = new FCopBehavior10(this);
+                    behavior = new FCopBehavior10(this, propertyData);
                     break;
                 case ActorBehavior.DynamicProp:
-                    behavior = new FCopBehavior11(this);
+                    behavior = new FCopBehavior11(this, propertyData);
                     break;
                 case ActorBehavior.CollidableProp:
-                    behavior = new FCopBehavior12(this);
+                    behavior = new FCopBehavior12(this, propertyData);
                     break;
                 case ActorBehavior.UniversalTrigger:
-                    behavior = new FCopBehavior14(this);
+                    behavior = new FCopBehavior14(this, propertyData);
                     break;
                 case ActorBehavior.FloatingItem:
-                    behavior = new FCopBehavior16(this);
+                    behavior = new FCopBehavior16(this, propertyData);
                     break;
                 case ActorBehavior.PathedTurret:
-                    behavior = new FCopBehavior20(this);
+                    behavior = new FCopBehavior20(this, propertyData);
                     break;
                 case ActorBehavior.MovableProp:
-                    behavior = new FCopBehavior25(this);
+                    behavior = new FCopBehavior25(this, propertyData);
                     break;
                 case ActorBehavior.Behavior26:
-                    behavior = new FCopBehavior26(this);
+                    behavior = new FCopBehavior26(this, propertyData);
                     break;
                 case ActorBehavior.Behavior27:
-                    behavior = new FCopBehavior27(this);
+                    behavior = new FCopBehavior27(this, propertyData);
                     break;
                 case ActorBehavior.Behavior28:
-                    behavior = new FCopBehavior28(this);
+                    behavior = new FCopBehavior28(this, propertyData);
                     break;
                 case ActorBehavior.Behavior29:
-                    behavior = new FCopBehavior29(this);
+                    behavior = new FCopBehavior29(this, propertyData);
                     break;
                 case ActorBehavior.Behavior30:
-                    behavior = new FCopBehavior30(this);
+                    behavior = new FCopBehavior30(this, propertyData);
                     break;
                 case ActorBehavior.Behavior31:
-                    behavior = new FCopBehavior31(this);
+                    behavior = new FCopBehavior31(this, propertyData);
                     break;
                 case ActorBehavior.Reloader:
-                    behavior = new FCopBehavior32(this);
+                    behavior = new FCopBehavior32(this, propertyData);
                     break;
                 case ActorBehavior.Behavior33:
-                    behavior = new FCopBehavior33(this);
+                    behavior = new FCopBehavior33(this, propertyData);
                     break;
                 case ActorBehavior.Behavior34:
-                    behavior = new FCopBehavior33(this);
+                    behavior = new FCopBehavior33(this, propertyData);
                     break;
                 case ActorBehavior.Behavior35:
-                    behavior = new FCopBehavior35(this);
+                    behavior = new FCopBehavior35(this, propertyData);
                     break;
                 case ActorBehavior.ClaimableTurret:
-                    behavior = new FCopBehavior36(this);
+                    behavior = new FCopBehavior36(this, propertyData);
                     break;
                 case ActorBehavior.Behavior37:
-                    behavior = new FCopBehavior37(this);
+                    behavior = new FCopBehavior37(this, propertyData);
                     break;
                 case ActorBehavior.Behavior38:
-                    behavior = new FCopBehavior38(this);
+                    behavior = new FCopBehavior38(this, propertyData);
                     break;
                 case ActorBehavior.Behavior87:
-                    behavior = new FCopBehavior87(this);
+                    behavior = new FCopBehavior87(this, propertyData);
                     break;
                 case ActorBehavior.Behavior88:
-                    behavior = new FCopBehavior88(this);
+                    behavior = new FCopBehavior88(this, propertyData);
                     break;
                 case ActorBehavior.Behavior89:
-                    behavior = new FCopBehavior89(this);
+                    behavior = new FCopBehavior89(this, propertyData);
                     break;
                 case ActorBehavior.Behavior90:
-                    behavior = new FCopBehavior90(this);
+                    behavior = new FCopBehavior90(this, propertyData);
                     break;
                 case ActorBehavior.Behavior91:
-                    behavior = new FCopBehavior91(this);
+                    behavior = new FCopBehavior91(this, propertyData);
                     break;
                 case ActorBehavior.Behavior92:
-                    behavior = new FCopBehavior92(this);
+                    behavior = new FCopBehavior92(this, propertyData);
                     break;
                 case ActorBehavior.Behavior93:
-                    behavior = new FCopBehavior93(this);
+                    behavior = new FCopBehavior93(this, propertyData);
                     break;
                 case ActorBehavior.Behavior94:
-                    behavior = new FCopBehavior94(this);
+                    behavior = new FCopBehavior94(this, propertyData);
                     break;
                 case ActorBehavior.Trigger:
-                    behavior = new FCopBehavior95(this);
+                    behavior = new FCopBehavior95(this, propertyData);
                     break;
                 case ActorBehavior.StaticProp:
-                    behavior = new FCopBehavior96(this);
+                    behavior = new FCopBehavior96(this, propertyData);
                     break;
                 case ActorBehavior.Fog:
-                    behavior = new FCopBehavior97(this);
+                    behavior = new FCopBehavior97(this, propertyData);
                     break;
                 case ActorBehavior.Weapon:
-                    behavior = new FCopBehavior98(this);
+                    behavior = new FCopBehavior98(this, propertyData);
                     break;
                 case ActorBehavior.PlayerWeapon:
-                    behavior = new FCopBehavior99(this);
+                    behavior = new FCopBehavior99(this, propertyData);
                     break;
             }
 
@@ -194,15 +197,15 @@ namespace FCopParser {
             this.x = x;
             this.y = y;
 
-            //switch (behavior) {
-            //    case ActorBehavior.DynamicProp:
-            //        resourceReferences.Add(new Resource("NULL", 0));
-            //        resourceReferences.Add(new Resource("NULL", 0));
+            switch (behavior) {
+                case ActorBehavior.StationaryEntity:
+                    resourceReferences.Add(new Resource("NULL", 0));
+                    resourceReferences.Add(new Resource("NULL", 0));
 
-            //        rawFile = new IFFDataFile(3, new(), "Cact", id, nullRPNSRef);
-            //        this.behavior = new FCopBehavior11();
-            //        break;
-            //}
+                    rawFile = new IFFDataFile(3, new(), "Cact", id, nullRPNSRef);
+                    this.behavior = new FCopBehavior6(this, Enumerable.Repeat((byte)0, FCopBehavior6.blocks * 2).ToList());
+                    break;
+            }
 
         }
 
@@ -340,26 +343,27 @@ namespace FCopParser {
         public string[] assetRefNames;
         public AssetType[] assetRefType;
 
-        public FCopActor actor;
+        FCopActor actor;
+        public List<byte> propertyData;
 
         public List<ActorProperty> properties;
         public Dictionary<string, ActorProperty> propertiesByName = new();
 
         public bool refuseCompile = false;
 
-        public FCopActorBehavior(FCopActor actor) {
+        public FCopActorBehavior(FCopActor actor, List<byte> propertyData) {
             this.actor = actor;
+            this.propertyData = propertyData;
 
             properties = new();
 
         }
 
-        // 28 is the offset to the properties, it skips the fourCC and coordinates.
-        protected int offset = 28;
+        protected int offset = 0;
 
         protected int Read16() {
 
-            var value = BitConverter.ToInt16(actor.rawFile.data.ToArray(), offset);
+            var value = BitConverter.ToInt16(propertyData.ToArray(), offset);
             offset += 2;
             return value;
 
@@ -367,7 +371,7 @@ namespace FCopParser {
 
         protected int Read8() {
 
-            var value = actor.rawFile.data[offset];
+            var value = propertyData[offset];
             offset += 1;
             return value;
 
@@ -434,7 +438,7 @@ namespace FCopParser {
 
     public abstract class FCopEntity: FCopActorBehavior {
 
-        public FCopEntity(FCopActor actor) : base(actor) {
+        public FCopEntity(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(InitTags());
 
@@ -444,7 +448,7 @@ namespace FCopParser {
 
         List<ActorProperty> InitTags() {
 
-            var data = actor.rawFile.data.GetRange(offset, 4);
+            var data = propertyData.GetRange(offset, 4);
 
             var total = new List<ActorProperty>() {
                 new ToggleActorProperty("disableTargeting", (data[0] & 0x01) == 0x01, BitCount.Bit1),
@@ -510,11 +514,11 @@ namespace FCopParser {
 
     public abstract class FCopShooter : FCopEntity {
 
-        public FCopShooter(FCopActor actor) : base(actor) {
+        public FCopShooter(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(new List<ActorProperty>() {
                 new ValueActorProperty("Weapon ID", Read16(), BitCount.Bit16),
-                new ValueActorProperty("unknown4", Read8(), BitCount.Bit8),
+                new ValueActorProperty("FOV and Fire alts?", Read8(), BitCount.Bit8),
                 new ValueActorProperty("u_weaponCollision", Read8(), BitCount.Bit8),
                 new ValueActorProperty("unknown5 - 48", Read8(), BitCount.Bit8),
                 new ValueActorProperty("unknown6 - 49", Read8(), BitCount.Bit8),
@@ -550,7 +554,7 @@ namespace FCopParser {
     // - Parsed -
     public class FCopBehavior1 : FCopEntity, FCopObjectMutating {
 
-        public FCopBehavior1(FCopActor actor) : base(actor) {
+        public FCopBehavior1(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             // FIXME: for some odd reason players facing can be negative. Allow the property to be negative
             properties.Add(new RotationActorProperty("Rotation", new ActorRotation().SetRotationCompiled(Read16()), BitCount.Bit16, Axis.Y, new int[] { 0, 2, 3, 4, 5 }));
@@ -570,9 +574,9 @@ namespace FCopParser {
 
     public class FCopBehavior5 : FCopShooter {
 
-        public FCopBehavior5(FCopActor actor): base(actor) {
+        public FCopBehavior5(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -585,26 +589,54 @@ namespace FCopParser {
 
     }
 
-    public class FCopBehavior6 : FCopShooter {
+    public class FCopBehavior6 : FCopShooter, FCopHeightOffseting, FCopObjectMutating {
 
-        public FCopBehavior6(FCopActor actor) : base(actor) {
+        public const int assetRefCount = 2;
+        public const int blocks = 24;
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+        public int heightMultiplier { get; set; }
 
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
-                properties.Add(property);
-            }
+        public FCopBehavior6(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            heightMultiplier = 512;
+
+            assetRefNames = new string[] { "Object", "Destroyed Object" };
+            assetRefType = new AssetType[] { AssetType.Object, AssetType.Object };
+
+            properties.AddRange(new List<ActorProperty>() {
+                new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(), BitCount.Bit8),
+                new ValueActorProperty("6_unknown1", Read8(), BitCount.Bit8),
+                new ValueActorProperty("6_unknown2", Read16(), BitCount.Bit16),
+                new RotationActorProperty("Rotation", new ActorRotation().SetRotationCompiled(Read16()), BitCount.Bit16, Axis.Y, new int[] { 0 }),
+                new ValueActorProperty("Height Offset", Read16(), BitCount.Bit16),
+                new ValueActorProperty("6_unknown3", Read8(), BitCount.Bit8),
+                new ValueActorProperty("Turn Speed", Read8(), BitCount.Bit8),
+                new ValueActorProperty("6_unknown5", Read16(), BitCount.Bit16),
+                new ValueActorProperty("Turn Type", Read16(), BitCount.Bit16),
+                new FillerActorProperty(0, BitCount.Bit16)
+            });
 
             InitPropertiesByName();
 
+        }
+
+        public int GetHeight() {
+            return propertiesByName["Height Offset"].GetCompiledValue();
+        }
+
+        public ActorGroundCast GetGroundCast() {
+            return ActorGroundCast.Highest;
+        }
+
+        public RotationActorProperty[] GetRotations() {
+            return new RotationActorProperty[] { (RotationActorProperty)propertiesByName["Rotation"] };
         }
 
     }
 
     public class FCopBehavior8 : FCopShooter, FCopObjectMutating {
 
-        public FCopBehavior8(FCopActor actor) : base(actor) {
+        public FCopBehavior8(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             assetRefNames = new string[] { "Head Object", "Object", "Base Object", "Destroyed Object" };
             assetRefType = new AssetType[] { AssetType.Object, AssetType.Object, AssetType.Object, AssetType.Object };
@@ -637,9 +669,9 @@ namespace FCopParser {
 
     public class FCopBehavior9 : FCopShooter {
 
-        public FCopBehavior9(FCopActor actor) : base(actor) {
+        public FCopBehavior9(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -657,7 +689,7 @@ namespace FCopParser {
 
         public int heightMultiplier { get; set; }
 
-        public FCopBehavior10(FCopActor actor) : base(actor) {
+        public FCopBehavior10(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             heightMultiplier = 8192;
 
@@ -697,12 +729,12 @@ namespace FCopParser {
 
     }
 
-    // - Parsed -
+    // - Completed -
     public class FCopBehavior11 : FCopEntity, FCopHeightOffseting, FCopObjectMutating {
 
         public int heightMultiplier { get; set; }
 
-        public FCopBehavior11(FCopActor actor) : base(actor) {
+        public FCopBehavior11(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             heightMultiplier = 8192;
 
@@ -734,12 +766,12 @@ namespace FCopParser {
 
     }
 
+    // - Parsed -
     public class FCopBehavior12 : FCopEntity, FCopHeightOffseting, FCopObjectMutating {
 
         public int heightMultiplier { get; set; }
 
-
-        public FCopBehavior12(FCopActor actor) : base(actor) {
+        public FCopBehavior12(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             heightMultiplier = 512;
 
@@ -774,9 +806,9 @@ namespace FCopParser {
 
     public class FCopBehavior14 : FCopActorBehavior {
 
-        public FCopBehavior14(FCopActor actor): base(actor) {
+        public FCopBehavior14(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -791,9 +823,9 @@ namespace FCopParser {
 
     public class FCopBehavior16 : FCopEntity {
 
-        public FCopBehavior16(FCopActor actor) : base(actor) {
+        public FCopBehavior16(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -808,9 +840,9 @@ namespace FCopParser {
 
     public class FCopBehavior20 : FCopShooter {
 
-        public FCopBehavior20(FCopActor actor) : base(actor) {
+        public FCopBehavior20(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -825,9 +857,9 @@ namespace FCopParser {
 
     public class FCopBehavior25 : FCopEntity {
 
-        public FCopBehavior25(FCopActor actor) : base(actor) {
+        public FCopBehavior25(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -842,9 +874,9 @@ namespace FCopParser {
 
     public class FCopBehavior26 : FCopShooter {
 
-        public FCopBehavior26(FCopActor actor) : base(actor) {
+        public FCopBehavior26(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -859,9 +891,9 @@ namespace FCopParser {
 
     public class FCopBehavior27 : FCopShooter {
 
-        public FCopBehavior27(FCopActor actor) : base(actor) {
+        public FCopBehavior27(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -876,9 +908,9 @@ namespace FCopParser {
 
     public class FCopBehavior28 : FCopShooter {
 
-        public FCopBehavior28(FCopActor actor) : base(actor) {
+        public FCopBehavior28(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -893,9 +925,9 @@ namespace FCopParser {
 
     public class FCopBehavior29 : FCopActorBehavior {
 
-        public FCopBehavior29(FCopActor actor) : base(actor) {
+        public FCopBehavior29(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -910,9 +942,9 @@ namespace FCopParser {
 
     public class FCopBehavior30 : FCopEntity {
 
-        public FCopBehavior30(FCopActor actor) : base(actor) {
+        public FCopBehavior30(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -927,9 +959,9 @@ namespace FCopParser {
 
     public class FCopBehavior31 : FCopEntity {
 
-        public FCopBehavior31(FCopActor actor) : base(actor) {
+        public FCopBehavior31(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -944,9 +976,9 @@ namespace FCopParser {
 
     public class FCopBehavior32 : FCopEntity {
 
-        public FCopBehavior32(FCopActor actor) : base(actor) {
+        public FCopBehavior32(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -961,9 +993,9 @@ namespace FCopParser {
 
     public class FCopBehavior33 : FCopEntity {
 
-        public FCopBehavior33(FCopActor actor) : base(actor) {
+        public FCopBehavior33(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -978,9 +1010,9 @@ namespace FCopParser {
 
     public class FCopBehavior34 : FCopActorBehavior {
 
-        public FCopBehavior34(FCopActor actor) : base(actor) {
+        public FCopBehavior34(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -995,9 +1027,9 @@ namespace FCopParser {
 
     public class FCopBehavior35 : FCopActorBehavior {
 
-        public FCopBehavior35(FCopActor actor) : base(actor) {
+        public FCopBehavior35(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -1012,7 +1044,7 @@ namespace FCopParser {
 
     public class FCopBehavior36 : FCopShooter, FCopObjectMutating {
 
-        public FCopBehavior36(FCopActor actor) : base(actor) {
+        public FCopBehavior36(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(new List<ActorProperty>() {
                 new ValueActorProperty("nt_unknown0", Read16(), BitCount.Bit16),
@@ -1046,9 +1078,9 @@ namespace FCopParser {
 
     public class FCopBehavior37 : FCopEntity {
 
-        public FCopBehavior37(FCopActor actor) : base(actor) {
+        public FCopBehavior37(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -1063,9 +1095,9 @@ namespace FCopParser {
 
     public class FCopBehavior38 : FCopEntity {
 
-        public FCopBehavior38(FCopActor actor) : base(actor) {
+        public FCopBehavior38(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -1080,9 +1112,9 @@ namespace FCopParser {
 
     public class FCopBehavior87 : FCopActorBehavior {
 
-        public FCopBehavior87(FCopActor actor) : base(actor) {
+        public FCopBehavior87(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -1097,9 +1129,9 @@ namespace FCopParser {
 
     public class FCopBehavior88 : FCopActorBehavior {
 
-        public FCopBehavior88(FCopActor actor) : base(actor) {
+        public FCopBehavior88(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -1114,9 +1146,9 @@ namespace FCopParser {
 
     public class FCopBehavior89 : FCopActorBehavior {
 
-        public FCopBehavior89(FCopActor actor) : base(actor) {
+        public FCopBehavior89(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -1131,9 +1163,9 @@ namespace FCopParser {
 
     public class FCopBehavior90 : FCopActorBehavior {
 
-        public FCopBehavior90(FCopActor actor) : base(actor) {
+        public FCopBehavior90(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -1148,9 +1180,9 @@ namespace FCopParser {
 
     public class FCopBehavior91 : FCopActorBehavior {
 
-        public FCopBehavior91(FCopActor actor) : base(actor) {
+        public FCopBehavior91(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -1165,9 +1197,9 @@ namespace FCopParser {
 
     public class FCopBehavior92 : FCopActorBehavior {
 
-        public FCopBehavior92(FCopActor actor) : base(actor) {
+        public FCopBehavior92(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -1182,9 +1214,9 @@ namespace FCopParser {
 
     public class FCopBehavior93 : FCopActorBehavior {
 
-        public FCopBehavior93(FCopActor actor) : base(actor) {
+        public FCopBehavior93(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -1199,9 +1231,9 @@ namespace FCopParser {
 
     public class FCopBehavior94 : FCopActorBehavior {
 
-        public FCopBehavior94(FCopActor actor) : base(actor) {
+        public FCopBehavior94(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -1216,16 +1248,16 @@ namespace FCopParser {
 
     public class FCopBehavior95 : FCopActorBehavior {
 
-        public FCopBehavior95(FCopActor actor): base(actor) {
+        public FCopBehavior95(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             refuseCompile = true;
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("Hit Box Width", Utils.BytesToShort(actor.rawFile.data.ToArray(), 28), BitCount.Bit16),
-                new ValueActorProperty("Hit Box Height", Utils.BytesToShort(actor.rawFile.data.ToArray(), 30), BitCount.Bit16),
-                new ValueActorProperty("Property 3", Utils.BytesToShort(actor.rawFile.data.ToArray(), 32), BitCount.Bit16),
-                new ValueActorProperty("Trigger Type", Utils.BytesToShort(actor.rawFile.data.ToArray(), 34), BitCount.Bit16),
-                new ValueActorProperty("Trigger Actor", Utils.BytesToInt(actor.rawFile.data.ToArray(), 36), BitCount.Bit16)
+                new ValueActorProperty("Hit Box Width", Read16(), BitCount.Bit16),
+                new ValueActorProperty("Hit Box Height", Read16(), BitCount.Bit16),
+                new ValueActorProperty("Property 3", Read16(), BitCount.Bit16),
+                new ValueActorProperty("Trigger Type", Read16(), BitCount.Bit16),
+                new ValueActorProperty("Trigger Actor", Read16(), BitCount.Bit16)
             });
 
         }
@@ -1236,7 +1268,7 @@ namespace FCopParser {
 
         public int heightMultiplier { get; set; }
 
-        public FCopBehavior96(FCopActor actor) : base(actor) {
+        public FCopBehavior96(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             assetRefNames = new string[] { "Object" };
             assetRefType = new AssetType[] { AssetType.Object };
@@ -1279,9 +1311,9 @@ namespace FCopParser {
 
     public class FCopBehavior97 : FCopActorBehavior {
 
-        public FCopBehavior97(FCopActor actor) : base(actor) {
+        public FCopBehavior97(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -1296,9 +1328,9 @@ namespace FCopParser {
 
     public class FCopBehavior98 : FCopActorBehavior {
 
-        public FCopBehavior98(FCopActor actor) : base(actor) {
+        public FCopBehavior98(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
@@ -1313,9 +1345,9 @@ namespace FCopParser {
 
     public class FCopBehavior99 : FCopActorBehavior {
 
-        public FCopBehavior99(FCopActor actor) : base(actor) {
+        public FCopBehavior99(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (Utils.BytesToInt(actor.rawFile.data.ToArray(), 4) - offset) / 2;
+            var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
                 var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);

@@ -224,7 +224,7 @@ public class ActorEditMode : EditMode {
 
             if (hitPos != null) {
 
-                CreateActor(ActorBehavior.DynamicProp, hitPos.Value);
+                CreateActor(ActorBehavior.StationaryEntity, hitPos.Value);
 
             }
 
