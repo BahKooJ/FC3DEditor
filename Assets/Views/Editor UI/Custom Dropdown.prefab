@@ -304,6 +304,9 @@ MonoBehaviour:
   contentList: {fileID: 2333359977960226521}
   contentTransform: {fileID: 6231957074550676973}
   label: {fileID: 3730528217777366461}
+  onValueChanged:
+    m_PersistentCalls:
+      m_Calls: []
   items: []
   value: 0
 --- !u!1 &817051721841299013
@@ -812,7 +815,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}

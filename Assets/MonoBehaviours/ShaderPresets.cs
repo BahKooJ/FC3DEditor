@@ -2,6 +2,7 @@
 
 using FCopParser;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class ShaderPresets {
 
@@ -93,7 +94,7 @@ public class ShaderPreset {
     public int meshID;
 
     public ShaderPreset(TileShaders shader, string name, int meshID) {
-        this.shader = shader.Clone();
+        this.shader = shader.Clone(shader.isQuad);
         this.name = name;
         this.meshID = meshID;
     }
@@ -103,7 +104,7 @@ public class ShaderPreset {
     }
 
     public ShaderPreset(Tile tile) {
-        this.shader = tile.shaders.Clone();
+        this.shader = tile.shaders.Clone(tile.isQuad);
         this.name = "Preset";
         this.meshID = (int)MeshType.IDFromVerticies(tile.verticies);
     }
@@ -177,7 +178,7 @@ public class ShaderPreset {
 
     public void ReceiveDataToTile(Tile tile) {
 
-        tile.shaders = shader.Clone();
+        tile.shaders = shader.Clone(tile.isQuad);
 
     }
 

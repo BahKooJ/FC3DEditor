@@ -243,12 +243,8 @@ public class ShaderPresetViewItem : MonoBehaviour {
         foreach (var selection in controller.selectedItems) {
 
             var tile = selection.tile;
-
-            if (tile.shaders.isQuad == preset.shader.isQuad) {
-
-                tile.shaders = preset.shader.Clone();
-
-            }
+            
+            tile.shaders = preset.shader.Clone(tile.isQuad);
 
         }
 

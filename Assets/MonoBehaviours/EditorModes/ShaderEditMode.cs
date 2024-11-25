@@ -764,12 +764,8 @@ public class ShaderEditMode : TileMutatingEditMode {
         void PaintTile() {
 
             var tile = hover.tile;
-
-            if (tile.shaders.isQuad == selectedPreset.shader.isQuad) {
-
-                tile.shaders = selectedPreset.shader.Clone();
-
-            }
+            
+            tile.shaders = selectedPreset.shader.Clone(tile.isQuad);
 
         }
 
@@ -869,7 +865,7 @@ public class ShaderEditMode : TileMutatingEditMode {
 
         foreach (var selection in selectedItems.Skip(1)) {
 
-            selection.tile.shaders = FirstTile.shaders.Clone();
+            selection.tile.shaders = FirstTile.shaders.Clone(selection.tile.isQuad);
 
         }
 

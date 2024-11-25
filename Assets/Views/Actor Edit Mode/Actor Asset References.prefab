@@ -91,7 +91,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -793,6 +793,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resourceName: {fileID: 7353943616194042068}
   assetName: {fileID: 8894544838925443816}
+  view: {fileID: 0}
+  main: {fileID: 0}
   refIndex: 0
 --- !u!114 &6694630319697447472
 MonoBehaviour:
@@ -807,7 +809,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}

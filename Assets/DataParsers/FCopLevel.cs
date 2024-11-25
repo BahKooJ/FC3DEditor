@@ -2553,6 +2553,10 @@ namespace FCopParser {
         public int culling;
         public int effectIndex;
 
+        public bool isQuad {
+            get { return verticies.Count == 4; }
+        }
+
         // Original parsed data from file
         TileGraphics graphics;
         List<TileGraphicsMetaData> graphicsMetaData = new();
@@ -2665,7 +2669,7 @@ namespace FCopParser {
 
             verticies = new List<TileVertex>(tile.verticies);
             uvs = new List<int>(tile.uvs);
-            shaders = tile.shaders.Clone();
+            shaders = tile.shaders.Clone(verticies.Count == 4);
             animatedUVs = new List<int>(tile.animatedUVs);
             animationSpeed = tile.animationSpeed;
 
@@ -2750,7 +2754,7 @@ namespace FCopParser {
 
             verticies = new List<TileVertex>(tile.verticies);
             uvs = new List<int>(tile.uvs);
-            shaders = tile.shaders.Clone();
+            shaders = tile.shaders.Clone(verticies.Count == 4);
             animatedUVs = new List<int>(tile.animatedUVs);
             animationSpeed = tile.animationSpeed;
 
@@ -3072,7 +3076,7 @@ namespace FCopParser {
 
                         break;
                     case VertexColorType.ColorAnimated:
-                        tile.shaders = shaders.Clone();
+                        tile.shaders = shaders.Clone(false);
                         tile.shaders.isQuad = false;
                         break;
                 }
@@ -4350,7 +4354,7 @@ namespace FCopParser {
 
         public TileShaders VerifyCorrectShader();
 
-        public TileShaders Clone();
+        public TileShaders Clone(bool isQuad);
 
         public bool Compare(TileShaders shaders);
 
@@ -4418,7 +4422,7 @@ namespace FCopParser {
             return null;
         }
 
-        public TileShaders Clone() {
+        public TileShaders Clone(bool isQuad) {
 
             return new MonoChromeShader(value, isQuad);
 
@@ -4583,6 +4587,10 @@ namespace FCopParser {
 
         public TileShaders VerifyCorrectShader() {
 
+            if (!isQuad) {
+                values[3] = 0;
+            }
+
             var first = values[0];
 
             if (values.All(value => value == first)) {
@@ -4602,7 +4610,7 @@ namespace FCopParser {
 
         }
 
-        public TileShaders Clone() {
+        public TileShaders Clone(bool isQuad) {
 
             return new DynamicMonoChromeShader(this.Compile(), isQuad);
 
@@ -4711,14 +4719,17 @@ namespace FCopParser {
                     new XRGB555(false, valueConversion, valueConversion, valueConversion),
                     new XRGB555(false, valueConversion, valueConversion, valueConversion),
                     new XRGB555(false, valueConversion, valueConversion, valueConversion),
-                    new XRGB555(false, valueConversion, valueConversion, valueConversion)
                 };
+
+                if (previousShader.isQuad) {
+                    values = values.Append(new XRGB555(false, valueConversion, valueConversion, valueConversion)).ToArray();
+                }
 
             }
             else if (previousShader.type == VertexColorType.DynamicMonoChrome) {
 
                 // Filler Data
-                values = new XRGB555[] {
+                var valuesList = new List<XRGB555>() {
                     new XRGB555(false, 31, 31, 31),
                     new XRGB555(false, 31, 31, 31),
                     new XRGB555(false, 31, 31, 31),
@@ -4728,7 +4739,7 @@ namespace FCopParser {
                 var dyanmicMonoChrome = (DynamicMonoChromeShader)previousShader;
 
                 var quadMonoPosToColor = new int[] { 3, 1, 0, 2 };
-                var triangleMonoPosToColor = new int[] { 1, 0, 2 };
+                var triangleMonoPosToColor = new int[] { 2, 1, 0 };
 
                 var i = 0;
                 foreach (var value in dyanmicMonoChrome.values) {
@@ -4742,12 +4753,12 @@ namespace FCopParser {
                     }
 
                     if (previousShader.isQuad) {
-                        values[quadMonoPosToColor[i]] = new XRGB555(false, valueConversion, valueConversion, valueConversion);
+                        valuesList[quadMonoPosToColor[i]] = new XRGB555(false, valueConversion, valueConversion, valueConversion);
                     } else {
 
-                        if (i != 3) {
+                        if (i < 3) {
 
-                            values[triangleMonoPosToColor[i]] = new XRGB555(false, valueConversion, valueConversion, valueConversion);
+                            valuesList[triangleMonoPosToColor[i]] = new XRGB555(false, valueConversion, valueConversion, valueConversion);
 
                         }
 
@@ -4757,15 +4768,34 @@ namespace FCopParser {
 
                 }
 
+                if (!previousShader.isQuad) {
+                    valuesList.RemoveAt(valuesList.Count - 1);
+                }
+
+                values = valuesList.ToArray();
+
             }
             else {
 
-                values = new XRGB555[] {
-                    new XRGB555(false, 31, 31, 31),
-                    new XRGB555(false, 31, 31, 31),
-                    new XRGB555(false, 31, 31, 31),
-                    new XRGB555(false, 31, 31, 31)
-                };
+                if (previousShader.isQuad) {
+
+                    values = new XRGB555[] {
+                        new XRGB555(false, 31, 31, 31),
+                        new XRGB555(false, 31, 31, 31),
+                        new XRGB555(false, 31, 31, 31),
+                        new XRGB555(false, 31, 31, 31)
+                    };
+
+                }
+                else {
+
+                    values = new XRGB555[] {
+                        new XRGB555(false, 31, 31, 31),
+                        new XRGB555(false, 31, 31, 31),
+                        new XRGB555(false, 31, 31, 31),
+                    };
+
+                }
 
             }
 
@@ -4830,6 +4860,10 @@ namespace FCopParser {
 
         public TileShaders VerifyCorrectShader() {
 
+            if ((isQuad && values.Length != 4) || (!isQuad && values.Length != 3)) {
+                throw new Exception("Incorrect shader format");
+            }
+
             var first = values[0];
 
             var sameColor = values.All(color => first.ToUShort() == color.ToUShort());
@@ -4882,7 +4916,7 @@ namespace FCopParser {
                 }
 
                 var quadMonoPosToColor = new int[] { 3, 1, 0, 2 };
-                var triangleMonoPosToColor = new int[] { 1, 0, 2, 3 };
+                var triangleMonoPosToColor = new int[] { 2, 1, 0, 3 };
 
                 var orderedMonoValues = new List<int>();
 
@@ -4909,12 +4943,19 @@ namespace FCopParser {
 
         }
 
-        public TileShaders Clone() {
+        public TileShaders Clone(bool isQuad) {
 
             var colors = new List<XRGB555>();
 
             foreach (var color in values) {
                 colors.Add(color.Clone());
+            }
+
+            if (!isQuad && colors.Count == 4) {
+                colors.RemoveAt(colors.Count - 1);
+            }
+            else if (isQuad && colors.Count != 4) {
+                colors.Add(new XRGB555(false, 31, 31, 31));
             }
 
             return new ColorShader(colors.ToArray(), isQuad);
@@ -4993,8 +5034,8 @@ namespace FCopParser {
             return null;
         }
 
-        public TileShaders Clone() {
-            return new AnimatedShader(this.isQuad);
+        public TileShaders Clone(bool isQuad) {
+            return new AnimatedShader(isQuad);
         }
 
         public bool Compare(TileShaders shaders) {
