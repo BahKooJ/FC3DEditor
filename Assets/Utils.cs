@@ -2,7 +2,9 @@
 namespace FCopParser {
     using System;
     using System.Collections;
+    using System.Collections.Generic;
     using System.Linq;
+
     class Utils {
 
         public static Element[] CopyOfRange<Element>(Element[] array, int start, int end) {
@@ -112,6 +114,207 @@ namespace FCopParser {
             }
 
             return total;
+
+        }
+
+    }
+
+    public class WavefrontParser {
+
+        static List<char> numbers = new List<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '.' };
+
+        public struct Vertex {
+            public float x;
+            public float y;
+            public float z;
+
+            public Vertex(float x, float y, float z) {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
+
+        }
+
+        public struct UV {
+            public float u; 
+            public float v;
+
+            public UV(float u, float v) {
+                this.u = u;
+                this.v = v;
+            }
+        }
+
+        public struct FaceElement {
+            public int vertIndex;
+            public int textureIndex;
+            public int normalIndex;
+
+            public FaceElement(int vertIndex, int textureIndex, int normalIndex) {
+                this.vertIndex = vertIndex;
+                this.textureIndex = textureIndex;
+                this.normalIndex = normalIndex;
+            }
+
+        }
+
+        public List<Vertex> vertices = new();
+        public List<Vertex> normals = new();
+        public List<UV> uvs = new();
+        public List<List<FaceElement>> faces = new();
+
+        public WavefrontParser(List<char> data) {
+
+            List<List<char>> floatingValues = new();
+            var expectedFloatingValueCount = 0;
+            var originalKeyWord = "";
+
+            void CreateVert() {
+
+                var x = float.Parse(new string(floatingValues[0].ToArray()));
+                var y = float.Parse(new string(floatingValues[1].ToArray()));
+                var z = float.Parse(new string(floatingValues[2].ToArray()));
+
+                vertices.Add(new Vertex(x, y, z));
+
+            }
+
+            void CreateNormal() {
+
+                var x = float.Parse(new string(floatingValues[0].ToArray()));
+                var y = float.Parse(new string(floatingValues[1].ToArray()));
+                var z = float.Parse(new string(floatingValues[2].ToArray()));
+
+                normals.Add(new Vertex(x, y, z));
+
+            }
+
+            void CreateUV() {
+
+                var u = float.Parse(new string(floatingValues[0].ToArray()));
+                var v = float.Parse(new string(floatingValues[1].ToArray()));
+
+                uvs.Add(new UV(u, v));
+
+            }
+
+            void CreateFace() {
+
+                faces.Add(new());
+
+                foreach (var i in Enumerable.Range(0, floatingValues.Count / 3)) {
+
+                    var vIndex = int.Parse(new string(floatingValues[i * 3].ToArray()));
+                    var nIndex = int.Parse(new string(floatingValues[i * 3 + 1].ToArray()));
+                    var uIndex = int.Parse(new string(floatingValues[i * 3 + 2].ToArray()));
+
+                    faces.Last().Add(new FaceElement(vIndex, nIndex, uIndex));
+
+                }
+
+            }
+
+            foreach (var c in data) {
+
+                if (expectedFloatingValueCount != 0) {
+
+                    if (numbers.Contains(c)) {
+
+                        if (floatingValues.Count == 0) {
+                            floatingValues.Add(new());
+                        }
+
+                        floatingValues.Last().Add(c);
+                    }
+                    else {
+
+                        if (floatingValues.Last().Count != 0) {
+                            floatingValues.Add(new());
+                        }
+
+                    }
+
+                    // expectedFloatingValueCount being -1 means it has a varible value count and is going until a stop char is found
+                    if (expectedFloatingValueCount == -1) {
+
+                        if (c == '\n') {
+
+                            if (originalKeyWord == "f") {
+                                CreateFace();
+                            }
+
+                            expectedFloatingValueCount = 0;
+                            floatingValues.Clear();
+                            originalKeyWord = "";
+
+                        }
+
+                    }
+
+                    // Just because the floating values equals the expected count,
+                    // doesn't mean the value is done being added to.
+                    // A new list being created indicats that the previous value is done.
+                    if (floatingValues.Count == expectedFloatingValueCount + 1) {
+
+                        switch (originalKeyWord) {
+
+                            case "v":
+
+                                CreateVert();
+
+                                break;
+                            case "vn":
+
+                                CreateNormal();
+
+                                break;
+                            case "vt":
+
+                                CreateUV();
+
+                                break;
+                        }
+
+                        expectedFloatingValueCount = 0;
+                        floatingValues.Clear();
+                        originalKeyWord = "";
+
+                    }
+
+                    continue;
+                }
+
+                if (c != ' ' && c != '\n') {
+                    originalKeyWord += c;
+                }
+                else {
+
+                    switch (originalKeyWord) {
+                        case "v":
+                            expectedFloatingValueCount = 3;
+                            floatingValues.Clear();
+                            break;
+                        case "vn":
+                            expectedFloatingValueCount = 3;
+                            floatingValues.Clear();
+                            break;
+                        case "vt":
+                            expectedFloatingValueCount = 2;
+                            floatingValues.Clear();
+                            break;
+                        case "f":
+                            expectedFloatingValueCount = -1;
+                            floatingValues.Clear();
+                            break;
+                        default:
+                            originalKeyWord = "";
+                            break;
+                    }
+
+                }
+
+            }
 
         }
 

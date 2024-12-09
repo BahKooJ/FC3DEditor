@@ -41,7 +41,7 @@ public class SchematicMeshItemView : MonoBehaviour {
 
         };
 
-        if (TileAddMode.selectedSchematic == schematic) {
+        if (controller.selectedSchematic == schematic) {
             background.color = new Color(0.08f, 0.20f, 0.08f);
         }
 

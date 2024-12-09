@@ -2,7 +2,7 @@ using FCopParser;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-
+using System.Linq;
 
 public class AssetManagerView : MonoBehaviour {
 
@@ -82,7 +82,7 @@ public class AssetManagerView : MonoBehaviour {
 
             contextMenu.items = new() {
                 ("Add", AddRaw),
-                ("Add Parsed", () => { })
+                ("Add Parsed", AddParsed)
             };
 
         }
@@ -196,6 +196,32 @@ public class AssetManagerView : MonoBehaviour {
             currentDirectory.files.Add(new AssetFile(newFile, currentDirectory.storedAssets, currentDirectory));
             Refresh();
         });
+
+    }
+
+    void AddParsed() {
+
+        switch (currentDirectory.storedAssets) {
+            case AssetType.Object:
+
+                OpenFileWindowUtil.OpenFile("FCEAssets", "", path => {
+
+                    var wavefrontParser = new WavefrontParser(File.ReadAllText(path).ToList());
+
+                    var emptyRawFile = level.CreateEmptyAssetFile(AssetType.Object);
+
+                    var obj = new FCopObject(wavefrontParser, emptyRawFile);
+
+                    level.AddAsset(AssetType.Object, obj);
+
+                    currentDirectory.files.Add(new AssetFile(obj, AssetType.Object, currentDirectory));
+                    Refresh();
+
+                });
+
+                break;
+
+        }
 
     }
 

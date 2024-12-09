@@ -28,8 +28,8 @@ public class TileAddMode : EditMode {
 
     };
 
-    public static TilePreset selectedTilePreset = null;
-    public static Schematic selectedSchematic = null;
+    public TilePreset selectedTilePreset = null;
+    public Schematic selectedSchematic = null;
 
     public TileSelection hoverSelection;
 
@@ -44,10 +44,6 @@ public class TileAddMode : EditMode {
     }
 
     public void OnCreateMode() {
-        
-        if (selectedSchematic != null) {
-            InitSchematicMeshOverlay();
-        }
 
         foreach (var preset in defaultPresets) {
             preset.transformedTile = null;

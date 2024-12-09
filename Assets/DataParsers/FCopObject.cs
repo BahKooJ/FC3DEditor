@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using static FCopParser.FCopObject;
 
 namespace FCopParser {
 
@@ -49,8 +48,10 @@ namespace FCopParser {
 
         public List<Primitive> primitives = new();
         public List<Vertex> vertices = new();
+        public List<Vertex> normals = new();
         public List<Surface> surfaces = new();
         public Dictionary<int, Surface> surfaceByCompiledOffset = new();
+        public List<BoundingBox> boundingBoxes = new();
 
         public List<Triangle> triangles = new();
 
@@ -61,8 +62,80 @@ namespace FCopParser {
             
             FindStartChunkOffset();
             ParseVertices();
+            ParseNormals();
             ParsePrimitives();
             ParseSurfaces();
+            ParseBoundingBoxes();
+
+            CreateTriangles();
+
+        }
+
+        public FCopObject(WavefrontParser wavefront, IFFDataFile rawFile) : base(rawFile) {
+
+            var compiledData = new List<byte>();
+
+            var convertedVerts = new List<Vertex>();
+            var convertedNormals = new List<Vertex>();
+            var convertedPrimitives = new List<Primitive>();
+
+            foreach (var v in wavefront.vertices) {
+                convertedVerts.Add(new Vertex((int)(v.x * 512), (int)(v.y * 512), (int)(v.z * 512), 0));
+            }
+
+            foreach (var v in wavefront.normals) {
+                convertedNormals.Add(new Vertex((int)(v.x * 512), (int)(v.y * 512), (int)(v.z * 512), 0));
+            }
+
+            foreach (var face in wavefront.faces) {
+
+                // The unknown1 bitfield does seem to do something, it caused the triangles to go crazy.
+                var bitfield = face.Count == 3 ? new List<byte>() { 195, 3 } : new List<byte>() { 196, 4 };
+                var vertIndexs = new List<byte>();
+                var normalIndexs = new List<byte>();
+
+                foreach (var element in face) {
+
+                    vertIndexs.Add((byte)(element.vertIndex - 1));
+                    normalIndexs.Add((byte)(element.normalIndex - 1));
+
+                }
+
+                if (vertIndexs.Count == 3) {
+                    vertIndexs.Add(0);
+                }
+
+                if (normalIndexs.Count == 3) {
+                    normalIndexs.Add(0);
+                }
+
+                vertIndexs.AddRange(normalIndexs);
+
+                convertedPrimitives.Add(new Primitive(bitfield, 0, vertIndexs.ToArray()));
+
+            }
+
+            compiledData.AddRange(CreateFourDGI());
+            compiledData.AddRange(CreateThreeDTL(new List<Surface>() { new Surface(SurfaceType.Texture, 0, 0, 0, new UVMap(3, new UV[] { new UV(0,0), new UV(0, 0), new UV(0, 0), new UV(0, 0) })) }));
+            compiledData.AddRange(CreateThreeDQL(convertedPrimitives));
+            compiledData.AddRange(CreateThreeDRF(1, FourCC.fourDVLbytes, new() { 1 }));
+            compiledData.AddRange(CreateThreeDRF(2, FourCC.fourDNLbytes, new() { 1 }));
+            compiledData.AddRange(CreateThreeDRF(3, FourCC.threeDRLbytes, new() { 1 }));
+            compiledData.AddRange(CreateFourDVL(convertedVerts));
+            compiledData.AddRange(CreateFourDNL(convertedNormals));
+            compiledData.AddRange(CreateThreeDRL(new()));
+            compiledData.AddRange(CreateThreeDBB(new() { CalculateBoundingBox(convertedVerts) }));
+
+            rawFile.data = compiledData;
+
+            name = "Object " + DataID.ToString();
+
+            FindStartChunkOffset();
+            ParseVertices();
+            ParseNormals();
+            ParsePrimitives();
+            ParseSurfaces();
+            ParseBoundingBoxes();
 
             CreateTriangles();
 
@@ -71,6 +144,25 @@ namespace FCopParser {
         public IFFDataFile Compile() {
 
             return rawFile;
+
+        }
+
+        public void TestCompile() {
+
+            var compiledData = new List<byte>();
+
+            compiledData.AddRange(CreateFourDGI());
+            compiledData.AddRange(CreateThreeDTL(surfaces));
+            compiledData.AddRange(CreateThreeDQL(primitives));
+            compiledData.AddRange(CreateThreeDRF(1, FourCC.fourDVLbytes, new() { 1 }));
+            compiledData.AddRange(CreateThreeDRF(2, FourCC.fourDNLbytes, new() { 1 }));
+            compiledData.AddRange(CreateThreeDRF(3, FourCC.threeDRLbytes, new() { 1 }));
+            compiledData.AddRange(CreateFourDVL(vertices));
+            compiledData.AddRange(CreateFourDNL(normals));
+            compiledData.AddRange(CreateThreeDRL(new()));
+            compiledData.AddRange(CreateThreeDBB(new() { CalculateBoundingBox(vertices) }));
+
+            rawFile.data = compiledData;
 
         }
 
@@ -167,6 +259,33 @@ namespace FCopParser {
 
         }
 
+        void ParseNormals() {
+
+            var header = offsets.First(header => {
+                return header.fourCCDeclaration == FourCC.fourDNL;
+            });
+
+            var bytes = rawFile.data.GetRange(header.index, header.chunkSize);
+
+            var vertexCount = Utils.BytesToInt(bytes.ToArray(), 12);
+
+            var offset = 16;
+
+            foreach (var i in Enumerable.Range(0, vertexCount)) {
+
+                normals.Add(new Vertex(
+                    BitConverter.ToInt16(bytes.ToArray(), offset),
+                    BitConverter.ToInt16(bytes.ToArray(), offset + 2),
+                    BitConverter.ToInt16(bytes.ToArray(), offset + 4),
+                    BitConverter.ToInt16(bytes.ToArray(), offset + 6)
+                    ));
+
+                offset += 8;
+
+            }
+
+        }
+
         void ParseSurfaces() {
 
             int headerSize = 12;
@@ -224,6 +343,38 @@ namespace FCopParser {
 
             }
 
+
+        }
+
+        void ParseBoundingBoxes() {
+
+            var header = offsets.First(header => {
+                return header.fourCCDeclaration == FourCC.threeDBB;
+            });
+
+            var bytes = rawFile.data.GetRange(header.index, header.chunkSize);
+
+            var boxesPerFrame = BitConverter.ToInt32(bytes.ToArray(), 8);
+            var boxesCount = BitConverter.ToInt32(bytes.ToArray(), 12);
+
+            var offset = 16;
+
+            foreach (var i in Enumerable.Range(0, boxesCount)) {
+
+                boundingBoxes.Add(new BoundingBox(
+                        BitConverter.ToInt16(bytes.ToArray(), offset),
+                        BitConverter.ToInt16(bytes.ToArray(), offset + 2),
+                        BitConverter.ToInt16(bytes.ToArray(), offset + 4),
+                        BitConverter.ToInt16(bytes.ToArray(), offset + 6),
+                        BitConverter.ToInt16(bytes.ToArray(), offset + 8),
+                        BitConverter.ToInt16(bytes.ToArray(), offset + 10),
+                        BitConverter.ToInt16(bytes.ToArray(), offset + 12),
+                        BitConverter.ToInt16(bytes.ToArray(), offset + 14)
+                    ));
+
+                offset += 16;
+
+            }
 
         }
 
@@ -297,6 +448,249 @@ namespace FCopParser {
 
         }
 
+        BoundingBox CalculateBoundingBox(List<Vertex> vertices) {
+
+            var maxX = vertices.Max(v => v.x);
+            var maxY = vertices.Max(v => v.y);
+            var maxZ = vertices.Max(v => v.z);
+
+            var minX = vertices.Min(v => v.x);
+            var minY = vertices.Min(v => v.y);
+            var minZ = vertices.Min(v => v.z);
+
+            var centerX = (minX + maxX) / 2;
+            var centerY = (minY + maxY) / 2;
+            var centerZ = (minZ + maxZ) / 2;
+
+            var lengthX = (maxX - minX) / 2;
+            var lengthY = (maxY - minY) / 2;
+            var lengthZ = (maxZ - minZ) / 2;
+
+            var pythXYZ = MathF.Pow(lengthX, 2) + MathF.Pow(lengthY, 2) + MathF.Pow(lengthZ, 2);
+            pythXYZ = MathF.Sqrt(pythXYZ);
+            var pythXZ = MathF.Pow(lengthX, 2) + MathF.Pow(lengthZ, 2);
+            pythXZ = MathF.Sqrt(pythXZ);
+
+            return new BoundingBox(centerX, centerY, centerZ, lengthX, lengthY, lengthZ, (int)MathF.Ceiling(pythXYZ), (int)MathF.Ceiling(pythXZ));
+
+        }
+
+        List<byte> CreateFourDGI() {
+
+            var compiledData = new List<byte>();
+
+            compiledData.AddRange(FourCC.fourDGIbytes);
+            compiledData.AddRange(BitConverter.GetBytes(60)); // size
+            compiledData.AddRange(BitConverter.GetBytes(1)); // id
+            compiledData.AddRange(BitConverter.GetBytes((short)1)); // frame count
+            compiledData.Add(1); // const
+            compiledData.Add(8); // bitfield?
+            compiledData.AddRange(BitConverter.GetBytes(0)); // const
+            compiledData.AddRange(BitConverter.GetBytes(0)); // const
+            compiledData.AddRange(BitConverter.GetBytes(0)); // const
+            compiledData.AddRange(BitConverter.GetBytes(1)); // const
+            compiledData.AddRange(BitConverter.GetBytes(2)); // const
+            compiledData.AddRange(BitConverter.GetBytes(1)); // const
+            compiledData.AddRange(BitConverter.GetBytes(1)); // const
+            compiledData.AddRange(BitConverter.GetBytes(3)); // const
+            compiledData.Add(255); // pos0
+            compiledData.Add(255); // pos1
+            compiledData.Add(255); // pos2
+            compiledData.Add(255); // pos3
+            compiledData.AddRange(BitConverter.GetBytes(4)); // const
+            compiledData.AddRange(BitConverter.GetBytes(5)); // const
+
+            return compiledData;
+
+        }
+
+        List<byte> CreateThreeDTL(List<Surface> surfaces) {
+
+            var compiledData = new List<byte>();
+
+            foreach (var surface in surfaces) {
+
+                compiledData.Add((byte)surface.type);
+                compiledData.Add((byte)surface.red);
+                compiledData.Add((byte)surface.green);
+                compiledData.Add((byte)surface.blue);
+
+                if (surface.uvMap != null) {
+
+                    foreach (var uv in surface.uvMap.Value.uvs) {
+                        compiledData.Add((byte)uv.x);
+                        compiledData.Add((byte)uv.y);
+
+                    }
+
+                    compiledData.AddRange(BitConverter.GetBytes(surface.uvMap.Value.texturePaletteIndex));
+
+                }
+
+            }
+
+            var compiledWithHeader = new List<byte>();
+
+            compiledWithHeader.AddRange(FourCC.threeDTLbytes);
+            compiledWithHeader.AddRange(BitConverter.GetBytes(compiledData.Count + 12));
+            compiledWithHeader.AddRange(BitConverter.GetBytes(1));
+            compiledWithHeader.AddRange(compiledData);
+
+            return compiledWithHeader;
+
+        }
+
+        List<byte> CreateFourDVL(List<Vertex> vertices) {
+
+            var compiledData = new List<byte>();
+
+            foreach (var vertex in vertices) {
+
+                compiledData.AddRange(BitConverter.GetBytes((short)vertex.x));
+                compiledData.AddRange(BitConverter.GetBytes((short)vertex.y));
+                compiledData.AddRange(BitConverter.GetBytes((short)vertex.z));
+                compiledData.AddRange(BitConverter.GetBytes((short)vertex.w));
+
+            }
+
+            var compiledWithHeader = new List<byte>();
+
+            compiledWithHeader.AddRange(FourCC.fourDVLbytes);
+            compiledWithHeader.AddRange(BitConverter.GetBytes(compiledData.Count + 16));
+            compiledWithHeader.AddRange(BitConverter.GetBytes(1));
+            compiledWithHeader.AddRange(BitConverter.GetBytes(vertices.Count));
+            compiledWithHeader.AddRange(compiledData);
+
+            return compiledWithHeader;
+
+        }
+
+        List<byte> CreateFourDNL(List<Vertex> vertices) {
+
+            var compiledData = new List<byte>();
+
+            foreach (var vertex in vertices) {
+
+                compiledData.AddRange(BitConverter.GetBytes((short)vertex.x));
+                compiledData.AddRange(BitConverter.GetBytes((short)vertex.y));
+                compiledData.AddRange(BitConverter.GetBytes((short)vertex.z));
+                compiledData.AddRange(BitConverter.GetBytes((short)vertex.w));
+
+            }
+
+            var compiledWithHeader = new List<byte>();
+
+            compiledWithHeader.AddRange(FourCC.fourDNLbytes);
+            compiledWithHeader.AddRange(BitConverter.GetBytes(compiledData.Count + 16));
+            compiledWithHeader.AddRange(BitConverter.GetBytes(1));
+            compiledWithHeader.AddRange(BitConverter.GetBytes(vertices.Count));
+            compiledWithHeader.AddRange(compiledData);
+
+            return compiledWithHeader;
+
+        }
+
+        List<byte> CreateThreeDRL(List<int> lengths) {
+
+            var compiledData = new List<byte>();
+
+            foreach (var length in lengths) {
+
+                compiledData.AddRange(BitConverter.GetBytes((short)length));
+
+            }
+
+            var compiledWithHeader = new List<byte>();
+
+            compiledWithHeader.AddRange(FourCC.threeDRLbytes);
+            compiledWithHeader.AddRange(BitConverter.GetBytes(compiledData.Count + 16));
+            compiledWithHeader.AddRange(BitConverter.GetBytes(1));
+            compiledWithHeader.AddRange(BitConverter.GetBytes(lengths.Count));
+            compiledWithHeader.AddRange(compiledData);
+
+            return compiledWithHeader;
+
+        }
+
+        List<byte> CreateThreeDRF(int id, List<byte> fourCC, List<int> idRefs) {
+
+            var compiledData = new List<byte>();
+
+            compiledData.AddRange(fourCC);
+            compiledData.AddRange(BitConverter.GetBytes(idRefs.Count));
+
+            foreach (var idRef in idRefs) {
+                compiledData.AddRange(BitConverter.GetBytes(idRef));
+
+            }
+
+            var compiledWithHeader = new List<byte>();
+
+            compiledWithHeader.AddRange(FourCC.threeDRFbytes);
+            compiledWithHeader.AddRange(BitConverter.GetBytes(compiledData.Count + 12));
+            compiledWithHeader.AddRange(BitConverter.GetBytes(id));
+            compiledWithHeader.AddRange(compiledData);
+
+            return compiledWithHeader;
+
+        }
+
+        List<byte> CreateThreeDQL(List<Primitive> primitives) {
+
+            var compiledData = new List<byte>();
+
+            foreach (var primitive in primitives) {
+
+                compiledData.AddRange(primitive.metaDatabitfeild);
+                compiledData.AddRange(BitConverter.GetBytes((short)primitive.surfaceIndex));
+
+                foreach (var data in primitive.associatedData) {
+                    compiledData.Add(data);
+                }
+
+            }
+
+            var compiledWithHeader = new List<byte>();
+
+            compiledWithHeader.AddRange(FourCC.threeDQLbytes);
+            compiledWithHeader.AddRange(BitConverter.GetBytes(compiledData.Count + 16));
+            compiledWithHeader.AddRange(BitConverter.GetBytes(1));
+            compiledWithHeader.AddRange(BitConverter.GetBytes(primitives.Count));
+            compiledWithHeader.AddRange(compiledData);
+
+            return compiledWithHeader;
+
+        }
+
+        List<byte> CreateThreeDBB(List<BoundingBox> boundingBoxes, int boxesPerFrame = 1) {
+
+            var compiledData = new List<byte>();
+
+            foreach (var boxes in boundingBoxes) {
+
+                compiledData.AddRange(BitConverter.GetBytes((short)boxes.x));
+                compiledData.AddRange(BitConverter.GetBytes((short)boxes.y));
+                compiledData.AddRange(BitConverter.GetBytes((short)boxes.z));
+                compiledData.AddRange(BitConverter.GetBytes((short)boxes.lengthX));
+                compiledData.AddRange(BitConverter.GetBytes((short)boxes.lengthY));
+                compiledData.AddRange(BitConverter.GetBytes((short)boxes.lengthZ));
+                compiledData.AddRange(BitConverter.GetBytes((short)boxes.pythXYZ));
+                compiledData.AddRange(BitConverter.GetBytes((short)boxes.pythXZ));
+
+            }
+
+            var compiledWithHeader = new List<byte>();
+
+            compiledWithHeader.AddRange(FourCC.threeDBBbytes);
+            compiledWithHeader.AddRange(BitConverter.GetBytes(compiledData.Count + 16));
+            compiledWithHeader.AddRange(BitConverter.GetBytes(boxesPerFrame));
+            compiledWithHeader.AddRange(BitConverter.GetBytes(boundingBoxes.Count));
+            compiledWithHeader.AddRange(compiledData);
+
+            return compiledWithHeader;
+
+        }
+
         string BytesToStringReversed(int offset, int length) {
 
             string Reverse(string s) {
@@ -330,7 +724,11 @@ namespace FCopParser {
             public int surfaceIndex;
             public byte[] associatedData;
 
+            public List<byte> metaDatabitfeild;
+
             public Primitive(List<byte> metaDatabitfeild, int surfaceIndex, byte[] associatedData) {
+
+                this.metaDatabitfeild = metaDatabitfeild;
 
                 var bitField = new BitArray(metaDatabitfeild.ToArray());
 
@@ -413,6 +811,30 @@ namespace FCopParser {
 
             public Vertex position;
             public int length;
+
+        }
+
+        public struct BoundingBox {
+
+            public int x;
+            public int y;
+            public int z;
+            public int lengthX;
+            public int lengthY;
+            public int lengthZ;
+            public int pythXYZ;
+            public int pythXZ;
+
+            public BoundingBox(int x, int y, int z, int lengthX, int height, int lengthZ, int pythXYZ, int pythXZ) {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.lengthX = lengthX;
+                this.lengthY = height;
+                this.lengthZ = lengthZ;
+                this.pythXYZ = pythXYZ;
+                this.pythXZ = pythXZ;
+            }
 
         }
 

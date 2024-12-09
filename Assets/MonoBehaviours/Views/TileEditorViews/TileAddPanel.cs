@@ -21,12 +21,18 @@ public class TileAddPanel : MonoBehaviour {
 
     }
 
+    private void OnDestroy() {
+
+        CloseSchematicsPanel();
+
+    }
+
     public void OpenSchematicsPanel() {
 
-        CloseTileEffectsPanel();
+        CloseSchematicsPanel();
 
-        if (TileAddMode.selectedSchematic != null) {
-            TileAddMode.selectedSchematic.transformedSchematic = null;
+        if (controller.selectedSchematic != null) {
+            controller.selectedSchematic.transformedSchematic = null;
         }
 
         var obj = Instantiate(schematicPanelPrefab);
@@ -37,7 +43,7 @@ public class TileAddPanel : MonoBehaviour {
 
     }
 
-    public void CloseTileEffectsPanel() {
+    public void CloseSchematicsPanel() {
 
         if (activeSchematicView != null) {
 

@@ -8,22 +8,34 @@ public class ObjectMesh : MonoBehaviour {
 
     const float scale = 512f;
 
+    // - Prefabs -
+    public GameObject boundingBoxFab;
+
     // - Parameters -
     public FCopObject fCopObject;
+    [HideInInspector]
     public int textureOffset;
+    [HideInInspector]
     public Texture levelTexturePallet;
+
+    [HideInInspector]
+    public ObjectBoundingBox boundingBox;
 
     Mesh mesh;
     Material material;
+    [HideInInspector]
     public MeshCollider meshCollider;
 
     List<Vector3> vertices = new();
     List<int> triangles = new();
     List<Vector2> textureCords = new();
 
+    [HideInInspector]
     public bool failed = false;
 
+    [HideInInspector]
     public float maxY = 0f;
+    [HideInInspector]
     public float minY = 0f;
 
     public void Create() {
@@ -87,6 +99,12 @@ public class ObjectMesh : MonoBehaviour {
             meshCollider.sharedMesh = mesh;
 
         }
+
+        var gobj = Instantiate(boundingBoxFab);
+        gobj.transform.SetParent(transform, false);
+
+        boundingBox = gobj.GetComponent<ObjectBoundingBox>();
+        boundingBox.fCopObject = fCopObject;
 
     }
 

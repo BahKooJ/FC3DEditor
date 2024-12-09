@@ -64,7 +64,7 @@ public class SchematicMeshPresetsView : MonoBehaviour {
     // - Unity Callbacks -
 
     public void OnClickDone() {
-        view.CloseTileEffectsPanel();
+        view.CloseSchematicsPanel();
     }
 
     public void OnToggleOverwriteTiles() {

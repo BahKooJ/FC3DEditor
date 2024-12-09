@@ -130,6 +130,10 @@ public class Main : MonoBehaviour {
 
     void _Debug() {
 
+        level.objects.First(obj => obj.DataID == 40).TestCompile();
+
+        return;
+
         var actorEditMode = (ActorEditMode)editMode;
 
         var actors = level.sceneActors.actors.Where(a => a.behaviorType == ActorBehavior.StaticProp).ToList();
@@ -322,8 +326,6 @@ public class Main : MonoBehaviour {
 
         TileAddMode.placementSetting = TileAddMode.SchematicPlacementSetting.Exact;
         TileAddMode.removeAllTilesOnSchematicPlacement = false;
-        TileAddMode.selectedTilePreset = null;
-        TileAddMode.selectedSchematic = null;
 
         NavMeshEditMode.copiedNavNodeCoords = null;
 

@@ -97,8 +97,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9f9e4572b2b3734db7c41509976f812, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundingBoxFab: {fileID: 2168547336867362444, guid: 0c1b17e7f26d4ac4db49c1692363d6c7, type: 3}
   textureOffset: 0
   levelTexturePallet: {fileID: 0}
+  boundingBox: {fileID: 0}
   meshCollider: {fileID: 0}
   failed: 0
   maxY: 0

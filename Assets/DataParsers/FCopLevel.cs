@@ -284,6 +284,48 @@ namespace FCopParser {
 
         }
 
+        public void AddAsset(AssetType assetType, FCopAsset asset) {
+
+            switch (assetType) {
+                case AssetType.WavSound:
+                    break;
+
+                case AssetType.Object:
+
+                    objects.Add((FCopObject)asset);
+
+                    break;
+
+                case AssetType.SndsSound:
+                    break;
+
+            }
+
+        }
+
+        public IFFDataFile CreateEmptyAssetFile(AssetType assetType) {
+
+            switch (assetType) {
+                case AssetType.WavSound:
+                    return null;
+
+                case AssetType.Object:
+
+                    var maxID = objects.Max(o => o.DataID);
+
+                    var rawFile = new IFFDataFile(2, new(), "Cobj", maxID + 1, scripting.emptyOffset);
+
+                    return rawFile;
+
+                case AssetType.SndsSound:
+                    return null;
+
+            }
+
+            return null;
+
+        }
+
         public void ClearLevelData(int width, int height) {
 
             sections.Clear();
