@@ -78,13 +78,15 @@ namespace FCopParser {
             var convertedVerts = new List<Vertex>();
             var convertedNormals = new List<Vertex>();
             var convertedPrimitives = new List<Primitive>();
+            var convertedSurfaces = new List<Surface>();
+            var surfacesHashes = new List<string>();
 
             foreach (var v in wavefront.vertices) {
                 convertedVerts.Add(new Vertex((int)(v.x * 512), (int)(v.y * 512), (int)(v.z * 512), 0));
             }
 
             foreach (var v in wavefront.normals) {
-                convertedNormals.Add(new Vertex((int)(v.x * 512), (int)(v.y * 512), (int)(v.z * 512), 0));
+                convertedNormals.Add(new Vertex((int)(v.x * 4096), (int)(v.y * 4096), (int)(v.z * 4096), 0));
             }
 
             foreach (var face in wavefront.faces) {
@@ -94,10 +96,16 @@ namespace FCopParser {
                 var vertIndexs = new List<byte>();
                 var normalIndexs = new List<byte>();
 
+                var grabedUV = new List<UV>();
+
                 foreach (var element in face) {
 
                     vertIndexs.Add((byte)(element.vertIndex - 1));
                     normalIndexs.Add((byte)(element.normalIndex - 1));
+
+                    var waveFrontUV = wavefront.uvs[element.textureIndex - 1];
+
+                    grabedUV.Add(new UV((int)(waveFrontUV.u * 256), (int)(waveFrontUV.v * 256)));
 
                 }
 
@@ -109,14 +117,31 @@ namespace FCopParser {
                     normalIndexs.Add(0);
                 }
 
+                if (grabedUV.Count == 3) {
+                    grabedUV.Add(new UV(0, 0));
+                }
+
                 vertIndexs.AddRange(normalIndexs);
 
-                convertedPrimitives.Add(new Primitive(bitfield, 0, vertIndexs.ToArray()));
+                var createSurface = new Surface(SurfaceType.Texture, 128, 128, 128, new UVMap(3, grabedUV.ToArray()));
+                var hash = createSurface.CreateHash();
+
+                var index = surfacesHashes.IndexOf(hash);
+
+                if (index == -1) {
+                    convertedSurfaces.Add(createSurface);
+                    surfacesHashes.Add(hash);
+
+                    index = surfacesHashes.Count - 1;
+
+                }
+
+                convertedPrimitives.Add(new Primitive(bitfield, index * 16, vertIndexs.ToArray()));
 
             }
 
             compiledData.AddRange(CreateFourDGI());
-            compiledData.AddRange(CreateThreeDTL(new List<Surface>() { new Surface(SurfaceType.Texture, 0, 0, 0, new UVMap(3, new UV[] { new UV(0,0), new UV(0, 0), new UV(0, 0), new UV(0, 0) })) }));
+            compiledData.AddRange(CreateThreeDTL(convertedSurfaces));
             compiledData.AddRange(CreateThreeDQL(convertedPrimitives));
             compiledData.AddRange(CreateThreeDRF(1, FourCC.fourDVLbytes, new() { 1 }));
             compiledData.AddRange(CreateThreeDRF(2, FourCC.fourDNLbytes, new() { 1 }));
@@ -762,6 +787,25 @@ namespace FCopParser {
                 this.green = green;
                 this.blue = blue;
                 this.uvMap = uvMap;
+            }
+
+            public string CreateHash() {
+
+                var total = type.ToString() + red.ToString() + green.ToString() + blue.ToString();
+
+                if (uvMap != null) {
+
+                    total += uvMap.Value.texturePaletteIndex.ToString();
+
+                    foreach (var uv in uvMap.Value.uvs) {
+                        total += uv.x.ToString();
+                        total += uv.y.ToString();
+                    }
+
+                }
+
+                return total;
+
             }
 
         }
