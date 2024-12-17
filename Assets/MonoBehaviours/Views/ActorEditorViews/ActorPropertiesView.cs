@@ -1,6 +1,7 @@
 ﻿
 
 using FCopParser;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ public class ActorPropertiesView : MonoBehaviour {
     public GameObject enumDataActorPropertyItem;
     public GameObject actorScriptCallItem;
     public GameObject actorAssetRefItem;
+    public GameObject groupActorPropertyItem;
 
     //View refs
     public Transform propertiesContent;
@@ -29,6 +31,62 @@ public class ActorPropertiesView : MonoBehaviour {
         sceneActorsView.controller = controller;
 
         Refresh();
+
+    }
+
+    public GameObject InitProperty(ActorProperty property) {
+
+        if (property is ValueActorProperty) {
+
+            var view = Instantiate(valueActorPropertyItem);
+
+            view.GetComponent<ValueActorPropertyItemView>().controller = controller;
+            view.GetComponent<ValueActorPropertyItemView>().property = (ValueActorProperty)property;
+            view.GetComponent<ValueActorPropertyItemView>().actor = controller.selectedActor;
+
+            view.transform.SetParent(propertiesContent, false);
+
+            return view;
+
+        }
+        else if (property is ToggleActorProperty) {
+
+            var view = Instantiate(toggleActorPropertyItem);
+
+            view.GetComponent<ToggleActorPropertyItemView>().controller = controller;
+            view.GetComponent<ToggleActorPropertyItemView>().property = (ToggleActorProperty)property;
+            view.GetComponent<ToggleActorPropertyItemView>().actor = controller.selectedActor;
+
+            view.transform.SetParent(propertiesContent, false);
+
+            return view;
+        }
+        else if (property is RotationActorProperty) {
+
+            var view = Instantiate(rotationActorPropertyItem);
+
+            view.GetComponent<RotationActorPropertyItemView>().controller = controller;
+            view.GetComponent<RotationActorPropertyItemView>().property = (RotationActorProperty)property;
+            view.GetComponent<RotationActorPropertyItemView>().actor = controller.selectedActor;
+
+            view.transform.SetParent(propertiesContent, false);
+
+            return view;
+        }
+        else if (property is EnumDataActorProperty) {
+
+            var view = Instantiate(enumDataActorPropertyItem);
+
+            view.GetComponent<EnumDataActorPropertyItemView>().controller = controller;
+            view.GetComponent<EnumDataActorPropertyItemView>().property = (EnumDataActorProperty)property;
+            view.GetComponent<EnumDataActorPropertyItemView>().actor = controller.selectedActor;
+
+            view.transform.SetParent(propertiesContent, false);
+
+            return view;
+        }
+
+        return null;
 
     }
 
@@ -49,57 +107,33 @@ public class ActorPropertiesView : MonoBehaviour {
         idText.text = controller.selectedActor.DataID.ToString();
         actorTypeText.text = controller.selectedActor.behaviorType.ToString();
 
+        List<ActorProperty> floatingProperties = new();
+
         if (controller.selectedActor.behavior != null && controller.selectedActor.behavior.properties != null) {
 
-            foreach (var property in controller.selectedActor.behavior.properties) {
+            foreach (var property in controller.selectedActor.behavior.propertiesByCommonName) {
 
-                if (property is ValueActorProperty) {
-
-                    var view = Instantiate(valueActorPropertyItem);
-
-                    view.GetComponent<ValueActorPropertyItemView>().controller = controller;
-                    view.GetComponent<ValueActorPropertyItemView>().property = (ValueActorProperty)property;
-                    view.GetComponent<ValueActorPropertyItemView>().actor = controller.selectedActor;
-
-                    view.transform.SetParent(propertiesContent, false);
-
+                if (property.Key == "") {
+                    floatingProperties = property.Value;
+                    continue;
                 }
-                else if (property is ToggleActorProperty) {
 
-                    var view = Instantiate(toggleActorPropertyItem);
+                var view = Instantiate(groupActorPropertyItem);
 
-                    view.GetComponent<ToggleActorPropertyItemView>().controller = controller;
-                    view.GetComponent<ToggleActorPropertyItemView>().property = (ToggleActorProperty)property;
-                    view.GetComponent<ToggleActorPropertyItemView>().actor = controller.selectedActor;
+                view.GetComponent<GroupActorPropertyItemView>().controller = controller;
+                view.GetComponent<GroupActorPropertyItemView>().view = this;
+                view.GetComponent<GroupActorPropertyItemView>().commonName = property.Key;
+                view.GetComponent<GroupActorPropertyItemView>().properties = property.Value;
+                view.GetComponent<GroupActorPropertyItemView>().actor = controller.selectedActor;
 
-                    view.transform.SetParent(propertiesContent, false);
-
-                }
-                else if (property is RotationActorProperty) {
-
-                    var view = Instantiate(rotationActorPropertyItem);
-
-                    view.GetComponent<RotationActorPropertyItemView>().controller = controller;
-                    view.GetComponent<RotationActorPropertyItemView>().property = (RotationActorProperty)property;
-                    view.GetComponent<RotationActorPropertyItemView>().actor = controller.selectedActor;
-
-                    view.transform.SetParent(propertiesContent, false);
-
-                }
-                else if (property is EnumDataActorProperty) {
-
-                    var view = Instantiate(enumDataActorPropertyItem);
-
-                    view.GetComponent<EnumDataActorPropertyItemView>().controller = controller;
-                    view.GetComponent<EnumDataActorPropertyItemView>().property = (EnumDataActorProperty)property;
-                    view.GetComponent<EnumDataActorPropertyItemView>().actor = controller.selectedActor;
-
-                    view.transform.SetParent(propertiesContent, false);
-
-                }
+                view.transform.SetParent(propertiesContent, false);
 
             }
 
+        }
+
+        foreach (var property in floatingProperties) {
+            InitProperty(property);
         }
 
 
@@ -118,6 +152,8 @@ public class ActorPropertiesView : MonoBehaviour {
         actorScriptView.transform.SetParent(propertiesContent, false);
 
     }
+
+
 
     public void RefreshName() {
 

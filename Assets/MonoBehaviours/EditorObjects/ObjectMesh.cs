@@ -100,11 +100,11 @@ public class ObjectMesh : MonoBehaviour {
 
         }
 
-        var gobj = Instantiate(boundingBoxFab);
-        gobj.transform.SetParent(transform, false);
+        //var gobj = Instantiate(boundingBoxFab);
+        //gobj.transform.SetParent(transform, false);
 
-        boundingBox = gobj.GetComponent<ObjectBoundingBox>();
-        boundingBox.fCopObject = fCopObject;
+        //boundingBox = gobj.GetComponent<ObjectBoundingBox>();
+        //boundingBox.fCopObject = fCopObject;
 
     }
 

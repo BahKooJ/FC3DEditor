@@ -9,7 +9,7 @@ namespace FCopParser {
 
         public string name { get; set; }
         public BitCount bitCount { get; set; }
-
+        public string commonName { get; set; }
         public int GetCompiledValue();
 
         public List<byte> Compile() {
@@ -30,7 +30,7 @@ namespace FCopParser {
     public class ValueActorProperty : ActorProperty {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
-
+        public string commonName { get; set; }
         public int GetCompiledValue() {
             return value;
         }
@@ -41,6 +41,12 @@ namespace FCopParser {
             this.name = name;
             this.value = value;
             this.bitCount = bitCount;
+            this.commonName = "";
+
+        }
+
+        public ValueActorProperty(string name, int value, BitCount bitCount, string commonName) : this(name, value, bitCount) {
+            this.commonName = commonName;
         }
 
     }
@@ -49,6 +55,7 @@ namespace FCopParser {
 
         public string name { get; set; }
         public BitCount bitCount { get; set; }
+        public string commonName { get; set; }
 
         public int GetCompiledValue() {
             return value ? 1 : 0;
@@ -60,6 +67,11 @@ namespace FCopParser {
             this.name = name;
             this.value = value;
             this.bitCount = bitCount;
+            this.commonName = "";
+        }
+
+        public ToggleActorProperty(string name, bool value, BitCount bitCount, string commonName) : this(name, value, bitCount) {
+            this.commonName = commonName;
         }
 
     }
@@ -67,6 +79,7 @@ namespace FCopParser {
     public class IDReferenceActorProperty : ActorProperty {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
+        public string commonName { get; set; }
 
         public int GetCompiledValue() {
             return value;
@@ -77,13 +90,19 @@ namespace FCopParser {
         public IDReferenceActorProperty(string name, int value) {
             this.name = name;
             this.value = value;
+            this.commonName = "";
+
         }
+
+
 
     }
 
     public class EnumDataActorProperty : ActorProperty {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
+        public string commonName { get; set; }
+
         public int GetCompiledValue() {
             return Convert.ToInt32(caseValue);
         }
@@ -94,6 +113,12 @@ namespace FCopParser {
             this.name = name;
             this.caseValue = caseValue;
             this.bitCount = bitCount;
+            this.commonName = "";
+
+        }
+
+        public EnumDataActorProperty(string name, Enum caseValue, BitCount bitCount, string commonName) : this(name, caseValue, bitCount) {
+            this.commonName = commonName;
         }
 
     }
@@ -101,6 +126,8 @@ namespace FCopParser {
     public class RangeActorProperty : ActorProperty {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
+        public string commonName { get; set; }
+
         public int GetCompiledValue() {
             return value;
         }
@@ -115,13 +142,18 @@ namespace FCopParser {
             this.value = value;
             this.max = max;
             this.min = min;
+            this.commonName = "";
+
         }
+
+
 
     }
 
     public class RotationActorProperty : ActorProperty {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
+        public string commonName { get; set; }
 
         public int[] affectedRefIndexes;
         public ActorRotation value;
@@ -137,6 +169,12 @@ namespace FCopParser {
             this.bitCount = bitCount;
             this.axis = axis;
             this.affectedRefIndexes = affectedRefIndexes;
+            this.commonName = "";
+
+        }
+
+        public RotationActorProperty(string name, ActorRotation value, BitCount bitCount, Axis axis, int[] affectedRefIndexes, string commonName) : this(name, value, bitCount, axis, affectedRefIndexes) {
+            this.commonName = commonName;
         }
 
     }
@@ -145,6 +183,7 @@ namespace FCopParser {
 
         public string name { get; set; }
         public BitCount bitCount { get; set; }
+        public string commonName { get; set; }
 
         public int GetCompiledValue() {
             return value;
@@ -156,6 +195,7 @@ namespace FCopParser {
             this.name = "Null";
             this.value = value;
             this.bitCount = bitCount;
+            this.commonName = "";
         }
 
     }
@@ -199,10 +239,11 @@ namespace FCopParser {
     }
 
     public enum BitCount {
+        NA = -1,
         Bit1 = 1,
         Bit8 = 8,
         Bit16 = 16,
-        Bit32 = 32
+        Bit32 = 32,
     }
 
     public enum MapIconColor {

@@ -7,10 +7,13 @@ using UnityEngine;
 
 public class ActorObject : MonoBehaviour {
 
+    // - Prefabs -
+    public GameObject missingObjectPrefab;
+
     // - Unity Refs -
     public Collider actCollider;
     public TextFieldPopupHandler renameTextFeild;
-    public GameObject placeholderCube;
+    public GameObject placeholderObject;
 
     // - Parameters -
     public ActorEditMode controller;
@@ -18,7 +21,10 @@ public class ActorObject : MonoBehaviour {
     [HideInInspector]
     public ActorGroupObject group = null;
 
+    [HideInInspector]
     public List<ObjectMesh> objects = new();
+    [HideInInspector]
+    public GameObject missingObjectGameobj;
 
     public List<(string, System.Action)> contextMenuItems = new();
 
@@ -64,6 +70,19 @@ public class ActorObject : MonoBehaviour {
 
     public void Create() {
 
+        if (actor.behavior is FCopObjectMutating) {
+
+            if (missingObjectGameobj == null) {
+                var obj = Instantiate(missingObjectPrefab);
+                obj.transform.SetParent(transform, false);
+                missingObjectGameobj = obj;
+                missingObjectGameobj.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
+            }
+
+            missingObjectGameobj.SetActive(false);
+
+        }
+
         SetToCurrentPosition();
 
         foreach (var resRef in actor.resourceReferences) {
@@ -83,7 +102,7 @@ public class ActorObject : MonoBehaviour {
 
                 if (!script.failed) {
 
-                    placeholderCube.SetActive(false);
+                    placeholderObject.SetActive(false);
                     actCollider = null;
 
                     objects.Add(script);
@@ -105,6 +124,28 @@ public class ActorObject : MonoBehaviour {
 
         }
 
+        if (actor.behavior is FCopObjectMutating) {
+
+            var hasObj = false;
+            foreach (var obj in objects) {
+
+                if (obj != null) {
+                    hasObj = true;
+                }
+
+            }
+
+            if (!hasObj) {
+
+                placeholderObject.SetActive(false);
+                actCollider = null;
+
+                missingObjectGameobj.SetActive(true);
+
+            }
+
+        }
+
         if (actor.behavior is FCopBehavior36 || actor.behavior is FCopBehavior8) {
 
             var headPos = objects[0].transform.localPosition;
@@ -119,17 +160,19 @@ public class ActorObject : MonoBehaviour {
 
     public void Refresh() {
 
-        foreach (Transform tran in transform) {
+        foreach (var obj in objects) {
 
-            if (tran.gameObject != placeholderCube) {
-                DestroyImmediate(tran.gameObject);
+            if (obj != null) {
+
+                DestroyImmediate(obj.gameObject);
+
             }
 
         }
 
         objects.Clear();
 
-        placeholderCube.SetActive(true);
+        placeholderObject.SetActive(true);
 
         Create();
 

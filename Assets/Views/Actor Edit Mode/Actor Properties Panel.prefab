@@ -2228,6 +2228,7 @@ MonoBehaviour:
   enumDataActorPropertyItem: {fileID: 5020871495025236756, guid: 4ee95e0a21fa2fa4da6aa1aadf787a5b, type: 3}
   actorScriptCallItem: {fileID: 1977952715223143764, guid: 9f98ec791f44dc0479e50929f36e6564, type: 3}
   actorAssetRefItem: {fileID: 1977952715223143764, guid: 850dc5fe77d12fa478df8b2e0d060dcb, type: 3}
+  groupActorPropertyItem: {fileID: 4875314843441743963, guid: fa874d88887f1744b801bfad0636db85, type: 3}
   propertiesContent: {fileID: 4429559707500750907}
   actorName: {fileID: 75131811161702472}
   idText: {fileID: 3775939840264087208}

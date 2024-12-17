@@ -46,11 +46,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6e6d57539bf24c42944fa6be2a0afbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  missingObjectPrefab: {fileID: 8277653005507222693, guid: d66b457816a66cb48a2aa4ff45ef03e0, type: 3}
   actCollider: {fileID: 586320845033451150}
   renameTextFeild: {fileID: 6673128335193514363}
-  placeholderCube: {fileID: 8775187337990704097}
+  placeholderObject: {fileID: 8775187337990704097}
   group: {fileID: 0}
   objects: []
+  missingObjectGameobj: {fileID: 0}
 --- !u!114 &6673128335193514363
 MonoBehaviour:
   m_ObjectHideFlags: 0

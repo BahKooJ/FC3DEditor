@@ -348,6 +348,7 @@ namespace FCopParser {
 
         public List<ActorProperty> properties;
         public Dictionary<string, ActorProperty> propertiesByName = new();
+        public Dictionary<string, List<ActorProperty>> propertiesByCommonName = new();
 
         public bool refuseCompile = false;
 
@@ -381,6 +382,18 @@ namespace FCopParser {
 
             foreach (var prop in properties) {
                 propertiesByName[prop.name] = prop;
+
+                if (prop is FillerActorProperty) {
+                    continue;
+                }
+
+                if (propertiesByCommonName.ContainsKey(prop.commonName)) {
+                    propertiesByCommonName[prop.commonName].Add(prop);
+                }
+                else {
+                    propertiesByCommonName[prop.commonName] = new List<ActorProperty>() { prop };
+                }
+
             }
 
         }
@@ -451,32 +464,32 @@ namespace FCopParser {
             var data = propertyData.GetRange(offset, 4);
 
             var total = new List<ActorProperty>() {
-                new ToggleActorProperty("disableTargeting", (data[0] & 0x01) == 0x01, BitCount.Bit1),
-                new ToggleActorProperty("unknown3", (data[0] & 0x02) == 0x02, BitCount.Bit1),
-                new ToggleActorProperty("Disable Collision", (data[0] & 0x04) == 0x04, BitCount.Bit1),
-                new ToggleActorProperty("unknown2", (data[0] & 0x08) == 0x08, BitCount.Bit1),
-                new ToggleActorProperty("unknown1", (data[0] & 0x10) == 0x10, BitCount.Bit1),
-                new ToggleActorProperty("Disable Rendering", (data[0] & 0x20) == 0x20, BitCount.Bit1),
-                new ToggleActorProperty("Player Physics", (data[0] & 0x40) == 0x40, BitCount.Bit1),
-                new ToggleActorProperty("Is Invincible", (data[0] & 0x80) == 0x80, BitCount.Bit1),
+                new ToggleActorProperty("disableTargeting", (data[0] & 0x01) == 0x01, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("unknown3", (data[0] & 0x02) == 0x02, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Disable Collision", (data[0] & 0x04) == 0x04, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("unknown2", (data[0] & 0x08) == 0x08, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("unknown1", (data[0] & 0x10) == 0x10, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Disable Rendering", (data[0] & 0x20) == 0x20, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Player Physics", (data[0] & 0x40) == 0x40, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Is Invincible", (data[0] & 0x80) == 0x80, BitCount.Bit1, "Entity Tags"),
 
-                new ToggleActorProperty("unknown9", (data[1] & 0x01) == 0x01, BitCount.Bit1),
-                new ToggleActorProperty("hurtBySameTeam", (data[1] & 0x02) == 0x02, BitCount.Bit1),
-                new ToggleActorProperty("unknown8", (data[1] & 0x04) == 0x04, BitCount.Bit1),
-                new ToggleActorProperty("unknown7", (data[1] & 0x08) == 0x08, BitCount.Bit1),
-                new ToggleActorProperty("Disable Destroyed Collision", (data[1] & 0x10) == 0x10, BitCount.Bit1),
-                new ToggleActorProperty("unknown6", (data[1] & 0x20) == 0x20, BitCount.Bit1),
-                new ToggleActorProperty("unknown5", (data[1] & 0x40) == 0x40, BitCount.Bit1),
-                new ToggleActorProperty("unknown4", (data[1] & 0x80) == 0x80, BitCount.Bit1),
+                new ToggleActorProperty("unknown9", (data[1] & 0x01) == 0x01, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("hurtBySameTeam", (data[1] & 0x02) == 0x02, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("unknown8", (data[1] & 0x04) == 0x04, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("unknown7", (data[1] & 0x08) == 0x08, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Disable Destroyed Collision", (data[1] & 0x10) == 0x10, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("unknown6", (data[1] & 0x20) == 0x20, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("unknown5", (data[1] & 0x40) == 0x40, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("unknown4", (data[1] & 0x80) == 0x80, BitCount.Bit1, "Entity Tags"),
 
-                new ToggleActorProperty("unknown14", (data[2] & 0x01) == 0x01, BitCount.Bit1),
-                new ToggleActorProperty("disableTeam", (data[2] & 0x02) == 0x02, BitCount.Bit1),
-                new ToggleActorProperty("Disable Explosion", (data[2] & 0x04) == 0x04, BitCount.Bit1),
-                new ToggleActorProperty("Has Shadow", (data[2] & 0x08) == 0x08, BitCount.Bit1),
-                new ToggleActorProperty("unknown13", (data[2] & 0x10) == 0x10, BitCount.Bit1),
-                new ToggleActorProperty("unknown12", (data[2] & 0x20) == 0x20, BitCount.Bit1),
-                new ToggleActorProperty("unknown11", (data[2] & 0x40) == 0x40, BitCount.Bit1),
-                new ToggleActorProperty("unknown10", (data[2] & 0x80) == 0x80, BitCount.Bit1),
+                new ToggleActorProperty("unknown14", (data[2] & 0x01) == 0x01, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("disableTeam", (data[2] & 0x02) == 0x02, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Disable Explosion", (data[2] & 0x04) == 0x04, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Has Shadow", (data[2] & 0x08) == 0x08, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("unknown13", (data[2] & 0x10) == 0x10, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("unknown12", (data[2] & 0x20) == 0x20, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("unknown11", (data[2] & 0x40) == 0x40, BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("unknown10", (data[2] & 0x80) == 0x80, BitCount.Bit1, "Entity Tags"),
 
                 new FillerActorProperty(0, BitCount.Bit8)
 
@@ -491,13 +504,13 @@ namespace FCopParser {
         List<ActorProperty> InitEntityProperties() {
 
             return new List<ActorProperty>() {
-                new ValueActorProperty("Health", Read16(), BitCount.Bit16),
-                new ValueActorProperty("Collide Damage", Read16(), BitCount.Bit16),
-                new ValueActorProperty("Team (Unknown)", Read16(), BitCount.Bit16),
-                new EnumDataActorProperty("Map Icon Color", (MapIconColor)Read8(), BitCount.Bit8),
-                new ValueActorProperty("u_unknown15", Read8(), BitCount.Bit8),
-                new ValueActorProperty("Explosion (Unknown)", Read16(), BitCount.Bit16),
-                new ValueActorProperty("UV Offset", Read16(), BitCount.Bit16)
+                new ValueActorProperty("Health", Read16(), BitCount.Bit16, "Entity Properties"),
+                new ValueActorProperty("Collide Damage", Read16(), BitCount.Bit16, "Entity Properties"),
+                new ValueActorProperty("Team (Unknown)", Read16(), BitCount.Bit16, "Entity Properties"),
+                new EnumDataActorProperty("Map Icon Color", (MapIconColor)Read8(), BitCount.Bit8, "Entity Properties"),
+                new ValueActorProperty("u_unknown15", Read8(), BitCount.Bit8, "Entity Properties"),
+                new ValueActorProperty("Explosion (Unknown)", Read16(), BitCount.Bit16, "Entity Properties"),
+                new ValueActorProperty("UV Offset", Read16(), BitCount.Bit16, "Entity Properties")
             };
 
         }
@@ -517,18 +530,18 @@ namespace FCopParser {
         public FCopShooter(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("Weapon ID", Read16(), BitCount.Bit16),
-                new ValueActorProperty("FOV and Fire alts?", Read8(), BitCount.Bit8),
-                new ValueActorProperty("u_weaponCollision", Read8(), BitCount.Bit8),
-                new ValueActorProperty("unknown5 - 48", Read8(), BitCount.Bit8),
-                new ValueActorProperty("unknown6 - 49", Read8(), BitCount.Bit8),
-                new ValueActorProperty("attack? - 50", Read16(), BitCount.Bit16),
-                new ValueActorProperty("unknown7 - 52", Read8(), BitCount.Bit8),
-                new ValueActorProperty("unknown8 - 53", Read8(), BitCount.Bit8),
-                new ValueActorProperty("unknown9 - 54", Read8(), BitCount.Bit8),
-                new ValueActorProperty("unknown10 - 55", Read8(), BitCount.Bit8),
-                new ValueActorProperty("Engage Range", Read16(), BitCount.Bit16),
-                new ValueActorProperty("unknown11 - 58", Read16(), BitCount.Bit16),
+                new ValueActorProperty("Weapon ID", Read16(), BitCount.Bit16, "Shooter Properties"),
+                new ValueActorProperty("FOV and Fire alts?", Read8(), BitCount.Bit8, "Shooter Properties"),
+                new ValueActorProperty("u_weaponCollision", Read8(), BitCount.Bit8, "Shooter Properties"),
+                new ValueActorProperty("unknown5 - 48", Read8(), BitCount.Bit8, "Shooter Properties"),
+                new ValueActorProperty("unknown6 - 49", Read8(), BitCount.Bit8, "Shooter Properties"),
+                new ValueActorProperty("attack? - 50", Read16(), BitCount.Bit16, "Shooter Properties"),
+                new ValueActorProperty("unknown7 - 52", Read8(), BitCount.Bit8, "Shooter Properties"),
+                new ValueActorProperty("unknown8 - 53", Read8(), BitCount.Bit8, "Shooter Properties"),
+                new ValueActorProperty("unknown9 - 54", Read8(), BitCount.Bit8, "Shooter Properties"),
+                new ValueActorProperty("unknown10 - 55", Read8(), BitCount.Bit8, "Shooter Properties"),
+                new ValueActorProperty("Engage Range", Read16(), BitCount.Bit16, "Shooter Properties"),
+                new ValueActorProperty("unknown11 - 58", Read16(), BitCount.Bit16, "Shooter Properties"),
             });
 
         }
@@ -731,6 +744,9 @@ namespace FCopParser {
 
     // - Completed -
     public class FCopBehavior11 : FCopEntity, FCopHeightOffseting, FCopObjectMutating {
+
+        public const int assetRefCount = 2;
+        public const int blocks = 12;
 
         public int heightMultiplier { get; set; }
 

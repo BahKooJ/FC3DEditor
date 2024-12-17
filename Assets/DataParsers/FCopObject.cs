@@ -55,6 +55,7 @@ namespace FCopParser {
 
         public List<Triangle> triangles = new();
 
+        public bool allowCompiling = false;
 
         public FCopObject(IFFDataFile rawFile) : base(rawFile) {
 
@@ -72,6 +73,8 @@ namespace FCopParser {
         }
 
         public FCopObject(WavefrontParser wavefront, IFFDataFile rawFile) : base(rawFile) {
+
+            allowCompiling = true;
 
             var compiledData = new List<byte>();
 
@@ -168,11 +171,74 @@ namespace FCopParser {
 
         public IFFDataFile Compile() {
 
+            if (allowCompiling) {
+                BasicCompile();
+            }
+
             return rawFile;
 
         }
 
-        public void TestCompile() {
+        public int GetTexturePalette() {
+
+            if (!allowCompiling) {
+                return -1;
+            }
+
+            var value = -2;
+
+            foreach (var surface in surfaces) {
+
+                if (surface.uvMap != null) {
+
+                    if (value == -2) {
+                        value = surface.uvMap.Value.texturePaletteIndex;
+                    }
+
+                    if (value != surface.uvMap.Value.texturePaletteIndex) {
+                        return -1;
+                    }
+
+                }
+
+            }
+
+            return value;
+
+        }
+
+        public void SetTexturePalette(int index) {
+
+            if (!allowCompiling) {
+                return;
+            }
+
+            foreach (var i in Enumerable.Range(0, surfaces.Count)) {
+
+                var surface = surfaces[i];
+
+                if (surface.uvMap != null) {
+                    
+                    var uvmap = surface.uvMap.Value;
+
+                    uvmap.texturePaletteIndex = index;
+
+                    surface.uvMap = uvmap;
+
+                }
+
+                surfaces[i] = surface;
+                surfaceByCompiledOffset[surfaceByCompiledOffset.Keys.ToList()[i]] = surface;
+
+            }
+
+            triangles.Clear();
+
+            CreateTriangles();
+
+        }
+
+        public void BasicCompile() {
 
             var compiledData = new List<byte>();
 
@@ -404,8 +470,6 @@ namespace FCopParser {
         }
 
         void CreateTriangles() {
-
-            var total = new List<Triangle>();
 
             foreach (var primitive in primitives) {
 

@@ -38,6 +38,8 @@ public class MiniAssetManagerView : MonoBehaviour {
 
         }
 
+        InitFile(null);
+
         switch (requestAssetType) {
 
             case AssetType.WavSound:

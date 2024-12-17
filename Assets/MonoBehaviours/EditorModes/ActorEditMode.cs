@@ -170,6 +170,13 @@ public class ActorEditMode : EditMode {
                         }
 
                     }
+                    else if (act.missingObjectGameobj != null && act.missingObjectGameobj.activeSelf) {
+
+                        if (hit.colliderInstanceID == act.missingObjectGameobj.GetComponentInChildren<MeshCollider>().GetInstanceID()) {
+                            didHit = true;
+                        }
+
+                    }
                     else {
 
                         foreach (var obj in act.objects) {

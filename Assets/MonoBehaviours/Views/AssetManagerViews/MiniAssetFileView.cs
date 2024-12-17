@@ -18,7 +18,12 @@ public class MiniAssetFileView : MonoBehaviour {
 
     void Start() {
 
-        title.text = asset.name;
+        if (asset == null) {
+            title.text = "None";
+        }
+        else {
+            title.text = asset.name;
+        }
 
     }
 

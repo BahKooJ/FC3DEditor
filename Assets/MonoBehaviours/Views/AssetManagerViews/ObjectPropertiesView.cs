@@ -4,6 +4,8 @@ using FCopParser;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Experimental.Rendering;
+using System.Collections.Generic;
+using TMPro;
 
 public class ObjectPropertiesView : MonoBehaviour {
 
@@ -13,6 +15,7 @@ public class ObjectPropertiesView : MonoBehaviour {
 
     // - Unity Refs -
     public RawImage meshPreview;
+    public TMP_Dropdown texturePaletteDropdown;
 
     // - Parameters -
     [HideInInspector]
@@ -21,10 +24,29 @@ public class ObjectPropertiesView : MonoBehaviour {
 
     ObjectMesh meshObj;
 
+    bool refuseCallback = true;
+
     private void Start() {
 
         InitSchematicMeshOverlay();
         RenderMesh();
+
+        texturePaletteDropdown.ClearOptions();
+
+        foreach (var t in main.level.textures) {
+            texturePaletteDropdown.AddOptions(new List<string> { t.name });
+        }
+
+        var textureIndex = fCopObject.GetTexturePalette();
+
+        if (textureIndex == -1) {
+            texturePaletteDropdown.interactable = false;
+        }
+        else {
+            texturePaletteDropdown.value = textureIndex;
+        }
+
+        refuseCallback = false;
 
     }
 
@@ -67,4 +89,14 @@ public class ObjectPropertiesView : MonoBehaviour {
 
     }
 
+    public void OnChangeTexturePalette() {
+
+        if (refuseCallback) return;
+
+        fCopObject.SetTexturePalette(texturePaletteDropdown.value);
+
+        InitSchematicMeshOverlay();
+        RenderMesh();
+
+    }
 }

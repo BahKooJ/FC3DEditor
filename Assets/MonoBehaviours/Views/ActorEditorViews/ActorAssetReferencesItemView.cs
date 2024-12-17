@@ -84,7 +84,13 @@ public class ActorAssetReferencesItemView : MonoBehaviour {
 
                 MiniAssetManagerUtil.RequestAsset(AssetType.Object, main, asset => {
 
-                    fcopActor.resourceReferences[refIndex] = new FCopActor.Resource(FCopActor.FourCC.Cobj, asset.DataID);
+                    if (asset == null) {
+                        fcopActor.resourceReferences[refIndex] = new FCopActor.Resource(FCopActor.FourCC.NULL, 0);
+                    }
+                    else {
+                        fcopActor.resourceReferences[refIndex] = new FCopActor.Resource(FCopActor.FourCC.Cobj, asset.DataID);
+                    }
+
 
                     Refresh();
 
@@ -99,7 +105,13 @@ public class ActorAssetReferencesItemView : MonoBehaviour {
 
                 MiniAssetManagerUtil.RequestAsset(AssetType.NavMesh, main, asset => {
 
-                    fcopActor.resourceReferences[refIndex] = new FCopActor.Resource(FCopActor.FourCC.Cnet, asset.DataID);
+                    if (asset == null) {
+                        fcopActor.resourceReferences[refIndex] = new FCopActor.Resource(FCopActor.FourCC.NULL, 0);
+                    }
+                    else {
+                        fcopActor.resourceReferences[refIndex] = new FCopActor.Resource(FCopActor.FourCC.Cnet, asset.DataID);
+                    }
+
 
                     Refresh();
 
