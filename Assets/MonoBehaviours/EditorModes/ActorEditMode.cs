@@ -589,6 +589,12 @@ public class ActorEditMode : EditMode {
         actor.x = Mathf.RoundToInt(pos.x * 8192f);
         actor.y = Mathf.RoundToInt(pos.z * -8192f);
 
+        if (actor.behavior is FCopHeightOffsetting heightOffseting) {
+            heightOffseting.SetHeight(Mathf.RoundToInt(pos.y * heightOffseting.heightMultiplier));
+            view.activeActorPropertiesView.RequestPropertyRefresh(heightOffseting.GetHeightProperty());
+        }
+        
+
     }
 
     // This is for grouping

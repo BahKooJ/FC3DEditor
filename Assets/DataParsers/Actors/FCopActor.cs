@@ -554,11 +554,15 @@ namespace FCopParser {
 
     }
 
-    public interface FCopHeightOffseting {
+    public interface FCopHeightOffsetting {
 
         public int heightMultiplier { get; set; }
 
+        public void SetHeight(int height);
+
         public int GetHeight();
+
+        public ActorProperty GetHeightProperty();
 
         public ActorGroundCast GetGroundCast();
 
@@ -602,7 +606,7 @@ namespace FCopParser {
 
     }
 
-    public class FCopBehavior6 : FCopShooter, FCopHeightOffseting, FCopObjectMutating {
+    public class FCopBehavior6 : FCopShooter, FCopHeightOffsetting, FCopObjectMutating {
 
         public const int assetRefCount = 2;
         public const int blocks = 24;
@@ -633,8 +637,16 @@ namespace FCopParser {
 
         }
 
+        public void SetHeight(int height) {
+            ((ValueActorProperty)propertiesByName["Height Offset"]).SafeSetSigned(height);
+        }
+
         public int GetHeight() {
             return propertiesByName["Height Offset"].GetCompiledValue();
+        }
+
+        public ActorProperty GetHeightProperty() {
+            return propertiesByName["Height Offset"];
         }
 
         public ActorGroundCast GetGroundCast() {
@@ -698,7 +710,7 @@ namespace FCopParser {
     }
 
     // - Parsed -
-    public class FCopBehavior10 : FCopEntity, FCopHeightOffseting, FCopObjectMutating {
+    public class FCopBehavior10 : FCopEntity, FCopHeightOffsetting, FCopObjectMutating {
 
         public int heightMultiplier { get; set; }
 
@@ -728,8 +740,16 @@ namespace FCopParser {
 
         }
 
+        public void SetHeight(int height) {
+            ((ValueActorProperty)propertiesByName["1st Height Offset"]).SafeSetSigned(height);
+        }
+
         public int GetHeight() {
             return propertiesByName["1st Height Offset"].GetCompiledValue();
+        }
+
+        public ActorProperty GetHeightProperty() {
+            return propertiesByName["1st Height Offset"];
         }
 
         public ActorGroundCast GetGroundCast() {
@@ -743,7 +763,7 @@ namespace FCopParser {
     }
 
     // - Completed -
-    public class FCopBehavior11 : FCopEntity, FCopHeightOffseting, FCopObjectMutating {
+    public class FCopBehavior11 : FCopEntity, FCopHeightOffsetting, FCopObjectMutating {
 
         public const int assetRefCount = 2;
         public const int blocks = 12;
@@ -768,8 +788,16 @@ namespace FCopParser {
 
         }
 
+        public void SetHeight(int height) {
+            ((ValueActorProperty)propertiesByName["Height Offset"]).SafeSetSigned(height);
+        }
+
         public int GetHeight() {
             return propertiesByName["Height Offset"].GetCompiledValue();
+        }
+
+        public ActorProperty GetHeightProperty() {
+            return propertiesByName["Height Offset"];
         }
 
         public ActorGroundCast GetGroundCast() {
@@ -783,7 +811,7 @@ namespace FCopParser {
     }
 
     // - Parsed -
-    public class FCopBehavior12 : FCopEntity, FCopHeightOffseting, FCopObjectMutating {
+    public class FCopBehavior12 : FCopEntity, FCopHeightOffsetting, FCopObjectMutating {
 
         public int heightMultiplier { get; set; }
 
@@ -803,8 +831,16 @@ namespace FCopParser {
 
         }
 
+        public void SetHeight(int height) {
+            ((ValueActorProperty)propertiesByName["Height Offset"]).SafeSetSigned(height);
+        }
+
         public int GetHeight() {
             return propertiesByName["Height Offset"].GetCompiledValue();
+        }
+
+        public ActorProperty GetHeightProperty() {
+            return propertiesByName["Height Offset"];
         }
 
         public ActorGroundCast GetGroundCast() {
@@ -1280,7 +1316,7 @@ namespace FCopParser {
 
     }
 
-    public class FCopBehavior96 : FCopActorBehavior, FCopObjectMutating, FCopHeightOffseting {
+    public class FCopBehavior96 : FCopActorBehavior, FCopObjectMutating, FCopHeightOffsetting {
 
         public int heightMultiplier { get; set; }
 
@@ -1307,8 +1343,16 @@ namespace FCopParser {
 
         }
 
+        public void SetHeight(int height) {
+            ((ValueActorProperty)propertiesByName["Height Offset"]).SafeSetSigned(height);
+        }
+
         public int GetHeight() {
             return propertiesByName["Height Offset"].GetCompiledValue();
+        }
+
+        public ActorProperty GetHeightProperty() {
+            return propertiesByName["Height Offset"];
         }
 
         public ActorGroundCast GetGroundCast() {

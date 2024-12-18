@@ -5,29 +5,29 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RotationActorPropertyItemView : MonoBehaviour {
+public class RotationActorPropertyItemView : ActorPropertyItemView {
 
     //View Refs
     public TMP_Text valueText;
     public TMP_Text nameText;
     public Slider slider;
 
-    public RotationActorProperty property;
-    public FCopActor actor;
-    public ActorEditMode controller;
-
     bool refuseCallback = true;
 
     void Start() {
 
-        nameText.text = property.name;
-        valueText.text = property.value.parsedRotation.ToString();
-        slider.value = property.value.parsedRotation;
+        var rotProperty = (RotationActorProperty)property;
+
+        nameText.text = rotProperty.name;
+        valueText.text = rotProperty.value.parsedRotation.ToString();
+        slider.value = rotProperty.value.parsedRotation;
 
         refuseCallback = false;
     }
 
     public void OnSliderChange() {
+
+        var rotProperty = (RotationActorProperty)property;
 
         if (!Main.counterActionAddedOnCurrentSelectHold) {
             ActorEditMode.AddActorPropertyCounterAction(property);
@@ -39,9 +39,9 @@ public class RotationActorPropertyItemView : MonoBehaviour {
             slider.value -= slider.value % 5;
         }
 
-        property.value.SetRotationDegree(slider.value);
+        rotProperty.value.SetRotationDegree(slider.value);
 
-        valueText.text = property.value.parsedRotation.ToString();
+        valueText.text = rotProperty.value.parsedRotation.ToString();
 
         controller.actorObjectsByID[actor.DataID].RefreshRotation();
 

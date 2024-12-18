@@ -35,6 +35,22 @@ namespace FCopParser {
             return value;
         }
 
+        public void SafeSetSigned(int newValue) {
+
+            var maxValue = (int)((Math.Pow(2, (int)bitCount) - 1) / 2);
+            var minValue = -(int)(Math.Pow(2, (int)bitCount) / 2);
+
+            value = newValue;
+
+            if (value > maxValue) {
+                value = maxValue;
+            }
+            if (value < minValue) {
+                value = minValue;
+            }
+
+        }
+
         public int value;
 
         public ValueActorProperty(string name, int value, BitCount bitCount) {

@@ -184,7 +184,7 @@ public class ActorObject : MonoBehaviour {
         float startingHeight = 100f;
 
 
-        if (actor.behavior is FCopHeightOffseting groundCast) {
+        if (actor.behavior is FCopHeightOffsetting groundCast) {
 
             switch (groundCast.GetGroundCast()) {
                 case ActorGroundCast.Highest:
@@ -207,7 +207,7 @@ public class ActorObject : MonoBehaviour {
 
             pos.y = hit.point.y;
 
-            if (actor.behavior is FCopHeightOffseting offset) {
+            if (actor.behavior is FCopHeightOffsetting offset) {
                 pos.y += offset.GetHeight() / (float)offset.heightMultiplier;
             }
             

@@ -22,7 +22,7 @@ public class GroupActorPropertyItemView : MonoBehaviour {
     public ActorPropertiesView view;
 
     [HideInInspector]
-    public List<GameObject> initedProperties = new();
+    public List<ActorPropertyItemView> initedProperties = new();
 
     private void Start() {
         

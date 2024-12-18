@@ -5,20 +5,22 @@ using System;
 using TMPro;
 using UnityEngine;
 
-public class ValueActorPropertyItemView : MonoBehaviour {
+public class ValueActorPropertyItemView : ActorPropertyItemView {
 
     //View refs
     public TMP_Text nameText;
     public TMP_InputField valueField;
 
-    public ValueActorProperty property;
-    public FCopActor actor;
-    public ActorEditMode controller;
-
     void Start() {
-        
+
+        Refresh();
+
+    }
+
+    public override void Refresh() {
+
         nameText.text = property.name;
-        valueField.text = property.value.ToString();
+        valueField.text = property.GetCompiledValue().ToString();
 
     }
 
@@ -28,14 +30,10 @@ public class ValueActorPropertyItemView : MonoBehaviour {
 
         var value = Int32.Parse(valueField.text);
 
-        if (value > Int16.MaxValue) {
-            value = Int16.MaxValue;
-        } else if (value < Int16.MinValue) {
-            value = Int16.MinValue;
-        }
+        var valueProperty = (ValueActorProperty)property;
 
-        property.value = value;
-        valueField.text = property.value.ToString();
+        valueProperty.SafeSetSigned(value);
+        valueField.text = valueProperty.value.ToString();
 
     }
 

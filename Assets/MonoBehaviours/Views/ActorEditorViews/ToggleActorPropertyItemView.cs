@@ -8,28 +8,29 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ToggleActorPropertyItemView : MonoBehaviour {
+public class ToggleActorPropertyItemView : ActorPropertyItemView {
 
     //View refs
     public TMP_Text nameText;
     public Toggle toggle;
 
-    public ToggleActorProperty property;
-    public FCopActor actor;
-    public ActorEditMode controller;
-
     void Start() {
 
-        nameText.text = property.name;
-        toggle.isOn = property.value;
+        var toggleProperty = (ToggleActorProperty)property;
+
+        nameText.text = toggleProperty.name;
+        toggle.isOn = toggleProperty.value;
 
     }
 
     public void OnToggle() {
 
+        var toggleProperty = (ToggleActorProperty)property;
+
+
         ActorEditMode.AddActorPropertyCounterAction(property);
 
-        property.value = toggle.isOn;
+        toggleProperty.value = toggle.isOn;
 
     }
 
