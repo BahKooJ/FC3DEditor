@@ -370,7 +370,15 @@ public class ActorEditMode : EditMode {
 
             script.moveCallback = (newPos) => {
 
-                actorObject.group.ChangePosition(newPos);
+                if (Controls.IsDown("SnapActorPosition")) {
+
+                    var lockPos = new Vector3(MathF.Round(newPos.x * 2) / 2, MathF.Round(newPos.y * 2) / 2, MathF.Round(newPos.z * 2) / 2);
+                    actorObject.group.ChangePosition(lockPos);
+
+                }
+                else {
+                    actorObject.group.ChangePosition(newPos);
+                }
 
                 return true;
             };
@@ -382,7 +390,18 @@ public class ActorEditMode : EditMode {
 
             script.moveCallback = (newPos) => {
 
-                actorObject.ChangePosition(newPos);
+                if (Controls.IsDown("SnapActorPosition")) {
+
+                    var lockPos = new Vector3(MathF.Round(newPos.x * 2) / 2, MathF.Round(newPos.y * 2) / 2, MathF.Round(newPos.z * 2) / 2);
+                    actorObject.ChangePosition(lockPos);
+
+                }
+                else {
+
+                    actorObject.ChangePosition(newPos);
+
+                }
+
 
                 return true;
             };

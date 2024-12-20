@@ -49,6 +49,7 @@ Inputs = {
 "EnableMirrorLevelSchematic":"1" "G"
 "AddNavNode":"1" "G"
 "ClearNavPaths":"1" "R"
+"SnapActorPosition":"1" "LeftAlt"
 }
 RenderMode = "Pixelated";
 MouseSensitivity = "3";

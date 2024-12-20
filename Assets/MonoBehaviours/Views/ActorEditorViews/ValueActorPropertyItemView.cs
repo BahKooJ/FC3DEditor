@@ -34,6 +34,12 @@ public class ValueActorPropertyItemView : ActorPropertyItemView {
 
         valueProperty.SafeSetSigned(value);
         valueField.text = valueProperty.value.ToString();
+        
+        if (ActorPropertyChangeEvent.changeEventsByPropertyName.ContainsKey(property.name)) {
+
+            ActorPropertyChangeEvent.changeEventsByPropertyName[property.name](controller);
+
+        }
 
     }
 
