@@ -7,12 +7,19 @@ public class ActorEditPanelView : MonoBehaviour {
     //Prefabs
     public GameObject actorPropertiesView;
 
+    // - Unity Refs -
+    public ContextMenuHandler addActorContextMenu;
+
     public ActorPropertiesView activeActorPropertiesView;
 
     void Start() {
 
         controller.view = this;
         OpenActorPropertiesView();
+
+        addActorContextMenu.items = new() {
+            ("Dynamic Prop", () => { controller.StartAdd(FCopParser.ActorBehavior.DynamicProp); })
+        };
 
     }
 

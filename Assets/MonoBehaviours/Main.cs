@@ -89,6 +89,7 @@ public class Main : MonoBehaviour {
     public GameObject BlankActor;
     public GameObject ObjectMesh;
     public GameObject actorGroupObjectFab;
+    public GameObject ArrowModelFab;
 
     public GameObject playerCamera;
     public GameObject playModePlayer;

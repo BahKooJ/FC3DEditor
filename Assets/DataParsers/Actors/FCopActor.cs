@@ -205,6 +205,13 @@ namespace FCopParser {
                     rawFile = new IFFDataFile(3, new(), "Cact", id, nullRPNSRef);
                     this.behavior = new FCopBehavior6(this, Enumerable.Repeat((byte)0, FCopBehavior6.blocks * 2).ToList());
                     break;
+                case ActorBehavior.DynamicProp:
+                    resourceReferences.Add(new Resource("NULL", 0));
+                    resourceReferences.Add(new Resource("NULL", 0));
+
+                    rawFile = new IFFDataFile(3, new(), "Cact", id, nullRPNSRef);
+                    this.behavior = new FCopBehavior11(this, Enumerable.Repeat((byte)0, FCopBehavior11.blocks * 2).ToList());
+                    break;
             }
 
         }

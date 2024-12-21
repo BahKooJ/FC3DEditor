@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 using Object = UnityEngine.Object;
 
 public class ActorEditMode : EditMode {
@@ -20,7 +21,8 @@ public class ActorEditMode : EditMode {
     public FCopActor selectedActor = null;
     public FCopActor actorToGroup = null;
 
-    ActorObject actorToAdd = null;
+    GameObject arrowModel = null;
+    ActorBehavior? actorToAdd = null;
 
     static int counterActionID = 0;
 
@@ -124,6 +126,30 @@ public class ActorEditMode : EditMode {
 
         if (Main.ignoreAllInputs) {
             return;
+        }
+
+        if (actorToAdd != null) {
+
+            var hitPos = main.CursorOnLevelMesh();
+
+            if (hitPos != null) {
+                arrowModel.transform.position = hitPos.Value;
+            }
+
+            if (Input.GetMouseButtonDown(0)) {
+
+                if (hitPos != null) {
+
+                    CreateActor(actorToAdd.Value, hitPos.Value);
+
+                    Object.Destroy(arrowModel);
+
+                    actorToAdd = null;
+
+                }
+
+            }
+
         }
 
         if (Controls.OnUp("MoveToCursor") || Controls.OnUp("Select") || Input.GetMouseButtonUp(0)) {
@@ -242,6 +268,19 @@ public class ActorEditMode : EditMode {
     public void StartGroup(FCopActor actor) {
         actorToGroup = actor;
         HeadsUpTextUtil.HeadsUp("Select Actor to Group...");
+    }
+
+    public void StartAdd(ActorBehavior behavior) {
+
+        actorToAdd = behavior;
+        arrowModel = Object.Instantiate(main.ArrowModelFab);
+
+        var pos = main.CursorOnLevelMesh();
+
+        if (pos != null) {
+            arrowModel.transform.position = pos.Value;
+        }
+
     }
 
     #region Selection And GameObjects
@@ -455,7 +494,11 @@ public class ActorEditMode : EditMode {
 
         if (hitPos != null) {
 
-            selectedActorObject.moveCallback((Vector3)hitPos);
+            var nnHitPost = hitPos.Value;
+
+            nnHitPost.y = 0;
+
+            selectedActorObject.moveCallback(nnHitPost);
 
             selectedActorObject.transform.position = selectedActorObject.controlledObject.transform.position;
 

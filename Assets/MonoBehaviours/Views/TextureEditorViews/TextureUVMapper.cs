@@ -160,7 +160,7 @@ public class TextureUVMapper : MonoBehaviour {
     // UV Drag
     private void LateUpdate() {
 
-        if (Input.GetMouseButton(0) && IsCursorInTexturePallete() && !refusedUVDrag) {
+        if (Input.GetMouseButton(0) && IsCursorInTexturePallete() && !refusedUVDrag && !editTransparency) {
 
             PointerEventData pointerData = new PointerEventData(EventSystem.current);
             pointerData.position = Input.mousePosition;
@@ -364,6 +364,9 @@ public class TextureUVMapper : MonoBehaviour {
 
             transparentMapper.drawingCursor.gameObject.SetActive(false);
 
+            textureLines.gameObject.SetActive(true);
+            textureLines.ReInit();
+
             InitView();
 
             return;
@@ -379,7 +382,6 @@ public class TextureUVMapper : MonoBehaviour {
         uvMapperTools.SetActive(false);
 
         textureLines.ReInit();
-
         textureLines.gameObject.SetActive(false);
 
         uvMapperTools.SetActive(false);
