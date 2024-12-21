@@ -140,7 +140,7 @@ public class Main : MonoBehaviour {
         var y = -5;
         foreach (var a in actors2) {
 
-            actorEditMode.actorObjectsByID[a.DataID].ChangePosition(new Vector3(x, 0, y));
+            actorEditMode.actorObjectsByID[a.DataID].ChangePosition(new Vector3(x, 0, y), AxisControl.Axis.IgnoreY);
 
             x += 3;
 

@@ -4,6 +4,7 @@ using FCopParser;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class ActorObject : MonoBehaviour {
 
@@ -50,9 +51,21 @@ public class ActorObject : MonoBehaviour {
 
     }
 
-    public void ChangePosition(Vector3 pos) {
+    public void ChangePosition(Vector3 pos, AxisControl.Axis axis) {
 
-        controller.ChangeActorPosition(actor, pos);
+        //controller.AddActorPositionCounterAction(actor.x, actor.y, actor, counterActionID);
+
+        actor.x = Mathf.RoundToInt(pos.x * 8192f);
+        actor.y = Mathf.RoundToInt(pos.z * -8192f);
+
+        if (axis == AxisControl.Axis.AxisY) {
+
+            if (actor.behavior is FCopHeightOffsetting heightOffseting) {
+                heightOffseting.SetHeight(Mathf.RoundToInt(pos.y * heightOffseting.heightMultiplier) - Mathf.RoundToInt(GroundCast() * heightOffseting.heightMultiplier));
+                controller.view.activeActorPropertiesView.RequestPropertyRefresh(heightOffseting.GetHeightProperty());
+            }
+
+        }
 
         SetToCurrentPosition();
 
@@ -178,11 +191,10 @@ public class ActorObject : MonoBehaviour {
 
     }
 
-    public void SetToCurrentPosition() {
+    public float GroundCast() {
 
         Vector3 castDirection = Vector3.down;
         float startingHeight = 100f;
-
 
         if (actor.behavior is FCopHeightOffsetting groundCast) {
 
@@ -199,24 +211,30 @@ public class ActorObject : MonoBehaviour {
 
         }
 
-        transform.position = new Vector3(actor.x / 8192f, startingHeight, -(actor.y / 8192f));
+        var castPos = new Vector3(actor.x / 8192f, startingHeight, -(actor.y / 8192f));
 
-        if (Physics.Raycast(transform.position, castDirection, out RaycastHit hit, Mathf.Infinity, 1)) {
+        if (Physics.Raycast(castPos, castDirection, out RaycastHit hit, Mathf.Infinity, 1)) {
 
-            var pos = transform.position;
-
-            pos.y = hit.point.y;
-
-            if (actor.behavior is FCopHeightOffsetting offset) {
-                pos.y += offset.GetHeight() / (float)offset.heightMultiplier;
-            }
-            
-            transform.position = pos;
+            return hit.point.y;
 
         }
         else {
-            print("No floor found");
+
+            return 6f;
+
         }
+
+    }
+
+    public void SetToCurrentPosition() {
+
+        var pos = new Vector3(actor.x / 8192f, GroundCast(), -(actor.y / 8192f));
+
+        if (actor.behavior is FCopHeightOffsetting offset) {
+            pos.y += offset.GetHeight() / (float)offset.heightMultiplier;
+        }
+
+        transform.position = pos;
 
     }
 

@@ -13,6 +13,7 @@ public class ActorPropertyChangeEvent {
                 var aObj = controller.actorObjectsByID[controller.selectedActor.DataID];
 
                 aObj.SetToCurrentPosition();
+                controller.selectedActorObject.RefreshPosition();
 
             }
 
@@ -24,6 +25,19 @@ public class ActorPropertyChangeEvent {
                 var aObj = controller.actorObjectsByID[controller.selectedActor.DataID];
 
                 aObj.SetToCurrentPosition();
+                controller.selectedActorObject.RefreshPosition();
+
+            }
+
+        } },
+        {"Ground Cast", controller => {
+
+            if (controller.selectedActorObject != null) {
+
+                var aObj = controller.actorObjectsByID[controller.selectedActor.DataID];
+
+                aObj.SetToCurrentPosition();
+                controller.selectedActorObject.RefreshPosition();
 
             }
 

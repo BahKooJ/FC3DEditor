@@ -7,10 +7,11 @@ public class AxisControl: MonoBehaviour {
     public GameObject axisY;
     public GameObject axisZ;
 
-    enum Axis {
+    public enum Axis {
         AxisX,
         AxisY,
         AxisZ,
+        IgnoreY,
         None
     }
 
@@ -20,7 +21,7 @@ public class AxisControl: MonoBehaviour {
     bool rotate = false;
 
     public GameObject controlledObject;
-    public Func<Vector3, bool> moveCallback = (par) => { return false; };
+    public Func<Vector3, Axis, bool> moveCallback = (par, axis) => { return false; };
     public Func<float, bool> rotateCallback = (par) => { return false; };
 
     bool preventSelection = true;
@@ -52,6 +53,12 @@ public class AxisControl: MonoBehaviour {
             }
 
         }
+
+    }
+
+    public void RefreshPosition() {
+
+        transform.position = controlledObject.transform.position;
 
     }
 
@@ -139,7 +146,7 @@ public class AxisControl: MonoBehaviour {
 
             transform.position = pos;
 
-            if (moveCallback(pos)) {
+            if (moveCallback(pos, click)) {
                 transform.position = controlledObject.transform.position;
             }
             else {

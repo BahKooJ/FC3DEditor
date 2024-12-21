@@ -50,6 +50,12 @@ public class EnumDataActorPropertyItemView: ActorPropertyItemView {
 
         enumProperty.caseValue = (Enum)values.GetValue(caseDropDown.value);
 
+        if (ActorPropertyChangeEvent.changeEventsByPropertyName.ContainsKey(property.name)) {
+
+            ActorPropertyChangeEvent.changeEventsByPropertyName[property.name](controller);
+
+        }
+
     }
 
 }

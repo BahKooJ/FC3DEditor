@@ -407,16 +407,16 @@ public class ActorEditMode : EditMode {
 
             script.controlledObject = actorObject.group.gameObject;
 
-            script.moveCallback = (newPos) => {
+            script.moveCallback = (newPos, axis) => {
 
                 if (Controls.IsDown("SnapActorPosition")) {
 
                     var lockPos = new Vector3(MathF.Round(newPos.x * 2) / 2, MathF.Round(newPos.y * 2) / 2, MathF.Round(newPos.z * 2) / 2);
-                    actorObject.group.ChangePosition(lockPos);
+                    actorObject.group.ChangePosition(lockPos, axis);
 
                 }
                 else {
-                    actorObject.group.ChangePosition(newPos);
+                    actorObject.group.ChangePosition(newPos, axis);
                 }
 
                 return true;
@@ -427,17 +427,17 @@ public class ActorEditMode : EditMode {
 
             script.controlledObject = actorObject.gameObject;
 
-            script.moveCallback = (newPos) => {
+            script.moveCallback = (newPos, axis) => {
 
                 if (Controls.IsDown("SnapActorPosition")) {
 
                     var lockPos = new Vector3(MathF.Round(newPos.x * 2) / 2, MathF.Round(newPos.y * 2) / 2, MathF.Round(newPos.z * 2) / 2);
-                    actorObject.ChangePosition(lockPos);
+                    actorObject.ChangePosition(lockPos, axis);
 
                 }
                 else {
 
-                    actorObject.ChangePosition(newPos);
+                    actorObject.ChangePosition(newPos, axis);
 
                 }
 
@@ -498,7 +498,7 @@ public class ActorEditMode : EditMode {
 
             nnHitPost.y = 0;
 
-            selectedActorObject.moveCallback(nnHitPost);
+            selectedActorObject.moveCallback(nnHitPost, AxisControl.Axis.IgnoreY);
 
             selectedActorObject.transform.position = selectedActorObject.controlledObject.transform.position;
 
@@ -567,7 +567,7 @@ public class ActorEditMode : EditMode {
             if (NavMeshEditMode.copiedNavNodeCoords != null) {
 
                 selectedActorObject.transform.position = (Vector3)NavMeshEditMode.copiedNavNodeCoords;
-                selectedActorObject.moveCallback((Vector3)NavMeshEditMode.copiedNavNodeCoords);
+                selectedActorObject.moveCallback((Vector3)NavMeshEditMode.copiedNavNodeCoords, AxisControl.Axis.IgnoreY);
 
             }
 
@@ -640,36 +640,6 @@ public class ActorEditMode : EditMode {
 
         if (nodeView != null) {
             nodeView.RefreshName();
-        }
-
-    }
-
-    public void ChangeActorPosition(FCopActor actor, Vector3 pos) {
-
-        AddActorPositionCounterAction(actor.x, actor.y, actor, counterActionID);
-
-        actor.x = Mathf.RoundToInt(pos.x * 8192f);
-        actor.y = Mathf.RoundToInt(pos.z * -8192f);
-
-        if (actor.behavior is FCopHeightOffsetting heightOffseting) {
-            heightOffseting.SetHeight(Mathf.RoundToInt(pos.y * heightOffseting.heightMultiplier));
-            view.activeActorPropertiesView.RequestPropertyRefresh(heightOffseting.GetHeightProperty());
-        }
-        
-
-    }
-
-    // This is for grouping
-    public void ChangeActorsPosition(List<FCopActor> actors, Vector3 pos) {
-
-        // Assuming all actors have the same position.
-        AddMultiActorPositionCounterAction(actors[0].x, actors[0].y, actors, counterActionID);
-
-        foreach (var actor in actors) {
-
-            actor.x = Mathf.RoundToInt(pos.x * 8192f);
-            actor.y = Mathf.RoundToInt(pos.z * -8192f);
-
         }
 
     }
