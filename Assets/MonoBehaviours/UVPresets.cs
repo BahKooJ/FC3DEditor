@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
+using System.Text;
 
 public class UVPresets {
 
@@ -186,52 +186,52 @@ public class UVPresets {
 
         string SavePreset(List<UVPreset> presets) {
 
-            var total = "";
+            var total = new StringBuilder();
 
             foreach (var preset in presets) {
 
-                total += preset.Compile();
-                total += ",";
+                total.Append(preset.Compile());
+                total.Append(",");
 
             }
 
             // Removes the access comma
-            if (total != "") {
-                total = total.Remove(total.Length - 1);
+            if (total.Length != 0) {
+                total.Remove(total.Length - 1, 1);
             }
 
-            return total;
+            return total.ToString();
 
         }
 
         string SavePresets(UVPresets presets) {
 
-            var total = "";
+            var total = new StringBuilder();
 
-            total += "{\"";
+            total.Append("{\"");
 
-            total += presets.directoryName + "\",[";
+            total.Append(presets.directoryName + "\",[");
 
-            total += SavePreset(presets.presets);
+            total.Append(SavePreset(presets.presets));
 
-            total += "],[";
+            total.Append("],[");
 
             var comma = false;
             foreach (var subPresets in presets.subFolders) {
 
                 if (comma) {
-                    total += ",";
+                    total.Append(",");
                 }
 
-                total += SavePresets(subPresets);
+                total.Append(SavePresets(subPresets));
 
                 comma = true;
 
             }
 
-            total += "]}";
+            total.Append("]}");
 
-            return total;
+            return total.ToString();
 
         }
 
@@ -320,46 +320,46 @@ public class UVPreset {
 
     public string Compile() {
 
-        var total = "";
+        var total = new StringBuilder();
 
-        total += "(";
+        total.Append("(");
 
-        total += "\"" + name + "\",";
-        total += texturePalette.ToString() + ",";
-        total += (isSemiTransparent ? 1 : 0).ToString() + ",";
-        total += (isVectorAnimated ? 1 : 0).ToString() + ",";
-        total += meshID.ToString() + ",";
+        total.Append("\"" + name + "\",");
+        total.Append(texturePalette.ToString() + ",");
+        total.Append((isSemiTransparent ? 1 : 0).ToString() + ",");
+        total.Append((isVectorAnimated ? 1 : 0).ToString() + ",");
+        total.Append(meshID.ToString() + ",");
 
 
-        total += "[";
+        total.Append("[");
         foreach (var uv in uvs) {
 
-            total += uv.ToString() + ",";
+            total.Append(uv.ToString() + ",");
 
         }
-        total = total.Remove(total.Length - 1);
+        total.Remove(total.Length - 1, 1);
 
         if (animatedUVs.Count == 0) {
-            total += "])";
+            total.Append("])");
         }
         else {
-            total += "],";
+            total.Append("],");
 
-            total += animationSpeed.ToString() + ",";
+            total.Append(animationSpeed.ToString() + ",");
 
-            total += "[";
+            total.Append("[");
             foreach (var uv in animatedUVs) {
 
-                total += uv.ToString() + ",";
+                total.Append(uv.ToString() + ",");
 
             }
-            total = total.Remove(total.Length - 1);
+            total.Remove(total.Length - 1, 1);
 
-            total += "])";
+            total.Append("])");
 
         }
 
-        return total;
+        return total.ToString();
 
     }
 

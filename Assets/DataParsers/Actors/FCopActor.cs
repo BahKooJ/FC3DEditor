@@ -197,21 +197,32 @@ namespace FCopParser {
             this.x = x;
             this.y = y;
 
+            void InitResourceAndRawFile(int resourceCount) {
+
+                foreach (var i in Enumerable.Range(0, resourceCount)) {
+                    resourceReferences.Add(new Resource("NULL", 0));
+                }
+
+                rawFile = new IFFDataFile(3, new(), "Cact", id, nullRPNSRef);
+
+            }
+
             switch (behavior) {
                 case ActorBehavior.StationaryEntity:
-                    resourceReferences.Add(new Resource("NULL", 0));
-                    resourceReferences.Add(new Resource("NULL", 0));
 
-                    rawFile = new IFFDataFile(3, new(), "Cact", id, nullRPNSRef);
+                    InitResourceAndRawFile(FCopBehavior6.assetRefCount);
                     this.behavior = new FCopBehavior6(this, Enumerable.Repeat((byte)0, FCopBehavior6.blocks * 2).ToList());
                     break;
+                case ActorBehavior.Elevator:
+                    InitResourceAndRawFile(FCopBehavior10.assetRefCount);
+                    this.behavior = new FCopBehavior10(this, Enumerable.Repeat((byte)0, FCopBehavior10.blocks * 2).ToList());
+                    break;
                 case ActorBehavior.DynamicProp:
-                    resourceReferences.Add(new Resource("NULL", 0));
-                    resourceReferences.Add(new Resource("NULL", 0));
 
-                    rawFile = new IFFDataFile(3, new(), "Cact", id, nullRPNSRef);
+                    InitResourceAndRawFile(FCopBehavior11.assetRefCount);
                     this.behavior = new FCopBehavior11(this, Enumerable.Repeat((byte)0, FCopBehavior11.blocks * 2).ToList());
                     break;
+
             }
 
         }
@@ -716,14 +727,20 @@ namespace FCopParser {
 
     }
 
-    // - Parsed -
+    // - Completed -
     public class FCopBehavior10 : FCopEntity, FCopHeightOffsetting, FCopObjectMutating {
+
+        public const int assetRefCount = 2;
+        public const int blocks = 20;
 
         public int heightMultiplier { get; set; }
 
         public FCopBehavior10(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             heightMultiplier = 8192;
+
+            assetRefNames = new string[] { "Object", "Destroyed Object" };
+            assetRefType = new AssetType[] { AssetType.Object, AssetType.Object };
 
             properties.AddRange(new List<ActorProperty>() {
                 new EnumDataActorProperty("Number Of Stops", (ElevatorStops)Read8(), BitCount.Bit8),

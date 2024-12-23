@@ -817,36 +817,44 @@ namespace FCopParser {
 
                     if (eightCC.Substring(4,4) == "Cact" || eightCC.Substring(4, 4) == "Csac") {
 
-                        var actor = new FCopActor(file) {
-                            name = name
-                        };
+                        var actor = new FCopActor(file);
+
+                        if (name != "") {
+                            actor.name = name;
+                        }
 
                         actors.Add(actor);
 
                     }
                     else if (eightCC.Substring(4, 4) == "Cnet") {
 
-                        var navMesh = new FCopNavMesh(file) {
-                            name = name
-                        };
+                        var navMesh = new FCopNavMesh(file);
+
+                        if (name != "") {
+                            navMesh.name = name;
+                        }
 
                         navMeshes.Add(navMesh);
 
                     }
                     else if (eightCC.Substring(4, 4) == "Cobj") {
 
-                        var obj = new FCopObject(file) {
-                            name = name
-                        };
+                        var obj = new FCopObject(file);
+
+                        if (name != "") {
+                            obj.name = name;
+                        }
 
                         objects.Add(obj);
 
                     }
                     else if (eightCC.Substring(4, 4) == "Cbmp") {
 
-                        var texture = new FCopTexture(file) {
-                            name = name
-                        };
+                        var texture = new FCopTexture(file);
+
+                        if (name != "") {
+                            texture.name = name;
+                        }
 
                         textures.Add(texture);
 

@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 public abstract class Presets {
 
@@ -13,6 +14,7 @@ public abstract class Presets {
     public static ShaderPresets shaderPresets = new ShaderPresets("Shader Presets", null);
     public static ColorPresets colorPresets = new ColorPresets("Color Presets", null);
     public static List<Schematic> levelSchematics = new();
+    public static ActorSchematics actorSchematics = new();
 
     static List<char> numbers = new List<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-' };
 
@@ -1211,24 +1213,26 @@ public abstract class Presets {
 
     public static string Save() {
 
-        var total = "";
+        var total = new StringBuilder();
 
-        total += UVPresets.tag + uvPresets.Compile();
-        total += ShaderPresets.tag + shaderPresets.Compile();
-        total += ColorPresets.tag + colorPresets.Compile();
+        total.Append(UVPresets.tag + uvPresets.Compile());
+        total.Append(ShaderPresets.tag + shaderPresets.Compile());
+        total.Append(ColorPresets.tag + colorPresets.Compile());
 
-        total += Schematic.tag + "{[";
+        total.Append(Schematic.tag + "{[");
 
         foreach (var schem in levelSchematics) {
-            total += schem.Compile();
-            total += ",";
+            total.Append(schem.Compile());
+            total.Append(",");
         }
 
-        total = total.Remove(total.Length - 1);
+        total.Remove(total.Length - 1, 1);
 
-        total += "]}";
+        total.Append("]}");
 
-        return total;
+        total.Append(ActorSchematics.tag + actorSchematics.Compile());
+
+        return total.ToString();
 
     }
 

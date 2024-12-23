@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3982175839306991785}
   - component: {fileID: 3982175839306991784}
   - component: {fileID: 3982175839306991766}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Sub LevelMesh Transparent
   m_TagString: Untagged
   m_Icon: {fileID: 0}

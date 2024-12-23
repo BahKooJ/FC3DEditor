@@ -2,7 +2,7 @@
 
 using FCopParser;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Text;
 
 public class ShaderPresets {
 
@@ -30,52 +30,52 @@ public class ShaderPresets {
 
         string SavePreset(List<ShaderPreset> presets) {
 
-            var total = "";
+            var total = new StringBuilder();
 
             foreach (var preset in presets) {
 
-                total += preset.Compile();
-                total += ",";
+                total.Append(preset.Compile());
+                total.Append(",");
 
             }
 
             // Removes the access comma
-            if (total != "") {
-                total = total.Remove(total.Length - 1);
+            if (total.Length != 0) {
+                total.Remove(total.Length - 1, 1);
             }
 
-            return total;
+            return total.ToString();
 
         }
 
         string SavePresets(ShaderPresets presets) {
 
-            var total = "";
+            var total = new StringBuilder();
 
-            total += "{\"";
+            total.Append("{\"");
 
-            total += presets.directoryName + "\",[";
+            total.Append(presets.directoryName + "\",[");
 
-            total += SavePreset(presets.presets);
+            total.Append(SavePreset(presets.presets));
 
-            total += "],[";
+            total.Append("],[");
 
             var comma = false;
             foreach (var subPresets in presets.subFolders) {
 
                 if (comma) {
-                    total += ",";
+                    total.Append(",");
                 }
 
-                total += SavePresets(subPresets);
+                total.Append(SavePresets(subPresets));
 
                 comma = true;
 
             }
 
-            total += "]}";
+            total.Append("]}");
 
-            return total;
+            return total.ToString();
 
         }
 
@@ -111,23 +111,23 @@ public class ShaderPreset {
 
     public string Compile() {
 
-        var total = "";
+        var total = new StringBuilder();
 
         // All Objects:
         // (NAME(string), TYPE(int), MESHTYPE(int), ...
 
-        total += "(\"" + name + "\",";
+        total.Append("(\"" + name + "\",");
 
-        total += ((int)shader.type).ToString() + ",";
+        total.Append(((int)shader.type).ToString() + ",");
 
-        total += meshID.ToString() + ",";
+        total.Append(meshID.ToString() + ",");
 
         switch (shader.type) {
             case VertexColorType.MonoChrome:
                 // VALUE(int))
 
                 var solidMono = (MonoChromeShader)shader;
-                total += solidMono.value.ToString() + ")";
+                total.Append(solidMono.value.ToString() + ")");
 
                 break;
             case VertexColorType.DynamicMonoChrome:
@@ -135,15 +135,15 @@ public class ShaderPreset {
 
                 var mono = (DynamicMonoChromeShader)shader;
 
-                total += "[";
+                total.Append("[");
 
                 foreach (var v in mono.values) {
-                    total += v.ToString() + ",";
+                    total.Append(v.ToString() + ",");
                 }
 
-                total = total.Remove(total.Length - 1);
+                total.Remove(total.Length - 1, 1);
 
-                total += "])";
+                total.Append("])");
 
                 break;
             case VertexColorType.Color:
@@ -151,15 +151,15 @@ public class ShaderPreset {
 
                 var color = (ColorShader)shader;
 
-                total += "[";
+                total.Append("[");
 
                 foreach (var v in color.values) {
-                    total += v.ToUShort().ToString() + ",";
+                    total.Append(v.ToUShort().ToString() + ",");
                 }
 
-                total = total.Remove(total.Length - 1);
+                total.Remove(total.Length - 1, 1);
 
-                total += "])";
+                total.Append("])");
 
                 break;
             case VertexColorType.ColorAnimated:
@@ -167,12 +167,12 @@ public class ShaderPreset {
                 // Update: Welp now it is because of schematics
                 // Thanks past me for not closing this causing a slew of issues
 
-                total += ")";
+                total.Append(")");
 
                 break;
         }
 
-        return total;
+        return total.ToString();
 
     }
 
@@ -236,34 +236,34 @@ public class ColorPresets {
 
         string SavePreset(List<ColorPreset> presets) {
 
-            var total = "";
+            var total = new StringBuilder();
 
             foreach (var preset in presets) {
 
                 // All Objects:
                 // (NAME(string), TYPE(int), ...
 
-                total += "(\"" + preset.name + "\",";
+                total.Append("(\"" + preset.name + "\",");
 
-                total += ((int)preset.type).ToString() + ",";
+                total.Append(((int)preset.type).ToString() + ",");
 
                 switch (preset.type) {
                     case VertexColorType.MonoChrome:
                         // VALUE(int))
 
-                        total += preset.monoValue.ToString() + "),";
+                        total.Append(preset.monoValue.ToString() + "),");
 
                         break;
                     case VertexColorType.DynamicMonoChrome:
                         // VALUE(int))
 
-                        total += preset.monoValue.ToString() + "),";
+                        total.Append(preset.monoValue.ToString() + "),");
 
                         break;
                     case VertexColorType.Color:
                         // VALUE(uShort))
 
-                        total += preset.colorValue.ToUShort().ToString() + "),";
+                        total.Append(preset.colorValue.ToUShort().ToString() + "),");
 
                         break;
                     case VertexColorType.ColorAnimated:
@@ -271,7 +271,7 @@ public class ColorPresets {
                         // Update: Welp now it is because of schematics
                         // Thanks past me for not closing this causing a slew of issues
 
-                        total += "),";
+                        total.Append("),");
 
                         break;
                 }
@@ -279,42 +279,42 @@ public class ColorPresets {
             }
 
             // Removes the access comma
-            if (total != "") {
-                total = total.Remove(total.Length - 1);
+            if (total.Length != 0) {
+                total.Remove(total.Length - 1, 1);
             }
 
-            return total;
+            return total.ToString();
 
         }
 
         string SavePresets(ColorPresets presets) {
 
-            var total = "";
+            var total = new StringBuilder();
 
-            total += "{\"";
+            total.Append("{\"");
 
-            total += presets.directoryName + "\",[";
+            total.Append(presets.directoryName + "\",[");
 
-            total += SavePreset(presets.presets);
+            total.Append(SavePreset(presets.presets));
 
-            total += "],[";
+            total.Append("],[");
 
             var comma = false;
             foreach (var subPresets in presets.subFolders) {
 
                 if (comma) {
-                    total += ",";
+                    total.Append(",");
                 }
 
-                total += SavePresets(subPresets);
+                total.Append(SavePresets(subPresets));
 
                 comma = true;
 
             }
 
-            total += "]}";
+            total.Append("]}");
 
-            return total;
+            return total.ToString();
 
         }
 

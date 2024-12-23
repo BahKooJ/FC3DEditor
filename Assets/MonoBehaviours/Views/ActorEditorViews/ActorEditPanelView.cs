@@ -18,6 +18,7 @@ public class ActorEditPanelView : MonoBehaviour {
         OpenActorPropertiesView();
 
         addActorContextMenu.items = new() {
+            ("Elevator", () => { controller.StartAdd(FCopParser.ActorBehavior.Elevator); }),
             ("Dynamic Prop", () => { controller.StartAdd(FCopParser.ActorBehavior.DynamicProp); })
         };
 
@@ -26,6 +27,14 @@ public class ActorEditPanelView : MonoBehaviour {
     public void PasteNavNodeCoords() {
 
         controller.PasteNavNodeCoords();
+
+    }
+
+    public void OpenActorSchematicsView() {
+
+    }
+
+    public void SaveActorSchematic() {
 
     }
 

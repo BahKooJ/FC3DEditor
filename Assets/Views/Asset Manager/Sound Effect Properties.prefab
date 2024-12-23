@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3576419408759716049}
   - component: {fileID: 3742228776821088683}
   - component: {fileID: 3468898768263193047}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Does Loop Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -162,7 +162,7 @@ GameObject:
   - component: {fileID: 2015540314117702846}
   - component: {fileID: 614678425603693191}
   - component: {fileID: 7452936020030611595}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Scripting ID Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -312,7 +312,7 @@ GameObject:
   - component: {fileID: 3500970375889413495}
   - component: {fileID: 1343281816838602995}
   - component: {fileID: 6491716361550866996}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Group ID Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -462,7 +462,7 @@ GameObject:
   - component: {fileID: 3198054154530250290}
   - component: {fileID: 12273412578169529}
   - component: {fileID: 3354818709433099130}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Name Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -612,7 +612,7 @@ GameObject:
   - component: {fileID: 6226771475660834368}
   - component: {fileID: 1705798850274202502}
   - component: {fileID: 1797596035027834895}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Data ID Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -763,7 +763,7 @@ GameObject:
   - component: {fileID: 4808215975754707856}
   - component: {fileID: 764793758633884682}
   - component: {fileID: 1694321028277048028}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Sound Effect Properties
   m_TagString: Untagged
   m_Icon: {fileID: 0}
