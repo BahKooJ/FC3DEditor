@@ -4,13 +4,15 @@ public class ActorEditPanelView : MonoBehaviour {
 
     public ActorEditMode controller;
 
-    //Prefabs
+    // - Prefabs -
     public GameObject actorPropertiesView;
+    public GameObject actorSchematicViewFab;
 
     // - Unity Refs -
     public ContextMenuHandler addActorContextMenu;
 
     public ActorPropertiesView activeActorPropertiesView;
+    public ActorSchematicView activeActorSchematicView;
 
     void Start() {
 
@@ -32,9 +34,31 @@ public class ActorEditPanelView : MonoBehaviour {
 
     public void OpenActorSchematicsView() {
 
+        if (activeActorSchematicView != null) {
+            Destroy(activeActorSchematicView.gameObject);
+            activeActorSchematicView = null;
+        }
+        else {
+            var obj = Instantiate(actorSchematicViewFab);
+
+            activeActorSchematicView = obj.GetComponent<ActorSchematicView>();
+            activeActorSchematicView.controller = controller;
+            activeActorSchematicView.view = this;
+
+            obj.transform.SetParent(transform.parent, false);
+        }
+
     }
 
     public void SaveActorSchematic() {
+
+        if (controller.selectedActor != null) {
+            Presets.actorSchematics.schematics.Add(new ActorSchematic(controller.selectedActor));
+            QuickLogHandler.Log("Actor Schematic Added", LogSeverity.Success);
+        }
+        else {
+            QuickLogHandler.Log("No Actor Selected", LogSeverity.Info);
+        }
 
     }
 
@@ -52,6 +76,15 @@ public class ActorEditPanelView : MonoBehaviour {
 
             obj.transform.SetParent(transform.parent, false);
 
+        }
+
+    }
+
+    public void CloseActorPropertiesView() {
+
+        if (activeActorSchematicView != null) {
+            Destroy(activeActorSchematicView.gameObject);
+            activeActorSchematicView = null;
         }
 
     }

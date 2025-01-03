@@ -904,6 +904,120 @@ public abstract class Presets {
 
     }
 
+    public static ActorSchematic ReadActorSchematicObject(string file, int index, out int newIndex) {
+
+        var schematic = new ActorSchematic();
+
+        var value = "";
+
+        var properties = new List<string> { "NAME", "TYPE", "BYTES" };
+        var lookingForValue = -1;
+        var isReadingValue = false;
+        var openArray = false;
+
+        var i = index - 1;
+        while (i < file.Length) {
+
+            i++;
+
+            var c = file[i];
+
+            if (c == '\"') {
+                isReadingValue = !isReadingValue;
+
+                // Continue because " is a keyword and can't be used for anything else
+                continue;
+            }
+
+            // If reading value all it cares is grabing the character
+            if (isReadingValue) {
+                value += c;
+                continue;
+            }
+
+            // Tells the next checks that an array was just opened.
+            // Continue because of keyword.
+            if (c == '[') {
+                openArray = true;
+                continue;
+            }
+            else if (c == ']') {
+                openArray = false;
+                continue;
+            }
+
+            if (lookingForValue < properties.Count && lookingForValue != -1) {
+
+                switch (properties[lookingForValue]) {
+
+                    case "NAME":
+
+                        if (value != "") {
+                            schematic.name = value;
+                            value = "";
+                            lookingForValue++;
+                        }
+
+                        break;
+                    case "TYPE":
+
+                        if (c == ',') {
+
+                            schematic.behavior = (ActorBehavior)Int32.Parse(value);
+
+                            value = "";
+                            lookingForValue++;
+
+                        }
+                        else if (numbers.Contains(c)) {
+                            value += c;
+                        }
+
+                        break;
+                    case "BYTES":
+
+                        if (openArray) {
+
+                            if (c == ',') {
+                                schematic.actorData.Add(Byte.Parse(value));
+                                value = "";
+
+                            }
+                            else if (numbers.Contains(c)) {
+                                value += c;
+                            }
+
+                        }
+                        else {
+
+                            schematic.actorData.Add(Byte.Parse(value));
+                            value = "";
+                            lookingForValue++;
+
+                        }
+
+                        break;
+
+                }
+
+            }
+
+            if (c == '(') {
+                lookingForValue = 0;
+                continue;
+            }
+            else if (c == ')') {
+                newIndex = i;
+                return schematic;
+            }
+
+        }
+
+        newIndex = i;
+        return schematic;
+
+    }
+
     public static void ReadFile(string fileName) {
 
         var file = File.ReadAllText(fileName);
@@ -1198,10 +1312,95 @@ public abstract class Presets {
 
         }
 
+        void ReadActorSchematics() {
+
+            var startIndex = file.IndexOf(ActorSchematics.tag);
+
+            if (startIndex == -1) {
+                return;
+            }
+
+            var opened = new List<ActorSchematics>();
+
+            var value = "";
+
+            var isReadingValue = false;
+
+            var i = startIndex - 1;
+
+            while (i < file.Length) {
+
+                i++;
+
+                var c = file[i];
+
+                // The only thing the value is really used for is names
+                // If it's ever used for something else this might have problems...
+                if (c == '\"') {
+                    isReadingValue = !isReadingValue;
+
+                    if (!isReadingValue) {
+
+                        opened.Last().directoryName = value;
+                        value = "";
+
+                    }
+
+                    // Continue because " is a keyword and can't be used for anything else
+                    continue;
+                }
+
+                // If reading value all it cares is grabing the character
+                if (isReadingValue) {
+                    value += c;
+                    continue;
+                }
+
+                if (c == '(') {
+
+                    opened.Last().schematics.Add(ReadActorSchematicObject(file, i, out i));
+
+                }
+
+                // Opens or closes a subfolder.
+                if (c == '{') {
+
+                    opened.Add(new ActorSchematics());
+
+                }
+                else if (c == '}') {
+
+                    var last = opened.Last();
+
+                    if (opened.Count() > 1) {
+
+                        // Needs to add itself to the parent
+                        var beforeLast = opened[opened.Count - 2];
+
+                        beforeLast.subFolders.Add(last);
+
+                        last.parent = beforeLast;
+
+                        opened.Remove(last);
+
+                    }
+                    else if (opened.Count() == 1) {
+                        // Finished
+                        actorSchematics = opened[0];
+                        return;
+                    }
+
+                }
+
+            }
+
+        }
+
         uvPresets = ReadUVPresetsContent(file);
         ReadShaderPresets();
         ReadColorPresets();
         ReadLevelSchematics();
+        ReadActorSchematics();
 
     }
 

@@ -124,6 +124,7 @@ public class TexturePresetsView : MonoBehaviour {
             Presets.uvPresets.directoryName = Utils.RemoveExtensionFromFileName(fileName);
             Presets.shaderPresets.directoryName = Utils.RemoveExtensionFromFileName(fileName);
             Presets.colorPresets.directoryName = Utils.RemoveExtensionFromFileName(fileName);
+            Presets.actorSchematics.directoryName = Utils.RemoveExtensionFromFileName(fileName);
 
             Presets.SaveToFile(Utils.RemoveExtensionFromFileName(fileName));
 

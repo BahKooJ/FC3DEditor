@@ -121,19 +121,19 @@ GameObject:
   - component: {fileID: 8307630172135697540}
   - component: {fileID: 3227669753118413780}
   - component: {fileID: 4036551316717813377}
-  - component: {fileID: 6871905225832551974}
   - component: {fileID: 5081173200935658316}
   - component: {fileID: 9053573547161205988}
   - component: {fileID: 5268462848339823202}
   - component: {fileID: 3605600378326007694}
   - component: {fileID: 5168268411369440779}
+  - component: {fileID: 2437169101738657632}
   m_Layer: 6
   m_Name: Actor Schematic Item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8307630172135697540
 RectTransform:
   m_ObjectHideFlags: 0
@@ -150,10 +150,10 @@ RectTransform:
   m_Father: {fileID: 8192983951240282353}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 54, y: -54}
+  m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3227669753118413780
 CanvasRenderer:
@@ -193,27 +193,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6871905225832551974
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 874525778990479216}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f95d231e66387ae4e962b4624ef9fd0c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  schematicPreviewCamera: {fileID: 3997049775156912574, guid: dc5ede8170c81db428701a6a591e5437, type: 3}
-  levelSchematicRenderTexture: {fileID: 8400000, guid: dd28eb30c63fc1d45a58522bc0f8dcc7, type: 2}
-  parentView: {fileID: 0}
-  view: {fileID: 0}
-  contextMenu: {fileID: 5268462848339823202}
-  infoBoxHandler: {fileID: 9053573547161205988}
-  textFieldPopupHandler: {fileID: 3605600378326007694}
-  meshPreview: {fileID: 789478436403455545}
-  background: {fileID: 4036551316717813377}
 --- !u!114 &5081173200935658316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -258,7 +237,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6871905225832551974}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SchematicMeshItemView, Assembly-CSharp
         m_MethodName: OnClick
         m_Mode: 1
@@ -325,6 +304,25 @@ MonoBehaviour:
   m_EffectColor: {r: 1, g: 1, b: 1, a: 1}
   m_EffectDistance: {x: 1, y: -1}
   m_UseGraphicAlpha: 1
+--- !u!114 &2437169101738657632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 874525778990479216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad57ddfe67b30ca4f9b8a9f9ef3b802a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectPreviewCamera: {fileID: 3997049775156912574, guid: 2d6438d457c3df44ebc293c68ca41728, type: 3}
+  objectRenderTexture: {fileID: 8400000, guid: 6342960dc752c834bb1ae419c28024b4, type: 2}
+  meshPreview: {fileID: 789478436403455545}
+  contextMenu: {fileID: 5268462848339823202}
+  infoBoxHandler: {fileID: 9053573547161205988}
+  textFieldPopupHandler: {fileID: 3605600378326007694}
+  view: {fileID: 0}
 --- !u!1 &2273779345183510336
 GameObject:
   m_ObjectHideFlags: 0
@@ -448,8 +446,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SchematicMeshPresetsView, Assembly-CSharp
+      - m_Target: {fileID: 3633992034315252942}
+        m_TargetAssemblyTypeName: ActorSchematicView, Assembly-CSharp
         m_MethodName: OnClickDone
         m_Mode: 1
         m_Arguments:
@@ -1195,6 +1193,7 @@ GameObject:
   - component: {fileID: 6700180159131241224}
   - component: {fileID: 3733025372850806582}
   - component: {fileID: 7800480729135805090}
+  - component: {fileID: 3633992034315252942}
   m_Layer: 6
   m_Name: Actor Schematic Presets Panel
   m_TagString: Untagged
@@ -1278,6 +1277,22 @@ MonoBehaviour:
   m_EffectColor: {r: 1, g: 1, b: 1, a: 1}
   m_EffectDistance: {x: 1, y: -1}
   m_UseGraphicAlpha: 1
+--- !u!114 &3633992034315252942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8668261250361995872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e24ef83a10585504d8f330eeb83bc9b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SchematicItem: {fileID: 874525778990479216}
+  FolderItem: {fileID: 9161756282894250042}
+  listContent: {fileID: 8192983951240282353}
+  view: {fileID: 0}
 --- !u!1 &8790087078764168624
 GameObject:
   m_ObjectHideFlags: 0
@@ -1345,7 +1360,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Level Schematics
+  m_text: Actor Schematics
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b66ceec7666a6044fb0168ddf311a4cb, type: 2}
   m_sharedMaterial: {fileID: 446512641697274038, guid: b66ceec7666a6044fb0168ddf311a4cb, type: 2}
@@ -1439,7 +1454,6 @@ GameObject:
   - component: {fileID: 4525143716992410116}
   - component: {fileID: 1682360188922187740}
   - component: {fileID: 9128985648146881924}
-  - component: {fileID: 966684153107803587}
   - component: {fileID: 7554405351029739527}
   - component: {fileID: 1302966388603676146}
   - component: {fileID: 4028663977643175512}
@@ -1451,7 +1465,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4525143716992410116
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1468,10 +1482,10 @@ RectTransform:
   m_Father: {fileID: 8192983951240282353}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 54, y: -54}
+  m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1682360188922187740
 CanvasRenderer:
@@ -1511,27 +1525,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &966684153107803587
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9161756282894250042}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f95d231e66387ae4e962b4624ef9fd0c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  schematicPreviewCamera: {fileID: 3997049775156912574, guid: dc5ede8170c81db428701a6a591e5437, type: 3}
-  levelSchematicRenderTexture: {fileID: 8400000, guid: dd28eb30c63fc1d45a58522bc0f8dcc7, type: 2}
-  parentView: {fileID: 0}
-  view: {fileID: 0}
-  contextMenu: {fileID: 4028663977643175512}
-  infoBoxHandler: {fileID: 1302966388603676146}
-  textFieldPopupHandler: {fileID: 4643999728290132396}
-  meshPreview: {fileID: 0}
-  background: {fileID: 9128985648146881924}
 --- !u!114 &7554405351029739527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1576,7 +1569,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 966684153107803587}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SchematicMeshItemView, Assembly-CSharp
         m_MethodName: OnClick
         m_Mode: 1

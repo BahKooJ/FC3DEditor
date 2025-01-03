@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 using Object = UnityEngine.Object;
 
 public class ActorEditMode : EditMode {
@@ -121,6 +120,7 @@ public class ActorEditMode : EditMode {
 
             HeadsUpTextUtil.End();
             actorToGroup = null;
+            EndAdd();
 
         }
 
@@ -142,9 +142,7 @@ public class ActorEditMode : EditMode {
 
                     CreateActor(actorToAdd.Value, hitPos.Value);
 
-                    Object.Destroy(arrowModel);
-
-                    actorToAdd = null;
+                    EndAdd();
 
                 }
 
@@ -280,6 +278,14 @@ public class ActorEditMode : EditMode {
         if (pos != null) {
             arrowModel.transform.position = pos.Value;
         }
+
+    }
+
+    public void EndAdd() {
+
+        Object.Destroy(arrowModel);
+
+        actorToAdd = null;
 
     }
 

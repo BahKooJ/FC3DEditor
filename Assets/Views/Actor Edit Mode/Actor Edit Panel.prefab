@@ -243,8 +243,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actorPropertiesView: {fileID: 5103753405492657139, guid: f4c95871b5585f348a4588b45d0cd1b4, type: 3}
+  actorSchematicViewFab: {fileID: 8668261250361995872, guid: 8ba630b261dcdae42a7c74c2cd29db98, type: 3}
   addActorContextMenu: {fileID: 6828022770600278391}
   activeActorPropertiesView: {fileID: 0}
+  activeActorSchematicView: {fileID: 0}
 --- !u!1 &5503720827429380930
 GameObject:
   m_ObjectHideFlags: 0
@@ -392,7 +394,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
-  message: Paste Nav Node Coords On Actor
+  message: Add Actor Schematics
 --- !u!1 &6461427044733956804
 GameObject:
   m_ObjectHideFlags: 0
@@ -690,7 +692,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
-  message: Paste Nav Node Coords On Actor
+  message: Open Actor Schematics
 --- !u!1001 &4687914008306104613
 PrefabInstance:
   m_ObjectHideFlags: 0
