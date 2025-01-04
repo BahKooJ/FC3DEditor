@@ -4,7 +4,6 @@ using FCopParser;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 public class ActorObject : MonoBehaviour {
 

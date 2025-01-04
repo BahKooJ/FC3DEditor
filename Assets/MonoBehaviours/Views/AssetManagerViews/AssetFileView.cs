@@ -1,10 +1,7 @@
 ﻿
 using System.IO;
-using System.Linq;
-using System.Xml.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Profiling;
 using UnityEngine.UI;
 
 public class AssetFileView : MonoBehaviour {

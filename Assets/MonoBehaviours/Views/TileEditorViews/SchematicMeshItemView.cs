@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FCopParser;
+using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
 
@@ -30,7 +31,7 @@ public class SchematicMeshItemView : MonoBehaviour {
         infoBoxHandler.message = schematic.name;
 
         contextMenu.items = new() {
-            ("Rename", Rename), ("Delete", Delete)
+            ("Remove Shaders", RemoveShaders), ("Rename", Rename), ("Delete", Delete)
         };
 
         textFieldPopupHandler.finishCallback = text => {
@@ -81,6 +82,21 @@ public class SchematicMeshItemView : MonoBehaviour {
 
         DestroyImmediate(meshObj.gameObject);
         DestroyImmediate(camera);
+
+    }
+
+    void RemoveShaders() {
+
+        foreach (var column in schematic.tileColumns) {
+
+            foreach (var tile in column.tiles) {
+                tile.shaders = new MonoChromeShader(tile.isQuad);
+            }
+
+        }
+
+        InitSchematicMeshOverlay();
+        RenderMesh();
 
     }
 

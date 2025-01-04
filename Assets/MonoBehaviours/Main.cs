@@ -300,6 +300,8 @@ public class Main : MonoBehaviour {
 
         ClearStaticData();
 
+        SettingsManager.renderDirectionalLight = false;
+
         Presets.uvPresets = new UVPresets("Texture Presets", null);
         Presets.shaderPresets = new ShaderPresets("Shader Presets", null);
         Presets.colorPresets = new ColorPresets("Color Presets", null);
@@ -328,7 +330,7 @@ public class Main : MonoBehaviour {
 
         ShaderEditMode.showColorPresets = false;
 
-        TextureEditMode.openUVMapperByDefault = false;
+        TextureEditMode.openUVMapperByDefault = true;
 
     }
 

@@ -3,7 +3,6 @@
 using FCopParser;
 using System;
 using TMPro;
-using UnityEngine;
 
 public class ValueActorPropertyItemView : ActorPropertyItemView {
 

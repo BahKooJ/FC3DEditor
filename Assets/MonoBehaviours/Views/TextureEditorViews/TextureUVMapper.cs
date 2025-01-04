@@ -10,8 +10,10 @@ using UnityEngine.EventSystems;
 
 public class TextureUVMapper : MonoBehaviour {
 
+    [HideInInspector]
     public bool editTransparency = false;
-    public bool refusedUVDrag = false;
+    [HideInInspector]
+    public bool refusedUVDrag = true;
 
     public TextureEditMode controller;
 
@@ -50,9 +52,12 @@ public class TextureUVMapper : MonoBehaviour {
     // Frame Animation Prefabs
     public GameObject frameListItem;
 
+    [HideInInspector]
     public List<FrameItemView> frameItems;
+    [HideInInspector]
     public int frameSelected = -1;
 
+    [HideInInspector]
     public int bmpID;
 
     bool preventDropdownCallback = false;
@@ -73,6 +78,8 @@ public class TextureUVMapper : MonoBehaviour {
     }
 
     void Start() {
+
+        refusedUVDrag = true;
 
         // For whatever reason, despite being set to -1 on declaration, it's 0 and I don't understand why
         frameSelected = -1;
@@ -137,7 +144,6 @@ public class TextureUVMapper : MonoBehaviour {
 
         }
 
-
         if (Main.ignoreAllInputs) {
             return;
         }
@@ -159,6 +165,12 @@ public class TextureUVMapper : MonoBehaviour {
 
     // UV Drag
     private void LateUpdate() {
+
+        if (Input.GetMouseButtonUp(0) && refusedUVDrag && !editTransparency) {
+
+            refusedUVDrag = false;
+
+        }
 
         if (Input.GetMouseButton(0) && IsCursorInTexturePallete() && !refusedUVDrag && !editTransparency) {
 

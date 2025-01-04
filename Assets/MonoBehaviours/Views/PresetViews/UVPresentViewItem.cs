@@ -291,6 +291,7 @@ public class UVPresentViewItem : MonoBehaviour {
 
         controller.RefreshTileOverlayTexture();
         controller.RefreshUVMapper();
+        controller.RefreshMeshes();
 
     }
 

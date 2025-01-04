@@ -2,10 +2,7 @@
 
 
 using FCopParser;
-using System;
 using TMPro;
-using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UI;
 
 public class ToggleActorPropertyItemView : ActorPropertyItemView {

@@ -1,9 +1,6 @@
 ﻿
 
 using FCopParser;
-using System.Xml.Linq;
-using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
