@@ -72,7 +72,13 @@ namespace FCopParser {
 
         }
 
+        public class VertexLimitExceededException : Exception { }
+        public class InvalidPrimitiveException : Exception { }
         public FCopObject(WavefrontParser wavefront, IFFDataFile rawFile) : base(rawFile) {
+
+            if (wavefront.vertices.Count > 255) {
+                throw new VertexLimitExceededException();
+            }
 
             allowCompiling = true;
 
@@ -93,6 +99,10 @@ namespace FCopParser {
             }
 
             foreach (var face in wavefront.faces) {
+
+                if (face.Count > 4) {
+                    throw new InvalidPrimitiveException();
+                }
 
                 // The unknown1 bitfield does seem to do something, it caused the triangles to go crazy.
                 var bitfield = face.Count == 3 ? new List<byte>() { 195, 3 } : new List<byte>() { 196, 4 };

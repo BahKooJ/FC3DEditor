@@ -22,6 +22,7 @@ public class ActorEditMode : EditMode {
 
     GameObject arrowModel = null;
     ActorBehavior? actorToAdd = null;
+    ActorObject schematicToAdd = null;
 
     static int counterActionID = 0;
 
@@ -121,10 +122,34 @@ public class ActorEditMode : EditMode {
             HeadsUpTextUtil.End();
             actorToGroup = null;
             EndAdd();
+            EndAddSchematic();
 
         }
 
         if (Main.ignoreAllInputs) {
+            return;
+        }
+
+        if (schematicToAdd != null) {
+
+            var hitPos = main.CursorOnLevelMesh();
+
+            if (hitPos != null) {
+                schematicToAdd.transform.position = hitPos.Value;
+            }
+
+            if (Input.GetMouseButtonDown(0)) {
+
+                if (hitPos != null) {
+
+                    AddActor(schematicToAdd.actor, hitPos.Value);
+
+                    EndAddSchematic();
+
+                }
+
+            }
+
             return;
         }
 
@@ -147,6 +172,8 @@ public class ActorEditMode : EditMode {
                 }
 
             }
+
+            return;
 
         }
 
@@ -249,23 +276,41 @@ public class ActorEditMode : EditMode {
             UnselectActorCompletely();
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha0)) {
-
-            var hitPos = main.CursorOnLevelMesh();
-
-            if (hitPos != null) {
-
-                CreateActor(ActorBehavior.StationaryEntity, hitPos.Value);
-
-            }
-
-        }
-
     }
 
     public void StartGroup(FCopActor actor) {
         actorToGroup = actor;
         HeadsUpTextUtil.HeadsUp("Select Actor to Group...");
+    }
+
+    public void StartAddSchematic(ActorSchematic schematic) {
+
+        var newAct = new FCopActor(new IFFDataFile(3, new(schematic.actorData), "Cact", main.level.sceneActors.FindNextID(), main.level.scripting.emptyOffset));
+
+        var obj = Object.Instantiate(main.BlankActor);
+        obj.layer = 8; // UI Mesh
+        var actorObject = obj.GetComponent<ActorObject>();
+        actorObject.actor = newAct;
+        actorObject.controller = this;
+
+        actorObject.Create();
+
+        schematicToAdd = actorObject;
+
+        UnselectActorCompletely();
+
+    }
+
+    public void EndAddSchematic() {
+
+        if (schematicToAdd == null) {
+            return;
+        }
+
+        Object.Destroy(schematicToAdd.gameObject);
+
+        schematicToAdd = null;
+
     }
 
     public void StartAdd(ActorBehavior behavior) {
@@ -279,9 +324,15 @@ public class ActorEditMode : EditMode {
             arrowModel.transform.position = pos.Value;
         }
 
+        UnselectActorCompletely();
+
     }
 
     public void EndAdd() {
+
+        if (arrowModel == null) {
+            return;
+        }
 
         Object.Destroy(arrowModel);
 
@@ -298,6 +349,10 @@ public class ActorEditMode : EditMode {
     }
 
     public void UnselectActorCompletely() {
+
+        if (selectedActor == null) {
+            return;
+        }
 
         AddActorSelectCounterAction(selectedActor.DataID);
 
@@ -529,6 +584,17 @@ public class ActorEditMode : EditMode {
         main.level.sceneActors.AddActor(newActor, null);
 
         AddNewActorObject(newActor);
+
+    }
+
+    public void AddActor(FCopActor actor, Vector3 pos) {
+
+        actor.x = Mathf.RoundToInt(pos.x * 8192f);
+        actor.y = Mathf.RoundToInt(pos.z * -8192f);
+
+        main.level.sceneActors.AddActor(actor, null);
+
+        AddNewActorObject(actor);
 
     }
 

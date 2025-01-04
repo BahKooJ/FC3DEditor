@@ -17,6 +17,8 @@ namespace FCopParser {
             public const string NULL = "NULL";
             public const string tSAC = "tSAC";
             public const string Cnet = "Cnet";
+            public const string Cact = "Cact";
+            public const string Csac = "Csac";
 
         }
 
@@ -289,6 +291,14 @@ namespace FCopParser {
             }
 
             rawFile.data = totalWithHeader;
+
+            // Makes sure the fourCC is correct.
+            if (tSACData != null) {
+                rawFile.dataFourCC = FourCC.Csac;
+            }
+            else {
+                rawFile.dataFourCC = FourCC.Cact;
+            }
 
             return rawFile;
 

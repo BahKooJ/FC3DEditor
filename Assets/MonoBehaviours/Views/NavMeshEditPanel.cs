@@ -61,6 +61,10 @@ public class NavMeshEditPanel : MonoBehaviour {
 
     }
 
+    public void PasteNavNodeCoords() {
+        controller.PasteNavNodeCoords();
+    }
+
     public void OnDropdownChange() {
 
         ChangeNavMesh(navMeshDropdown.value);

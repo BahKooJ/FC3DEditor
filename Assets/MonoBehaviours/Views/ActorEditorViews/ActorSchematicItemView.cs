@@ -123,4 +123,14 @@ public class ActorSchematicItemView : MonoBehaviour {
 
     }
 
+    // - Unity Events -
+
+    public void OnClick() {
+
+        controller.StartAddSchematic(actorSchematic);
+
+        view.OnClickDone();
+
+    }
+
 }

@@ -210,12 +210,27 @@ public class AssetManagerView : MonoBehaviour {
 
                     var emptyRawFile = level.CreateEmptyAssetFile(AssetType.Object);
 
-                    var obj = new FCopObject(wavefrontParser, emptyRawFile);
+                    try {
+                        var obj = new FCopObject(wavefrontParser, emptyRawFile);
 
-                    level.AddAsset(AssetType.Object, obj);
+                        level.AddAsset(AssetType.Object, obj);
 
-                    currentDirectory.files.Add(new AssetFile(obj, AssetType.Object, currentDirectory));
-                    Refresh();
+                        currentDirectory.files.Add(new AssetFile(obj, AssetType.Object, currentDirectory));
+                        Refresh();
+                    }
+                    catch (FCopObject.VertexLimitExceededException) {
+
+                        DialogWindowUtil.Dialog("Cobj Vertex Limit Exceeded", "Future Cop models has a maximum of 256 vertices, this limit was exceeded. " +
+                            "Keep the vertex count in mind when making models, this limit can be easily exceeded if not careful.");
+
+                    }
+                    catch (FCopObject.InvalidPrimitiveException) {
+
+                        DialogWindowUtil.Dialog("Invalid Face", "Future Cop models only support triangle and quad faces. " +
+                            "Any face with more than 4 vertices is invalid.");
+
+                    }
+
 
                 });
 

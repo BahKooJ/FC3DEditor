@@ -237,8 +237,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SchematicMeshItemView, Assembly-CSharp
+      - m_Target: {fileID: 2437169101738657632}
+        m_TargetAssemblyTypeName: ActorSchematicItemView, Assembly-CSharp
         m_MethodName: OnClick
         m_Mode: 1
         m_Arguments:

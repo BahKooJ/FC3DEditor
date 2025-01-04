@@ -362,11 +362,37 @@ public class NavMeshEditMode : EditMode {
 
     }
 
+    public void PasteNavNodeCoords() {
+
+        if (selectedNavNode == null) {
+
+            QuickLogHandler.Log("No Nav Node selected.", LogSeverity.Info);
+
+        }
+        else if (copiedNavNodeCoords == null) {
+
+            QuickLogHandler.Log("No Nav Node coordinates Copied.", LogSeverity.Info);
+
+        }
+        else {
+
+            selectedNavNode.moveCallback((Vector3)copiedNavNodeCoords, AxisControl.Axis.None);
+
+            selectedNavNode.transform.position = selectedNavNode.controlledObject.transform.position;
+
+            preventCounterAction = false;
+
+            QuickLogHandler.Log("Nav Node coordinates pasted.", LogSeverity.Success);
+
+        }
+
+    }
+
     public void CopyNavNodeCoords() {
 
         if (selectedNavNode != null) {
 
-            QuickLogHandler.Log("Nav Node coordinates copied", LogSeverity.Success);
+            QuickLogHandler.Log("Nav Node coordinates copied.", LogSeverity.Success);
 
             copiedNavNodeCoords = selectedNavNode.controlledObject.transform.position;
 
