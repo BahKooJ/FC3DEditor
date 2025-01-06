@@ -401,4 +401,13 @@ namespace FCopParser {
         Unknown4 = 4
     }
 
+    public enum MoveablePropMoveAxis {
+        RotationY = 0,
+        PositionZ = 1,
+        PositionX = 2,
+        PositionY = 3,
+        RotationX = 4,
+        RotationZ = 5
+    }
+
 }

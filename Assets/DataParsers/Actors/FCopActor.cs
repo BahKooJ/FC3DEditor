@@ -88,7 +88,7 @@ namespace FCopParser {
                 case ActorBehavior.DynamicProp:
                     behavior = new FCopBehavior11(this, propertyData);
                     break;
-                case ActorBehavior.CollidableProp:
+                case ActorBehavior.WalkableProp:
                     behavior = new FCopBehavior12(this, propertyData);
                     break;
                 case ActorBehavior.UniversalTrigger:
@@ -471,6 +471,10 @@ namespace FCopParser {
 
             }
 
+            if (floatingBits.Count != 0) {
+                throw new Exception("Actor Behavor " + actor.behaviorType.ToString() + " compilation still has floating bits!");
+            }
+
             return total;
 
         }
@@ -844,14 +848,20 @@ namespace FCopParser {
 
     }
 
-    // - Parsed -
+    // - Completed -
     public class FCopBehavior12 : FCopEntity, FCopHeightOffsetting, FCopObjectMutating {
 
         public int heightMultiplier { get; set; }
 
+        public const int assetRefCount = 2;
+        public const int blocks = 12;
+
         public FCopBehavior12(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             heightMultiplier = 512;
+
+            assetRefNames = new string[] { "Object", "Destroyed Object" };
+            assetRefType = new AssetType[] { AssetType.Object, AssetType.Object };
 
             properties.AddRange(new List<ActorProperty>() {
                 new RotationActorProperty("Rotation Y", new ActorRotation().SetRotationCompiled(Read16()), BitCount.Bit16, Axis.Y, new int[] { 0 }),
@@ -941,19 +951,75 @@ namespace FCopParser {
 
     }
 
-    public class FCopBehavior25 : FCopEntity {
+    // - Completed -
+    public class FCopBehavior25 : FCopEntity, FCopHeightOffsetting, FCopObjectMutating {
+
+        public int heightMultiplier { get; set; }
+
+        public const int assetRefCount = 2;
+        public const int blocks = 16;
 
         public FCopBehavior25(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (propertyData.Count - offset) / 2;
+            heightMultiplier = 512;
 
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
-                properties.Add(property);
-            }
+            assetRefNames = new string[] { "Object", "Destroyed Object" };
+            assetRefType = new AssetType[] { AssetType.Object, AssetType.Object };
+
+            properties.Add(new EnumDataActorProperty("Move Axis", (MoveablePropMoveAxis)Read8(), BitCount.Bit8));
+
+            var data = propertyData[offset];
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ToggleActorProperty("Start in End Position", (data & 0x01) == 0x01, BitCount.Bit1),
+                new ToggleActorProperty("Looping", (data & 0x02) == 0x02, BitCount.Bit1),
+                new ToggleActorProperty("Walkable", (data & 0x04) == 0x04, BitCount.Bit1),
+                new ToggleActorProperty("Enabled", (data & 0x08) == 0x08, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+
+            });
+
+            offset++;
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(), BitCount.Bit8),
+                new ValueActorProperty("Start Sound", Read8(), BitCount.Bit8),
+                new ValueActorProperty("Height Offset", Read16(), BitCount.Bit16),
+                new RotationActorProperty("Rotation", new ActorRotation().SetRotationCompiled(Read16()), BitCount.Bit16, Axis.Y, new int[] { 0, 1 }),
+                new ValueActorProperty("Ending Position Offset", Read16(), BitCount.Bit16),
+                new RotationActorProperty("Ending Rotation Offset", new ActorRotation().SetRotationCompiled(Read16()), BitCount.Bit16, Axis.Y, new int[] { }),
+                new ValueActorProperty("Position Speed", Read16(), BitCount.Bit16),
+                new ValueActorProperty("Rotation Speed", Read16(), BitCount.Bit16),
+
+            });
 
             InitPropertiesByName();
 
+        }
+
+        public void SetHeight(int height) {
+            ((ValueActorProperty)propertiesByName["Height Offset"]).SafeSetSigned(height);
+        }
+
+        public int GetHeight() {
+            return propertiesByName["Height Offset"].GetCompiledValue();
+        }
+
+        public ActorProperty GetHeightProperty() {
+            return propertiesByName["Height Offset"];
+        }
+
+        public ActorGroundCast GetGroundCast() {
+            return (ActorGroundCast)((EnumDataActorProperty)propertiesByName["Ground Cast"]).caseValue;
+        }
+
+        public RotationActorProperty[] GetRotations() {
+            return new RotationActorProperty[] { (RotationActorProperty)propertiesByName["Rotation"] };
         }
 
     }
@@ -1463,7 +1529,7 @@ namespace FCopParser {
         Aircraft = 9,
         Elevator = 10,
         DynamicProp = 11,
-        CollidableProp = 12,
+        WalkableProp = 12,
         UniversalTrigger = 14,
         FloatingItem = 16,
         PathedTurret = 20,
