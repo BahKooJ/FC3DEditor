@@ -1181,12 +1181,49 @@ namespace FCopParser {
 
         public FCopBehavior35(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (propertyData.Count - offset) / 2;
+            properties.Add(new ValueActorProperty("35_unknown1", Read16(), BitCount.Bit16));
 
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(), BitCount.Bit16);
-                properties.Add(property);
-            }
+            properties.AddRange(new List<ActorProperty>() {
+
+                new FillerActorProperty(0, BitCount.Bit16),
+                new FillerActorProperty(1, BitCount.Bit16),
+                new FillerActorProperty(0, BitCount.Bit16),
+                new FillerActorProperty(0, BitCount.Bit16),
+                new FillerActorProperty(0, BitCount.Bit16),
+                new FillerActorProperty(0, BitCount.Bit16),
+                new FillerActorProperty(0, BitCount.Bit16),
+                new FillerActorProperty(255, BitCount.Bit16),
+                new FillerActorProperty(0, BitCount.Bit16),
+
+            });
+
+            offset += 18;
+
+            properties.AddRange(new List<ActorProperty>() {
+                new ValueActorProperty("35_unknown2", Read16(), BitCount.Bit16),
+                new ValueActorProperty("35_unknown3", Read16(), BitCount.Bit16),
+                new ValueActorProperty("35_unknown4", Read16(), BitCount.Bit16),
+                new ValueActorProperty("35_unknown5", Read16(), BitCount.Bit16),
+                new ValueActorProperty("35_unknown6", Read16(), BitCount.Bit16),
+                new ValueActorProperty("35_unknown7", Read16(), BitCount.Bit16),
+                new ValueActorProperty("redBaseX", Read16(), BitCount.Bit16),
+                new ValueActorProperty("redBaseY", Read16(), BitCount.Bit16),
+                new ValueActorProperty("blueBaseX", Read16(), BitCount.Bit16),
+                new ValueActorProperty("blueBaseY", Read16(), BitCount.Bit16),
+                new ValueActorProperty("outpost4X", Read16(), BitCount.Bit16),
+                new ValueActorProperty("outpost4Y", Read16(), BitCount.Bit16),
+                new ValueActorProperty("outpost3X", Read16(), BitCount.Bit16),
+                new ValueActorProperty("outpost3Y", Read16(), BitCount.Bit16),
+                new ValueActorProperty("outpost1X", Read16(), BitCount.Bit16),
+                new ValueActorProperty("outpost1Y", Read16(), BitCount.Bit16),
+                new ValueActorProperty("outpost2X", Read16(), BitCount.Bit16),
+                new ValueActorProperty("outpost2Y", Read16(), BitCount.Bit16),
+                new ValueActorProperty("35_unknown20", Read16(), BitCount.Bit16),
+                new ValueActorProperty("35_unknown21", Read16(), BitCount.Bit16),
+                new ValueActorProperty("35_unknown22", Read16(), BitCount.Bit16),
+                new ValueActorProperty("35_unknown23", Read16(), BitCount.Bit16),
+
+            });
 
             InitPropertiesByName();
 
