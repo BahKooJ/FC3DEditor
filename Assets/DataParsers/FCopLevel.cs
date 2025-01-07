@@ -600,9 +600,18 @@ namespace FCopParser {
                         sectionData.AddRange(BitConverter.GetBytes(tile.texturePalette));
                         sectionData.AddRange(BitConverter.GetBytes(tile.isSemiTransparent ? 1 : 0));
                         sectionData.AddRange(BitConverter.GetBytes(tile.isVectorAnimated ? 1 : 0));
-                        sectionData.AddRange(BitConverter.GetBytes((int)tile.shaders.type));
 
+                        //var newShader = tile.shaders.VerifyCorrectShader();
+
+                        //if (newShader != null) {
+
+                        //    tile.shaders = tile.shaders.VerifyCorrectShader();
+
+                        //}
+
+                        sectionData.AddRange(BitConverter.GetBytes((int)tile.shaders.type));
                         sectionData.AddRange(BitConverter.GetBytes(tile.shaders.isQuad ? 1 : 0));
+
                         switch (tile.shaders.type) {
                             case VertexColorType.MonoChrome:
                                 var monoShader = (MonoChromeShader)tile.shaders;
@@ -4911,7 +4920,23 @@ namespace FCopParser {
         public TileShaders VerifyCorrectShader() {
 
             if ((isQuad && values.Length != 4) || (!isQuad && values.Length != 3)) {
-                throw new Exception("Incorrect shader format");
+
+                if (!isQuad && values.Length != 3) {
+
+                    values = values.Take(values.Length - 1).ToArray();
+
+                }
+                else if (isQuad && values.Length != 4) {
+
+                    values = values.Append(new XRGB555(false, 31, 31, 31)).ToArray();
+
+                }
+                else {
+                    
+                    throw new Exception("Incorrect shader format");
+
+                }
+
             }
 
             var first = values[0];

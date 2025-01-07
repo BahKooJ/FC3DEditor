@@ -31,7 +31,17 @@ public class ValueActorPropertyItemView : ActorPropertyItemView {
 
         var valueProperty = (ValueActorProperty)property;
 
-        valueProperty.SafeSetSigned(value);
+        if (valueProperty.bitCount != BitCount.Bit3) {
+
+            valueProperty.SafeSetSigned(value);
+
+        }
+        else {
+
+            valueProperty.value = value;
+
+        }
+
         valueField.text = valueProperty.value.ToString();
         
         if (ActorPropertyChangeEvent.changeEventsByPropertyName.ContainsKey(property.name)) {

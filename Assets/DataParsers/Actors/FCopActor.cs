@@ -1,6 +1,7 @@
 ﻿
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -130,7 +131,7 @@ namespace FCopParser {
                 case ActorBehavior.Behavior34:
                     behavior = new FCopBehavior33(this, propertyData);
                     break;
-                case ActorBehavior.Behavior35:
+                case ActorBehavior.MapObjectiveNodes:
                     behavior = new FCopBehavior35(this, propertyData);
                     break;
                 case ActorBehavior.ClaimableTurret:
@@ -445,6 +446,9 @@ namespace FCopParser {
                     switch (p.bitCount) {
                         case BitCount.Bit1:
                             floatingBits.Add(new BitNumber(1, p.GetCompiledValue()));
+                            break;
+                        case BitCount.Bit3:
+                            floatingBits.Add(new BitNumber(3, p.GetCompiledValue()));
                             break;
                     }
 
@@ -1177,11 +1181,15 @@ namespace FCopParser {
 
     }
 
+    // - Completed - (One unknown)
     public class FCopBehavior35 : FCopActorBehavior {
+
+        public const int assetRefCount = 2;
+        public const int blocks = 32;
 
         public FCopBehavior35(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            properties.Add(new ValueActorProperty("35_unknown1", Read16(), BitCount.Bit16));
+            properties.Add(new ValueActorProperty("Unknown", Read16(), BitCount.Bit16));
 
             properties.AddRange(new List<ActorProperty>() {
 
@@ -1199,29 +1207,69 @@ namespace FCopParser {
 
             offset += 18;
 
+            var nodeTypeBytes = propertyData.GetRange(offset, 3).ToArray();
+            var nodeTypeBitfield = new BitArray(nodeTypeBytes);
+
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("35_unknown2", Read16(), BitCount.Bit16),
-                new ValueActorProperty("35_unknown3", Read16(), BitCount.Bit16),
-                new ValueActorProperty("35_unknown4", Read16(), BitCount.Bit16),
-                new ValueActorProperty("35_unknown5", Read16(), BitCount.Bit16),
-                new ValueActorProperty("35_unknown6", Read16(), BitCount.Bit16),
-                new ValueActorProperty("35_unknown7", Read16(), BitCount.Bit16),
-                new ValueActorProperty("redBaseX", Read16(), BitCount.Bit16),
-                new ValueActorProperty("redBaseY", Read16(), BitCount.Bit16),
-                new ValueActorProperty("blueBaseX", Read16(), BitCount.Bit16),
-                new ValueActorProperty("blueBaseY", Read16(), BitCount.Bit16),
-                new ValueActorProperty("outpost4X", Read16(), BitCount.Bit16),
-                new ValueActorProperty("outpost4Y", Read16(), BitCount.Bit16),
-                new ValueActorProperty("outpost3X", Read16(), BitCount.Bit16),
-                new ValueActorProperty("outpost3Y", Read16(), BitCount.Bit16),
-                new ValueActorProperty("outpost1X", Read16(), BitCount.Bit16),
-                new ValueActorProperty("outpost1Y", Read16(), BitCount.Bit16),
-                new ValueActorProperty("outpost2X", Read16(), BitCount.Bit16),
-                new ValueActorProperty("outpost2Y", Read16(), BitCount.Bit16),
-                new ValueActorProperty("35_unknown20", Read16(), BitCount.Bit16),
-                new ValueActorProperty("35_unknown21", Read16(), BitCount.Bit16),
-                new ValueActorProperty("35_unknown22", Read16(), BitCount.Bit16),
-                new ValueActorProperty("35_unknown23", Read16(), BitCount.Bit16),
+                new ToggleActorProperty("Show Arrow Node 1", (nodeTypeBytes[0] & 0x01) == 0x01, BitCount.Bit1, "Node 1 Properties"),
+                new ToggleActorProperty("Show Satellite Node 1", (nodeTypeBytes[0] & 0x02) == 0x02, BitCount.Bit1, "Node 1 Properties"),
+                new ToggleActorProperty("Show Minimap Node 1", (nodeTypeBytes[0] & 0x04) == 0x04, BitCount.Bit1, "Node 1 Properties"),
+                new ToggleActorProperty("Show Arrow Node 2", (nodeTypeBytes[0] & 0x08) == 0x08, BitCount.Bit1, "Node 2 Properties"),
+                new ToggleActorProperty("Show Satellite Node 2", (nodeTypeBytes[0] & 0x10) == 0x10, BitCount.Bit1, "Node 2 Properties"),
+                new ToggleActorProperty("Show Minimap Node 2", (nodeTypeBytes[0] & 0x20) == 0x20, BitCount.Bit1, "Node 2 Properties"),
+                new ToggleActorProperty("Show Arrow Node 3", (nodeTypeBytes[0] & 0x40) == 0x40, BitCount.Bit1, "Node 3 Properties"),
+                new ToggleActorProperty("Show Satellite Node 3", (nodeTypeBytes[0] & 0x80) == 0x80, BitCount.Bit1, "Node 3 Properties"),
+
+                new ToggleActorProperty("Show Minimap Node 3", (nodeTypeBytes[1] & 0x01) == 0x01, BitCount.Bit1, "Node 3 Properties"),
+                new ToggleActorProperty("Show Arrow Node 4", (nodeTypeBytes[1] & 0x02) == 0x02, BitCount.Bit1, "Node 4 Properties"),
+                new ToggleActorProperty("Show Satellite Node 4", (nodeTypeBytes[1] & 0x04) == 0x04, BitCount.Bit1, "Node 4 Properties"),
+                new ToggleActorProperty("Show Minimap Node 4", (nodeTypeBytes[1] & 0x08) == 0x08, BitCount.Bit1, "Node 4 Properties"),
+                new ToggleActorProperty("Show Arrow Node 5", (nodeTypeBytes[1] & 0x10) == 0x10, BitCount.Bit1, "Node 5 Properties"),
+                new ToggleActorProperty("Show Satellite Node 5", (nodeTypeBytes[1] & 0x20) == 0x20, BitCount.Bit1, "Node 5 Properties"),
+                new ToggleActorProperty("Show Minimap Node 5", (nodeTypeBytes[1] & 0x40) == 0x40, BitCount.Bit1, "Node 5 Properties"),
+                new ToggleActorProperty("Show Arrow Node 6", (nodeTypeBytes[1] & 0x80) == 0x80, BitCount.Bit1, "Node 6 Properties"),
+
+                new ToggleActorProperty("Show Satellite Node 6", (nodeTypeBytes[2] & 0x01) == 0x01, BitCount.Bit1, "Node 6 Properties"),
+                new ToggleActorProperty("Show Minimap Node 6", (nodeTypeBytes[2] & 0x02) == 0x02, BitCount.Bit1, "Node 6 Properties"),
+                new ToggleActorProperty("Show Arrow Node 7", (nodeTypeBytes[2] & 0x04) == 0x04, BitCount.Bit1, "Node 7 Properties"),
+                new ToggleActorProperty("Show Satellite Node 7", (nodeTypeBytes[2] & 0x08) == 0x08, BitCount.Bit1, "Node 7 Properties"),
+                new ToggleActorProperty("Show Minimap Node 7", (nodeTypeBytes[2] & 0x10) == 0x10, BitCount.Bit1, "Node 7 Properties"),
+                new ToggleActorProperty("Show Arrow Node 8", (nodeTypeBytes[2] & 0x20) == 0x20, BitCount.Bit1, "Node 8 Properties"),
+                new ToggleActorProperty("Show Satellite Node 8", (nodeTypeBytes[2] & 0x40) == 0x40, BitCount.Bit1, "Node 8 Properties"),
+                new ToggleActorProperty("Show Minimap Node 8", (nodeTypeBytes[2] & 0x80) == 0x80, BitCount.Bit1, "Node 8 Properties"),
+
+                new FillerActorProperty(0, BitCount.Bit8)
+            });
+
+            offset += 4;
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new EnumDataActorProperty("Map Icon Color 1", (MapIconColor)Read8(), BitCount.Bit8, "Node 1 Properties"),
+                new EnumDataActorProperty("Map Icon Color 2", (MapIconColor)Read8(), BitCount.Bit8, "Node 2 Properties"),
+                new EnumDataActorProperty("Map Icon Color 3", (MapIconColor)Read8(), BitCount.Bit8, "Node 3 Properties"),
+                new EnumDataActorProperty("Map Icon Color 4", (MapIconColor)Read8(), BitCount.Bit8, "Node 4 Properties"),
+                new EnumDataActorProperty("Map Icon Color 5", (MapIconColor)Read8(), BitCount.Bit8, "Node 5 Properties"),
+                new EnumDataActorProperty("Map Icon Color 6", (MapIconColor)Read8(), BitCount.Bit8, "Node 6 Properties"),
+                new EnumDataActorProperty("Map Icon Color 7", (MapIconColor)Read8(), BitCount.Bit8, "Node 7 Properties"),
+                new EnumDataActorProperty("Map Icon Color 8", (MapIconColor)Read8(), BitCount.Bit8, "Node 8 Properties"),
+
+                new ValueActorProperty("Node 1 X", Read16(), BitCount.Bit16, "Node 1 Properties"),
+                new ValueActorProperty("Node 1 Y", Read16(), BitCount.Bit16, "Node 1 Properties"),
+                new ValueActorProperty("Node 2 X", Read16(), BitCount.Bit16, "Node 2 Properties"),
+                new ValueActorProperty("Node 2 Y", Read16(), BitCount.Bit16, "Node 2 Properties"),
+                new ValueActorProperty("Node 3 X", Read16(), BitCount.Bit16, "Node 3 Properties"),
+                new ValueActorProperty("Node 3 Y", Read16(), BitCount.Bit16, "Node 3 Properties"),
+                new ValueActorProperty("Node 4 X", Read16(), BitCount.Bit16, "Node 4 Properties"),
+                new ValueActorProperty("Node 4 Y", Read16(), BitCount.Bit16, "Node 4 Properties"),
+                new ValueActorProperty("Node 5 X", Read16(), BitCount.Bit16, "Node 5 Properties"),
+                new ValueActorProperty("Node 5 Y", Read16(), BitCount.Bit16, "Node 5 Properties"),
+                new ValueActorProperty("Node 6 X", Read16(), BitCount.Bit16, "Node 6 Properties"),
+                new ValueActorProperty("Node 6 Y", Read16(), BitCount.Bit16, "Node 6 Properties"),
+                new ValueActorProperty("Node 7 X", Read16(), BitCount.Bit16, "Node 7 Properties"),
+                new ValueActorProperty("Node 7 Y", Read16(), BitCount.Bit16, "Node 7 Properties"),
+                new ValueActorProperty("Node 8 X", Read16(), BitCount.Bit16, "Node 8 Properties"),
+                new ValueActorProperty("Node 8 Y", Read16(), BitCount.Bit16, "Node 8 Properties"),
 
             });
 
@@ -1580,7 +1628,7 @@ namespace FCopParser {
         Reloader = 32,
         Behavior33 = 33,
         Behavior34 = 34,
-        Behavior35 = 35,
+        MapObjectiveNodes = 35,
         ClaimableTurret = 36,
         Behavior37 = 37,
         Behavior38 = 38,

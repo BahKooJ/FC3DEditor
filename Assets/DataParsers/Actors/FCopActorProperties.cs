@@ -257,6 +257,7 @@ namespace FCopParser {
     public enum BitCount {
         NA = -1,
         Bit1 = 1,
+        Bit3 = 3,
         Bit8 = 8,
         Bit16 = 16,
         Bit32 = 32,
