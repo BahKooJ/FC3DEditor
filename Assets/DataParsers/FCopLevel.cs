@@ -260,7 +260,8 @@ namespace FCopParser {
 
             switch (assetType) {
                 case AssetType.WavSound:
-                    return null;
+
+                    return audio.AddWave(newData, scripting.emptyOffset);
 
                 case AssetType.Object:
 
@@ -386,7 +387,7 @@ namespace FCopParser {
 
             newFileManager.files.Add(audio.CompileSoundHeader());
 
-            foreach (var wav in audio.GetWaves()) {
+            foreach (var wav in audio.soundEffects) {
                 newFileManager.files.Add(wav.rawFile);
             }
 
@@ -540,7 +541,7 @@ namespace FCopParser {
 
             CreateHeaderWithFile(audio.CompileSoundHeader(), "FCopCshd", "");
 
-            foreach (var wav in audio.GetWaves()) {
+            foreach (var wav in audio.soundEffects) {
                 CreateHeaderWithFile(wav.rawFile, "FCopCwav", wav.name);
             }
 

@@ -320,6 +320,65 @@ namespace FCopParser {
 
     }
 
+    public class WaveParser {
+
+        public int fileSize;
+        public int audioFormat;
+        public int channels;
+        public int sampleRate;
+        public int bytesPerSec;
+        public int bytesPerBlock;
+        public int bitsPerSample;
+        public List<byte> sampleData;
+
+        public List<byte> data;
+
+        public WaveParser(List<byte> data) {
+
+            this.data = data;
+
+            var arrayData = data.ToArray();
+
+            if (!data.GetRange(0, 4).SequenceEqual(new List<byte>() { 0x52, 0x49, 0x46, 0x46 })) {
+                throw new InvalidFileException();
+            }
+
+            var offset = 4;
+
+            fileSize = BitConverter.ToInt32(arrayData, offset);
+            offset += 8;
+
+            // JUNK
+            // IDK why but sometimes a wave has this junk chunk because why not I guess
+            if (data.GetRange(offset, 4).SequenceEqual(new List<byte>() { 0x4A, 0x55, 0x4E, 0x4B })) {
+                offset += 4;
+                offset += BitConverter.ToInt32(arrayData, offset) + 4;
+            }
+
+            // Move past fmt  and size
+            offset += 8;
+
+            audioFormat = BitConverter.ToInt16(arrayData, offset);
+            offset += 2;
+            channels = BitConverter.ToInt16(arrayData, offset);
+            offset += 2;
+            sampleRate = BitConverter.ToInt32(arrayData, offset);
+            offset += 4;
+            bytesPerSec = BitConverter.ToInt32(arrayData, offset);
+            offset += 4;
+            bytesPerBlock = BitConverter.ToInt16(arrayData, offset);
+            offset += 2;
+            bitsPerSample = BitConverter.ToInt16(arrayData, offset);
+            offset += 2;
+
+            // Move Past data fourCC
+            offset += 4;
+            sampleData = data.GetRange(offset + 4, BitConverter.ToInt32(arrayData, offset));
+
+        }
+
+    }
+
     public enum AssetType {
         WavSound,
         Texture,

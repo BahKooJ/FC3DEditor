@@ -8,7 +8,7 @@ namespace FCopParser {
 
     public class FCopAudioParser {
 
-        public Dictionary<int, List<FCopAudio>> soundEffects = new();
+        public List<FCopAudio> soundEffects = new();
         public List<FCopStream> soundStreams = new();
         public FCopAudio music;
 
@@ -47,13 +47,7 @@ namespace FCopParser {
 
                 var soundEffect = new FCopAudio(GetCwav(metaDataStruct.dataID), metaDataStruct);
 
-                if (soundEffects.ContainsKey(metaDataStruct.groupID)) {
-                    soundEffects[metaDataStruct.groupID].Add(soundEffect);
-                }
-                else {
-                    soundEffects[metaDataStruct.groupID] = new() { soundEffect };
-                }
-
+                soundEffects.Add(soundEffect);
 
                 offset += 12;
 
@@ -73,15 +67,13 @@ namespace FCopParser {
 
             var total = new List<byte>();
 
-            var waves = GetWaves();
-
             total.AddRange(BitConverter.GetBytes((short)4));
             total.AddRange(BitConverter.GetBytes((short)1));
             total.AddRange(BitConverter.GetBytes((short)50));
-            total.AddRange(BitConverter.GetBytes((short)waves.Count));
+            total.AddRange(BitConverter.GetBytes((short)soundEffects.Count));
             total.AddRange(BitConverter.GetBytes((short)10));
 
-            foreach (var wave in waves) {
+            foreach (var wave in soundEffects) {
 
                 total.AddRange(BitConverter.GetBytes((short)wave.groupID));
                 total.AddRange(BitConverter.GetBytes((short)wave.DataID));
@@ -223,25 +215,25 @@ namespace FCopParser {
 
         }
 
-        public List<FCopAudio> GetWaves() {
+        public FCopAudio AddWave(byte[] newData, int emptyOffset) {
 
-            List<FCopAudio> total = new();
+            var maxID = soundEffects.Max(s => s.DataID);
+            var maxGroup = soundEffects.Max(s => s.groupID);
+            var maxScript = soundEffects.Max(s => s.scriptingID);
 
-            foreach (var sound in soundEffects) {
+            var rawFile = new IFFDataFile(2, newData.ToList(), "Cwav", maxID + 1, emptyOffset);
 
-                foreach (var s in sound.Value) {
-                    total.Add(s);
-                }
+            var sound = new FCopAudio(rawFile, new SoundMetaData(maxGroup + 1, maxID + 1, 7, 3, 0, 0, maxScript + 1));
 
-            }
+            soundEffects.Add(sound);
 
-            return total;
+            return sound;
 
         }
 
         public void ImportWave(int id, byte[] newData) {
 
-            var wave = GetWaves().First(wav => wav.DataID == id);
+            var wave = soundEffects.First(wav => wav.DataID == id);
 
             wave.rawFile.data = newData.ToList();
 

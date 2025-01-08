@@ -36,12 +36,10 @@ public class AssetManagerView : MonoBehaviour {
 
         var soundDir = new AssetDirectory(AssetType.WavSound, true, "Sound Effects", root);
 
-        foreach (var item in level.audio.soundEffects) {
-
-            foreach (var sound in item.Value) {
-                soundDir.files.Add(new AssetFile(sound, AssetType.WavSound, soundDir));
-            }
-
+        foreach (var sound in level.audio.soundEffects) {
+            
+            soundDir.files.Add(new AssetFile(sound, AssetType.WavSound, soundDir));
+            
         }
 
         var textureDir = new AssetDirectory(AssetType.Texture, false, "Textures", root);
@@ -81,7 +79,7 @@ public class AssetManagerView : MonoBehaviour {
         if (currentDirectory.canAddFiles) {
 
             contextMenu.items = new() {
-                ("Add", AddRaw),
+                ("Add Raw", AddRaw),
                 ("Add Parsed", AddParsed)
             };
 
@@ -202,6 +200,42 @@ public class AssetManagerView : MonoBehaviour {
     void AddParsed() {
 
         switch (currentDirectory.storedAssets) {
+
+            case AssetType.WavSound:
+
+                OpenFileWindowUtil.OpenFile("FCEAssets", "", path => {
+
+                    try {
+
+                        var waveParser = new WaveParser(File.ReadAllBytes(path).ToList());
+
+                        if (!(waveParser.sampleRate == 22050 && waveParser.channels == 1 && waveParser.bitsPerSample == 16)) {
+                            DialogWindowUtil.Dialog("Incorrect Wave Format", "Wave file is incorrect format, ensure that wave file meets required format:\n" +
+                                "Required Sample Rate: 22050, File Sample Rate: " + waveParser.sampleRate + "\n" +
+                                "Required Channels: 1, File Channels: " + waveParser.channels + "\n" +
+                                "Required Bits Per Sample: 16, File Bits Per Sample: " + waveParser.bitsPerSample);
+                            return;
+                        }
+
+                        var newFile = level.AddAsset(AssetType.WavSound, waveParser.data.ToArray());
+
+                        currentDirectory.files.Add(new AssetFile(newFile, currentDirectory.storedAssets, currentDirectory));
+
+                        Refresh();
+
+                    }
+                    catch (InvalidFileException) {
+
+                        DialogWindowUtil.Dialog("Invalid File", "Please select a valid wave file.");
+
+                    }
+
+
+
+                });
+
+                break;
+
             case AssetType.Object:
 
                 OpenFileWindowUtil.OpenFile("FCEAssets", "", path => {
