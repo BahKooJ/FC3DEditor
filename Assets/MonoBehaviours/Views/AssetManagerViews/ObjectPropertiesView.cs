@@ -99,4 +99,11 @@ public class ObjectPropertiesView : MonoBehaviour {
         RenderMesh();
 
     }
+
+    public void OnClickEdit() {
+
+        main.OpenObjectEditor(fCopObject);
+
+    }
+
 }

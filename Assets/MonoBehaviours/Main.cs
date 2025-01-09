@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -314,6 +315,18 @@ public class Main : MonoBehaviour {
         SceneManager.LoadScene("Scenes/FileManagerScene", LoadSceneMode.Single);
 
         System.GC.Collect();
+
+    }
+
+    public void OpenObjectEditor(FCopObject fCopObject) {
+
+        foreach (var obj in SceneManager.GetActiveScene().GetRootGameObjects()) {
+            obj.SetActive(false);
+        }
+        
+        ObjectEditorMain.fCopObject = fCopObject;
+        ObjectEditorMain.levelTexturePallet = levelTexturePallet;
+        SceneManager.LoadScene("Scenes/ObjectEditorScene", LoadSceneMode.Additive);
 
     }
 

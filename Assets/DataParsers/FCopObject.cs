@@ -306,6 +306,14 @@ namespace FCopParser {
 
         }
 
+        void ParseElementReferences() {
+
+            var headers = offsets.Where(header => {
+                return header.fourCCDeclaration == FourCC.threeDRF;
+            });
+
+        }
+
         void ParsePrimitives() {
 
             var header = offsets.First(header => {
@@ -799,6 +807,12 @@ namespace FCopParser {
             }
 
             return Reverse(Encoding.Default.GetString(rawFile.data.ToArray(), offset, length));
+        }
+
+        public struct ObjectElementReference {
+
+
+
         }
 
         public struct Vertex {

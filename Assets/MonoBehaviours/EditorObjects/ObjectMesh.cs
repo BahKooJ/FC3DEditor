@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ObjectMesh : MonoBehaviour {
 
-    const float scale = 512f;
+    public const float scale = 512f;
 
     // - Prefabs -
     public GameObject boundingBoxFab;
