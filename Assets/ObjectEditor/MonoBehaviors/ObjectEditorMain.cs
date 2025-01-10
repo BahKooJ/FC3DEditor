@@ -1,18 +1,21 @@
 ﻿
 
 using FCopParser;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UIElements;
 
 public class ObjectEditorMain : MonoBehaviour {
 
     // - Prefabs -
     public GameObject ObjectMeshPrefab;
     public GameObject ObjectVertexPrefab;
+
+    // - Unity View Refs -
+    public ObjectPropertiesPanelView view;
 
     // - Parameters -
     public static FCopObject fCopObject;
@@ -21,6 +24,8 @@ public class ObjectEditorMain : MonoBehaviour {
 
     [HideInInspector]
     public ObjectMesh objectMesh;
+
+    public Action<ObjectVertex> requestedVertexActionCallback = v => { };
 
     private void Start() {
 
@@ -45,6 +50,8 @@ public class ObjectEditorMain : MonoBehaviour {
 
         InitObject();
         InitObjectVertices();
+
+        view.Init();
 
     }
 

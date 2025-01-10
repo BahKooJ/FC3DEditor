@@ -82,8 +82,6 @@ namespace FCopParser {
 
         public List<Triangle> triangles = new();
 
-        public bool allowCompiling = false;
-
         public FCopObject(IFFDataFile rawFile) : base(rawFile) {
 
             name = "Object " + DataID.ToString();
@@ -99,8 +97,6 @@ namespace FCopParser {
             if (wavefront.vertices.Count > 255) {
                 throw new VertexLimitExceededException();
             }
-
-            allowCompiling = true;
 
             var compiledData = new List<byte>();
 
@@ -324,10 +320,6 @@ namespace FCopParser {
 
         public int GetTexturePalette() {
 
-            if (!allowCompiling) {
-                return -1;
-            }
-
             var value = -2;
 
             foreach (var surface in surfaces) {
@@ -351,10 +343,6 @@ namespace FCopParser {
         }
 
         public void SetTexturePalette(int index) {
-
-            if (!allowCompiling) {
-                return;
-            }
 
             foreach (var i in Enumerable.Range(0, surfaces.Count)) {
 
