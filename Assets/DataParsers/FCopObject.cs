@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -46,12 +47,38 @@ namespace FCopParser {
 
         public List<ChunkHeader> offsets = new();
 
+        public class ObjectElementGroup {
+
+            public List<Vertex> vertices = new();
+            public List<Vertex> normals = new();
+            public List<int> lengths = new();
+            // For whatever reason there can be more lengths even if the count is differet
+            public List<int> overflowLengths = new();
+
+        }
+
+        public Dictionary<int, ObjectElementGroup> objectElementGroups = new();
+        public ObjectElementGroup firstElementGroup {
+            get { return objectElementGroups.First().Value; }
+        }
+
+        public List<ObjectElementReference> elementReferences = new();
         public List<Primitive> primitives = new();
-        public List<Vertex> vertices = new();
-        public List<Vertex> normals = new();
         public List<Surface> surfaces = new();
         public Dictionary<int, Surface> surfaceByCompiledOffset = new();
         public List<BoundingBox> boundingBoxes = new();
+        public int boundingBoxesPerFrame = 1;
+        public List<byte> threeDTAData;
+        public List<byte> threeDALData;
+        public List<byte> threeDHYData;
+        public List<byte> threeDMIData;
+        public List<byte> threeDHSData;
+        public List<byte> AnmDData;
+
+        public int frameCount;
+        public byte metaDataBitfield;
+        public List<byte> positions = new();
+
 
         public List<Triangle> triangles = new();
 
@@ -60,15 +87,8 @@ namespace FCopParser {
         public FCopObject(IFFDataFile rawFile) : base(rawFile) {
 
             name = "Object " + DataID.ToString();
-            
-            FindStartChunkOffset();
-            ParseVertices();
-            ParseNormals();
-            ParsePrimitives();
-            ParseSurfaces();
-            ParseBoundingBoxes();
 
-            CreateTriangles();
+            Init();
 
         }
 
@@ -156,24 +176,95 @@ namespace FCopParser {
             compiledData.AddRange(CreateFourDGI());
             compiledData.AddRange(CreateThreeDTL(convertedSurfaces));
             compiledData.AddRange(CreateThreeDQL(convertedPrimitives));
-            compiledData.AddRange(CreateThreeDRF(1, FourCC.fourDVLbytes, new() { 1 }));
-            compiledData.AddRange(CreateThreeDRF(2, FourCC.fourDNLbytes, new() { 1 }));
-            compiledData.AddRange(CreateThreeDRF(3, FourCC.threeDRLbytes, new() { 1 }));
-            compiledData.AddRange(CreateFourDVL(convertedVerts));
-            compiledData.AddRange(CreateFourDNL(convertedNormals));
-            compiledData.AddRange(CreateThreeDRL(new()));
-            compiledData.AddRange(CreateThreeDBB(new() { CalculateBoundingBox(convertedVerts) }));
+            compiledData.AddRange(CreateThreeDRF(new ObjectElementReference(1, FourCC.fourDVL, new() { 1 })));
+            compiledData.AddRange(CreateThreeDRF(new ObjectElementReference(2, FourCC.fourDNL, new() { 1 })));
+            compiledData.AddRange(CreateThreeDRF(new ObjectElementReference(3, FourCC.threeDRL, new() { 1 })));
+            compiledData.AddRange(CreateFourDVL(convertedVerts, 1));
+            compiledData.AddRange(CreateFourDNL(convertedNormals, 1));
+            compiledData.AddRange(CreateThreeDRL(new(), 1, new()));
+            compiledData.AddRange(CreateThreeDBB(new() { CalculateBoundingBox(convertedVerts) }, 1));
 
             rawFile.data = compiledData;
 
             name = "Object " + DataID.ToString();
 
+            Init();
+
+        }
+
+        void Init() {
+
             FindStartChunkOffset();
-            ParseVertices();
-            ParseNormals();
+
+            var header4DGI = offsets.FirstOrDefault(header => {
+                return header.fourCCDeclaration == FourCC.fourDGI;
+            });
+
+            var fourDGI = rawFile.data.GetRange(header4DGI.index, header4DGI.chunkSize);
+
+            frameCount = BitConverter.ToInt16(fourDGI.ToArray(), 12);
+            metaDataBitfield = fourDGI[15];
+
+            positions.Add(fourDGI[48]);
+            positions.Add(fourDGI[49]);
+            positions.Add(fourDGI[50]);
+            positions.Add(fourDGI[51]);
+
+            ParseElementReferences();
             ParsePrimitives();
             ParseSurfaces();
+            ParseVertices();
+            ParseNormals();
+            ParseLengths();
             ParseBoundingBoxes();
+
+            var header3DTA = offsets.FirstOrDefault(header => {
+                return header.fourCCDeclaration == FourCC.threeDTA;
+            });
+
+            if (header3DTA != null) {
+                threeDTAData = rawFile.data.GetRange(header3DTA.index, header3DTA.chunkSize);
+            }
+
+            var header3DAL = offsets.FirstOrDefault(header => {
+                return header.fourCCDeclaration == FourCC.threeDAL;
+            });
+
+            if (header3DAL != null) {
+                threeDALData = rawFile.data.GetRange(header3DAL.index, header3DAL.chunkSize);
+            }
+
+            var header3DHY = offsets.FirstOrDefault(header => {
+                return header.fourCCDeclaration == FourCC.threeDHY;
+            });
+
+            if (header3DHY != null) {
+                threeDHYData = rawFile.data.GetRange(header3DHY.index, header3DHY.chunkSize);
+            }
+
+            var header3DMI = offsets.FirstOrDefault(header => {
+                return header.fourCCDeclaration == FourCC.threeDMI;
+            });
+
+            if (header3DMI != null) {
+                threeDMIData = rawFile.data.GetRange(header3DMI.index, header3DMI.chunkSize);
+            }
+
+            var header3DHS = offsets.FirstOrDefault(header => {
+                return header.fourCCDeclaration == FourCC.threeDHS;
+            });
+
+            if (header3DHS != null) {
+                threeDHSData = rawFile.data.GetRange(header3DHS.index, header3DHS.chunkSize);
+            }
+
+            var headerAnmD = offsets.FirstOrDefault(header => {
+                return header.fourCCDeclaration == FourCC.AnmD;
+            });
+
+            if (headerAnmD != null) {
+                AnmDData = rawFile.data.GetRange(headerAnmD.index, headerAnmD.chunkSize);
+            }
 
             CreateTriangles();
 
@@ -181,9 +272,51 @@ namespace FCopParser {
 
         public IFFDataFile Compile() {
 
-            if (allowCompiling) {
-                BasicCompile();
+            var compiledData = new List<byte>();
+
+            compiledData.AddRange(CreateFourDGI());
+            compiledData.AddRange(CreateThreeDTL(surfaces));
+
+            if (threeDTAData != null) {
+                compiledData.AddRange(threeDTAData);
             }
+
+            compiledData.AddRange(CreateThreeDQL(primitives));
+
+            if (threeDALData != null) {
+                compiledData.AddRange(threeDALData);
+            }
+
+            foreach (var elementRef in elementReferences) {
+                compiledData.AddRange(CreateThreeDRF(elementRef));
+            }
+
+            foreach (var group in objectElementGroups) {
+                compiledData.AddRange(CreateFourDVL(group.Value.vertices, group.Key));
+                compiledData.AddRange(CreateFourDNL(group.Value.normals, group.Key));
+                compiledData.AddRange(CreateThreeDRL(group.Value.lengths, group.Key, group.Value.overflowLengths));
+            }
+
+
+            compiledData.AddRange(CreateThreeDBB(boundingBoxes, boundingBoxesPerFrame));
+
+            if (threeDHYData != null) {
+                compiledData.AddRange(threeDHYData);
+            }
+
+            if (threeDMIData != null) {
+                compiledData.AddRange(threeDMIData);
+            }
+
+            if (threeDHSData != null) {
+                compiledData.AddRange(threeDHSData);
+            }
+
+            if (AnmDData != null) {
+                compiledData.AddRange(AnmDData);
+            }
+
+            rawFile.data = compiledData;
 
             return rawFile;
 
@@ -248,42 +381,29 @@ namespace FCopParser {
 
         }
 
-        public void BasicCompile() {
-
-            var compiledData = new List<byte>();
-
-            compiledData.AddRange(CreateFourDGI());
-            compiledData.AddRange(CreateThreeDTL(surfaces));
-            compiledData.AddRange(CreateThreeDQL(primitives));
-            compiledData.AddRange(CreateThreeDRF(1, FourCC.fourDVLbytes, new() { 1 }));
-            compiledData.AddRange(CreateThreeDRF(2, FourCC.fourDNLbytes, new() { 1 }));
-            compiledData.AddRange(CreateThreeDRF(3, FourCC.threeDRLbytes, new() { 1 }));
-            compiledData.AddRange(CreateFourDVL(vertices));
-            compiledData.AddRange(CreateFourDNL(normals));
-            compiledData.AddRange(CreateThreeDRL(new()));
-            compiledData.AddRange(CreateThreeDBB(new() { CalculateBoundingBox(vertices) }));
-
-            rawFile.data = compiledData;
-
-        }
-
         public void Import(byte[] newData) {
 
             rawFile.data = newData.ToList();
 
             offsets = new();
+            elementReferences = new();
             primitives = new();
-            vertices = new();
+            objectElementGroups = new();
             surfaces = new();
             surfaceByCompiledOffset = new();
+            boundingBoxes = new();
             triangles = new();
 
-            FindStartChunkOffset();
-            ParseVertices();
-            ParsePrimitives();
-            ParseSurfaces();
+            positions = new();
 
-            CreateTriangles();
+            threeDTAData = null;
+            threeDALData = null;
+            threeDHYData = null;
+            threeDMIData = null;
+            threeDHSData = null;
+            AnmDData = null;
+
+            Init();
 
         }
 
@@ -311,6 +431,26 @@ namespace FCopParser {
             var headers = offsets.Where(header => {
                 return header.fourCCDeclaration == FourCC.threeDRF;
             });
+
+            foreach (var header in headers) {
+
+                var bytes = rawFile.data.GetRange(header.index, header.chunkSize);
+
+                var id = BitConverter.ToInt32(bytes.ToArray(), 8);
+                var fourCCRef = Encoding.Default.GetString(bytes.ToArray(), 12, 4);
+                var refCount = BitConverter.ToInt32(bytes.ToArray(), 16);
+
+                var offset = 20;
+
+                var refIds = new List<int>();
+                foreach (var i in Enumerable.Range(0, refCount)) {
+                    refIds.Add(BitConverter.ToInt32(bytes.ToArray(), offset));
+                    offset += 4;
+                }
+
+                elementReferences.Add(new ObjectElementReference(id, IFFParser.Reverse(fourCCRef), refIds));
+
+            }
 
         }
 
@@ -343,26 +483,44 @@ namespace FCopParser {
 
         void ParseVertices() {
 
-            var header = offsets.First(header => {
+            var headers = offsets.Where(header => {
                 return header.fourCCDeclaration == FourCC.fourDVL;
             });
 
-            var bytes = rawFile.data.GetRange(header.index, header.chunkSize);
+            foreach (var header in headers) {
 
-            var vertexCount = Utils.BytesToInt(bytes.ToArray(), 12);
+                var vertices = new List<Vertex>();
 
-            var offset = 16;
+                var bytes = rawFile.data.GetRange(header.index, header.chunkSize);
+                var id = Utils.BytesToInt(bytes.ToArray(), 8);
+                var vertexCount = Utils.BytesToInt(bytes.ToArray(), 12);
 
-            foreach (var i in Enumerable.Range(0, vertexCount)) {
+                var offset = 16;
 
-                vertices.Add(new Vertex(
-                    BitConverter.ToInt16(bytes.ToArray(), offset),
-                    BitConverter.ToInt16(bytes.ToArray(), offset + 2),
-                    BitConverter.ToInt16(bytes.ToArray(), offset + 4),
-                    BitConverter.ToInt16(bytes.ToArray(), offset + 6)
-                    ));
+                foreach (var i in Enumerable.Range(0, vertexCount)) {
 
-                offset += 8;
+                    vertices.Add(new Vertex(
+                        BitConverter.ToInt16(bytes.ToArray(), offset),
+                        BitConverter.ToInt16(bytes.ToArray(), offset + 2),
+                        BitConverter.ToInt16(bytes.ToArray(), offset + 4),
+                        BitConverter.ToInt16(bytes.ToArray(), offset + 6)
+                        ));
+
+                    offset += 8;
+
+                }
+
+                if (objectElementGroups.ContainsKey(id)) {
+
+                    objectElementGroups[id].vertices = vertices;
+
+                }
+                else {
+
+                    objectElementGroups[id] = new ObjectElementGroup();
+                    objectElementGroups[id].vertices = vertices;
+
+                }
 
             }
 
@@ -370,26 +528,100 @@ namespace FCopParser {
 
         void ParseNormals() {
 
-            var header = offsets.First(header => {
+            var headers = offsets.Where(header => {
                 return header.fourCCDeclaration == FourCC.fourDNL;
             });
 
-            var bytes = rawFile.data.GetRange(header.index, header.chunkSize);
+            foreach (var header in headers) {
 
-            var vertexCount = Utils.BytesToInt(bytes.ToArray(), 12);
+                var normals = new List<Vertex>();
 
-            var offset = 16;
+                var bytes = rawFile.data.GetRange(header.index, header.chunkSize);
+                var id = Utils.BytesToInt(bytes.ToArray(), 8);
+                var vertexCount = Utils.BytesToInt(bytes.ToArray(), 12);
 
-            foreach (var i in Enumerable.Range(0, vertexCount)) {
+                var offset = 16;
 
-                normals.Add(new Vertex(
-                    BitConverter.ToInt16(bytes.ToArray(), offset),
-                    BitConverter.ToInt16(bytes.ToArray(), offset + 2),
-                    BitConverter.ToInt16(bytes.ToArray(), offset + 4),
-                    BitConverter.ToInt16(bytes.ToArray(), offset + 6)
-                    ));
+                foreach (var i in Enumerable.Range(0, vertexCount)) {
 
-                offset += 8;
+                    normals.Add(new Vertex(
+                        BitConverter.ToInt16(bytes.ToArray(), offset),
+                        BitConverter.ToInt16(bytes.ToArray(), offset + 2),
+                        BitConverter.ToInt16(bytes.ToArray(), offset + 4),
+                        BitConverter.ToInt16(bytes.ToArray(), offset + 6)
+                        ));
+
+                    offset += 8;
+
+                }
+
+                if (objectElementGroups.ContainsKey(id)) {
+
+                    objectElementGroups[id].normals = normals;
+
+                }
+                else {
+
+                    objectElementGroups[id] = new ObjectElementGroup();
+                    objectElementGroups[id].normals = normals;
+
+                }
+
+            }
+
+        }
+
+        void ParseLengths() {
+
+            var headers = offsets.Where(header => {
+                return header.fourCCDeclaration == FourCC.threeDRL;
+            });
+
+            foreach (var header in headers) {
+
+                var lengths = new List<int>();
+
+                var bytes = rawFile.data.GetRange(header.index, header.chunkSize);
+                var id = Utils.BytesToInt(bytes.ToArray(), 8);
+                var lengthCount = Utils.BytesToInt(bytes.ToArray(), 12);
+
+                var offset = 16;
+
+                foreach (var i in Enumerable.Range(0, lengthCount)) {
+
+                    lengths.Add(BitConverter.ToInt16(bytes.ToArray(), offset));
+
+                    offset += 2;
+
+                }
+
+                var overflowLengths = new List<int>();
+
+                if (offset != bytes.Count) {
+
+                    while (offset < bytes.Count) {
+
+                        overflowLengths.Add(BitConverter.ToInt16(bytes.ToArray(), offset));
+
+                        offset += 2;
+
+                    }
+
+                }
+
+                if (objectElementGroups.ContainsKey(id)) {
+
+                    objectElementGroups[id].lengths = lengths;
+                    objectElementGroups[id].overflowLengths = overflowLengths;
+
+                }
+                else {
+
+                    objectElementGroups[id] = new ObjectElementGroup();
+                    objectElementGroups[id].lengths = lengths;
+                    objectElementGroups[id].overflowLengths = overflowLengths;
+
+                }
 
             }
 
@@ -463,7 +695,7 @@ namespace FCopParser {
 
             var bytes = rawFile.data.GetRange(header.index, header.chunkSize);
 
-            var boxesPerFrame = BitConverter.ToInt32(bytes.ToArray(), 8);
+            boundingBoxesPerFrame = BitConverter.ToInt32(bytes.ToArray(), 8);
             var boxesCount = BitConverter.ToInt32(bytes.ToArray(), 12);
 
             var offset = 16;
@@ -504,9 +736,9 @@ namespace FCopParser {
 
                 void CreateTriangle(int[] vertOrder) {
 
-                    verts.Add(vertices[primitive.associatedData[vertOrder[0]]]);
-                    verts.Add(vertices[primitive.associatedData[vertOrder[1]]]);
-                    verts.Add(vertices[primitive.associatedData[vertOrder[2]]]);
+                    verts.Add(firstElementGroup.vertices[primitive.associatedData[vertOrder[0]]]);
+                    verts.Add(firstElementGroup.vertices[primitive.associatedData[vertOrder[1]]]);
+                    verts.Add(firstElementGroup.vertices[primitive.associatedData[vertOrder[2]]]);
 
                     if (surface.uvMap != null) {
 
@@ -589,9 +821,9 @@ namespace FCopParser {
             compiledData.AddRange(FourCC.fourDGIbytes);
             compiledData.AddRange(BitConverter.GetBytes(60)); // size
             compiledData.AddRange(BitConverter.GetBytes(1)); // id
-            compiledData.AddRange(BitConverter.GetBytes((short)1)); // frame count
+            compiledData.AddRange(BitConverter.GetBytes((short)frameCount)); // frame count
             compiledData.Add(1); // const
-            compiledData.Add(8); // bitfield?
+            compiledData.Add(metaDataBitfield); // bitfield?
             compiledData.AddRange(BitConverter.GetBytes(0)); // const
             compiledData.AddRange(BitConverter.GetBytes(0)); // const
             compiledData.AddRange(BitConverter.GetBytes(0)); // const
@@ -600,10 +832,18 @@ namespace FCopParser {
             compiledData.AddRange(BitConverter.GetBytes(1)); // const
             compiledData.AddRange(BitConverter.GetBytes(1)); // const
             compiledData.AddRange(BitConverter.GetBytes(3)); // const
-            compiledData.Add(255); // pos0
-            compiledData.Add(255); // pos1
-            compiledData.Add(255); // pos2
-            compiledData.Add(255); // pos3
+
+            if (positions.Count == 0) {
+                positions.Add(255);
+                positions.Add(255);
+                positions.Add(255);
+                positions.Add(255);
+            }
+
+            compiledData.Add(positions[0]); // pos0
+            compiledData.Add(positions[1]); // pos1
+            compiledData.Add(positions[2]); // pos2
+            compiledData.Add(positions[3]); // pos3
             compiledData.AddRange(BitConverter.GetBytes(4)); // const
             compiledData.AddRange(BitConverter.GetBytes(5)); // const
 
@@ -647,7 +887,7 @@ namespace FCopParser {
 
         }
 
-        List<byte> CreateFourDVL(List<Vertex> vertices) {
+        List<byte> CreateFourDVL(List<Vertex> vertices, int id) {
 
             var compiledData = new List<byte>();
 
@@ -664,7 +904,7 @@ namespace FCopParser {
 
             compiledWithHeader.AddRange(FourCC.fourDVLbytes);
             compiledWithHeader.AddRange(BitConverter.GetBytes(compiledData.Count + 16));
-            compiledWithHeader.AddRange(BitConverter.GetBytes(1));
+            compiledWithHeader.AddRange(BitConverter.GetBytes(id));
             compiledWithHeader.AddRange(BitConverter.GetBytes(vertices.Count));
             compiledWithHeader.AddRange(compiledData);
 
@@ -672,7 +912,7 @@ namespace FCopParser {
 
         }
 
-        List<byte> CreateFourDNL(List<Vertex> vertices) {
+        List<byte> CreateFourDNL(List<Vertex> vertices, int id) {
 
             var compiledData = new List<byte>();
 
@@ -689,7 +929,7 @@ namespace FCopParser {
 
             compiledWithHeader.AddRange(FourCC.fourDNLbytes);
             compiledWithHeader.AddRange(BitConverter.GetBytes(compiledData.Count + 16));
-            compiledWithHeader.AddRange(BitConverter.GetBytes(1));
+            compiledWithHeader.AddRange(BitConverter.GetBytes(id));
             compiledWithHeader.AddRange(BitConverter.GetBytes(vertices.Count));
             compiledWithHeader.AddRange(compiledData);
 
@@ -697,7 +937,7 @@ namespace FCopParser {
 
         }
 
-        List<byte> CreateThreeDRL(List<int> lengths) {
+        List<byte> CreateThreeDRL(List<int> lengths, int id, List<int> overflowLengths) {
 
             var compiledData = new List<byte>();
 
@@ -707,11 +947,17 @@ namespace FCopParser {
 
             }
 
+            foreach (var length in overflowLengths) {
+
+                compiledData.AddRange(BitConverter.GetBytes((short)length));
+
+            }
+
             var compiledWithHeader = new List<byte>();
 
             compiledWithHeader.AddRange(FourCC.threeDRLbytes);
             compiledWithHeader.AddRange(BitConverter.GetBytes(compiledData.Count + 16));
-            compiledWithHeader.AddRange(BitConverter.GetBytes(1));
+            compiledWithHeader.AddRange(BitConverter.GetBytes(id));
             compiledWithHeader.AddRange(BitConverter.GetBytes(lengths.Count));
             compiledWithHeader.AddRange(compiledData);
 
@@ -719,14 +965,14 @@ namespace FCopParser {
 
         }
 
-        List<byte> CreateThreeDRF(int id, List<byte> fourCC, List<int> idRefs) {
+        List<byte> CreateThreeDRF(ObjectElementReference elementReference) {
 
             var compiledData = new List<byte>();
 
-            compiledData.AddRange(fourCC);
-            compiledData.AddRange(BitConverter.GetBytes(idRefs.Count));
+            compiledData.AddRange(Encoding.ASCII.GetBytes(IFFParser.Reverse(elementReference.refFourCC)));
+            compiledData.AddRange(BitConverter.GetBytes(elementReference.refIds.Count));
 
-            foreach (var idRef in idRefs) {
+            foreach (var idRef in elementReference.refIds) {
                 compiledData.AddRange(BitConverter.GetBytes(idRef));
 
             }
@@ -735,7 +981,7 @@ namespace FCopParser {
 
             compiledWithHeader.AddRange(FourCC.threeDRFbytes);
             compiledWithHeader.AddRange(BitConverter.GetBytes(compiledData.Count + 12));
-            compiledWithHeader.AddRange(BitConverter.GetBytes(id));
+            compiledWithHeader.AddRange(BitConverter.GetBytes(elementReference.id));
             compiledWithHeader.AddRange(compiledData);
 
             return compiledWithHeader;
@@ -769,7 +1015,7 @@ namespace FCopParser {
 
         }
 
-        List<byte> CreateThreeDBB(List<BoundingBox> boundingBoxes, int boxesPerFrame = 1) {
+        List<byte> CreateThreeDBB(List<BoundingBox> boundingBoxes, int boxesPerFrame) {
 
             var compiledData = new List<byte>();
 
@@ -811,7 +1057,15 @@ namespace FCopParser {
 
         public struct ObjectElementReference {
 
+            public int id;
+            public string refFourCC;
+            public List<int> refIds;
 
+            public ObjectElementReference(int id, string refFourCC, List<int> refIds) {
+                this.id = id;
+                this.refFourCC = refFourCC;
+                this.refIds = refIds;
+            }
 
         }
 

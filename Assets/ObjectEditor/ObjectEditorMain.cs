@@ -61,7 +61,7 @@ public class ObjectEditorMain : MonoBehaviour {
 
         var scale = ObjectMesh.scale;
 
-        foreach (var vert in fCopObject.vertices) {
+        foreach (var vert in fCopObject.firstElementGroup.vertices) {
 
             var gobj = Instantiate(ObjectVertexPrefab);
             gobj.transform.position = new Vector3(vert.x / scale, vert.y / scale, -(vert.z / scale));
