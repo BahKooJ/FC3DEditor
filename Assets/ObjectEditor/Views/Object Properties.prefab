@@ -489,7 +489,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1712592484926613373}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 7494038906803935178}
+        m_TargetAssemblyTypeName: ObjectPropertiesPanelView, Assembly-CSharp
+        m_MethodName: OnClickSetPos2
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &7320219434501181706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1749,7 +1761,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3488086253228091973}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 7494038906803935178}
+        m_TargetAssemblyTypeName: ObjectPropertiesPanelView, Assembly-CSharp
+        m_MethodName: OnClickSetPos0
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &7662126864937299183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2140,7 +2164,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6587235298718335230}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 7494038906803935178}
+        m_TargetAssemblyTypeName: ObjectPropertiesPanelView, Assembly-CSharp
+        m_MethodName: OnClickSetPos3
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &22729478752461331
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2278,7 +2314,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8803921672881759442}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 7494038906803935178}
+        m_TargetAssemblyTypeName: ObjectPropertiesPanelView, Assembly-CSharp
+        m_MethodName: OnClickSetPos1
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &7477919324276771935
 MonoBehaviour:
   m_ObjectHideFlags: 0

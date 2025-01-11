@@ -13,9 +13,11 @@ public class ObjectEditorMain : MonoBehaviour {
     // - Prefabs -
     public GameObject ObjectMeshPrefab;
     public GameObject ObjectVertexPrefab;
+    public GameObject HeadsUpText;
 
     // - Unity View Refs -
     public ObjectPropertiesPanelView view;
+    public GameObject canvas;
 
     // - Parameters -
     public static FCopObject fCopObject;
@@ -24,10 +26,14 @@ public class ObjectEditorMain : MonoBehaviour {
 
     [HideInInspector]
     public ObjectMesh objectMesh;
+    public List<ObjectVertex> gameObjectVertices = new();
 
     public Action<ObjectVertex> requestedVertexActionCallback = v => { };
 
     private void Start() {
+
+        HeadsUpTextUtil.prefab = HeadsUpText;
+        HeadsUpTextUtil.canvas = canvas;
 
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("Scenes/ObjectEditorScene"));
 
@@ -46,12 +52,62 @@ public class ObjectEditorMain : MonoBehaviour {
 
         }
 
-        fCopObject = level.objects[19];
+        //fCopObject = level.objects[19];
 
         InitObject();
         InitObjectVertices();
 
         view.Init();
+
+    }
+
+    private void Update() {
+
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            HeadsUpTextUtil.End();
+            ClearVertexCallback();
+        }
+        
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (Input.GetMouseButtonDown(0)) {
+
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, 8)) {
+
+                foreach (var vert in gameObjectVertices) {
+
+                    if (hit.colliderInstanceID == vert.boxCollider.GetInstanceID()) {
+                        requestedVertexActionCallback(vert);
+                        break;
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+    public void ClearVertexCallback() {
+        requestedVertexActionCallback = v => { };
+    }
+
+    public void BackToLevelEditor() {
+
+        fCopObject = null;
+        levelTexturePallet = null;
+
+        SceneManager.UnloadSceneAsync("Scenes/ObjectEditorScene");
+
+        foreach (var obj in SceneManager.GetSceneByName("Scenes/LevelEditorScene").GetRootGameObjects()) {
+
+            if (obj.TryGetComponent(out Main main)) {
+                HeadsUpTextUtil.canvas = main.canvas;
+            }
+
+            obj.SetActive(true);
+        }
 
     }
 
@@ -68,10 +124,15 @@ public class ObjectEditorMain : MonoBehaviour {
 
         var scale = ObjectMesh.scale;
 
+        var i = 0;
         foreach (var vert in fCopObject.firstElementGroup.vertices) {
 
             var gobj = Instantiate(ObjectVertexPrefab);
             gobj.transform.position = new Vector3(vert.x / scale, vert.y / scale, -(vert.z / scale));
+            var objVertex = gobj.GetComponent<ObjectVertex>();
+            gameObjectVertices.Add(objVertex);
+            objVertex.index = i;
+            i++;
 
         }
     }
