@@ -111,7 +111,7 @@ public class ActorObject : MonoBehaviour {
                 script.levelTexturePallet = controller.main.levelTexturePallet;
                 script.fCopObject = obj;
                 script.textureOffset = SetTextureOffset();
-                script.Create();
+                script.ForceMake();
 
                 if (!script.failed) {
 

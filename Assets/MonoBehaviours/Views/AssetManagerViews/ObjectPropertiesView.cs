@@ -61,6 +61,10 @@ public class ObjectPropertiesView : MonoBehaviour {
         objectMesh.textureOffset = 0;
         objectMesh.ForceMake();
 
+        foreach (Transform trans in objectMesh.transform) {
+            trans.gameObject.layer = 8; // UI Mesh
+        }
+
         meshObj = objectMesh;
 
     }

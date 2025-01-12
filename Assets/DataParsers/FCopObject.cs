@@ -81,7 +81,9 @@ namespace FCopParser {
 
 
         public List<Triangle> triangles = new();
-
+        public List<Billboard> billboards = new();
+        public List<Line> lines = new();
+        public List<Star> stars = new();
         public FCopObject(IFFDataFile rawFile) : base(rawFile) {
 
             name = "Object " + DataID.ToString();
@@ -263,6 +265,9 @@ namespace FCopParser {
             }
 
             CreateTriangles();
+            CreateBillboards();
+            CreateLines();
+            CreateStarts();
 
         }
 
@@ -381,6 +386,9 @@ namespace FCopParser {
             surfaceByCompiledOffset = new();
             boundingBoxes = new();
             triangles = new();
+            billboards = new();
+            lines = new();
+            stars = new();
 
             positions = new();
 
@@ -768,6 +776,66 @@ namespace FCopParser {
                     texturePalette = 0;
 
                     CreateTriangle(new int[] { 2, 3, 0 });
+
+                }
+
+            }
+
+        }
+
+        void CreateBillboards() {
+
+            foreach (var primitive in primitives) {
+
+                if (primitive.type == PrimitiveType.Billboard) {
+
+                    var surface = surfaceByCompiledOffset[primitive.surfaceIndex];
+                    var position = firstElementGroup.vertices[primitive.associatedData[0]];
+                    var length = firstElementGroup.lengths[primitive.associatedData[2]];
+
+                    billboards.Add(new Billboard(position, length, surface));
+
+                }
+
+            }
+
+        }
+
+        void CreateLines() {
+
+            foreach (var primitive in primitives) {
+
+                if (primitive.type == PrimitiveType.Line) {
+
+                    var surface = surfaceByCompiledOffset[primitive.surfaceIndex];
+                    var startPos = firstElementGroup.vertices[primitive.associatedData[0]];
+                    var endPos = firstElementGroup.vertices[primitive.associatedData[1]];
+                    var startLength = firstElementGroup.lengths[primitive.associatedData[2]];
+                    var endLength = firstElementGroup.lengths[primitive.associatedData[3]];
+
+
+                    lines.Add(new Line(startPos, endPos, startLength, endLength, surface));
+
+                }
+
+            }
+
+        }
+
+        void CreateStarts() {
+
+            foreach (var primitive in primitives) {
+
+                if (primitive.type == PrimitiveType.Star) {
+
+                    var position = firstElementGroup.vertices[primitive.associatedData[0]];
+                    var red = primitive.associatedData[1];
+                    var green = primitive.associatedData[2];
+                    var blue = primitive.associatedData[3];
+                    var length = firstElementGroup.lengths[primitive.associatedData[4]];
+                    var triCount = primitive.surfaceIndex;
+
+                    stars.Add(new Star(position, length, red, green, blue, triCount));
 
                 }
 
@@ -1185,6 +1253,51 @@ namespace FCopParser {
 
             public Vertex position;
             public int length;
+            public Surface surface;
+
+            public Billboard(Vertex position, int length, Surface surface) {
+                this.position = position;
+                this.length = length;
+                this.surface = surface;
+            }
+
+        }
+
+        public struct Line {
+
+            public Vertex startPosition;
+            public Vertex endPosition;
+            public int startWidth;
+            public int endWidth;
+            public Surface surface;
+
+            public Line(Vertex startPosition, Vertex endPosition, int startWidth, int endWidth, Surface surface) {
+                this.startPosition = startPosition;
+                this.endPosition = endPosition;
+                this.startWidth = startWidth;
+                this.endWidth = endWidth;
+                this.surface = surface;
+            }
+
+        }
+
+        public struct Star {
+
+            public Vertex position;
+            public int length;
+            public int red;
+            public int green;
+            public int blue;
+            public int triCount;
+
+            public Star(Vertex position, int length, int red, int green, int blue, int triCount) {
+                this.position = position;
+                this.length = length;
+                this.red = red;
+                this.green = green;
+                this.blue = blue;
+                this.triCount = triCount;
+            }
 
         }
 

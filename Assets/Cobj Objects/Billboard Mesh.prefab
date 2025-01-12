@@ -11,7 +11,9 @@ GameObject:
   - component: {fileID: 3566283141111829596}
   - component: {fileID: 3665940581119287964}
   - component: {fileID: 840964489039839079}
-  m_Layer: 0
+  - component: {fileID: 5087463498147257022}
+  - component: {fileID: 8274598192929867199}
+  m_Layer: 3
   m_Name: Billboard Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -83,3 +85,32 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &5087463498147257022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6936746525340447713}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 274729ee64a47d544bdbeb22dd26a0f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  material: {fileID: 0}
+  meshCollider: {fileID: 0}
+  levelTexturePallet: {fileID: 0}
+--- !u!64 &8274598192929867199
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6936746525340447713}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}

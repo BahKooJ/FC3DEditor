@@ -239,6 +239,18 @@ public class ActorEditMode : EditMode {
                             if (hit.colliderInstanceID == obj.meshCollider.GetInstanceID()) {
                                 didHit = true;
                             }
+                            else {
+
+                                foreach (var specialObj in obj.specialPrimitives) {
+
+                                    if (hit.colliderInstanceID == specialObj.GetComponent<MeshCollider>().GetInstanceID()) {
+                                        didHit = true;
+                                        break;
+                                    }
+
+                                }
+
+                            }
 
                         }
 
@@ -274,6 +286,26 @@ public class ActorEditMode : EditMode {
 
         if (Controls.OnDown("Unselect")) {
             UnselectActorCompletely();
+        }
+
+        if (Input.GetKeyDown(KeyCode.F10)) {
+
+            foreach (var aobj in actorObjects) {
+
+                foreach (var boj in aobj.objects) {
+
+                    if (boj != null) {
+
+                        if (boj.specialPrimitives.Count != 0) {
+                            aobj.transform.position = new Vector3(10, 10, -10);
+                        }
+
+                    }
+
+                }
+
+            }
+
         }
 
     }

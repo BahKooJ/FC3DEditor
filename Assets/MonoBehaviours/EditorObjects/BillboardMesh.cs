@@ -6,12 +6,15 @@ using UnityEngine;
 
 public class BillboardMesh : MonoBehaviour {
 
-
+    [HideInInspector]
     public Material material;
+    [HideInInspector]
     public MeshCollider meshCollider;
 
     // - Parameters -
-    public FCopObject fCopObject;
+    [HideInInspector]
+    public FCopObject.Billboard billboard;
+    [HideInInspector]
     public Texture levelTexturePallet;
 
     Mesh mesh;
@@ -19,7 +22,7 @@ public class BillboardMesh : MonoBehaviour {
     List<int> triangles = new();
     List<Vector2> textureCords = new();
 
-    private void Start() {
+    public void Create() {
 
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
@@ -37,11 +40,44 @@ public class BillboardMesh : MonoBehaviour {
 
         mesh.RecalculateNormals();
 
+        meshCollider.sharedMesh = mesh;
+
+    }
+
+    private void LateUpdate() {
+
+        transform.LookAt(Camera.main.transform);
+
     }
 
     void Generate() {
 
+        transform.localPosition = new Vector3(billboard.position.x / ObjectMesh.scale, billboard.position.y / ObjectMesh.scale, billboard.position.z / ObjectMesh.scale);
 
+        vertices.Add(new Vector3(-(billboard.length / ObjectMesh.scale), billboard.length / ObjectMesh.scale, 0.0f));
+        vertices.Add(new Vector3(billboard.length / ObjectMesh.scale, billboard.length / ObjectMesh.scale, 0.0f));
+        vertices.Add(new Vector3(billboard.length / ObjectMesh.scale, -(billboard.length / ObjectMesh.scale), 0.0f));
+        vertices.Add(new Vector3(-(billboard.length / ObjectMesh.scale), -(billboard.length / ObjectMesh.scale), 0.0f));
+
+        if (billboard.surface.uvMap != null) {
+
+            foreach (var uv in billboard.surface.uvMap.Value.uvs) {
+
+                var x = uv.x / 256f;
+                var y = (uv.y + (256 * billboard.surface.uvMap.Value.texturePaletteIndex)) / 2580f;
+                textureCords.Add(new Vector2(x, y));
+
+            }
+
+        }
+
+        triangles.Add(0);
+        triangles.Add(1);
+        triangles.Add(2);
+
+        triangles.Add(0);
+        triangles.Add(2);
+        triangles.Add(3);
 
     }
 

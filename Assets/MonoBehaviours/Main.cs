@@ -132,24 +132,6 @@ public class Main : MonoBehaviour {
 
     void _Debug() {
 
-        var actorEditMode = (ActorEditMode)editMode;
-
-        var actors = level.sceneActors.actors.Where(a => a.behaviorType == ActorBehavior.StaticProp).ToList();
-
-        var actors2 = actors.Where(a => (((FCopBehavior96)a.behavior).propertiesByName["unknown2"].GetCompiledValue()) > 0).ToList();
-        var x = 5;
-        var y = -5;
-        foreach (var a in actors2) {
-
-            actorEditMode.actorObjectsByID[a.DataID].ChangePosition(new Vector3(x, 0, y), AxisControl.Axis.IgnoreY);
-
-            x += 3;
-
-            if (x > 128) {
-                x = 5;
-                y -= 5;
-            }
-        }
 
     }
 
@@ -198,7 +180,7 @@ public class Main : MonoBehaviour {
 
         editMode.Update();
 
-        if (Input.GetKeyDown(KeyCode.F10)) {
+        if (Input.GetKeyDown(KeyCode.F11)) {
 
             _Debug();
         }
