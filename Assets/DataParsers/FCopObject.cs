@@ -757,7 +757,7 @@ namespace FCopParser {
                     colors.Add(new float[] { surface.red / 255f, surface.green / 255f, surface.blue / 255f });
                     colors.Add(new float[] { surface.red / 255f, surface.green / 255f, surface.blue / 255f });
 
-                    triangles.Add(new Triangle(verts.ToArray(), uvs.ToArray(), colors.ToArray(), texturePalette));
+                    triangles.Add(new Triangle(verts.ToArray(), uvs.ToArray(), colors.ToArray(), texturePalette, primitive));
 
                 }
 
@@ -1141,26 +1141,32 @@ namespace FCopParser {
 
         }
 
-        public struct Primitive {
+        public class Primitive {
 
-            public PrimitiveType type;
             public int surfaceIndex;
             public byte[] associatedData;
 
             public List<byte> metaDatabitfeild;
+            public int unknown1;
+            public FCopObjectMaterial.Material material;
+            public bool textureEnabled;
+            public PrimitiveType type;
+            public int unknown2;
+            public bool isReflective;
 
             public Primitive(List<byte> metaDatabitfeild, int surfaceIndex, byte[] associatedData) {
 
                 this.metaDatabitfeild = metaDatabitfeild;
-
                 var bitField = new BitArray(metaDatabitfeild.ToArray());
 
-                var unknown1 = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 0, 3));
-                var material = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 3, 7));
-                var textureEnabled = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 7, 8));
+                unknown1 = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 0, 3));
+                var materialID = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 3, 7));
+                textureEnabled = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 7, 8)) == 1;
                 var primitiveType = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 8, 11));
-                var unknown2 = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 11, 15));
-                var isReflective = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 15, 16));
+                unknown2 = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 11, 15));
+                isReflective = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 15, 16)) == 1;
+
+                material = FCopObjectMaterial.materialByID[materialID];
 
                 type = (PrimitiveType)primitiveType;
 
@@ -1239,12 +1245,14 @@ namespace FCopParser {
             public UV[] uvs;
             public float[][] colors;
             public int texturePaletteIndex;
+            public Primitive primitive;
 
-            public Triangle(Vertex[] vertices, UV[] uvs, float[][] colors, int texturePaletteIndex) {
+            public Triangle(Vertex[] vertices, UV[] uvs, float[][] colors, int texturePaletteIndex, Primitive primitive) {
                 this.vertices = vertices;
                 this.uvs = uvs;
                 this.colors = colors;
                 this.texturePaletteIndex = texturePaletteIndex;
+                this.primitive = primitive;
             }
 
         }
@@ -1337,6 +1345,72 @@ namespace FCopParser {
             Quad = 4,
             Billboard = 5,
             Line = 7
+        }
+
+    }
+
+    public abstract class FCopObjectMaterial {
+
+        public static Dictionary<int, Material> materialByID = new Dictionary<int, Material>() {
+            { 0, new Material(false, VertexColorMode.Monochrome, VisabilityMode.Opaque, false) },
+            { 1, new Material(false, VertexColorMode.Monochrome, VisabilityMode.Mix, false) },
+            { 2, new Material(false, VertexColorMode.Full, VisabilityMode.Opaque, false) },
+            { 3, new Material(false, VertexColorMode.Full, VisabilityMode.Mix, true) },
+            { 4, new Material(true, VertexColorMode.Monochrome, VisabilityMode.Opaque, false) },
+            { 5, new Material(true, VertexColorMode.Monochrome, VisabilityMode.Mix, false) },
+            { 6, new Material(true, VertexColorMode.Full, VisabilityMode.Opaque, false) },
+            { 7, new Material(true, VertexColorMode.Full, VisabilityMode.Mix, true) },
+            { 8, new Material(true, VertexColorMode.Monochrome, VisabilityMode.Opaque, false) },
+            { 9, new Material(true, VertexColorMode.Monochrome, VisabilityMode.Mix, false) },
+            { 10, new Material(true, VertexColorMode.Full, VisabilityMode.Opaque, false) },
+            { 11, new Material(true, VertexColorMode.Full, VisabilityMode.Opaque, true) },
+            { 12, new Material(false, VertexColorMode.Full, VisabilityMode.Addition, true) },
+            { 13, new Material(false, VertexColorMode.Full, VisabilityMode.Addition, true) },
+            { 14, new Material(true, VertexColorMode.Black, VisabilityMode.Mix, false) },
+            { 15, new Material(true, VertexColorMode.Black, VisabilityMode.Mix, false) }
+
+        };
+
+        public static int? IdByMaterial(Material mat) {
+
+            foreach (var entry in materialByID) {
+
+                if (entry.Value.Equals(mat)) return entry.Key;
+
+            }
+
+            return null;
+
+        }
+
+        public struct Material {
+
+            public bool gouraudShading;
+            public VertexColorMode colorMode;
+            public VisabilityMode visabilityMode;
+            public bool vertexColorSemiTransparent;
+
+            public Material(bool gouraudShading, VertexColorMode colorMode, VisabilityMode visabilityMode, bool vertexColorSemiTransparent) {
+                this.gouraudShading = gouraudShading;
+                this.colorMode = colorMode;
+                this.visabilityMode = visabilityMode;
+                this.vertexColorSemiTransparent = vertexColorSemiTransparent;
+            }
+
+        }
+
+        public enum VertexColorMode {
+            Monochrome = 0,
+            Full = 1,
+            Black = 2
+        }
+
+        public enum VisabilityMode {
+
+            Opaque = 0,
+            Mix = 1,
+            Addition = 2
+
         }
 
     }

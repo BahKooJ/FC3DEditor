@@ -16,7 +16,7 @@ public class ObjectPropertiesPanelView : MonoBehaviour {
     // - Parameters -
     public ObjectEditorMain main;
 
-    public void Init() {
+    void Start() {
 
         nameText.text = ObjectEditorMain.fCopObject.name;
 

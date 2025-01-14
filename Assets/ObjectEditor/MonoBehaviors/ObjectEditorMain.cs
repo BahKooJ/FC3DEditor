@@ -14,10 +14,11 @@ public class ObjectEditorMain : MonoBehaviour {
     public GameObject ObjectMeshPrefab;
     public GameObject ObjectVertexPrefab;
     public GameObject HeadsUpText;
+    public GameObject ObjectTriangleSelectionOverlayPrefab;
 
     // - Unity View Refs -
-    public ObjectPropertiesPanelView view;
     public GameObject canvas;
+    public ObjectEditorView view;
 
     // - Parameters -
     public static FCopObject fCopObject;
@@ -26,9 +27,13 @@ public class ObjectEditorMain : MonoBehaviour {
 
     [HideInInspector]
     public ObjectMesh objectMesh;
+    [HideInInspector]
     public List<ObjectVertex> gameObjectVertices = new();
 
     public Action<ObjectVertex> requestedVertexActionCallback = v => { };
+    public FCopObject.Primitive selectedPrimitive;
+
+    ObjectTriangleSelectionOverlay activeTriangleOverlay;
 
     private void Start() {
 
@@ -68,24 +73,73 @@ public class ObjectEditorMain : MonoBehaviour {
             ClearVertexCallback();
         }
         
-        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         if (Input.GetMouseButtonDown(0)) {
 
+            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
             if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, 8)) {
 
-                foreach (var vert in gameObjectVertices) {
+                var result = TestVertexRaycast(hit);
 
-                    if (hit.colliderInstanceID == vert.boxCollider.GetInstanceID()) {
-                        requestedVertexActionCallback(vert);
-                        break;
-                    }
-
+                if (result == false) {
+                    TestObjectMeshRaycast(hit);
                 }
 
             }
 
         }
+
+    }
+
+    public bool TestVertexRaycast(RaycastHit hit) {
+
+        foreach (var vert in gameObjectVertices) {
+
+            if (hit.colliderInstanceID == vert.boxCollider.GetInstanceID()) {
+                requestedVertexActionCallback(vert);
+                return true;
+            }
+
+        }
+
+        return false;
+
+    }
+
+    public bool TestObjectMeshRaycast(RaycastHit hit) {
+
+        if (objectMesh.meshCollider.GetInstanceID() == hit.colliderInstanceID) {
+
+            SelectFace(objectMesh.sortedPrimitives[hit.triangleIndex]);
+
+            return true;
+
+        }
+
+        return false;
+
+    }
+
+    void SelectFace(FCopObject.Primitive selectedPrimitive) {
+
+        this.selectedPrimitive = selectedPrimitive;
+        view.RefreshPrimitivePropertyView(selectedPrimitive);
+
+        if (activeTriangleOverlay != null) {
+
+            Destroy(activeTriangleOverlay.gameObject);
+
+        }
+
+        var gobj = Instantiate(ObjectTriangleSelectionOverlayPrefab);
+        gobj.transform.SetParent(objectMesh.transform, false);
+        var overlay = gobj.GetComponent<ObjectTriangleSelectionOverlay>();
+        overlay.fCopTriangles = objectMesh.trianglesByPrimitive[selectedPrimitive];
+        overlay.textureOffset = objectMesh.textureOffset;
+        overlay.levelTexturePallet = levelTexturePallet;
+        overlay.Create();
+        activeTriangleOverlay = overlay;
 
     }
 

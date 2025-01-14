@@ -2,7 +2,6 @@ using FCopParser;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static FCopParser.FCopObject;
 
 public class ObjectMesh : MonoBehaviour {
 
@@ -35,6 +34,8 @@ public class ObjectMesh : MonoBehaviour {
     List<Vector3> vertices = new();
     List<int> triangles = new();
     List<Vector2> textureCords = new();
+    public List<FCopObject.Primitive> sortedPrimitives = new();
+    public Dictionary<FCopObject.Primitive, List<FCopObject.Triangle>> trianglesByPrimitive = new();
 
     [HideInInspector]
     public bool failed = false;
@@ -146,6 +147,15 @@ public class ObjectMesh : MonoBehaviour {
             triangles.Add(vertexIndex + 2);
 
             vertexIndex += 3;
+
+            sortedPrimitives.Add(triangle.primitive);
+
+            if (trianglesByPrimitive.ContainsKey(triangle.primitive)) {
+                trianglesByPrimitive[triangle.primitive].Add(triangle);
+            }
+            else {
+                trianglesByPrimitive[triangle.primitive] = new() { triangle };
+            }
 
         }
 
