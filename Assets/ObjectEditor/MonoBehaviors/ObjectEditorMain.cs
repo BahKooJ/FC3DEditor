@@ -182,7 +182,7 @@ public class ObjectEditorMain : MonoBehaviour {
         foreach (var vert in fCopObject.firstElementGroup.vertices) {
 
             var gobj = Instantiate(ObjectVertexPrefab);
-            gobj.transform.position = new Vector3(vert.x / scale, vert.y / scale, -(vert.z / scale));
+            gobj.transform.position = new Vector3(-(vert.x / scale), vert.y / scale, -(vert.z / scale));
             var objVertex = gobj.GetComponent<ObjectVertex>();
             gameObjectVertices.Add(objVertex);
             objVertex.index = i;

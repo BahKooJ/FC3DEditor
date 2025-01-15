@@ -608,10 +608,18 @@ public class Main : MonoBehaviour {
 
         // This is here to add a section of black to the texture.
         // This is used for prevent tiles to display.
+        // Update: Also has a white space for Cobjs
         foreach (var _ in Enumerable.Range(0, 20)) {
 
             foreach (var i in Enumerable.Range(0, 256)) {
                 texturePallet.AddRange(new List<byte> { 0, 0, 255, 0 });
+
+                if (i > 127) {
+
+                    texturePallet.AddRange(new List<byte> { 255, 255, 255, 255 });
+
+                }
+
             }
 
         }

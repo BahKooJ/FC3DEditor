@@ -11,10 +11,9 @@ GameObject:
   - component: {fileID: 3982175839306991785}
   - component: {fileID: 3982175839306991784}
   - component: {fileID: 3982175839306991766}
-  - component: {fileID: -8477413917953185718}
-  - component: {fileID: 3624231561955279305}
-  m_Layer: 3
-  m_Name: Object Mesh
+  - component: {fileID: 5268531702365172445}
+  m_Layer: 2
+  m_Name: Object Transparent Sub Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 3982175839306991789}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: -1, y: 1, z: -1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -63,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: fd6c3e73418371d4192f408361956be0, type: 2}
+  - {fileID: 2100000, guid: cddb61f95c753a4468850cfb08c52211, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -85,7 +84,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &-8477413917953185718
+--- !u!114 &5268531702365172445
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -94,34 +93,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 3982175839306991789}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9f9e4572b2b3734db7c41509976f812, type: 3}
+  m_Script: {fileID: 11500000, guid: 621161c2f2647534395cabe2ff352548, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundingBoxFab: {fileID: 2168547336867362444, guid: 0c1b17e7f26d4ac4db49c1692363d6c7, type: 3}
-  billboardFab: {fileID: 6936746525340447713, guid: d490b566af4b5d147be879890f360259, type: 3}
-  lineFab: {fileID: 6936746525340447713, guid: 5e48fdda8a5d0f748a1a083cb4949914, type: 3}
-  starFab: {fileID: 6936746525340447713, guid: 578294093ed7b4946a21ce7a68bdb93d, type: 3}
-  transparentSubMeshFab: {fileID: 3982175839306991789, guid: bd566dad5577fa64d9dc8e89e0afcddd, type: 3}
-  additionSubMeshFab: {fileID: 3982175839306991789, guid: b9f2b8a77aa28d9449caffa229602411, type: 3}
   textureOffset: 0
   levelTexturePallet: {fileID: 0}
-  boundingBox: {fileID: 0}
-  specialPrimitives: []
   meshCollider: {fileID: 0}
-  failed: 0
-  maxY: 0
-  minY: 0
---- !u!64 &3624231561955279305
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3982175839306991789}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}

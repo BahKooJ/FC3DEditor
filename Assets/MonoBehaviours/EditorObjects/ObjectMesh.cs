@@ -12,6 +12,8 @@ public class ObjectMesh : MonoBehaviour {
     public GameObject billboardFab;
     public GameObject lineFab;
     public GameObject starFab;
+    public GameObject transparentSubMeshFab;
+    public GameObject additionSubMeshFab;
 
     // - Parameters -
     public FCopObject fCopObject;
@@ -34,6 +36,7 @@ public class ObjectMesh : MonoBehaviour {
     List<Vector3> vertices = new();
     List<int> triangles = new();
     List<Vector2> textureCords = new();
+    List<Color> colors = new();
     public List<FCopObject.Primitive> sortedPrimitives = new();
     public Dictionary<FCopObject.Primitive, List<FCopObject.Triangle>> trianglesByPrimitive = new();
 
@@ -114,6 +117,7 @@ public class ObjectMesh : MonoBehaviour {
             mesh.triangles = triangles.ToArray();
 
             mesh.uv = textureCords.ToArray();
+            mesh.colors = colors.ToArray();
 
             mesh.RecalculateNormals();
 
@@ -129,16 +133,40 @@ public class ObjectMesh : MonoBehaviour {
 
         var vertexIndex = 0;
 
+        var transparentTriangles = new List<FCopObject.Triangle>();
+        var additionTriangles = new List<FCopObject.Triangle>();
+
+
         foreach (var triangle in fCopObject.triangles) {
 
             foreach (var vert in triangle.vertices) {
                 vertices.Add(new Vector3(vert.x / scale, vert.y / scale, vert.z / scale));
             }
-            foreach (var uv in triangle.uvs) {
 
-                var x = (uv.x + TextureCoordinate.GetXPixel(textureOffset)) / 256f;
-                var y = (uv.y + TextureCoordinate.GetYPixel(textureOffset) + (256 * triangle.texturePaletteIndex)) / 2580f;
-                textureCords.Add(new Vector2(x, y));
+            if (triangle.primitive.material.visabilityMode == FCopObjectMaterial.VisabilityMode.Opaque) {
+
+                foreach (var uv in triangle.uvs) {
+
+                    var x = (uv.x + TextureCoordinate.GetXPixel(textureOffset)) / 256f;
+                    var y = (uv.y + TextureCoordinate.GetYPixel(textureOffset) + (256 * triangle.texturePaletteIndex)) / 2580f;
+                    textureCords.Add(new Vector2(x, y));
+
+                }
+
+                colors.Add(new Color(triangle.colors[0][0], triangle.colors[0][1], triangle.colors[0][2]));
+                colors.Add(new Color(triangle.colors[1][0], triangle.colors[1][1], triangle.colors[1][2]));
+                colors.Add(new Color(triangle.colors[2][0], triangle.colors[2][1], triangle.colors[2][2]));
+
+            }
+            else {
+
+                textureCords.Add(new Vector2(5f / 256f, 2565f / 2580f));
+                textureCords.Add(new Vector2(10f / 256f, 2565f / 2580f));
+                textureCords.Add(new Vector2(5f / 256f, 2570f / 2580f));
+
+                colors.Add(Color.white);
+                colors.Add(Color.white);
+                colors.Add(Color.white);
 
             }
 
@@ -150,12 +178,43 @@ public class ObjectMesh : MonoBehaviour {
 
             sortedPrimitives.Add(triangle.primitive);
 
+            if (triangle.primitive.material.visabilityMode == FCopObjectMaterial.VisabilityMode.Transparent) {
+                transparentTriangles.Add(triangle);
+            }
+            else if (triangle.primitive.material.visabilityMode == FCopObjectMaterial.VisabilityMode.Addition) {
+                additionTriangles.Add(triangle);
+            }
+
             if (trianglesByPrimitive.ContainsKey(triangle.primitive)) {
                 trianglesByPrimitive[triangle.primitive].Add(triangle);
             }
             else {
                 trianglesByPrimitive[triangle.primitive] = new() { triangle };
             }
+
+        }
+
+        if (transparentTriangles.Count > 1) {
+
+            var subMeshGobj = Instantiate(transparentSubMeshFab);
+            subMeshGobj.transform.SetParent(transform, false);
+            var subMesh = subMeshGobj.GetComponent<ObjectSubMesh>();
+            subMesh.fCopTriangles = transparentTriangles;
+            subMesh.textureOffset = textureOffset;
+            subMesh.levelTexturePallet = levelTexturePallet;
+            subMesh.Create();
+
+        }
+
+        if (additionTriangles.Count > 1) {
+
+            var subFMeshGobj = Instantiate(additionSubMeshFab);
+            subFMeshGobj.transform.SetParent(transform, false);
+            var subFMesh = subFMeshGobj.GetComponent<ObjectSubMesh>();
+            subFMesh.fCopTriangles = additionTriangles;
+            subFMesh.textureOffset = textureOffset;
+            subFMesh.levelTexturePallet = levelTexturePallet;
+            subFMesh.Create();
 
         }
 
