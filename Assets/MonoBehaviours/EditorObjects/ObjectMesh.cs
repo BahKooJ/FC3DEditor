@@ -145,11 +145,22 @@ public class ObjectMesh : MonoBehaviour {
 
             if (triangle.primitive.material.visabilityMode == FCopObjectMaterial.VisabilityMode.Opaque) {
 
-                foreach (var uv in triangle.uvs) {
+                if (triangle.uvs.SequenceEqual(new List<FCopObject.UV>() { new(0, 0), new(0, 0), new(0, 0) })) {
 
-                    var x = (uv.x + TextureCoordinate.GetXPixel(textureOffset)) / 256f;
-                    var y = (uv.y + TextureCoordinate.GetYPixel(textureOffset) + (256 * triangle.texturePaletteIndex)) / 2580f;
-                    textureCords.Add(new Vector2(x, y));
+                    textureCords.Add(new Vector2(130f / 256f, 2565f / 2580f));
+                    textureCords.Add(new Vector2(140f / 256f, 2565f / 2580f));
+                    textureCords.Add(new Vector2(130f / 256f, 2570f / 2580f));
+
+                }
+                else {
+
+                    foreach (var uv in triangle.uvs) {
+
+                        var x = (uv.x + TextureCoordinate.GetXPixel(textureOffset)) / 256f;
+                        var y = (uv.y + TextureCoordinate.GetYPixel(textureOffset) + (256 * triangle.texturePaletteIndex)) / 2580f;
+                        textureCords.Add(new Vector2(x, y));
+
+                    }
 
                 }
 

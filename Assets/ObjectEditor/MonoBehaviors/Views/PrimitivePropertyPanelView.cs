@@ -4,13 +4,14 @@ using FCopParser;
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using static FCopParser.FCopObject;
 
 public class PrimitivePropertyPanelView : MonoBehaviour {
 
     // - Unity View Refs -
     public TMP_Text unknown1Text;
-    public TMP_Text textureEnabledText;
+    public Toggle textureEnabledToggle;
     public TMP_Text unknown2Text;
     public TMP_Text isReflectiveText;
     public TMP_Text gouraudShadingText;
@@ -21,6 +22,8 @@ public class PrimitivePropertyPanelView : MonoBehaviour {
     public TMP_InputField redInput;
     public TMP_InputField greenInput;
     public TMP_InputField blueInput;
+    public TMP_InputField surfaceTypeInput;
+    public TMP_Text uvValueText;
 
     // - Parameters -
     [HideInInspector]
@@ -39,7 +42,7 @@ public class PrimitivePropertyPanelView : MonoBehaviour {
         surface = ObjectEditorMain.fCopObject.surfaceByCompiledOffset[primitive.surfaceIndex];
 
         unknown1Text.text = primitive.unknown1.ToString();
-        textureEnabledText.text = primitive.textureEnabled.ToString();
+        textureEnabledToggle.isOn = primitive.textureEnabled;
         unknown2Text.text = primitive.unknown2.ToString();
         isReflectiveText.text = primitive.isReflective.ToString();
         gouraudShadingText.text = primitive.material.gouraudShading.ToString();
@@ -51,6 +54,8 @@ public class PrimitivePropertyPanelView : MonoBehaviour {
         redInput.text = surface.red.ToString();
         greenInput.text = surface.green.ToString();
         blueInput.text = surface.blue.ToString();
+        surfaceTypeInput.text = ((int)surface.type).ToString();
+        uvValueText.text = (surface.uvMap != null).ToString();
 
     }
 
@@ -76,6 +81,20 @@ public class PrimitivePropertyPanelView : MonoBehaviour {
 
         surface.blue = Int32.Parse(blueInput.text);
 
+    }
+
+    public void OnFinishType() {
+
+        surface.type = (SurfaceType)Int32.Parse(surfaceTypeInput.text);
+
+    }
+
+    public void RemoveUVs() {
+        surface.uvMap = null;
+    }
+
+    public void OnToggleTextureEnabled() {
+        primitive.textureEnabled = textureEnabledToggle.isOn;
     }
 
 }

@@ -290,21 +290,7 @@ public class ActorEditMode : EditMode {
 
         if (Input.GetKeyDown(KeyCode.F10)) {
 
-            foreach (var aobj in actorObjects) {
 
-                foreach (var boj in aobj.objects) {
-
-                    if (boj != null) {
-
-                        if (boj.specialPrimitives.Count != 0) {
-                            aobj.transform.position = new Vector3(10, 10, -10);
-                        }
-
-                    }
-
-                }
-
-            }
 
         }
 

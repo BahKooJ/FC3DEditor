@@ -196,6 +196,17 @@ public class Main : MonoBehaviour {
         }
 
         if (Controls.OnDown("Compile")) {
+
+            var objs = level.objects.Where(o => o.DataID > 58);
+
+            foreach (var obj in objs) {
+
+                foreach (var prim in obj.primitives) {
+                    prim.materialID++;
+                }
+
+            }
+
             Compile();
             counterActions.Clear();
             System.GC.Collect();
@@ -612,11 +623,15 @@ public class Main : MonoBehaviour {
         foreach (var _ in Enumerable.Range(0, 20)) {
 
             foreach (var i in Enumerable.Range(0, 256)) {
-                texturePallet.AddRange(new List<byte> { 0, 0, 255, 0 });
 
                 if (i > 127) {
 
                     texturePallet.AddRange(new List<byte> { 255, 255, 255, 255 });
+
+                }
+                else {
+
+                    texturePallet.AddRange(new List<byte> { 0, 0, 255, 0 });
 
                 }
 
