@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class LineMesh : MonoBehaviour {
 
-    [HideInInspector]
-    public Material material;
+    // - Unity Assets -
+    public Material transparentMaterial;
+    public Material AdditionMaterial;
+
     [HideInInspector]
     public MeshCollider meshCollider;
 
@@ -25,9 +27,17 @@ public class LineMesh : MonoBehaviour {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
         meshCollider = GetComponent<MeshCollider>();
-        material = GetComponent<MeshRenderer>().material;
 
-        material.mainTexture = levelTexturePallet;
+        var meshRenderer = GetComponent<MeshRenderer>();
+
+        if (line.primitive.Material.visabilityMode == FCopObjectMaterial.VisabilityMode.Transparent) {
+            meshRenderer.material = transparentMaterial;
+        }
+        else if (line.primitive.Material.visabilityMode == FCopObjectMaterial.VisabilityMode.Addition) {
+            meshRenderer.material = AdditionMaterial;
+        }
+
+        meshRenderer.material.mainTexture = levelTexturePallet;
 
         Generate();
 

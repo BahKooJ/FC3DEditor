@@ -143,7 +143,7 @@ public class ObjectMesh : MonoBehaviour {
                 vertices.Add(new Vector3(vert.x / scale, vert.y / scale, vert.z / scale));
             }
 
-            if (triangle.primitive.material.visabilityMode == FCopObjectMaterial.VisabilityMode.Opaque) {
+            if (triangle.primitive.Material.visabilityMode == FCopObjectMaterial.VisabilityMode.Opaque) {
 
                 if (triangle.uvs.SequenceEqual(new List<FCopObject.UV>() { new(0, 0), new(0, 0), new(0, 0) })) {
 
@@ -189,10 +189,10 @@ public class ObjectMesh : MonoBehaviour {
 
             sortedPrimitives.Add(triangle.primitive);
 
-            if (triangle.primitive.material.visabilityMode == FCopObjectMaterial.VisabilityMode.Transparent) {
+            if (triangle.primitive.Material.visabilityMode == FCopObjectMaterial.VisabilityMode.Transparent) {
                 transparentTriangles.Add(triangle);
             }
-            else if (triangle.primitive.material.visabilityMode == FCopObjectMaterial.VisabilityMode.Addition) {
+            else if (triangle.primitive.Material.visabilityMode == FCopObjectMaterial.VisabilityMode.Addition) {
                 additionTriangles.Add(triangle);
             }
 

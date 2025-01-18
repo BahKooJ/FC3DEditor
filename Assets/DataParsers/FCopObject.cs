@@ -64,6 +64,7 @@ namespace FCopParser {
 
         public List<ObjectElementReference> elementReferences = new();
         public List<Primitive> primitives = new();
+
         public List<Surface> surfaces = new();
         public Dictionary<int, Surface> surfaceByCompiledOffset = new();
         public List<BoundingBox> boundingBoxes = new();
@@ -753,22 +754,33 @@ namespace FCopParser {
 
                     }
 
-                    if (primitive.material.colorMode == FCopObjectMaterial.VertexColorMode.Full) {
-
-                        colors.Add(new float[] { surface.red / 255f, surface.green / 255f, surface.blue / 255f });
-                        colors.Add(new float[] { surface.red / 255f, surface.green / 255f, surface.blue / 255f });
-                        colors.Add(new float[] { surface.red / 255f, surface.green / 255f, surface.blue / 255f });
-
+                    switch (primitive.Material.colorMode) {
+                        case FCopObjectMaterial.VertexColorMode.Monochrome:
+                            colors.Add(new float[] { surface.red / 128f, surface.red / 128f, surface.red / 128f });
+                            colors.Add(new float[] { surface.red / 128f, surface.red / 128f, surface.red / 128f });
+                            colors.Add(new float[] { surface.red / 128f, surface.red / 128f, surface.red / 128f });
+                            break;
+                        case FCopObjectMaterial.VertexColorMode.MonochromeLighting:
+                            colors.Add(new float[] { (surface.red + 127) / 255f, (surface.red + 127) / 255f, (surface.red + 127) / 255f });
+                            colors.Add(new float[] { (surface.red + 127) / 255f, (surface.red + 127) / 255f, (surface.red + 127) / 255f });
+                            colors.Add(new float[] { (surface.red + 127) / 255f, (surface.red + 127) / 255f, (surface.red + 127) / 255f });
+                            break;
+                        case FCopObjectMaterial.VertexColorMode.Full:
+                            colors.Add(new float[] { surface.red / 255f, surface.green / 255f, surface.blue / 255f });
+                            colors.Add(new float[] { surface.red / 255f, surface.green / 255f, surface.blue / 255f });
+                            colors.Add(new float[] { surface.red / 255f, surface.green / 255f, surface.blue / 255f });
+                            break;
+                        case FCopObjectMaterial.VertexColorMode.WarmShading:
+                            colors.Add(new float[] { (surface.red + 127) / 255f, (surface.green + 127) / 255f, 0f });
+                            colors.Add(new float[] { (surface.red + 127) / 255f, (surface.green + 127) / 255f, 0f });
+                            colors.Add(new float[] { (surface.red + 127) / 255f, (surface.green + 127) / 255f, 0f });
+                            break;
+                        case FCopObjectMaterial.VertexColorMode.Black:
+                            colors.Add(new float[] { 0f, 0f, 0f });
+                            colors.Add(new float[] { 0f, 0f, 0f });
+                            colors.Add(new float[] { 0f, 0f, 0f });
+                            break;
                     }
-                    else {
-
-                        colors.Add(new float[] { (surface.red + 127) / 255f, (surface.red + 127) / 255f, (surface.red + 127) / 255f });
-                        colors.Add(new float[] { (surface.red + 127) / 255f, (surface.red + 127) / 255f, (surface.red + 127) / 255f });
-                        colors.Add(new float[] { (surface.red + 127) / 255f, (surface.red + 127) / 255f, (surface.red + 127) / 255f });
-
-                    }
-
-
 
                     triangles.Add(new Triangle(verts.ToArray(), uvs.ToArray(), colors.ToArray(), texturePalette, primitive));
 
@@ -806,7 +818,7 @@ namespace FCopParser {
                     var position = firstElementGroup.vertices[primitive.associatedData[0]];
                     var length = firstElementGroup.lengths[primitive.associatedData[2]];
 
-                    billboards.Add(new Billboard(position, length, surface));
+                    billboards.Add(new Billboard(position, length, surface, primitive));
 
                 }
 
@@ -827,7 +839,7 @@ namespace FCopParser {
                     var endLength = firstElementGroup.lengths[primitive.associatedData[3]];
 
 
-                    lines.Add(new Line(startPos, endPos, startLength, endLength, surface));
+                    lines.Add(new Line(startPos, endPos, startLength, endLength, surface, primitive));
 
                 }
 
@@ -1163,7 +1175,9 @@ namespace FCopParser {
 
             public List<byte> metaDatabitfeild;
             public int unknown1;
-            public FCopObjectMaterial.Material material;
+            public FCopObjectMaterial.Material Material {
+                get => FCopObjectMaterial.materialByID [materialID];
+            }
             public bool textureEnabled;
             public PrimitiveType type;
             public int unknown2;
@@ -1181,8 +1195,6 @@ namespace FCopParser {
                 var primitiveType = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 8, 11));
                 unknown2 = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 11, 15));
                 isReflective = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 15, 16)) == 1;
-
-                material = FCopObjectMaterial.materialByID[materialID];
 
                 type = (PrimitiveType)primitiveType;
 
@@ -1293,11 +1305,13 @@ namespace FCopParser {
             public Vertex position;
             public int length;
             public Surface surface;
+            public Primitive primitive;
 
-            public Billboard(Vertex position, int length, Surface surface) {
+            public Billboard(Vertex position, int length, Surface surface, Primitive primitive) {
                 this.position = position;
                 this.length = length;
                 this.surface = surface;
+                this.primitive = primitive;
             }
 
         }
@@ -1309,13 +1323,15 @@ namespace FCopParser {
             public int startWidth;
             public int endWidth;
             public Surface surface;
+            public Primitive primitive;
 
-            public Line(Vertex startPosition, Vertex endPosition, int startWidth, int endWidth, Surface surface) {
+            public Line(Vertex startPosition, Vertex endPosition, int startWidth, int endWidth, Surface surface, Primitive primitive) {
                 this.startPosition = startPosition;
                 this.endPosition = endPosition;
                 this.startWidth = startWidth;
                 this.endWidth = endWidth;
                 this.surface = surface;
+                this.primitive = primitive;
             }
 
         }
@@ -1387,14 +1403,14 @@ namespace FCopParser {
             { 1, new Material(false, VertexColorMode.Monochrome, VisabilityMode.Transparent, false) },
             { 2, new Material(false, VertexColorMode.Full, VisabilityMode.Opaque, false) },
             { 3, new Material(false, VertexColorMode.Full, VisabilityMode.Transparent, true) },
-            { 4, new Material(true, VertexColorMode.Monochrome, VisabilityMode.Opaque, false) },
-            { 5, new Material(true, VertexColorMode.Monochrome, VisabilityMode.Transparent, false) },
-            { 6, new Material(true, VertexColorMode.Full, VisabilityMode.Opaque, false) },
-            { 7, new Material(true, VertexColorMode.Full, VisabilityMode.Transparent, true) },
-            { 8, new Material(true, VertexColorMode.Monochrome, VisabilityMode.Opaque, false) },
-            { 9, new Material(true, VertexColorMode.Monochrome, VisabilityMode.Transparent, false) },
-            { 10, new Material(true, VertexColorMode.Full, VisabilityMode.Opaque, false) },
-            { 11, new Material(true, VertexColorMode.Full, VisabilityMode.Opaque, true) },
+            { 4, new Material(true, VertexColorMode.MonochromeLighting, VisabilityMode.Opaque, false) },
+            { 5, new Material(true, VertexColorMode.MonochromeLighting, VisabilityMode.Transparent, false) },
+            { 6, new Material(true, VertexColorMode.WarmShading, VisabilityMode.Opaque, false) },
+            { 7, new Material(true, VertexColorMode.WarmShading, VisabilityMode.Transparent, true) },
+            { 8, new Material(true, VertexColorMode.MonochromeLighting, VisabilityMode.Opaque, false) },
+            { 9, new Material(true, VertexColorMode.MonochromeLighting, VisabilityMode.Transparent, false) },
+            { 10, new Material(true, VertexColorMode.WarmShading, VisabilityMode.Opaque, false) },
+            { 11, new Material(true, VertexColorMode.WarmShading, VisabilityMode.Opaque, true) },
             { 12, new Material(false, VertexColorMode.Full, VisabilityMode.Addition, true) },
             { 13, new Material(false, VertexColorMode.Full, VisabilityMode.Addition, true) },
             { 14, new Material(true, VertexColorMode.Black, VisabilityMode.Transparent, false) },
@@ -1416,13 +1432,13 @@ namespace FCopParser {
 
         public struct Material {
 
-            public bool gouraudShading;
+            public bool shading;
             public VertexColorMode colorMode;
             public VisabilityMode visabilityMode;
             public bool vertexColorSemiTransparent;
 
-            public Material(bool gouraudShading, VertexColorMode colorMode, VisabilityMode visabilityMode, bool vertexColorSemiTransparent) {
-                this.gouraudShading = gouraudShading;
+            public Material(bool shading, VertexColorMode colorMode, VisabilityMode visabilityMode, bool vertexColorSemiTransparent) {
+                this.shading = shading;
                 this.colorMode = colorMode;
                 this.visabilityMode = visabilityMode;
                 this.vertexColorSemiTransparent = vertexColorSemiTransparent;
@@ -1432,8 +1448,10 @@ namespace FCopParser {
 
         public enum VertexColorMode {
             Monochrome = 0,
-            Full = 1,
-            Black = 2
+            MonochromeLighting = 1,
+            Full = 2,
+            WarmShading = 3,
+            Black = 4
         }
 
         public enum VisabilityMode {

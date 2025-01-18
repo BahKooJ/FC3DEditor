@@ -196,17 +196,6 @@ public class Main : MonoBehaviour {
         }
 
         if (Controls.OnDown("Compile")) {
-
-            var objs = level.objects.Where(o => o.DataID > 58);
-
-            foreach (var obj in objs) {
-
-                foreach (var prim in obj.primitives) {
-                    prim.materialID++;
-                }
-
-            }
-
             Compile();
             counterActions.Clear();
             System.GC.Collect();

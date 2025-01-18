@@ -45,10 +45,10 @@ public class PrimitivePropertyPanelView : MonoBehaviour {
         textureEnabledToggle.isOn = primitive.textureEnabled;
         unknown2Text.text = primitive.unknown2.ToString();
         isReflectiveText.text = primitive.isReflective.ToString();
-        gouraudShadingText.text = primitive.material.gouraudShading.ToString();
-        vertexColorModeText.text = primitive.material.colorMode.ToString();
-        visabilityModeText.text = primitive.material.visabilityMode.ToString();
-        vertexColorSemiTransText.text = primitive.material.vertexColorSemiTransparent.ToString();
+        gouraudShadingText.text = primitive.Material.shading.ToString();
+        vertexColorModeText.text = primitive.Material.colorMode.ToString();
+        visabilityModeText.text = primitive.Material.visabilityMode.ToString();
+        vertexColorSemiTransText.text = primitive.Material.vertexColorSemiTransparent.ToString();
         materialIDInput.text = primitive.materialID.ToString();
 
         redInput.text = surface.red.ToString();

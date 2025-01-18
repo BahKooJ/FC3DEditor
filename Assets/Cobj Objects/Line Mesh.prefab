@@ -111,6 +111,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf61ba2b0340fd14e994a7ceb1c17937, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  material: {fileID: 0}
+  transparentMaterial: {fileID: 2100000, guid: a2449eda40e81d448bce16831cbd202c, type: 2}
+  AdditionMaterial: {fileID: 2100000, guid: 3c0e3b4a1d81b674ea3164ab9ce1a69d, type: 2}
   meshCollider: {fileID: 0}
   levelTexturePallet: {fileID: 0}
