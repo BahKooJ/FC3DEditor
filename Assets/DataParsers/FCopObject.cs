@@ -404,6 +404,14 @@ namespace FCopParser {
 
         }
 
+        public void RefreshTriangles() {
+
+            triangles.Clear();
+
+            CreateTriangles();
+
+        }
+
         void FindStartChunkOffset() {
 
             offsets.Clear();
@@ -1417,6 +1425,27 @@ namespace FCopParser {
             { 15, new Material(true, VertexColorMode.Black, VisabilityMode.Transparent, false) }
 
         };
+
+        public enum MaterialEnum {
+
+            Unlit = 0,
+            UnlitTransparent = 1,
+            UnlitColor = 2,
+            UnlitColorTransparnet = 3,
+            LitFlat = 4,
+            LitFlatTransparnet = 5,
+            LitWarm = 6,
+            LitWarmTransparent = 7,
+            Lit = 8,
+            LitTransparent = 9,
+            LitWarm2 = 10,
+            LitWarm3 = 11,
+            AdditiveColor = 12,
+            AdditiveColor2 = 13,
+            Black = 14,
+            Black2 = 15
+
+        }
 
         public static int? IdByMaterial(Material mat) {
 

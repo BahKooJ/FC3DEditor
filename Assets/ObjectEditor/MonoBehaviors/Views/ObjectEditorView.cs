@@ -47,4 +47,10 @@ public class ObjectEditorView : MonoBehaviour {
 
     }
 
+    public void ClearPrimitivePropertyView() {
+
+        Destroy(primitivePropertyView.gameObject);
+
+    }
+
 }

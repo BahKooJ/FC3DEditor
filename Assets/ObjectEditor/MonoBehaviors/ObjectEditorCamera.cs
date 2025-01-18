@@ -3,13 +3,12 @@ using UnityEngine;
 
 public class ObjectEditorCamera : MonoBehaviour {
 
-    Vector3 orbitPoint = Vector3.zero;
+    public Transform orbitPoint;
 
     float zoomDistance = 10f;
 
     private void Start() {
-        
-        orbitPoint = transform.position + Vector3.forward * zoomDistance;
+       
 
     }
 
@@ -22,9 +21,27 @@ public class ObjectEditorCamera : MonoBehaviour {
                 previousMousePos = Input.mousePosition;
             }
 
-            transform.RotateAround(orbitPoint, transform.up, Input.mousePosition.x - previousMousePos.x);
-            transform.RotateAround(orbitPoint, -transform.right, Input.mousePosition.y - previousMousePos.y);
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, 0);
+            if (Input.GetKey(KeyCode.LeftShift)) {
+
+                // Why 600? idk that was just the best multiplier I found
+                var xMove = (Input.mousePosition.x - previousMousePos.x) * (zoomDistance / 600f);
+                var yMove = (Input.mousePosition.y - previousMousePos.y) * (zoomDistance / 600f);
+
+                orbitPoint.transform.position += -transform.right * xMove;
+                orbitPoint.transform.position -= transform.up * yMove;
+
+                transform.position = orbitPoint.position + -transform.forward * zoomDistance;
+
+            }
+            else {
+
+                transform.RotateAround(orbitPoint.position, transform.up, Input.mousePosition.x - previousMousePos.x);
+                transform.RotateAround(orbitPoint.position, -transform.right, Input.mousePosition.y - previousMousePos.y);
+                transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, 0);
+
+            }
+
+
 
 
             previousMousePos = Input.mousePosition;
@@ -44,7 +61,7 @@ public class ObjectEditorCamera : MonoBehaviour {
                 zoomDistance = 0;
             }
 
-            transform.position = orbitPoint + -transform.forward * zoomDistance;
+            transform.position = orbitPoint.position + -transform.forward * zoomDistance;
 
         }
 

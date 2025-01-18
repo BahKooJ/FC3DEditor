@@ -31,9 +31,9 @@ public class ObjectEditorMain : MonoBehaviour {
     public List<ObjectVertex> gameObjectVertices = new();
 
     public Action<ObjectVertex> requestedVertexActionCallback = v => { };
-    public FCopObject.Primitive selectedPrimitive;
 
-    ObjectTriangleSelectionOverlay activeTriangleOverlay;
+    public List<FCopObject.Primitive> selectedPrimitives = new();
+    List<ObjectTriangleSelectionOverlay> activeTriangleOverlays = new();
 
     private void Start() {
 
@@ -71,6 +71,11 @@ public class ObjectEditorMain : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Escape)) {
             HeadsUpTextUtil.End();
             ClearVertexCallback();
+        }
+
+        if (Input.GetKeyDown(KeyCode.C)) {
+            Clear();
+            view.ClearPrimitivePropertyView();
         }
         
 
@@ -123,23 +128,78 @@ public class ObjectEditorMain : MonoBehaviour {
 
     void SelectFace(FCopObject.Primitive selectedPrimitive) {
 
-        this.selectedPrimitive = selectedPrimitive;
-        view.RefreshPrimitivePropertyView(selectedPrimitive);
+        if (Input.GetKey(KeyCode.LeftShift)) {
 
-        if (activeTriangleOverlay != null) {
+            if (!selectedPrimitives.Contains(selectedPrimitive)) {
 
-            Destroy(activeTriangleOverlay.gameObject);
+                selectedPrimitives.Add(selectedPrimitive);
+                CreateOverlay(selectedPrimitive);
+
+            }
+            else {
+
+                selectedPrimitives.Remove(selectedPrimitive);
+                RemoveOverlay(selectedPrimitive);
+
+                if (selectedPrimitives.Count == 0) {
+                    view.ClearPrimitivePropertyView();
+                    return;
+                }
+
+            }
 
         }
+        else {
+
+            Clear();
+            selectedPrimitives.Add(selectedPrimitive);
+            CreateOverlay(selectedPrimitive);
+
+        }
+        
+        view.RefreshPrimitivePropertyView(selectedPrimitive);
+
+    }
+
+    void CreateOverlay(FCopObject.Primitive selectedPrimitive) {
 
         var gobj = Instantiate(ObjectTriangleSelectionOverlayPrefab);
         gobj.transform.SetParent(objectMesh.transform, false);
         var overlay = gobj.GetComponent<ObjectTriangleSelectionOverlay>();
+        overlay.primitive = selectedPrimitive;
         overlay.fCopTriangles = objectMesh.trianglesByPrimitive[selectedPrimitive];
         overlay.textureOffset = objectMesh.textureOffset;
         overlay.levelTexturePallet = levelTexturePallet;
         overlay.Create();
-        activeTriangleOverlay = overlay;
+        activeTriangleOverlays.Add(overlay);
+
+    }
+
+    void RemoveOverlay(FCopObject.Primitive selectedPrimitive) {
+
+        var overlay = activeTriangleOverlays.FirstOrDefault(o => o.primitive == selectedPrimitive);
+
+        activeTriangleOverlays.Remove(overlay);
+
+        if (overlay != null) {
+
+            Destroy(overlay.gameObject);
+
+        }
+
+    }
+
+    void Clear() {
+
+        selectedPrimitives.Clear();
+
+        foreach (var overlay in activeTriangleOverlays) {
+
+            Destroy(overlay.gameObject);
+
+        }
+
+        activeTriangleOverlays.Clear();
 
     }
 
@@ -226,6 +286,19 @@ public class ObjectEditorMain : MonoBehaviour {
         texture.Apply();
 
         levelTexturePallet = texture;
+
+    }
+
+    public void ChangePrimitiveMaterial(int id) {
+
+        foreach (var prim in selectedPrimitives) {
+
+            prim.materialID = id;
+
+        }
+
+        fCopObject.RefreshTriangles();
+        objectMesh.Refresh();
 
     }
 

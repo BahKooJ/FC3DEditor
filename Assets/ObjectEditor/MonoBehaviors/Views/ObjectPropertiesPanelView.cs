@@ -20,10 +20,10 @@ public class ObjectPropertiesPanelView : MonoBehaviour {
 
         nameText.text = ObjectEditorMain.fCopObject.name;
 
-        pos0IndexText.text = ObjectEditorMain.fCopObject.positions[0].ToString();
-        pos1IndexText.text = ObjectEditorMain.fCopObject.positions[1].ToString();
-        pos2IndexText.text = ObjectEditorMain.fCopObject.positions[2].ToString();
-        pos3IndexText.text = ObjectEditorMain.fCopObject.positions[3].ToString();
+        pos0IndexText.text = PositionString(ObjectEditorMain.fCopObject.positions[0]);
+        pos1IndexText.text = PositionString(ObjectEditorMain.fCopObject.positions[1]);
+        pos2IndexText.text = PositionString(ObjectEditorMain.fCopObject.positions[2]);
+        pos3IndexText.text = PositionString(ObjectEditorMain.fCopObject.positions[3]);
 
 
     }
@@ -85,6 +85,46 @@ public class ObjectPropertiesPanelView : MonoBehaviour {
             main.ClearVertexCallback();
 
         };
+
+    }
+
+    public void OnClickReset0() {
+
+        ObjectEditorMain.fCopObject.positions[0] = 255;
+        pos0IndexText.text = PositionString(ObjectEditorMain.fCopObject.positions[0]);
+
+    }
+
+    public void OnClickReset1() {
+
+        ObjectEditorMain.fCopObject.positions[1] = 255;
+        pos1IndexText.text = PositionString(ObjectEditorMain.fCopObject.positions[1]);
+
+    }
+
+    public void OnClickReset2() {
+
+        ObjectEditorMain.fCopObject.positions[2] = 255;
+        pos2IndexText.text = PositionString(ObjectEditorMain.fCopObject.positions[2]);
+
+    }
+
+    public void OnClickReset3() {
+
+        ObjectEditorMain.fCopObject.positions[3] = 255;
+        pos3IndexText.text = PositionString(ObjectEditorMain.fCopObject.positions[3]);
+
+    }
+
+    string PositionString(byte pos) {
+
+        var total = pos.ToString();
+
+        if (pos == 255) {
+            total += " (N/A)";
+        }
+
+        return total;
 
     }
 

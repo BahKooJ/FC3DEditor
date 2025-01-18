@@ -8,6 +8,7 @@ public class ObjectTriangleSelectionOverlay : MonoBehaviour {
 
     // - Parameters -
     public List<FCopObject.Triangle> fCopTriangles;
+    public FCopObject.Primitive primitive;
     [HideInInspector]
     public int textureOffset;
     [HideInInspector]

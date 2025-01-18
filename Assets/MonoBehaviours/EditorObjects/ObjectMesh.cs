@@ -64,13 +64,8 @@ public class ObjectMesh : MonoBehaviour {
     }
 
     void Create() {
-
-        //try {
-            Generate();
-        //}
-        //catch {
-            //failed = true;
-        //}
+        
+        Generate();
 
         if (!failed) {
 
@@ -126,6 +121,40 @@ public class ObjectMesh : MonoBehaviour {
         }
 
         alreadyCreated = true;
+
+    }
+
+    public void Refresh() {
+
+        foreach (Transform t in transform) {
+
+            if (t.gameObject.GetComponent<ObjectTriangleSelectionOverlay>() == null) {
+
+                Destroy(t.gameObject);
+
+            }
+
+        }
+
+        vertices.Clear();
+        triangles.Clear();
+        textureCords.Clear();
+        colors.Clear();
+        sortedPrimitives.Clear();
+        trianglesByPrimitive.Clear();
+        specialPrimitives.Clear();
+
+        Create();
+
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+
+        mesh.uv = textureCords.ToArray();
+        mesh.colors = colors.ToArray();
+
+        mesh.RecalculateNormals();
+
+        meshCollider.sharedMesh = mesh;
 
     }
 
