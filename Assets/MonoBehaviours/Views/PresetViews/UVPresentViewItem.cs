@@ -243,6 +243,11 @@ public class UVPresentViewItem : MonoBehaviour {
     public void OnClick() {
 
         if (controller.selectedItems.Count == 0) {
+
+            if (controller.view.activeTextureUVMapper != null) {
+                controller.view.activeTextureUVMapper.GetComponent<TextureUVMapper>().RecievePresetData(preset);
+            }
+
             return;
         }
 

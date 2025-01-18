@@ -251,6 +251,14 @@ public class TextureUVMapper : MonoBehaviour {
 
     }
 
+    public void RecievePresetData(UVPreset preset) {
+
+        textureLines.ReInit(new (preset.uvs));
+
+        texturePaletteDropdown.GetComponent<TMP_Dropdown>().value = preset.texturePalette;
+
+    }
+
     public bool IsCursorInTexturePallete() {
 
         Vector2 pointOnPallete = Vector2.zero;

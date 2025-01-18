@@ -21,11 +21,15 @@ public class TileTexturePreview : MonoBehaviour {
 
     AnimatedTile animatedTile = null;
 
+    Color startColor;
+
     void Start() {
 
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
         material = GetComponent<MeshRenderer>().material;
+
+        startColor = material.color;
 
         material.mainTexture = controller.levelTexturePallet;
 
@@ -66,6 +70,13 @@ public class TileTexturePreview : MonoBehaviour {
 
         if (newTexture) {
             material.mainTexture = controller.levelTexturePallet;
+        }
+
+        if (tile.isSemiTransparent) {
+            material.color = new Color(0.3f, 0.3f, 0.8f);
+        }
+        else {
+            material.color = startColor;
         }
 
         vertexColors.Clear();

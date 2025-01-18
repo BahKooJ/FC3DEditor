@@ -181,8 +181,20 @@ public class TextureCoordinatePoint : MonoBehaviour {
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(imageTransform, Input.mousePosition, Camera.main, out Vector2 pointOnPallete);
 
+        var originalX = transform.localPosition.x;
+        var originalY = transform.localPosition.y;
+
         var x = Mathf.Floor(pointOnPallete.x);
         var y = Mathf.Floor(pointOnPallete.y);
+
+        if (Controls.IsDown("LockUVU")) {
+            
+            y = originalY;
+
+        }
+        else if (Controls.IsDown("LockUVV")) {
+            x = originalX;
+        }
 
         // Moves all points
         if (Controls.IsDown("MultiSelect")) {

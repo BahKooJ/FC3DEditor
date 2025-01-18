@@ -444,9 +444,13 @@ public class TextureEditMode : TileMutatingEditMode {
             } else {
 
                 selection.tile.uvs = new List<int>(FirstTile.uvs);
-                selection.tile.texturePalette = FirstTile.texturePalette;
 
             }
+
+            selection.tile.texturePalette = FirstTile.texturePalette;
+            selection.tile.isVectorAnimated = FirstTile.isVectorAnimated;
+            selection.section.section.animationVector.x = FirstItem.section.section.animationVector.x;
+            selection.section.section.animationVector.y = FirstItem.section.section.animationVector.y;
 
         }
 
@@ -474,6 +478,7 @@ public class TextureEditMode : TileMutatingEditMode {
         }
 
         RefreshMeshes();
+        RefreshTileOverlayTexture();
 
         QuickLogHandler.Log("Selected tiles made opaque", LogSeverity.Success);
 
@@ -494,6 +499,7 @@ public class TextureEditMode : TileMutatingEditMode {
         }
 
         RefreshMeshes();
+        RefreshTileOverlayTexture();
 
         QuickLogHandler.Log("Selected tiles made transparent", LogSeverity.Success);
 

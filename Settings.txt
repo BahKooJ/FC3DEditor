@@ -38,6 +38,8 @@ Inputs = {
 "RotateCounterClockwiseUV":"1" "F"
 "FlipTextureCoordsVerticallyUV":"1" "T"
 "FlipTextureCoordsHorizontallyUV":"1" "G"
+"LockUVU":"1" "X"
+"LockUVV":"1" "V"
 "DuplicateTileShaders":"2" "LeftControl""V"
 "OpenCloseColorPicker":"1" "U"
 "PaintTool":"1" "T"
