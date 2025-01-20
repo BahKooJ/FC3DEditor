@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 
 public class NavMeshEditPanel : MonoBehaviour {
 
-    public Toggle isStartToggle;
     public CustomDropdown navMeshDropdown;
 
     public NavMeshEditMode controller;
+
+    public NavNodeDebugPanel debugPanel;
 
 
     void Start() {
@@ -17,10 +17,6 @@ public class NavMeshEditPanel : MonoBehaviour {
 
         }
 
-    }
-
-    public void RefeshCheck() {
-        isStartToggle.isOn = controller.selectedNavNode.controlledObject.GetComponent<NavNodePoint>().node.isStartingPoint;
     }
 
     public void AddNode() {
@@ -42,16 +38,6 @@ public class NavMeshEditPanel : MonoBehaviour {
         controller.selectedNavMeshIndex = index;
         controller.OnDestroy();
         controller.OnCreateMode();
-
-    }
-    // TODO: No logic should be in the view!
-    public void OnValueChangeStartToggle() {
-
-        if (controller == null) { return; }
-
-        if (controller.selectedNavNode == null) { return; }
-
-        controller.selectedNavNode.controlledObject.GetComponent<NavNodePoint>().node.isStartingPoint = isStartToggle.isOn;
 
     }
 

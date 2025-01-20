@@ -41,6 +41,22 @@ namespace FCopParser {
 
         }
 
+        public static int BitsToSignedInt(BitArray bits, int bitCount) {
+
+            int[] array = new int[1];
+            bits.CopyTo(array, 0);
+            var unsigned = array[0];
+
+            var max = (int)Math.Pow(2, bitCount);
+
+            if (unsigned > (max / 2) - 1) {
+                return unsigned - max;
+            }
+
+            return unsigned;
+
+        }
+
         public static byte[] BitArrayToByteArray(BitArray bits) {
             byte[] ret = new byte[bits.Length / 8];
             bits.CopyTo(ret, 0);

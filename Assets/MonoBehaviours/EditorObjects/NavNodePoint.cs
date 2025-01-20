@@ -180,6 +180,10 @@ public class NavNodePoint : MonoBehaviour {
                 lineRenderer.startColor = Color.red;
                 lineRenderer.endColor = Color.red;
                 break;
+            case 3:
+                lineRenderer.startColor = Color.magenta;
+                lineRenderer.endColor = Color.magenta;
+                break;
         }
 
         return lineRenderer;

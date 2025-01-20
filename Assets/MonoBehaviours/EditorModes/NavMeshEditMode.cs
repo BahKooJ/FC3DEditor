@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 using Object = UnityEngine.Object;
 
 public class NavMeshEditMode : EditMode {
@@ -114,6 +115,20 @@ public class NavMeshEditMode : EditMode {
 
         if (Main.ignoreAllInputs) {
             return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.F11)) {
+
+            var node = navNodes.FirstOrDefault(n => n.node.unknown2Bit == 1);
+
+            if (node != null) {
+
+                Camera.main.transform.position = node.transform.position;
+
+                Camera.main.transform.position = Camera.main.transform.position + (Camera.main.transform.forward * -4);
+
+            }
+
         }
 
         if (Controls.OnUp("MoveToCursor") || Input.GetMouseButtonUp(0)) {
@@ -287,7 +302,6 @@ public class NavMeshEditMode : EditMode {
 
     }
 
-
     void NodeNotAdded() {
 
         if (navNodeToAdd != null) {
@@ -337,8 +351,7 @@ public class NavMeshEditMode : EditMode {
 
         selectedNavNode = script;
 
-        // TODO: Why not just refresh view?
-        view.RefeshCheck();
+        view.debugPanel.Refresh();
 
     }
 
@@ -504,9 +517,9 @@ public class NavMeshEditMode : EditMode {
 
         AddNavMeshSaveState(SelectedNavMesh);
 
-        var node = new NavNode(navNodes.Count, -64, 0,
+        var node = new NavNode(navNodes.Count,
             Mathf.RoundToInt(navNodeToAdd.transform.position.x * 32f),
-            Mathf.RoundToInt(navNodeToAdd.transform.position.z * -32f), false);
+            Mathf.RoundToInt(navNodeToAdd.transform.position.z * -32f));
 
         SelectedNavMesh.nodes.Add(node);
 
