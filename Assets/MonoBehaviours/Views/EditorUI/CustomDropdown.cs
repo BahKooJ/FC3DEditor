@@ -5,6 +5,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 // I'm at my limit with Unity's built in dropdown that I'm just gonna write my own because I think it'll be fast than trying to work with that nightmare
 public class CustomDropdown : MonoBehaviour {
@@ -12,6 +13,7 @@ public class CustomDropdown : MonoBehaviour {
     // - Unity Refs -
     public GameObject listItem;
     public GameObject contentList;
+    public GameObject scrollbar;
     public Transform contentTransform;
     public TMP_Text label;
     public UnityEvent onValueChanged;
@@ -71,6 +73,20 @@ public class CustomDropdown : MonoBehaviour {
     }
 
     public void OnClick() {
+
+        PointerEventData pointerData = new PointerEventData(EventSystem.current);
+        pointerData.position = Input.mousePosition;
+
+        var results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(pointerData, results);
+
+        foreach (var result in results) {
+
+            if (result.gameObject == scrollbar) {
+                return;
+            }
+
+        }
 
         contentList.SetActive(!contentList.activeSelf);
 
