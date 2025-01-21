@@ -31,12 +31,12 @@ namespace FCopParser {
                 var bitField = new BitArray(nodeData);
 
                 var groundCast = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 80, 82));
-                var unknown1 = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 82, 84));
+                var readHeightOffset = Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 82, 84));
                 var heightOffset = Utils.BitsToSignedInt(Utils.CopyBitsOfRange(bitField, 84, 96), 12);
 
                 nodes.Add(new NavNode(
                     index,
-                    Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 0, 2)),
+                    (NavNodeState)Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 0, 2)),
                     Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 22, 32)),
                     Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 12, 22)),
                     Utils.BitsToInt(Utils.CopyBitsOfRange(bitField, 2, 12)),
@@ -44,7 +44,7 @@ namespace FCopParser {
                     BitConverter.ToInt16(nodeData, 6),
                     BitConverter.ToInt16(nodeData, 8),
                     (NavNodeGroundCast)groundCast,
-                    unknown1,
+                    readHeightOffset == 1,
                     heightOffset
                     ));
 
@@ -61,7 +61,7 @@ namespace FCopParser {
             foreach (var node in nodes) {
 
                 var nextNodesBitfield = new BitField(48, new List<BitNumber> {
-                    new BitNumber(2, node.unknown2Bit), 
+                    new BitNumber(2, (int)node.state), 
                     new BitNumber(10, node.nextNodeIndexes[2]), 
                     new BitNumber(10, node.nextNodeIndexes[1]), 
                     new BitNumber(10, node.nextNodeIndexes[0]),
@@ -76,7 +76,7 @@ namespace FCopParser {
 
                 var heightOffsetingBitfield = new BitField(16, new List<BitNumber> {
                     new BitNumber(2, (int)node.groundCast),
-                    new BitNumber(2, node.unknown),
+                    new BitNumber(2, node.readHeightOffset ? 1 : 0),
                     new BitNumber(12, node.heightOffset)
                 });
 
@@ -116,17 +116,17 @@ namespace FCopParser {
         public static int invalid = 1023;
 
         public int index;
-        public int unknown2Bit;
+        public NavNodeState state;
         public int[] nextNodeIndexes = new int[4];
         public int x;
         public int y;
         public NavNodeGroundCast groundCast;
-        public int unknown;
+        public bool readHeightOffset;
         public int heightOffset; // 12-Bit
 
-        public NavNode(int index, int unknown2Bit, int nextNodeA, int nextNodeB, int nextNodeC, int nextNodeD, int x, int y, NavNodeGroundCast groundCast, int unknown, int heightOffset) {
+        public NavNode(int index, NavNodeState state, int nextNodeA, int nextNodeB, int nextNodeC, int nextNodeD, int x, int y, NavNodeGroundCast groundCast, bool readHeightOffset, int heightOffset) {
             this.index = index;
-            this.unknown2Bit = unknown2Bit;
+            this.state = state;
             this.nextNodeIndexes[0] = nextNodeA;
             this.nextNodeIndexes[1] = nextNodeB;
             this.nextNodeIndexes[2] = nextNodeC;
@@ -134,13 +134,13 @@ namespace FCopParser {
             this.x = x;
             this.y = y;
             this.groundCast = groundCast;
-            this.unknown = unknown;
+            this.readHeightOffset = readHeightOffset;
             this.heightOffset = heightOffset;
         }
 
         public NavNode(int index, int x, int y) {
             this.index = index;
-            this.unknown2Bit = 0;
+            this.state = NavNodeState.Enabled;
             this.nextNodeIndexes[0] = invalid;
             this.nextNodeIndexes[1] = invalid;
             this.nextNodeIndexes[2] = invalid;
@@ -148,14 +148,14 @@ namespace FCopParser {
             this.x = x;
             this.y = y;
             this.groundCast = NavNodeGroundCast.Highest;
-            this.unknown = 0;
+            this.readHeightOffset = false;
             this.heightOffset = 0;
 
         }
 
         public NavNode Clone() {
 
-            return new NavNode(index, unknown2Bit, nextNodeIndexes[0], nextNodeIndexes[1], nextNodeIndexes[2], nextNodeIndexes[3], x, y, groundCast, unknown, heightOffset);
+            return new NavNode(index, state, nextNodeIndexes[0], nextNodeIndexes[1], nextNodeIndexes[2], nextNodeIndexes[3], x, y, groundCast, readHeightOffset, heightOffset);
 
         }
 
@@ -182,6 +182,12 @@ namespace FCopParser {
         Lowest = 1,
         LowestDisableHeight = 2,
         Middle = 3
+    }
+
+    public enum NavNodeState {
+        Enabled = 0,
+        Unknown = 1,
+        Disabled = 2
     }
 
 }

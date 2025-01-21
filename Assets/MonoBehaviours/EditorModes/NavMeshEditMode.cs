@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 using Object = UnityEngine.Object;
 
 public class NavMeshEditMode : EditMode {
@@ -15,7 +14,7 @@ public class NavMeshEditMode : EditMode {
 
     public NavMeshEditPanel view;
 
-    public int selectedNavMeshIndex = 0;
+    public static int selectedNavMeshIndex = 0;
     public FCopNavMesh SelectedNavMesh {
         get => main.level.navMeshes [selectedNavMeshIndex];
     }
@@ -117,25 +116,11 @@ public class NavMeshEditMode : EditMode {
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.F11)) {
-
-            var node = navNodes.FirstOrDefault(n => n.node.unknown2Bit == 1);
-
-            if (node != null) {
-
-                Camera.main.transform.position = node.transform.position;
-
-                Camera.main.transform.position = Camera.main.transform.position + (Camera.main.transform.forward * -4);
-
-            }
-
-        }
-
         if (Controls.OnUp("MoveToCursor") || Input.GetMouseButtonUp(0)) {
             preventCounterAction = false;
         }
 
-        if (selectedNavNode != null) {
+        if (selectedNavNode != null && !Main.IsMouseOverUI()) {
 
             if (selectedNavNode.TestCollision()) {
                 return;
@@ -263,7 +248,7 @@ public class NavMeshEditMode : EditMode {
 
         }
 
-        if (Controls.OnDown("Select")) {
+        if (Controls.OnDown("Select") && !Main.IsMouseOverUI()) {
 
             var castResult = TestRayOnNavNode();
 
@@ -275,7 +260,7 @@ public class NavMeshEditMode : EditMode {
 
         }
 
-        if (Controls.OnDown("Interact")) {
+        if (Controls.OnDown("Interact") && !Main.IsMouseOverUI()) {
 
             var castResult = TestRayOnNavNode();
 
@@ -326,6 +311,10 @@ public class NavMeshEditMode : EditMode {
 
                 }
 
+                if (hit.colliderInstanceID == node.heightOffsetSphere.GetComponent<SphereCollider>().GetInstanceID()) {
+                    return node;
+                }
+
             }
 
         }
@@ -344,14 +333,14 @@ public class NavMeshEditMode : EditMode {
         script.controlledObject = node.gameObject;
         script.moveCallback = (newPos, axis) => {
 
-            node.ChangePosition(newPos);
+            node.ChangePosition(newPos, axis);
 
             return true;
         };
 
         selectedNavNode = script;
 
-        view.debugPanel.Refresh();
+        view.propertyPanel.Refresh();
 
     }
 
@@ -448,6 +437,26 @@ public class NavMeshEditMode : EditMode {
         }
 
         selectedNavNode = null;
+
+        view.propertyPanel.Refresh();
+
+    }
+
+    public NavNode GetSeletedNavNode() {
+
+        if (selectedNavNode == null) {
+            return null;
+        }
+
+        return selectedNavNode.controlledObject.GetComponent<NavNodePoint>().node;
+
+    }
+
+    public void RefreshNavNode() {
+
+        if (selectedNavNode != null) {
+            selectedNavNode.controlledObject.GetComponent<NavNodePoint>().SetToCurrentPosition();
+        }
 
     }
 
@@ -568,6 +577,22 @@ public class NavMeshEditMode : EditMode {
 
         OnCreateMode();
 
+    }
+
+    public void ChangeState(NavNodeState state) {
+        GetSeletedNavNode().state = state;
+    }
+
+    public void ChangeGroundCast(NavNodeGroundCast groundCast) {
+        GetSeletedNavNode().groundCast = groundCast;
+    }
+
+    public void ChangeReadHeight(bool value) {
+        GetSeletedNavNode().readHeightOffset = value;
+    }
+
+    public void ChangeHeightOffset(int value) {
+        GetSeletedNavNode().SafeSetHeight(value);
     }
 
     #endregion

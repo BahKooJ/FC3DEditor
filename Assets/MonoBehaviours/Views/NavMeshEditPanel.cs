@@ -6,7 +6,7 @@ public class NavMeshEditPanel : MonoBehaviour {
 
     public NavMeshEditMode controller;
 
-    public NavNodeDebugPanel debugPanel;
+    public NavNodePropertyPanel propertyPanel;
 
 
     void Start() {
@@ -16,6 +16,8 @@ public class NavMeshEditPanel : MonoBehaviour {
             navMeshDropdown.AddItem(navMesh.name);
 
         }
+
+        navMeshDropdown.value = NavMeshEditMode.selectedNavMeshIndex;
 
     }
 
@@ -35,7 +37,7 @@ public class NavMeshEditPanel : MonoBehaviour {
 
         Main.ClearCounterActions();
 
-        controller.selectedNavMeshIndex = index;
+        NavMeshEditMode.selectedNavMeshIndex = index;
         controller.OnDestroy();
         controller.OnCreateMode();
 
