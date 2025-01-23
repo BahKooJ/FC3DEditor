@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 public class NavMeshEditPanel : MonoBehaviour {
 
@@ -10,6 +11,14 @@ public class NavMeshEditPanel : MonoBehaviour {
 
 
     void Start() {
+
+        RefreshDropdown();
+
+    }
+
+    public void RefreshDropdown() {
+
+        navMeshDropdown.Clear();
 
         foreach (var navMesh in controller.main.level.navMeshes) {
 
@@ -56,6 +65,24 @@ public class NavMeshEditPanel : MonoBehaviour {
     public void OnDropdownChange() {
 
         ChangeNavMesh(navMeshDropdown.value);
+
+    }
+
+    public void OnClickAddNavMesh() {
+
+        controller.AddNewNavMesh();
+
+        RefreshDropdown();
+
+        navMeshDropdown.Open();
+
+        navMeshDropdown.ScrollToBottom();
+
+        navMeshDropdown.itemObjects.Last().GetComponent<NavMeshListItemView>().StartRenaming(controller.main.level.navMeshes.Last().name);
+
+        // Delayed action because it takes a sec for the new item to be added.
+        // Otherwise it would scroll just above the new item.
+        Main.delayedActions.Add(new DelayedAction(1, () => navMeshDropdown.ScrollToBottom()));
 
     }
 

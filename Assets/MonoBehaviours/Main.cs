@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -24,6 +23,8 @@ public class Main : MonoBehaviour {
     // Undos
     public static List<CounterAction> counterActions = new();
     public static bool counterActionAddedOnCurrentSelectHold = false;
+
+    public static List<DelayedAction> delayedActions = new();
 
     public static void AddCounterAction(CounterAction counterAction, bool ignoreSelectionCheck = false) {
         
@@ -171,6 +172,23 @@ public class Main : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Escape) && !isEscMenuOpen) {
             HeadsUpTextUtil.End();
             OpenEscMenu();
+        }
+
+        var delayedActionsToRemove = new List<DelayedAction>();
+        foreach (var delayedAction in delayedActions) {
+
+            if (delayedAction.frameCount == 0) {
+                delayedAction.action();
+                delayedActionsToRemove.Add(delayedAction);
+            }
+            else {
+                delayedAction.frameCount--;
+            }
+
+        }
+
+        foreach (var delayedAction in delayedActionsToRemove) {
+            delayedActions.Remove(delayedAction);
         }
 
         // If the edit mode is null that most likely means unity is transitioning scenes.

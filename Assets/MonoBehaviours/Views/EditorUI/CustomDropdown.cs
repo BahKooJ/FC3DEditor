@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 // I'm at my limit with Unity's built in dropdown that I'm just gonna write my own because I think it'll be fast than trying to work with that nightmare
 public class CustomDropdown : MonoBehaviour {
@@ -14,11 +15,13 @@ public class CustomDropdown : MonoBehaviour {
     public GameObject listItem;
     public GameObject contentList;
     public GameObject scrollbar;
+    public ScrollRect scrollRect;
     public Transform contentTransform;
     public TMP_Text label;
     public UnityEvent onValueChanged;
 
     public List<string> items = new();
+    public List<GameObject> itemObjects = new();
     public int value = 0;
 
     private void Start() {
@@ -50,11 +53,30 @@ public class CustomDropdown : MonoBehaviour {
 
         obj.SetActive(true);
 
+        itemObjects.Add(obj);
+
     }
 
     public void AddItem(string item) {
         items.Add(item);
         CreateListItem(item, items.Count - 1);
+    }
+
+    public void Clear() {
+
+        foreach (var obj in itemObjects) {
+            Destroy(obj);
+        }
+
+        items.Clear();
+        itemObjects.Clear();
+
+    }
+
+    public void ScrollToBottom() {
+
+        scrollRect.normalizedPosition = new Vector2(0f, 0f);
+
     }
 
     public void OnSelectItem(int index) {
@@ -70,6 +92,12 @@ public class CustomDropdown : MonoBehaviour {
 
     public void UpdateLabel() {
         label.text = items[value];
+    }
+
+    public void Open() {
+
+        contentList.SetActive(true);
+
     }
 
     public void OnClick() {

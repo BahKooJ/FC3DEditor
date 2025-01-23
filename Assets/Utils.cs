@@ -1,4 +1,18 @@
 ﻿
+using System;
+
+public class DelayedAction {
+
+    public int frameCount;
+    public Action action;
+
+    public DelayedAction(int frameCount, Action action) {
+        this.frameCount = frameCount;
+        this.action = action;
+    }
+
+}
+
 namespace FCopParser {
     using System;
     using System.Collections;
@@ -423,3 +437,4 @@ namespace FCopParser {
     }
 
 }
+

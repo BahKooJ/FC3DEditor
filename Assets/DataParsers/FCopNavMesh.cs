@@ -20,6 +20,10 @@ namespace FCopParser {
 
             name = "NavMesh " + DataID;
 
+            if (rawFile.data.Count == 0) {
+                return;
+            }
+
             int nodeCount = Utils.BytesToShort(rawFile.data.ToArray(), nodeCountOffset);
 
             int index = 0;

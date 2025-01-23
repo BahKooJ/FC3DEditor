@@ -16,12 +16,13 @@ public class NavMeshListItemView : MonoBehaviour {
 
         contextMenu.items = new() {
             ("Rename", StartRenaming),
-            ("Clear", Clear)
+            ("Clear", Clear),
+            ("Delete", Delete)
         };
 
     }
 
-    void StartRenaming() {
+    public void StartRenaming() {
 
         Main.ignoreAllInputs = true;
 
@@ -33,9 +34,27 @@ public class NavMeshListItemView : MonoBehaviour {
 
     }
 
+    public void StartRenaming(string defaultName) {
+
+        Main.ignoreAllInputs = true;
+
+        inputField.gameObject.SetActive(true);
+
+        inputField.text = defaultName;
+
+        inputField.Select();
+
+    }
+
     void Clear() {
 
         view.controller.ClearNavMesh(dropdownListItem.index);
+
+    }
+
+    void Delete() {
+
+        view.controller.RemoveNavMesh(dropdownListItem.index);
 
     }
 

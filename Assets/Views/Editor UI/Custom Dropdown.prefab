@@ -303,12 +303,14 @@ MonoBehaviour:
   listItem: {fileID: 8245704301294588863}
   contentList: {fileID: 2333359977960226521}
   scrollbar: {fileID: 6718610658625016595}
+  scrollRect: {fileID: 4538827307659931562}
   contentTransform: {fileID: 6231957074550676973}
   label: {fileID: 3730528217777366461}
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
   items: []
+  itemObjects: []
   value: 0
 --- !u!1 &817051721841299013
 GameObject:

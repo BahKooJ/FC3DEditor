@@ -208,6 +208,13 @@ namespace FCopParser {
                     objects.Remove(obj);
 
                     break;
+                case AssetType.NavMesh:
+
+                    var navMesh = navMeshes.First(n => n.DataID == id);
+
+                    navMeshes.Remove(navMesh);
+
+                    break;
                 case AssetType.SndsSound:
                     // TODO
                     break;
@@ -306,18 +313,30 @@ namespace FCopParser {
 
         public IFFDataFile CreateEmptyAssetFile(AssetType assetType) {
 
+            int maxID;
+            IFFDataFile rawFile;
+
             switch (assetType) {
                 case AssetType.WavSound:
                     return null;
 
                 case AssetType.Object:
 
-                    var maxID = objects.Max(o => o.DataID);
+                    maxID = objects.Max(o => o.DataID);
 
-                    var rawFile = new IFFDataFile(2, new(), "Cobj", maxID + 1, scripting.emptyOffset);
+                    rawFile = new IFFDataFile(2, new(), "Cobj", maxID + 1, scripting.emptyOffset);
 
                     return rawFile;
 
+                case AssetType.NavMesh:
+
+                    maxID = navMeshes.Max(n => n.DataID);
+
+                    rawFile = new IFFDataFile(2, new(), "Cnet", maxID + 1, scripting.emptyOffset);
+
+                    return rawFile;
+
+                    return null;
                 case AssetType.SndsSound:
                     return null;
 

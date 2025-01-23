@@ -16,7 +16,7 @@ public class NavMeshEditMode : EditMode {
 
     public static int selectedNavMeshIndex = 0;
     public FCopNavMesh SelectedNavMesh {
-        get => main.level.navMeshes [selectedNavMeshIndex];
+        get => main.level.navMeshes[selectedNavMeshIndex];
     }
 
     public List<NavNodePoint> navNodes = new();
@@ -519,6 +519,32 @@ public class NavMeshEditMode : EditMode {
 
         node.x = Mathf.RoundToInt(pos.x * 32f);
         node.y = Mathf.RoundToInt(pos.z * -32f);
+
+    }
+
+    public void AddNewNavMesh() {
+
+        main.level.navMeshes.Add(new FCopNavMesh(main.level.CreateEmptyAssetFile(AssetType.NavMesh)));
+
+    }
+
+    public void RemoveNavMesh(int index) {
+
+        DialogWindowUtil.Dialog("Delete Nav Mesh", "Are you sure you would like to delete this nav mesh? Some actors maybe dependent on this nav mesh and may not work correctly. This cannot be undone.", () => {
+
+            main.level.DeleteAsset(AssetType.NavMesh, main.level.navMeshes[index].DataID);
+
+            OnDestroy();
+
+            OnCreateMode();
+
+            view.RefreshDropdown();
+
+            Main.ClearCounterActions();
+
+            return true;
+
+        });
 
     }
 
