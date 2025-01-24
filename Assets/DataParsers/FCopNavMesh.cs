@@ -163,6 +163,22 @@ namespace FCopParser {
 
         }
 
+        public void ReciveData(NavNode node) {
+
+            this.index = node.index;
+            this.state = node.state;
+            this.nextNodeIndexes[0] = node.nextNodeIndexes[0];
+            this.nextNodeIndexes[1] = node.nextNodeIndexes[1];
+            this.nextNodeIndexes[2] = node.nextNodeIndexes[2];
+            this.nextNodeIndexes[3] = node.nextNodeIndexes[3];
+            this.x = node.x;
+            this.y = node.y;
+            this.groundCast = node.groundCast;
+            this.readHeightOffset = node.readHeightOffset;
+            this.heightOffset = node.heightOffset;
+
+        }
+
         public void SafeSetHeight(int newValue) {
 
             var maxValue = (int)((Math.Pow(2, 12) - 1) / 2);

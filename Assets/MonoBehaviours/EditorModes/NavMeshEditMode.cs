@@ -456,6 +456,8 @@ public class NavMeshEditMode : EditMode {
 
         if (selectedNavNode != null) {
             selectedNavNode.controlledObject.GetComponent<NavNodePoint>().SetToCurrentPosition();
+            selectedNavNode.controlledObject.GetComponent<NavNodePoint>().RefreshLines();
+            selectedNavNode.RefreshPosition();
         }
 
     }
@@ -469,6 +471,8 @@ public class NavMeshEditMode : EditMode {
         var startingNodeObj = pathToAdd.Value.Item1;
 
         if (startingNodeObj.AlreadyContainsPath(navNode.node.index)) {
+            Object.Destroy(pathToAdd.Value.Item2.gameObject);
+            pathToAdd = null;
             return;
         }
 
@@ -511,7 +515,7 @@ public class NavMeshEditMode : EditMode {
 
         if (!preventCounterAction) {
 
-            AddNavMeshSaveState(SelectedNavMesh);
+            AddNavNodeSaveState(node);
 
         }
 
@@ -606,19 +610,32 @@ public class NavMeshEditMode : EditMode {
     }
 
     public void ChangeState(NavNodeState state) {
+
+        AddNavNodeSaveState(GetSeletedNavNode());
+
         GetSeletedNavNode().state = state;
     }
 
     public void ChangeGroundCast(NavNodeGroundCast groundCast) {
+
+        AddNavNodeSaveState(GetSeletedNavNode());
+
         GetSeletedNavNode().groundCast = groundCast;
     }
 
     public void ChangeReadHeight(bool value) {
+
+        AddNavNodeSaveState(GetSeletedNavNode());
+
         GetSeletedNavNode().readHeightOffset = value;
     }
 
     public void ChangeHeightOffset(int value) {
+
+        AddNavNodeSaveState(GetSeletedNavNode());
+
         GetSeletedNavNode().SafeSetHeight(value);
+
     }
 
     #endregion
@@ -663,9 +680,52 @@ public class NavMeshEditMode : EditMode {
 
     }
 
+    class NavNodeSaveState : CounterAction {
+
+        public string name { get; set; }
+
+        NavNode saveNodeState;
+        public NavNode navNode;
+        Action additionalAction;
+
+        public NavNodeSaveState(NavNode node, Action additionalAction) {
+            this.navNode = node;
+            this.saveNodeState = node.Clone();
+
+            this.additionalAction = additionalAction;
+
+            name = "Nav Node Changes";
+
+        }
+
+        public void Action() {
+            navNode.ReciveData(saveNodeState);
+            additionalAction();
+        }
+
+    }
+
     static void AddNavMeshSaveState(FCopNavMesh navMesh) {
 
         Main.AddCounterAction(new NavMeshSaveState(navMesh));
+    }
+
+    static void AddNavNodeSaveState(NavNode navNode) {
+
+        Main.AddCounterAction(new NavNodeSaveState(navNode, () => {
+
+            if (Main.editMode is not NavMeshEditMode) {
+                return;
+            }
+
+            var editMode = (NavMeshEditMode)Main.editMode;
+
+            editMode.Refresh();
+
+            editMode.view.propertyPanel.Refresh();
+
+        }));
+
     }
 
     #endregion
