@@ -40,9 +40,7 @@ public abstract class TileMutatingEditMode : EditMode {
 
     virtual public void MakeSelection(TileSelection selection, bool deSelectDuplicate = true) { }
 
-    public void SelectRangeOfTiles(TileSelection tile) {
-
-        var firstSelection = selectedItems[0];
+    public void SelectRangeOfTiles(TileSelection tile, TileSelection firstSelection, bool trySameMesh) {
 
         var firstClickColumnX = firstSelection.column.x;
         var firstClickColumnY = firstSelection.column.y;
@@ -68,7 +66,7 @@ public abstract class TileMutatingEditMode : EditMode {
 
                     foreach (var itTile in itColumn.tiles) {
 
-                        if (sameMesh) {
+                        if (sameMesh && trySameMesh) {
 
                             if (itTile.verticies.SequenceEqual(firstSelection.tile.verticies)) {
 
@@ -113,7 +111,7 @@ public abstract class TileMutatingEditMode : EditMode {
 
                     foreach (var itTile in itColumn.tiles) {
 
-                        if (sameMesh) {
+                        if (sameMesh && trySameMesh) {
 
                             if (itTile.verticies.SequenceEqual(firstSelection.tile.verticies)) {
 

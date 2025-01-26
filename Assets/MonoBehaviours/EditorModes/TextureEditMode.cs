@@ -1,6 +1,8 @@
 ﻿using FCopParser;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Experimental.GraphView;
+using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -34,32 +36,39 @@ public class TextureEditMode : TileMutatingEditMode {
         ClearAllSelectedItems();
     }
 
+    TileSelection clickSelection = null;
     override public void Update() {
+
+        var selection = main.GetTileOnLevelMesh(!FreeMove.looking);
 
         if (mapperDrawing) {
             TestPaintTileSelection();
         }
-        else if (Controls.OnDown("Select")) {
+        else if (selection != null) {
 
-            var selection = main.GetTileOnLevelMesh(!FreeMove.looking);
+            if (Controls.OnDown("Select")) {
 
-            if (selection != null) {
                 SelectLevelItems(selection);
+                clickSelection = selection;
+            }
+            else if (Controls.IsDown("Select")) {
+
+                if (clickSelection?.tile != selection.tile) {
+
+                    PaintSelection(selection);
+                }
+
+            }
+            else {
+
+                PreviewSelection(selection);
+
             }
 
         }
         else {
 
-            var previewSelection = main.GetTileOnLevelMesh(!FreeMove.looking);
-
-            if (previewSelection != null) {
-                PreviewSelection(previewSelection);
-            }
-            else if (previewSelectionOverlay != null) {
-
-                ClearPreviewOverlay();
-
-            }
+            ClearPreviewOverlay();
 
         }
 
@@ -99,6 +108,7 @@ public class TextureEditMode : TileMutatingEditMode {
             // Clears the selected tile(s).
             selectedItems.Clear();
             selectedSections.Clear();
+            ClearTileOverlays();
 
         }
 
@@ -121,7 +131,16 @@ public class TextureEditMode : TileMutatingEditMode {
 
             if (HasSelection) {
 
-                SelectRangeOfTiles(selection);
+                if (IsTileAlreadySelected(selection.tile)) {
+
+                    SelectRangeOfTiles(selection, FirstItem, !IsTileAlreadySelected(selection.tile));
+
+                }
+                else {
+
+                    SelectRangeOfTiles(selection, selectedItems.Last(), !IsTileAlreadySelected(selection.tile));
+
+                }
 
             }
 
@@ -147,7 +166,6 @@ public class TextureEditMode : TileMutatingEditMode {
 
         RefreshSectionOverlay();
 
-        RefeshTileOverlay();
         RefreshMeshes();
 
     }
@@ -176,6 +194,25 @@ public class TextureEditMode : TileMutatingEditMode {
 
             selectedItems.Add(selection);
             selectedSections.Add(selection.section);
+            InitTileOverlay(selection);
+
+        }
+
+    }
+
+    void PaintSelection(TileSelection selection) {
+
+        var existingSelectedSection = selectedSections.FirstOrDefault(s => s == selection.section);
+
+        MakeSelection(selection, false);
+
+        if (existingSelectedSection == null) {
+
+            ClearSectionOverlays();
+
+            foreach (var iSection in selectedSections) {
+                selectedSectionOverlays.Add(Object.Instantiate(main.SectionBoarders, new Vector3(iSection.x, 0, -iSection.y), Quaternion.identity));
+            }
 
         }
 

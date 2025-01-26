@@ -4,6 +4,7 @@
 using FCopParser;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -51,6 +52,7 @@ public class ShaderEditMode : TileMutatingEditMode {
         this.main = main;
     }
 
+    TileSelection clickSelection = null;
     override public void Update() {
 
         var testForSelection = true;
@@ -112,15 +114,27 @@ public class ShaderEditMode : TileMutatingEditMode {
             if (Painting) {
                 if (FreeMove.looking && Controls.OnDown("Select")) {
                     SelectLevelItems(hover);
+                    clickSelection = hover;
                 }
                 else if (Controls.OnDown("SelectWhilePainting")) {
                     SelectLevelItems(hover);
+                    clickSelection = hover;
                 }
             }
             else {
 
                 if (Controls.OnDown("Select")) {
                     SelectLevelItems(hover);
+                    clickSelection = hover;
+                }
+                else if (Controls.IsDown("Select")) {
+
+                    if (clickSelection?.tile != hover.tile) {
+
+                        PaintSelection(hover);
+
+                    }
+
                 }
                 else {
 
@@ -177,6 +191,7 @@ public class ShaderEditMode : TileMutatingEditMode {
             // Clears the selected tile(s).
             selectedItems.Clear();
             selectedSections.Clear();
+            ClearTileOverlays();
 
         }
 
@@ -185,7 +200,16 @@ public class ShaderEditMode : TileMutatingEditMode {
 
             if (HasSelection) {
 
-                SelectRangeOfTiles(selection);
+                if (IsTileAlreadySelected(selection.tile)) {
+
+                    SelectRangeOfTiles(selection, FirstItem, !IsTileAlreadySelected(selection.tile));
+
+                }
+                else {
+
+                    SelectRangeOfTiles(selection, selectedItems.Last(), !IsTileAlreadySelected(selection.tile));
+
+                }
 
             }
 
@@ -215,8 +239,25 @@ public class ShaderEditMode : TileMutatingEditMode {
             InitVertexColorCorners(selectedItems[0]);
         }
 
-        RefeshTileOverlay();
         selection.section.RefreshMesh();
+
+    }
+
+    void PaintSelection(TileSelection selection) {
+
+        var existingSelectedSection = selectedSections.FirstOrDefault(s => s == selection.section);
+
+        MakeSelection(selection, false);
+
+        if (existingSelectedSection == null) {
+
+            ClearSectionOverlays();
+
+            foreach (var iSection in selectedSections) {
+                selectedSectionOverlays.Add(Object.Instantiate(main.SectionBoarders, new Vector3(iSection.x, 0, -iSection.y), Quaternion.identity));
+            }
+
+        }
 
     }
 
@@ -241,6 +282,7 @@ public class ShaderEditMode : TileMutatingEditMode {
 
             selectedItems.Add(selection);
             selectedSections.Add(selection.section);
+            InitTileOverlay(selection);
 
         }
 
