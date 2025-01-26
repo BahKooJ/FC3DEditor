@@ -541,6 +541,10 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
         }
 
+        RefreshMeshes();
+
+        ClearAllSelectedItems();
+
         if (removedItems.Count > 0) {
             AddRemoveTileCounterAction(removedItems);
         }
@@ -548,11 +552,6 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
         if (showDialog) {
             QuickLogHandler.Log("At least one tile must be present in a tile column", LogSeverity.Error);
         }
-
-        RefreshMeshes();
-
-        ClearAllSelectedItems();
-
 
     }
 
@@ -1247,12 +1246,13 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
         public string name { get; set; }
 
         List<RemoveTileCounterAction> removedTileCounterActions = new();
-
+        HashSet<LevelMesh> affectedSections = new();
         public MultiRemoveTileCounterAction(List<TileSelection> items) {
 
             foreach (var item in items) {
 
                 removedTileCounterActions.Add(new RemoveTileCounterAction(item.tile, item.column));
+                affectedSections.Add(item.section);
 
             }
 
@@ -1264,6 +1264,10 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
             
             foreach (var counterAction in removedTileCounterActions) {
                 counterAction.Action();
+            }
+
+            foreach (var levelMesh in affectedSections) {
+                levelMesh.RefreshMesh();
             }
 
             if (Main.editMode is not TileEditMode) {

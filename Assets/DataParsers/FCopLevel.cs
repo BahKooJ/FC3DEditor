@@ -2338,7 +2338,11 @@ namespace FCopParser {
             }
 
             tileEffects = new List<byte>(section.tileEffects);
-            slfxData = new List<byte>(slfxData);
+            if (section.slfxData != null) {
+
+                slfxData = new List<byte>(section.slfxData);
+
+            }
 
         }
 

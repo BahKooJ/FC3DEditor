@@ -108,6 +108,20 @@ public class FreeMove : MonoBehaviour {
 
         }
 
+        if (Controls.IsDown("CameraEnableHold")) {
+
+            if (!looking) {
+                StartLooking();
+            }
+
+        }
+
+        if (Controls.OnUp("CameraEnableHold")) {
+
+            StopLooking();
+
+        }
+
     }
 
     void OnDisable() {
