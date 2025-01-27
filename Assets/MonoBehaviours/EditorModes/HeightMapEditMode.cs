@@ -27,7 +27,7 @@ public class HeightMapEditMode : EditMode {
         
         if (FreeMove.looking) {
 
-            if (Controls.IsDown("Select")) {
+            if (Controls.OnDown("Select")) {
                 
                 var selection = main.GetTileOnLevelMesh(false);
 

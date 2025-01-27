@@ -75,7 +75,11 @@ public class HeightMapChannelPoint : MonoBehaviour {
 
             }
 
-            var distance = (Input.mousePosition.y - previousMousePosition.y) / 40f;
+            var mousePos = Input.mousePosition;
+            mousePos.z = Camera.main.WorldToScreenPoint(transform.position).z;
+            var dragPos = Camera.main.ScreenToWorldPoint(mousePos);
+
+            var distance = dragPos.y - transform.position.y;
 
             if (isSelected) {
                 controller.MoveAllHeights(distance);
