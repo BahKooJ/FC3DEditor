@@ -24,6 +24,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
     }
 
     TileSelection clickSelection = null;
+    bool preventPaintSelection = false;
     override public void Update() {
 
         if (Controls.OnUp("Select")) {
@@ -39,14 +40,14 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
             if (selection != null) {
 
                 if (Controls.OnDown("Select")) {
-                    
+
                     SelectLevelItems(selection);
                     clickSelection = selection;
 
                 }
                 else if (Controls.IsDown("Select")) {
 
-                    if (clickSelection?.tile != selection.tile) {
+                    if (clickSelection?.tile != selection.tile && !preventPaintSelection) {
 
                         PaintSelection(selection);
 
@@ -54,7 +55,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
                 }
                 else {
-                    
+
                     PreviewSelection(selection);
 
                 }
@@ -67,10 +68,20 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
             }
 
         }
-        else if (previewSelectionOverlay != null) {
+        else {
 
-            ClearPreviewOverlay();
+            if (previewSelectionOverlay != null) {
 
+                ClearPreviewOverlay();
+
+            }
+
+            preventPaintSelection = true;
+
+        }
+
+        if (Controls.OnUp("Select")) {
+            preventPaintSelection = false;
         }
 
         if (Controls.OnDown("Unselect")) {

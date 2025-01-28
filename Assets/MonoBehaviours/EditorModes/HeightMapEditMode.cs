@@ -27,7 +27,7 @@ public class HeightMapEditMode : EditMode {
         
         if (FreeMove.looking) {
 
-            if (Controls.OnDown("Select")) {
+            if (Controls.IsDown("Select")) {
                 
                 var selection = main.GetTileOnLevelMesh(false);
 
@@ -72,7 +72,7 @@ public class HeightMapEditMode : EditMode {
 
         var isDifferentSection = section != selectedSection;
 
-        if (isDifferentSection) {
+        if (isDifferentSection && Controls.OnDown("Select")) {
 
             AddSectionSelectionSaveStateCounterAction();
 
@@ -93,16 +93,17 @@ public class HeightMapEditMode : EditMode {
 
             selectedSectionOverlay = Object.Instantiate(main.SectionBoarders, new Vector3(section.x, 0, -section.y), Quaternion.identity);
 
-        }
+            selectedSection = section;
 
-        // Updates the remaining data
-        selectedColumn = column;
-        selectedSection = section;
-
-        if (isDifferentSection) {
             AddAllHeights();
+
         }
 
+        if (selectedSection == section) {
+
+            selectedColumn = column;
+
+        }
 
         // If the number of the height channel is held down, all HeightMapChannelPoints will be selected in the column.
         if (Controls.IsDown("ModifierChannelSelect1")) {
