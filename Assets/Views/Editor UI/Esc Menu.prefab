@@ -1428,7 +1428,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 180, y: 72}
-  m_SizeDelta: {x: 332, y: 220}
+  m_SizeDelta: {x: 360, y: 220}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &7588630499181047856
 CanvasRenderer:
@@ -2651,7 +2651,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 48, y: 0}
-  m_SizeDelta: {x: 267.46, y: 31.11}
+  m_SizeDelta: {x: 289.33, y: 31.11}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &8402509323283245902
 CanvasRenderer:
@@ -2681,7 +2681,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Render Direction Light
+  m_text: Render Directional Light
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b66ceec7666a6044fb0168ddf311a4cb, type: 2}
   m_sharedMaterial: {fileID: 446512641697274038, guid: b66ceec7666a6044fb0168ddf311a4cb, type: 2}
