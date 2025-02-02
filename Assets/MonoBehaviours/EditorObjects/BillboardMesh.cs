@@ -3,7 +3,6 @@
 using FCopParser;
 using System.Collections.Generic;
 using UnityEngine;
-using static FCopParser.FCopObject;
 
 public class BillboardMesh : MonoBehaviour {
 
