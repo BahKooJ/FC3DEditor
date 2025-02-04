@@ -116,14 +116,18 @@ public class TextureUVMapper : MonoBehaviour {
                 scale.x += axis * 4;
                 scale.y += axis * 4;
 
-                texturePaletteImage.transform.localScale = scale;
+                if (scale.x > 0f) {
 
-                var position = texturePaletteImage.transform.localPosition;
+                    texturePaletteImage.transform.localScale = scale;
 
-                position.x -= 265 * (axis * 2);
-                position.y -= 265 * (axis * 2);
+                    var position = texturePaletteImage.transform.localPosition;
 
-                texturePaletteImage.transform.localPosition = position;
+                    position.x -= 265 * (axis * 2);
+                    position.y -= 265 * (axis * 2);
+
+                    texturePaletteImage.transform.localPosition = position;
+
+                }
 
             }
 
@@ -894,19 +898,28 @@ public class TextureUVMapper : MonoBehaviour {
 
         OpenFileWindowUtil.OpenFile("FCEAssets/Textures", "", path => {
 
-            var texture = controller.main.level.textures[controller.FirstTile.texturePalette];
+            try {
 
-            texture.ImportBMP(File.ReadAllBytes(path));
+                var texture = controller.main.level.textures[controller.FirstTile.texturePalette];
 
-            controller.main.RefreshTextures();
+                texture.ImportBMP(File.ReadAllBytes(path));
 
-            controller.RefreshUVMapper();
+                controller.main.RefreshTextures();
 
-            controller.ReInitTileOverlayTexture();
+                controller.RefreshUVMapper();
 
-            foreach (var section in controller.main.sectionMeshes) {
-                section.RefreshTexture();
-                section.RefreshMesh();
+                controller.ReInitTileOverlayTexture();
+
+                foreach (var section in controller.main.sectionMeshes) {
+                    section.RefreshTexture();
+                    section.RefreshMesh();
+                }
+
+            }
+            catch {
+
+                DialogWindowUtil.Dialog("Invalid File", "Please select a valid bitmap file. The bitmap file must be in XRGB555 format.");
+
             }
 
         });
@@ -920,8 +933,13 @@ public class TextureUVMapper : MonoBehaviour {
         OpenFileWindowUtil.OpenFile("FCEAssets/Textures/Color Palettes", "", path => {
 
             var texture = controller.main.level.textures[controller.FirstTile.texturePalette];
+            try {
+                texture.ImportColorPaletteData(File.ReadAllBytes(path));
+            }
+            catch {
+                DialogWindowUtil.Dialog("Invalid File", "Please select a valid color palette file.");
 
-            texture.ImportColorPaletteData(File.ReadAllBytes(path));
+            }
 
         });
 
@@ -933,19 +951,28 @@ public class TextureUVMapper : MonoBehaviour {
 
         OpenFileWindowUtil.OpenFile("FCEAssets/Textures/Cbmp", "", path => {
 
-            var texture = controller.main.level.textures[controller.FirstTile.texturePalette];
+            try {
 
-            texture.ImportCbmp(File.ReadAllBytes(path));
+                var texture = controller.main.level.textures[controller.FirstTile.texturePalette];
 
-            controller.main.RefreshTextures();
+                texture.ImportCbmp(File.ReadAllBytes(path));
 
-            controller.RefreshUVMapper();
+                controller.main.RefreshTextures();
 
-            controller.ReInitTileOverlayTexture();
+                controller.RefreshUVMapper();
 
-            foreach (var section in controller.main.sectionMeshes) {
-                section.RefreshTexture();
-                section.RefreshMesh();
+                controller.ReInitTileOverlayTexture();
+
+                foreach (var section in controller.main.sectionMeshes) {
+                    section.RefreshTexture();
+                    section.RefreshMesh();
+                }
+
+            }
+            catch {
+
+                DialogWindowUtil.Dialog("Invalid File", "Please select a valid Cbmp file.");
+
             }
 
         });
