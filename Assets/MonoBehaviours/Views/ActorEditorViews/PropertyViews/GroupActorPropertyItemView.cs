@@ -27,6 +27,7 @@ public class GroupActorPropertyItemView : MonoBehaviour {
     private void Start() {
         
         nameText.text = commonName;
+        OnClick();
 
     }
 

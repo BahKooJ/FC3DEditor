@@ -15,6 +15,7 @@ public class ActorPropertiesView : MonoBehaviour {
     public GameObject actorScriptCallItem;
     public GameObject actorAssetRefItem;
     public GameObject groupActorPropertyItem;
+    public GameObject overloadActorPropertyItem;
 
     //View refs
     public Transform propertiesContent;
@@ -56,6 +57,9 @@ public class ActorPropertiesView : MonoBehaviour {
             case EnumDataActorProperty:
                 obj = Instantiate(enumDataActorPropertyItem);
                 break;
+            case OverloadedProperty:
+                obj = Instantiate(overloadActorPropertyItem);
+                break;
         }
 
         if (obj == null) {
@@ -67,6 +71,7 @@ public class ActorPropertiesView : MonoBehaviour {
         view.controller = controller;
         view.property = property;
         view.actor = controller.selectedActor;
+        view.view = this;
 
         obj.transform.SetParent(propertiesContent, false);
 

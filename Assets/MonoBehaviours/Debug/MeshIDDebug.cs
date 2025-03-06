@@ -29,7 +29,7 @@ public class MeshIDDebug: MonoBehaviour {
             new HeightPoints(0f,1f,2f), new HeightPoints(0f,1f,2f), new HeightPoints(0f, 1f, 2f), new HeightPoints(0f,1f,2f)
         });
 
-        exampleTile = new Tile(null, 0, 0);
+        exampleTile = new Tile(exampleColumn, 0, 0);
 
         var overlay = Instantiate(tilePreviewPrefab);
         var script = overlay.GetComponent<SelectedTileOverlay>();
@@ -49,7 +49,7 @@ public class MeshIDDebug: MonoBehaviour {
 
             meshID++;
 
-            exampleTile = new Tile(null, 0, 0);
+            exampleTile = new Tile(exampleColumn, meshID, 0);
 
             meshIDtext.text = meshID.ToString();
 
@@ -82,9 +82,9 @@ public class MeshIDDebug: MonoBehaviour {
             var counterClockID = MeshType.IDFromVerticies(counterClockVertices);
 
             if (counterClockID == null) {
-                meshIDtext.text = meshID.ToString() + " : NA";
+                meshIDtext.text = meshID.ToString();
             } else {
-                meshIDtext.text = meshID.ToString() + " : " + counterClockID.ToString();
+                meshIDtext.text = meshID.ToString();
             }
 
         }
@@ -92,7 +92,7 @@ public class MeshIDDebug: MonoBehaviour {
 
             meshID--;
 
-            exampleTile = new Tile(null, 0, 0);
+            exampleTile = new Tile(exampleColumn, meshID, 0);
 
             meshIDtext.text = meshID.ToString();
 
@@ -125,10 +125,10 @@ public class MeshIDDebug: MonoBehaviour {
             var counterClockID = MeshType.IDFromVerticies(counterClockVertices);
 
             if (counterClockID == null) {
-                meshIDtext.text = meshID.ToString() + " : NA";
+                meshIDtext.text = meshID.ToString();
             }
             else {
-                meshIDtext.text = meshID.ToString() + " : " + counterClockID.ToString();
+                meshIDtext.text = meshID.ToString();
             }
 
         }

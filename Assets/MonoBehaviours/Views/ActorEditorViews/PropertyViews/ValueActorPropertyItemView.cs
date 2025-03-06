@@ -31,16 +31,16 @@ public class ValueActorPropertyItemView : ActorPropertyItemView {
 
         var valueProperty = (ValueActorProperty)property;
 
-        if (valueProperty.bitCount != BitCount.Bit3) {
+        //if (valueProperty.bitCount != BitCount.Bit3) {
 
-            valueProperty.SafeSetSigned(value);
+            //valueProperty.SafeSetSigned(value);
 
-        }
-        else {
+        //}
+        //else {
 
             valueProperty.value = value;
 
-        }
+        //}
 
         valueField.text = valueProperty.value.ToString();
         

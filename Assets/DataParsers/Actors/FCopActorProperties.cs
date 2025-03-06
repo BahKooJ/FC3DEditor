@@ -10,6 +10,8 @@ namespace FCopParser {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
+        public string dictatesOverload { get; set; }
+
         public int GetCompiledValue();
 
         public List<byte> Compile() {
@@ -31,6 +33,8 @@ namespace FCopParser {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
+        public string dictatesOverload { get; set; }
+
         public int GetCompiledValue() {
             return value;
         }
@@ -72,6 +76,7 @@ namespace FCopParser {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
+        public string dictatesOverload { get; set; }
 
         public int GetCompiledValue() {
             return value ? 1 : 0;
@@ -96,6 +101,7 @@ namespace FCopParser {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
+        public string dictatesOverload { get; set; }
 
         public int GetCompiledValue() {
             return value;
@@ -118,6 +124,7 @@ namespace FCopParser {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
+        public string dictatesOverload { get; set; }
 
         public int GetCompiledValue() {
             return Convert.ToInt32(caseValue);
@@ -130,19 +137,25 @@ namespace FCopParser {
             this.caseValue = caseValue;
             this.bitCount = bitCount;
             this.commonName = "";
-
+            this.dictatesOverload = "";
         }
 
         public EnumDataActorProperty(string name, Enum caseValue, BitCount bitCount, string commonName) : this(name, caseValue, bitCount) {
             this.commonName = commonName;
+            this.dictatesOverload = "";
         }
 
+
+        public EnumDataActorProperty(string name, Enum caseValue, BitCount bitCount, string commonName, string dictatesOverload) : this(name, caseValue, bitCount, commonName) {
+            this.dictatesOverload = dictatesOverload;
+        }
     }
 
     public class RangeActorProperty : ActorProperty {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
+        public string dictatesOverload { get; set; }
 
         public int GetCompiledValue() {
             return value;
@@ -170,6 +183,7 @@ namespace FCopParser {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
+        public string dictatesOverload { get; set; }
 
         public int[] affectedRefIndexes;
         public ActorRotation value;
@@ -200,6 +214,7 @@ namespace FCopParser {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
+        public string dictatesOverload { get; set; }
 
         public int GetCompiledValue() {
             return value;
@@ -212,6 +227,59 @@ namespace FCopParser {
             this.value = value;
             this.bitCount = bitCount;
             this.commonName = "";
+        }
+
+    }
+
+    public class OverloadedProperty : ActorProperty {
+
+        public string name { get; set; }
+        public BitCount bitCount { get; set; }
+        public string commonName { get; set; }
+        public string dictatesOverload { get; set; }
+
+        public List<(ActorProperty property, Func<bool> overloadCondition)> properties = new();
+
+        public int GetCompiledValue() {
+            
+            return GetOverloadProperty().GetCompiledValue();
+
+        }
+
+        public ActorProperty GetOverloadProperty() {
+
+            foreach (var property in properties) {
+                if (property.overloadCondition()) {
+                    return property.property;
+                }
+            }
+
+            throw new Exception("No property");
+
+        }
+
+        public OverloadedProperty(string name, List<(ActorProperty property, Func<bool> overloadCondition)> properties, BitCount bitCount) {
+            this.name = name;
+            this.properties = properties;
+            this.bitCount = bitCount;
+            this.commonName = "";
+            UpdateCommonName();
+        }
+
+        public OverloadedProperty(string name, List<(ActorProperty property, Func<bool> overloadCondition)> properties, BitCount bitCount, string commonName) {
+            this.name = name;
+            this.properties = properties;
+            this.bitCount = bitCount;
+            this.commonName = commonName;
+            UpdateCommonName();
+        }
+
+        void UpdateCommonName() {
+
+            foreach (var prop in properties) {
+                prop.property.commonName = commonName;
+            }
+
         }
 
     }
@@ -381,6 +449,14 @@ namespace FCopParser {
         Middle = 3,
         Default = 255
 
+    }
+
+    public enum TargetType {
+        ShootNoTarget = 0,
+        PlayerOnly = 1,
+        Actor = 2,
+        NoTarget = 3,
+        Team = 4
     }
 
     public enum ElevatorStops {
