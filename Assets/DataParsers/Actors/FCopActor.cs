@@ -77,7 +77,7 @@ namespace FCopParser {
                 case ActorBehavior.StationaryEntity: 
                     behavior = new FCopBehavior6(this, propertyData);
                     break;
-                case ActorBehavior.Turret:
+                case ActorBehavior.StationaryTurret:
                     behavior = new FCopBehavior8(this, propertyData);
                     break;
                 case ActorBehavior.Aircraft:
@@ -646,10 +646,55 @@ namespace FCopParser {
                 new ValueActorProperty("unknown8 - 53", Read8(0), BitCount.Bit8, "Shooter Properties"),
                 new ValueActorProperty("unknown9 - 54", Read8(0), BitCount.Bit8, "Shooter Properties"),
                 new ValueActorProperty("unknown10 - 55", Read8(0), BitCount.Bit8, "Shooter Properties"),
-                new ValueActorProperty("Engage Range", Read16(0), BitCount.Bit16, "Shooter Properties"),
+                new ValueActorProperty("Engage Range", Read16(6144), BitCount.Bit16, "Shooter Properties"),
                 new ValueActorProperty("unknown11 - 58", Read16(0), BitCount.Bit16, "Shooter Properties"),
             });
 
+        }
+
+    }
+
+    public abstract class FCopTurret : FCopShooter, FCopObjectMutating, FCopHeightOffsetting {
+
+        public int heightMultiplier { get; set; }
+
+        public FCopTurret(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            heightMultiplier = 512;
+
+            properties.AddRange(new List<ActorProperty>() {
+                new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8, "Turret Properties"),
+                new ValueActorProperty("unknown10", Read8(0), BitCount.Bit8, "Turret Properties"),
+                new ValueActorProperty("unknown11", Read16(0), BitCount.Bit16, "Turret Properties"),
+                new RotationActorProperty("Rotation", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { 0 }, "Turret Properties"),
+                new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16, "Turret Properties"),
+                new ValueActorProperty("Turn Speed", Read16(0), BitCount.Bit16, "Turret Properties"),
+                new ValueActorProperty("unknown13", Read16(0), BitCount.Bit16, "Turret Properties"),
+                new ValueActorProperty("unknown14", Read16(0), BitCount.Bit16, "Turret Properties")
+            });
+
+        }
+
+        public void SetHeight(int height) {
+            ((ValueActorProperty)propertiesByName["Height Offset"]).SafeSetSigned(height);
+        }
+
+        public int GetHeight() {
+            return propertiesByName["Height Offset"].GetCompiledValue();
+        }
+
+        public ActorProperty GetHeightProperty() {
+            return propertiesByName["Height Offset"];
+        }
+
+        public ActorGroundCast GetGroundCast() {
+            return (ActorGroundCast)((EnumDataActorProperty)propertiesByName["Ground Cast"]).caseValue;
+        }
+
+        public virtual RotationActorProperty[] GetRotations() {
+            return new RotationActorProperty[] {
+                (RotationActorProperty)propertiesByName["Rotation"]
+            };
         }
 
     }
@@ -765,25 +810,14 @@ namespace FCopParser {
 
     }
 
-    public class FCopBehavior8 : FCopShooter, FCopObjectMutating, FCopHeightOffsetting {
-
-        public int heightMultiplier { get; set; }
+    public class FCopBehavior8 : FCopTurret {
 
         public FCopBehavior8(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
-
-            heightMultiplier = 512;
 
             assetRefNames = new string[] { "Head Object", "Object", "Base Object", "Destroyed Object" };
             assetRefType = new AssetType[] { AssetType.Object, AssetType.Object, AssetType.Object, AssetType.Object };
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("unknown10", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("unknown11", Read16(0), BitCount.Bit16),
-                new RotationActorProperty("Head Rotation", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { 0 }),
-                new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("unknown12", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("unknown13", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("unknown14", Read16(0), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new ValueActorProperty("unknown16", Read16(0), BitCount.Bit16),
                 new RotationActorProperty("Base Rotation", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { 2 })
@@ -793,25 +827,9 @@ namespace FCopParser {
 
         }
 
-        public void SetHeight(int height) {
-            ((ValueActorProperty)propertiesByName["Height Offset"]).SafeSetSigned(height);
-        }
-
-        public int GetHeight() {
-            return propertiesByName["Height Offset"].GetCompiledValue();
-        }
-
-        public ActorProperty GetHeightProperty() {
-            return propertiesByName["Height Offset"];
-        }
-
-        public ActorGroundCast GetGroundCast() {
-            return ActorGroundCast.Highest;
-        }
-
-        public RotationActorProperty[] GetRotations() {
+        override public RotationActorProperty[] GetRotations() {
             return new RotationActorProperty[] { 
-                (RotationActorProperty)propertiesByName["Head Rotation"], 
+                (RotationActorProperty)propertiesByName["Rotation"], 
                 (RotationActorProperty)propertiesByName["Base Rotation"] 
             };
         }
@@ -962,7 +980,7 @@ namespace FCopParser {
                 new RotationActorProperty("Rotation X", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.X, new int[] { 0 }),
                 new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
                 new EnumDataActorProperty("Tile Effect", (TileEffectType)Read8(0), BitCount.Bit8),
-                new FillerActorProperty(Read16(0), BitCount.Bit8)
+                new FillerActorProperty(Read8(0), BitCount.Bit8)
             });
 
             InitPropertiesByName();
@@ -1282,13 +1300,13 @@ namespace FCopParser {
             properties.AddRange(new List<ActorProperty>() {
 
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
-                new FillerActorProperty(Read8(1), BitCount.Bit16),
+                new FillerActorProperty(Read16(1), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
-                new FillerActorProperty(Read8(255), BitCount.Bit16),
+                new FillerActorProperty(Read16(255), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
 
             });
@@ -1693,7 +1711,7 @@ namespace FCopParser {
         Player = 1,
         PathedEntity = 5,
         StationaryEntity = 6,
-        Turret = 8,
+        StationaryTurret = 8,
         Aircraft = 9,
         Elevator = 10,
         DynamicProp = 11,
