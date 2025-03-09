@@ -465,6 +465,9 @@ namespace FCopParser {
 
         public void InitPropertiesByName() {
 
+            propertiesByName.Clear();
+            propertiesByCommonName.Clear();
+
             foreach (var prop in properties) {
                 propertiesByName[prop.name] = prop;
 
@@ -606,7 +609,7 @@ namespace FCopParser {
                 new ValueActorProperty("Collide Damage", Read16(0), BitCount.Bit16, "Entity Properties"),
                 new ValueActorProperty("Team (Unknown)", Read16(0), BitCount.Bit16, "Entity Properties"),
                 new EnumDataActorProperty("Map Icon Color", (MapIconColor)Read8(0), BitCount.Bit8, "Entity Properties"),
-                new ValueActorProperty("u_unknown15", Read8(0), BitCount.Bit8, "Entity Properties"),
+                new ValueActorProperty("Target Priority", Read8(0), BitCount.Bit8, "Entity Properties"),
                 new ValueActorProperty("Explosion (Unknown)", Read8(0), BitCount.Bit8, "Entity Properties"),
                 new ValueActorProperty("Ambient Sound", Read8(0), BitCount.Bit8, "Entity Properties"),
                 new ValueActorProperty("UV Offset", Read16(0), BitCount.Bit16, "Entity Properties")
@@ -629,25 +632,51 @@ namespace FCopParser {
         public FCopShooter(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("Weapon ID", Read16(0), BitCount.Bit16, "Shooter Properties"),
-                new ValueActorProperty("FOV and Fire alts?", Read8(0), BitCount.Bit8, "Shooter Properties"),
-                new ValueActorProperty("u_weaponCollision", Read8(0), BitCount.Bit8, "Shooter Properties"),
+                new ValueActorProperty("Weapon ID", Read16(0), BitCount.Bit16, "Shooter Properties")
+            });
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("STag unknown1", Read1(0x02, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("Shoot When Facing", Read1(0x04, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("STag unknown2", Read1(0x08, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("STag unknown3", Read1(0x10, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("Fire Alternations", Read1(0x20, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("Target Priority", Read1(0x40, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("STag unknown4", Read1(0x80, false), BitCount.Bit1, "Shooter Tags"),
+
+            });
+            offset++;
+            properties.AddRange(new List<ActorProperty>() {
+
+
+                new ToggleActorProperty("Disabled", Read1(0x01, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("Weapon Actor Collision", Read1(0x02, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("Attackable Weapon", Read1(0x04, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("STag unknown5", Read1(0x08, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("STag unknown6", Read1(0x10, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("STag unknown7", Read1(0x20, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("Allow Switch Target", Read1(0x40, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("STag unknown8", Read1(0x80, false), BitCount.Bit1, "Shooter Tags"),
+
+            });
+            offset++;
+
+            properties.AddRange(new List<ActorProperty>() {
                 new ValueActorProperty("unknown5 - 48", Read8(0), BitCount.Bit8, "Shooter Properties"),
                 new EnumDataActorProperty("Target Type", (TargetType)Read8(0), BitCount.Bit8, "Shooter Properties", "OverloadAttack"),
 
-                new OverloadedProperty("OverloadAttack", new() { 
+                new OverloadedProperty("OverloadAttack", new() {
                     (new ValueActorProperty("Attack Team", Read16NoIt(0), BitCount.Bit16), () => (TargetType)propertiesByName["Target Type"].GetCompiledValue() == TargetType.Team),
                     (new ValueActorProperty("Attack Actor", Read16(0), BitCount.Bit16), () => true),
 
                 }, BitCount.Bit16, "Shooter Properties"),
 
-                //new ValueActorProperty("attack? - 50", Read16(), BitCount.Bit16, "Shooter Properties"),
-                new ValueActorProperty("unknown7 - 52", Read8(0), BitCount.Bit8, "Shooter Properties"),
-                new ValueActorProperty("unknown8 - 53", Read8(0), BitCount.Bit8, "Shooter Properties"),
-                new ValueActorProperty("unknown9 - 54", Read8(0), BitCount.Bit8, "Shooter Properties"),
-                new ValueActorProperty("unknown10 - 55", Read8(0), BitCount.Bit8, "Shooter Properties"),
+                new ValueActorProperty("Detection FOV? - 52", Read16(4096), BitCount.Bit16, "Shooter Properties"),
+                new ValueActorProperty("unknown9 - 54", Read16(4096), BitCount.Bit16, "Shooter Properties"),
                 new ValueActorProperty("Engage Range", Read16(6144), BitCount.Bit16, "Shooter Properties"),
-                new ValueActorProperty("unknown11 - 58", Read16(0), BitCount.Bit16, "Shooter Properties"),
+                new ValueActorProperty("Targeting Delay", Read16(32), BitCount.Bit16, "Shooter Properties"),
             });
 
         }
@@ -744,12 +773,25 @@ namespace FCopParser {
 
         public FCopBehavior5(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (propertyData.Count - offset) / 2;
+            properties.AddRange(new List<ActorProperty>() {
 
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
-                properties.Add(property);
-            }
+                new ValueActorProperty("5_Unknown0 60:", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Move Speed", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("5_Unknown1 66:", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("5_Unknown2 68:", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("5_Unknown3 70:", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("5_Unknown4 72:", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("5_Unknown5 74:", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("5_Unknown6 76:", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("5_Unknown7 78:", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("5_Unknown8 79:", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("5_Unknown9 80:", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("5_Unknown10 81:", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("5_Unknown11 82:", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("5_Unknown12 83:", Read8(0), BitCount.Bit8)
+
+            });
 
             InitPropertiesByName();
 
@@ -757,55 +799,25 @@ namespace FCopParser {
 
     }
 
-    public class FCopBehavior6 : FCopShooter, FCopHeightOffsetting, FCopObjectMutating {
+    // Ok instead of have the "Turret" Object the parent object may just be behavior 6.
+    // The only issues is from what I can tell, the only property is always zero which
+    // makes it hard to actually confirm that.
+    public class FCopBehavior6 : FCopTurret {
 
         public const int assetRefCount = 2;
         public const int blocks = 24;
 
-        public int heightMultiplier { get; set; }
-
         public FCopBehavior6(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
-
-            heightMultiplier = 512;
 
             assetRefNames = new string[] { "Object", "Destroyed Object" };
             assetRefType = new AssetType[] { AssetType.Object, AssetType.Object };
 
             properties.AddRange(new List<ActorProperty>() {
-                new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8),
-                new ValueActorProperty("6_unknown1", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("6_unknown2", Read16(0), BitCount.Bit16),
-                new RotationActorProperty("Rotation", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { 0 }),
-                new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("6_unknown3", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Turn Speed", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("6_unknown5", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Turn Type", Read16(0), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16)
             });
 
             InitPropertiesByName();
 
-        }
-
-        public void SetHeight(int height) {
-            ((ValueActorProperty)propertiesByName["Height Offset"]).SafeSetSigned(height);
-        }
-
-        public int GetHeight() {
-            return propertiesByName["Height Offset"].GetCompiledValue();
-        }
-
-        public ActorProperty GetHeightProperty() {
-            return propertiesByName["Height Offset"];
-        }
-
-        public ActorGroundCast GetGroundCast() {
-            return ActorGroundCast.Highest;
-        }
-
-        public RotationActorProperty[] GetRotations() {
-            return new RotationActorProperty[] { (RotationActorProperty)propertiesByName["Rotation"] };
         }
 
     }
@@ -818,8 +830,9 @@ namespace FCopParser {
             assetRefType = new AssetType[] { AssetType.Object, AssetType.Object, AssetType.Object, AssetType.Object };
 
             properties.AddRange(new List<ActorProperty>() {
-                new FillerActorProperty(Read16(0), BitCount.Bit16),
-                new ValueActorProperty("unknown16", Read16(0), BitCount.Bit16),
+                //new FillerActorProperty(Read16(0), BitCount.Bit16),
+                new ValueActorProperty("8unknownFill", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("8unknown0", Read16(0), BitCount.Bit16),
                 new RotationActorProperty("Base Rotation", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { 2 })
             });
 
@@ -1321,6 +1334,10 @@ namespace FCopParser {
                 new ToggleActorProperty("Show Arrow Node 3", Read1(0x40, false), BitCount.Bit1, "Node 3 Properties"),
                 new ToggleActorProperty("Show Satellite Node 3", Read1(0x80, false), BitCount.Bit1, "Node 3 Properties"),
 
+            });
+            offset++;
+            properties.AddRange(new List<ActorProperty>() {
+
                 new ToggleActorProperty("Show Minimap Node 3", Read1(0x01, false), BitCount.Bit1, "Node 3 Properties"),
                 new ToggleActorProperty("Show Arrow Node 4", Read1(0x02, false), BitCount.Bit1, "Node 4 Properties"),
                 new ToggleActorProperty("Show Satellite Node 4", Read1(0x04, false), BitCount.Bit1, "Node 4 Properties"),
@@ -1329,6 +1346,10 @@ namespace FCopParser {
                 new ToggleActorProperty("Show Satellite Node 5", Read1(0x20, false), BitCount.Bit1, "Node 5 Properties"),
                 new ToggleActorProperty("Show Minimap Node 5", Read1(0x40, false), BitCount.Bit1, "Node 5 Properties"),
                 new ToggleActorProperty("Show Arrow Node 6", Read1(0x80, false), BitCount.Bit1, "Node 6 Properties"),
+
+            });
+            offset++;
+            properties.AddRange(new List<ActorProperty>() {
 
                 new ToggleActorProperty("Show Satellite Node 6", Read1(0x01, false), BitCount.Bit1, "Node 6 Properties"),
                 new ToggleActorProperty("Show Minimap Node 6", Read1(0x02, false), BitCount.Bit1, "Node 6 Properties"),
@@ -1342,7 +1363,7 @@ namespace FCopParser {
                 new FillerActorProperty(0, BitCount.Bit8)
             });
 
-            offset += 4;
+            offset += 2;
 
             properties.AddRange(new List<ActorProperty>() {
 
@@ -1380,21 +1401,12 @@ namespace FCopParser {
 
     }
 
-    public class FCopBehavior36 : FCopShooter, FCopObjectMutating {
+    // Found implications that this inherits all of behavior 8.
+    public class FCopBehavior36 : FCopBehavior8 {
 
         public FCopBehavior36(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("nt_unknown0", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("nt_unknown1", Read16(0), BitCount.Bit16),
-                new RotationActorProperty("Head Rotation", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { 0 }),
-                new ValueActorProperty("nt_unknown2", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("nt_unknown3", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("nt_unknown4", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("nt_unknown5", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("nt_unknown6", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("nt_unknown7", Read16(0), BitCount.Bit16),
-                new RotationActorProperty("Base Rotation", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { 2 }),
                 new ValueActorProperty("nt_unknown8", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("nt_unknown9", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("nt_unknown10", Read16(0), BitCount.Bit16),
@@ -1403,13 +1415,6 @@ namespace FCopParser {
 
             InitPropertiesByName();
 
-        }
-
-        public RotationActorProperty[] GetRotations() {
-            return new RotationActorProperty[] {
-                (RotationActorProperty)propertiesByName["Head Rotation"],
-                (RotationActorProperty)propertiesByName["Base Rotation"]
-            };
         }
 
     }
