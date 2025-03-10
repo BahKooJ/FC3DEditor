@@ -3,6 +3,8 @@
 using FCopParser;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+
 
 public class VisualScriptingScriptWindowView : MonoBehaviour {
 
@@ -10,6 +12,9 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
     public GameObject linePrefab;
     public GameObject statementNodePrefab;
     public GameObject endCodeBracket;
+
+    // - Unity Refs -
+    public TMP_InputField debugInput;
 
     // - Parameters -
     public FCopScript script;
@@ -105,6 +110,13 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
 
         AddLines(script.scriptNodes);
 
+        refuseCallback = true;
+        debugInput.text = "";
+        foreach (var b in script.compiledBytes) {
+            debugInput.text += b.ToString() + " ";
+        }
+        refuseCallback = false;
+
     }
 
     public void Clear() {
@@ -114,6 +126,39 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
         }
 
         lines.Clear();
+
+    }
+
+    bool refuseCallback = false;
+    public void OnFinishDebugType() {
+
+        if (refuseCallback) return;
+
+        var total = new List<byte>();
+
+        var value = "";
+
+        foreach (var c in debugInput.text) {
+
+            if (c == ' ') {
+
+                total.Add(byte.Parse(value));
+                value = "";
+                continue;
+            }
+
+            value += c;
+
+        }
+        if (value != "") {
+
+            total.Add(byte.Parse(value));
+
+        }
+
+        script.compiledBytes = total;
+        script.Refresh();
+        Init();
 
     }
 

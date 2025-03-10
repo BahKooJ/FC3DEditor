@@ -433,6 +433,13 @@ namespace FCopParser {
 
         }
 
+        public void Refresh() {
+
+            this.Disassemble(compiledBytes);
+            this.DeCompile();
+
+        }
+
         class VarHasNoID : Exception { }
         class MissingArguments : Exception {
             public MissingArguments(string message) : base(message) {
