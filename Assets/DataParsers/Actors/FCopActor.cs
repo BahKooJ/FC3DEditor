@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Unity.VisualScripting;
 
 namespace FCopParser {
 
@@ -769,17 +770,44 @@ namespace FCopParser {
 
     }
 
+    // Observed
     public class FCopBehavior5 : FCopShooter {
 
         public FCopBehavior5(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("5_Unknown0 60:", Read16(0), BitCount.Bit16),
+                new ToggleActorProperty("Enable Backtrack", Read1(0x01, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown1", Read1(0x02, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown2", Read1(0x04, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("Disable Path Obstruction", Read1(0x08, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown3", Read1(0x10, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown4", Read1(0x20, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown5", Read1(0x40, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown6", Read1(0x80, false), BitCount.Bit1, "Pathing Tags"),
+
+            });
+            offset++;
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ToggleActorProperty("PTag unknown7", Read1(0x01, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown8", Read1(0x02, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("Disable Ease", Read1(0x04, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown9", Read1(0x08, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown10", Read1(0x10, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown11", Read1(0x20, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown12", Read1(0x40, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown13", Read1(0x80, false), BitCount.Bit1, "Pathing Tags"),
+
+            });
+            offset++;
+
+            properties.AddRange(new List<ActorProperty>() {
+
                 new ValueActorProperty("Move Speed", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("5_Unknown1 66:", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("5_Unknown2 68:", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Move Speed Multiplier 66:", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Acceleration", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("5_Unknown3 70:", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("5_Unknown4 72:", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("5_Unknown5 74:", Read16(0), BitCount.Bit16),
@@ -822,6 +850,7 @@ namespace FCopParser {
 
     }
 
+    // Observed
     public class FCopBehavior8 : FCopTurret {
 
         public FCopBehavior8(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
@@ -853,13 +882,28 @@ namespace FCopParser {
 
         public FCopBehavior9(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (propertyData.Count - offset) / 2;
+            properties.AddRange(new List<ActorProperty>() {
+                new ValueActorProperty("60", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("61", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("62", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("64", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("65", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("66", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("68", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("70", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("74", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("76", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Move Speed", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("80", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("82", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("84", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("86", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Spawn Pos X", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Spawn Pos Y", Read16(0), BitCount.Bit16),
 
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
-                properties.Add(property);
-            }
-
+            });
+            
             InitPropertiesByName();
 
         }
