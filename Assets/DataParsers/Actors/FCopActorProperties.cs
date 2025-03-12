@@ -487,4 +487,17 @@ namespace FCopParser {
         RotationZ = 5
     }
 
+    public enum AircraftSpawnType {
+
+        EaseTakeoffActorPos = 0,
+        EaseTakeoffRandom = 1,
+        AirActorPos = 2,
+        AirRandom = 3,
+        VTOLActorPos = 4,
+        VTOLRandom = 5,
+        EaseTakeoffSpawnPos = 8,
+        AirSpawnPos = 10,
+        VTOLSpawnPos = 12
+
+    }
 }

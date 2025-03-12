@@ -878,6 +878,7 @@ namespace FCopParser {
 
     }
 
+    // Observed
     public class FCopBehavior9 : FCopShooter {
 
         public FCopBehavior9(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
@@ -887,16 +888,16 @@ namespace FCopParser {
                 new ValueActorProperty("61", Read8(0), BitCount.Bit8),
                 new ValueActorProperty("62", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("64", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("65", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("66", Read16(0), BitCount.Bit16),
+                new EnumDataActorProperty("Spawn Type", (AircraftSpawnType)Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Target Detection Range", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("68", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("70", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("74", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("76", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Time To Descend", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Turn Rate", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("Move Speed", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("80", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("82", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Orbit Area X", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Orbit Area Y", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("84", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("86", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("Spawn Pos X", Read16(0), BitCount.Bit16),
@@ -1073,12 +1074,24 @@ namespace FCopParser {
 
         public FCopBehavior14(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (propertyData.Count - offset) / 2;
+            properties.AddRange(new List<ActorProperty>() {
+                new ValueActorProperty("28", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("29", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("30", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("31", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("32", Read16(0), BitCount.Bit16),
+                new FillerActorProperty(Read16(0), BitCount.Bit16),
+                new FillerActorProperty(Read16(0), BitCount.Bit16),
+                new FillerActorProperty(Read16(0), BitCount.Bit16),
+                new FillerActorProperty(Read16(0), BitCount.Bit16),
+                new FillerActorProperty(Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Interact Radius", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("46", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("48", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("49", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("50", Read16(0), BitCount.Bit16)
 
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
-                properties.Add(property);
-            }
+            });
 
             InitPropertiesByName();
 
