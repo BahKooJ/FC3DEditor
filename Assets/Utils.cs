@@ -417,7 +417,8 @@ namespace FCopParser {
         SndsSound,
         Music,
         MiniAnimation,
-        Mixed
+        Mixed,
+        None
     }
 
     public enum Axis {

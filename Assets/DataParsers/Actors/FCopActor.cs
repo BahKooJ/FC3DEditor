@@ -1069,7 +1069,8 @@ namespace FCopParser {
         }
 
     }
-
+    
+    // Breifly Observed (Not simple)
     public class FCopBehavior14 : FCopActorBehavior {
 
         public FCopBehavior14(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
@@ -1099,16 +1100,68 @@ namespace FCopParser {
 
     }
 
+    // - Completed -
     public class FCopBehavior16 : FCopEntity {
 
         public FCopBehavior16(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (propertyData.Count - offset) / 2;
+            assetRefNames = new string[] { "Object", "Unused",};
+            assetRefType = new AssetType[] { AssetType.Object, AssetType.None };
 
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
-                properties.Add(property);
-            }
+            properties.AddRange(new List<ActorProperty>() {
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(1), BitCount.Bit8),
+                new FillerActorProperty(Read8(1), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(81), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(51), BitCount.Bit8),
+                new FillerActorProperty(Read8(3), BitCount.Bit8),
+                new FillerActorProperty(Read8(51), BitCount.Bit8),
+                new FillerActorProperty(Read8(3), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(8), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(99), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+
+            });
+
+            // 60
+
+            properties.AddRange(new List<ActorProperty>() {
+                new ToggleActorProperty("Reload Gun", Read1(0x01, false), BitCount.Bit1),
+                new ToggleActorProperty("Reload Heavy", Read1(0x02, false), BitCount.Bit1),
+                new ToggleActorProperty("Reload Special", Read1(0x04, false), BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Power Up Gun", Read1(0x10, false), BitCount.Bit1),
+                new ToggleActorProperty("Power Up Heavy", Read1(0x20, false), BitCount.Bit1),
+                new ToggleActorProperty("Power Up Special", Read1(0x40, false), BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+            });
+            offset++;
+
+            properties.Add(new FillerActorProperty(Read8(0), BitCount.Bit8));
+
+            properties.AddRange(new List<ActorProperty>() {
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Restore Health", Read1(0x02, false), BitCount.Bit1),
+                new ToggleActorProperty("Invisibility", Read1(0x04, false), BitCount.Bit1),
+                new ToggleActorProperty("Invincibility", Read1(0x08, false), BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1)
+            });
+            offset++;
+
+            properties.AddRange(new List<ActorProperty>() {
+                new FillerActorProperty(Read8(3), BitCount.Bit8),
+                new FillerActorProperty(Read8(255), BitCount.Bit8),
+                new FillerActorProperty(Read8(255), BitCount.Bit8),
+                new ValueActorProperty("Rotation Speed", Read16(0), BitCount.Bit16),
+            });
 
             InitPropertiesByName();
 
