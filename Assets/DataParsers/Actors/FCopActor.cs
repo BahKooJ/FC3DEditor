@@ -729,6 +729,58 @@ namespace FCopParser {
 
     }
 
+    public abstract class FCopPathedEntity : FCopShooter {
+
+        public FCopPathedEntity(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ToggleActorProperty("Enable Backtrack", Read1(0x01, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown1", Read1(0x02, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown2", Read1(0x04, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("Disable Path Obstruction", Read1(0x08, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown3", Read1(0x10, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown4", Read1(0x20, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown5", Read1(0x40, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown6", Read1(0x80, false), BitCount.Bit1, "Pathing Tags"),
+
+            });
+            offset++;
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ToggleActorProperty("PTag unknown7", Read1(0x01, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown8", Read1(0x02, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("Disable Ease", Read1(0x04, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown9", Read1(0x08, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown10", Read1(0x10, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown11", Read1(0x20, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown12", Read1(0x40, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag unknown13", Read1(0x80, false), BitCount.Bit1, "Pathing Tags"),
+
+            });
+            offset++;
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ValueActorProperty("Move Speed", Read16(0), BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Move Speed Multiplier 66:", Read16(0), BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Acceleration", Read16(0), BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Path_Unknown3 70:", Read16(0), BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Path_Unknown4 72:", Read16(0), BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Path_Unknown5 74:", Read16(0), BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Path_Unknown6 76:", Read16(0), BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Path_Unknown7 78:", Read8(0), BitCount.Bit8, "Pathing Properties"),
+                new ValueActorProperty("Path_Unknown8 79:", Read8(0), BitCount.Bit8, "Pathing Properties"),
+
+            });
+
+            InitPropertiesByName();
+
+        }
+
+    }
+
     public interface FCopObjectMutating {
 
         public RotationActorProperty[] GetRotations();
@@ -771,49 +823,12 @@ namespace FCopParser {
     }
 
     // Observed
-    public class FCopBehavior5 : FCopShooter {
+    public class FCopBehavior5 : FCopPathedEntity {
 
         public FCopBehavior5(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(new List<ActorProperty>() {
 
-                new ToggleActorProperty("Enable Backtrack", Read1(0x01, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("PTag unknown1", Read1(0x02, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("PTag unknown2", Read1(0x04, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("Disable Path Obstruction", Read1(0x08, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("PTag unknown3", Read1(0x10, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("PTag unknown4", Read1(0x20, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("PTag unknown5", Read1(0x40, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("PTag unknown6", Read1(0x80, false), BitCount.Bit1, "Pathing Tags"),
-
-            });
-            offset++;
-            properties.AddRange(new List<ActorProperty>() {
-
-                new ToggleActorProperty("PTag unknown7", Read1(0x01, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("PTag unknown8", Read1(0x02, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("Disable Ease", Read1(0x04, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("PTag unknown9", Read1(0x08, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("PTag unknown10", Read1(0x10, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("PTag unknown11", Read1(0x20, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("PTag unknown12", Read1(0x40, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("PTag unknown13", Read1(0x80, false), BitCount.Bit1, "Pathing Tags"),
-
-            });
-            offset++;
-
-            properties.AddRange(new List<ActorProperty>() {
-
-                new ValueActorProperty("Move Speed", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Move Speed Multiplier 66:", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Acceleration", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("5_Unknown3 70:", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("5_Unknown4 72:", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("5_Unknown5 74:", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("5_Unknown6 76:", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("5_Unknown7 78:", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("5_Unknown8 79:", Read8(0), BitCount.Bit8),
                 new ValueActorProperty("5_Unknown9 80:", Read8(0), BitCount.Bit8),
                 new ValueActorProperty("5_Unknown10 81:", Read8(0), BitCount.Bit8),
                 new ValueActorProperty("5_Unknown11 82:", Read8(0), BitCount.Bit8),
@@ -1169,16 +1184,20 @@ namespace FCopParser {
 
     }
 
-    public class FCopBehavior20 : FCopShooter {
+    public class FCopBehavior20 : FCopPathedEntity {
 
         public FCopBehavior20(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (propertyData.Count - offset) / 2;
+            properties.AddRange(new List<ActorProperty>() {
 
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
-                properties.Add(property);
-            }
+                new ValueActorProperty("80", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("82", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("84", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("85", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("86", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("87", Read8(0), BitCount.Bit8)
+
+            });
 
             InitPropertiesByName();
 
