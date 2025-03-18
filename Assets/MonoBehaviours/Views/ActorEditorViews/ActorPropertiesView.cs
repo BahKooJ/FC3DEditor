@@ -186,4 +186,9 @@ public class ActorPropertiesView : MonoBehaviour {
 
     }
 
+    public void CleartSAC() {
+
+        controller.selectedActor.tSACData = null;
+
+    }
 }
