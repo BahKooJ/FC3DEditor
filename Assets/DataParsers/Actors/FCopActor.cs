@@ -225,6 +225,10 @@ namespace FCopParser {
                     InitResourceAndRawFile(FCopBehavior11.assetRefCount);
                     this.behavior = new FCopBehavior11(this, new());
                     break;
+                case ActorBehavior.StaticProp:
+                    InitResourceAndRawFile(FCopBehavior96.assetRefCount);
+                    this.behavior = new FCopBehavior96(this, new());
+                    break;
 
             }
 
@@ -1754,6 +1758,7 @@ namespace FCopParser {
 
     }
 
+    // Observed
     public class FCopBehavior95 : FCopActorBehavior {
 
         public FCopBehavior95(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
@@ -1764,8 +1769,27 @@ namespace FCopParser {
                 new ValueActorProperty("Length", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("Height", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("34", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("35", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("36", Read16(0), BitCount.Bit16),
+
+
+            });
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ToggleActorProperty("Unknown1", Read1(0x01, false), BitCount.Bit1, "Trigger Tags"),
+                new ToggleActorProperty("Can Retrigger", Read1(0x02, false), BitCount.Bit1, "Trigger Tags"),
+                new ToggleActorProperty("Trigger By Action", Read1(0x04, false), BitCount.Bit1, "Trigger Tags"),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Disable Trigger", Read1(0x10, false), BitCount.Bit1, "Trigger Tags"),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Unknown2", Read1(0x40, false), BitCount.Bit1, "Trigger Tags"),
+                new FillerActorProperty(0, BitCount.Bit1)
+
+            });
+            offset++;
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ValueActorProperty("Triggering Actor", Read16(0), BitCount.Bit16),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8)
 
@@ -1777,8 +1801,10 @@ namespace FCopParser {
 
     }
 
+    // Observed, closed to parsed
     public class FCopBehavior96 : FCopActorBehavior, FCopObjectMutating, FCopHeightOffsetting {
 
+        public const int assetRefCount = 1;
         public int heightMultiplier { get; set; }
 
         public FCopBehavior96(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
@@ -1789,15 +1815,20 @@ namespace FCopParser {
             heightMultiplier = 512;
 
             properties = new() {
+
                 new RotationActorProperty("Rotation Y", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { 0 }),
                 new RotationActorProperty("Rotation Z", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Z, new int[] { 0 }),
                 new RotationActorProperty("Rotation X", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.X, new int[] { 0 }),
                 new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
                 new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8),
-                new ValueActorProperty("unknown5", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("unknown6", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("unknown7", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("unknown8", Read16(0), BitCount.Bit16)
+                new ValueActorProperty("Unknown Tags", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Animation Speed", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Scale X", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Scale Y", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Scale Z", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Spin Speed", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Spin Angle", Read8(0), BitCount.Bit8)
+
             };
 
             InitPropertiesByName();
