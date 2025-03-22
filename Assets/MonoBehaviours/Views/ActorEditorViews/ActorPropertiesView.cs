@@ -16,6 +16,7 @@ public class ActorPropertiesView : MonoBehaviour {
     public GameObject actorAssetRefItem;
     public GameObject groupActorPropertyItem;
     public GameObject overloadActorPropertyItem;
+    public GameObject spawningPropertiesItem;
 
     //View refs
     public Transform propertiesContent;
@@ -152,6 +153,13 @@ public class ActorPropertiesView : MonoBehaviour {
 
         actorScriptView.transform.SetParent(propertiesContent, false);
 
+        var actorSpawningView = Instantiate(spawningPropertiesItem);
+
+        actorSpawningView.GetComponent<ActorSpawningPropertiesItemView>().controller = controller;
+        actorSpawningView.GetComponent<ActorSpawningPropertiesItemView>().actor = controller.selectedActor;
+
+        actorSpawningView.transform.SetParent(propertiesContent, false);
+
     }
 
     public void RequestPropertyRefresh(ActorProperty property) {
@@ -186,9 +194,4 @@ public class ActorPropertiesView : MonoBehaviour {
 
     }
 
-    public void CleartSAC() {
-
-        controller.selectedActor.tSACData = null;
-
-    }
 }

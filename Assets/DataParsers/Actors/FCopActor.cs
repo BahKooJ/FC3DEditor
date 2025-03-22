@@ -21,6 +21,7 @@ namespace FCopParser {
             public const string Cact = "Cact";
             public const string Csac = "Csac";
 
+            public static List<byte> tSACBytes = new() { 67, 64, 83, 116 };
         }
 
         public struct Resource {
@@ -49,8 +50,7 @@ namespace FCopParser {
         public List<Resource> resourceReferences = new();
 
         public FCopActorBehavior behavior;
-
-        public List<byte> tSACData = null;
+        public FCopActorSpawning spawningProperties = null;
 
         public FCopActor(IFFDataFile rawFile): base(rawFile) {
 
@@ -187,7 +187,7 @@ namespace FCopParser {
             var tSAC = offsets.FirstOrDefault(h => h.fourCCDeclaration == FourCC.tSAC);
 
             if (tSAC != null) {
-                tSACData = rawFile.data.GetRange(tSAC.index, tSAC.chunkSize);
+                spawningProperties = new FCopActorSpawning(rawFile.data.GetRange(tSAC.index, tSAC.chunkSize));
             }
 
         }
@@ -281,8 +281,8 @@ namespace FCopParser {
             total.AddRange(BitConverter.GetBytes(DataID));
             total.AddRange(refTotal);
 
-            if (tSACData != null) {
-                total.AddRange(tSACData);
+            if (spawningProperties != null) {
+                total.AddRange(spawningProperties.Compile());
             }
 
             var totalWithHeader = new List<byte>();
@@ -298,7 +298,7 @@ namespace FCopParser {
             rawFile.data = totalWithHeader;
 
             // Makes sure the fourCC is correct.
-            if (tSACData != null) {
+            if (spawningProperties != null) {
                 rawFile.dataFourCC = FourCC.Csac;
             }
             else {
@@ -367,6 +367,87 @@ namespace FCopParser {
             return Reverse(Encoding.Default.GetString(rawFile.data.ToArray(), offset, length));
         }
 
+
+    }
+
+    public class FCopActorSpawning {
+
+        const int size = 48;
+        const float respawnTimerMulitpler = 60f;
+
+        public int dataID; // 32bit
+        public float respawnTime;
+        public bool randomFirstSpawnTime;
+        public int maxActiveActors;
+        public bool disableRespawn;
+        public bool infiniteRespawns;
+        public int maxRespawns;
+
+        public FCopActorSpawning(List<byte> propertyData) {
+
+            dataID = BitConverter.ToInt32(propertyData.ToArray(), 8);
+
+            var respawnRaw = BitConverter.ToInt16(propertyData.ToArray(), 12);
+            
+            randomFirstSpawnTime = respawnRaw > 0;
+            respawnTime = MathF.Abs(respawnRaw) / respawnTimerMulitpler;
+
+            maxActiveActors = BitConverter.ToInt16(propertyData.ToArray(), 14);
+            disableRespawn = BitConverter.ToInt16(propertyData.ToArray(), 16) == 1;
+
+            var maxRespawnsRaw = BitConverter.ToInt16(propertyData.ToArray(), 18);
+
+            infiniteRespawns = maxRespawnsRaw == -1;
+            maxRespawns = maxRespawnsRaw;
+
+        }
+
+        public FCopActorSpawning(int dataID) {
+
+            dataID = 0;
+            respawnTime = 5;
+            randomFirstSpawnTime = false;
+            maxActiveActors = 1;
+            disableRespawn = true;
+            infiniteRespawns = false;
+            maxRespawns = 1;
+
+        }
+
+        public List<byte> Compile() {
+
+            var total = new List<byte>();
+
+            total.AddRange(FCopActor.FourCC.tSACBytes);
+            total.AddRange(BitConverter.GetBytes(size));
+            total.AddRange(BitConverter.GetBytes(dataID));
+
+            var respawnTimeCompiled = (int)(respawnTime * respawnTimerMulitpler);
+
+            if (!randomFirstSpawnTime) {
+                respawnTimeCompiled = -respawnTimeCompiled;
+            }
+
+            total.AddRange(BitConverter.GetBytes((short)respawnTimeCompiled));
+
+            total.AddRange(BitConverter.GetBytes((short)maxActiveActors));
+
+            total.AddRange(BitConverter.GetBytes((short)(disableRespawn ? 1 : 0)));
+
+            if (infiniteRespawns) {
+                total.AddRange(BitConverter.GetBytes((short)-1));
+            }
+            else {
+                total.AddRange(BitConverter.GetBytes((short)maxRespawns));
+            }
+
+            foreach (var i in Enumerable.Range(0, 28)) {
+                total.Add(0);
+            }
+
+            return total;
+
+        }
 
     }
 
