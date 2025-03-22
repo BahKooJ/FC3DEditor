@@ -1861,16 +1861,29 @@ namespace FCopParser {
 
     }
 
+    // Observed, closed to parsed
     public class FCopBehavior97 : FCopActorBehavior {
 
         public FCopBehavior97(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (propertyData.Count - offset) / 2;
+            properties = new() {
 
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
-                properties.Add(property);
-            }
+                new ValueActorProperty("Tags", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Cdcs Ref", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Width", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Height", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("RotationY", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("RotationZ", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("RotationX", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("42", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Red", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Green", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Blue", Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8)
+
+            };
 
             InitPropertiesByName();
 
