@@ -13,6 +13,10 @@ namespace FCopParser {
         public Dictionary<int, ActorNode> behaviorGroupedActors = new();
         public List<ActorNode> scriptingGroupedActors;
 
+        public Dictionary<int, string> teams = new() {
+            {0, "None"}
+        };
+
         public FCopSceneActors(List<FCopActor> actors, FCopLevel level) {
 
             this.level = level;
@@ -24,6 +28,8 @@ namespace FCopParser {
 
             SortActorsByPosition();
             SortActorsByBehavior();
+
+            FindTeams();
         }
         
         public int FindNextID() {
@@ -302,6 +308,108 @@ namespace FCopParser {
                 }
                 else {
                     behaviorGroupedActors[(int)actor.behaviorType] = new ActorNode(ActorGroupType.Behavior, "Group " + actor.behaviorType, actor);
+                }
+
+            }
+
+        }
+
+        void FindTeams() {
+
+            var teamedActors = actors.Where(a => a.behavior is FCopEntity);
+
+            foreach (var actor in teamedActors) {
+
+                var teamProperties = actor.behavior.properties.Where(p => p is AssetActorProperty);
+
+                foreach (var teamProperty in teamProperties.Cast<AssetActorProperty>()) {
+
+                    if (!teams.ContainsKey(teamProperty.assetID) && teamProperty.assetType == AssetType.Team) {
+                        teams[teamProperty.assetID] = "Team" + teamProperty.assetID;
+                    }
+
+                }
+
+                var overloads = actor.behavior.properties.Where(o => o is OverloadedProperty);
+
+                foreach (var overload in overloads.Cast<OverloadedProperty>()) {
+
+                    if (overload.GetOverloadProperty() is AssetActorProperty teamProp) {
+
+                        if (!teams.ContainsKey(teamProp.assetID) && teamProp.assetType == AssetType.Team) {
+                            teams[teamProp.assetID] = "Team" + teamProp.assetID;
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        public int AddTeam() {
+
+            int newID = -1;
+
+            var teamsByAscending = teams.OrderBy(t => t.Key).ToList();
+
+            var previousID = teamsByAscending[0].Key;
+            foreach (var team in teamsByAscending) {
+
+                if (team.Key == previousID + 1 || team.Key == previousID) {
+                    previousID = team.Key;
+                    continue;
+                }
+                else {
+                    newID = previousID + 1;
+                    break;
+                }
+
+            }
+
+            if (newID == -1) {
+
+                newID = teamsByAscending.Last().Key + 1;
+
+            }
+
+            teams[newID] = "Team";
+
+            return newID;
+
+        }
+
+        public void DeleteTeam(int id) {
+
+            teams.Remove(id);
+
+            var teamedActors = actors.Where(a => a.behavior is FCopEntity);
+
+            foreach (var actor in teamedActors) {
+
+                var teamProperties = actor.behavior.properties.Where(p => p is AssetActorProperty);
+
+                foreach (var teamProperty in teamProperties.Cast<AssetActorProperty>()) {
+
+                    if (!teams.ContainsKey(teamProperty.assetID) && teamProperty.assetType == AssetType.Team) {
+                        teamProperty.assetID = 0;
+                    }
+
+                }
+
+                var overloads = actor.behavior.properties.Where(o => o is OverloadedProperty);
+
+                foreach (var overload in overloads.Cast<OverloadedProperty>()) {
+
+                    if (overload.GetOverloadProperty() is AssetActorProperty teamProp) {
+
+                        if (!teams.ContainsKey(teamProp.assetID) && teamProp.assetType == AssetType.Team) {
+                            teamProp.assetID = 0;
+                        }
+
+                    }
+
                 }
 
             }

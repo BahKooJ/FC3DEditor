@@ -55,7 +55,7 @@ public class ActorSchematicView : MonoBehaviour {
     // - Unity Callbacks -
 
     public void OnClickDone() {
-        view.CloseActorPropertiesView();
+        view.CloseActorSchematicsView();
     }
 
 }

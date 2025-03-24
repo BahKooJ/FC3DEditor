@@ -709,7 +709,8 @@ namespace FCopParser {
             return new List<ActorProperty>() {
                 new ValueActorProperty("Health", Read16(0), BitCount.Bit16, "Entity Properties"),
                 new ValueActorProperty("Collide Damage", Read16(0), BitCount.Bit16, "Entity Properties"),
-                new ValueActorProperty("Team (Unknown)", Read16(0), BitCount.Bit16, "Entity Properties"),
+                new AssetActorProperty("Team", Read8(0), AssetType.Team, BitCount.Bit8, "Entity Properties"),
+                new ValueActorProperty("Group?", Read8(0), BitCount.Bit8, "Entity Properties"),
                 new EnumDataActorProperty("Map Icon Color", (MapIconColor)Read8(0), BitCount.Bit8, "Entity Properties"),
                 new ValueActorProperty("Target Priority", Read8(0), BitCount.Bit8, "Entity Properties"),
                 new ValueActorProperty("Explosion (Unknown)", Read8(0), BitCount.Bit8, "Entity Properties"),
@@ -770,7 +771,7 @@ namespace FCopParser {
                 new EnumDataActorProperty("Target Type", (TargetType)Read8(0), BitCount.Bit8, "Shooter Properties", "OverloadAttack"),
 
                 new OverloadedProperty("OverloadAttack", new() {
-                    (new ValueActorProperty("Attack Team", Read16NoIt(0), BitCount.Bit16), () => (TargetType)propertiesByName["Target Type"].GetCompiledValue() == TargetType.Team),
+                    (new AssetActorProperty("Attack Team", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type"].GetCompiledValue() == TargetType.Team),
                     (new ValueActorProperty("Attack Actor", Read16(0), BitCount.Bit16), () => true),
 
                 }, BitCount.Bit16, "Shooter Properties"),

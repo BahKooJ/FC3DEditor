@@ -2231,6 +2231,7 @@ MonoBehaviour:
   groupActorPropertyItem: {fileID: 4875314843441743963, guid: fa874d88887f1744b801bfad0636db85, type: 3}
   overloadActorPropertyItem: {fileID: 8774014927552486263, guid: e06b03c096ffd5d4e9671e42166188be, type: 3}
   spawningPropertiesItem: {fileID: 8213937852208876216, guid: cda48b90ed7d6ec45adb939a85db987b, type: 3}
+  assetActorPropertyItem: {fileID: 3486778975069844253, guid: 8f4e13b8b532e4842aea0259cf164bbd, type: 3}
   propertiesContent: {fileID: 4429559707500750907}
   actorName: {fileID: 75131811161702472}
   idText: {fileID: 3775939840264087208}

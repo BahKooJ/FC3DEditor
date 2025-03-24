@@ -17,6 +17,7 @@ public class ActorPropertiesView : MonoBehaviour {
     public GameObject groupActorPropertyItem;
     public GameObject overloadActorPropertyItem;
     public GameObject spawningPropertiesItem;
+    public GameObject assetActorPropertyItem;
 
     //View refs
     public Transform propertiesContent;
@@ -57,6 +58,9 @@ public class ActorPropertiesView : MonoBehaviour {
                 break;
             case EnumDataActorProperty:
                 obj = Instantiate(enumDataActorPropertyItem);
+                break;
+            case AssetActorProperty:
+                obj = Instantiate(assetActorPropertyItem);
                 break;
             case OverloadedProperty:
                 obj = Instantiate(overloadActorPropertyItem);

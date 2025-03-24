@@ -89,16 +89,16 @@ public class FileManagerMain : MonoBehaviour {
 
         if (Path.GetExtension(path) == ".ncfc") {
 
-            try {
+            //try {
                 LoadingScreenUtil.Show();
                 level = new FCopLevel(fileContent);
                 SceneManager.LoadScene("Scenes/LevelEditorScene", LoadSceneMode.Single);
 
-            }
-            catch {
-                LoadingScreenUtil.End();
-                DialogWindowUtil.Dialog("Invalid or Corrupted File", "Unable to parse Non-Compressed Future Cop file");
-            }
+            //}
+            //catch {
+            //    LoadingScreenUtil.End();
+            //    DialogWindowUtil.Dialog("Invalid or Corrupted File", "Unable to parse Non-Compressed Future Cop file");
+            //}
 
         }
         else {

@@ -9,6 +9,7 @@ public class ActorPropertyItemView : MonoBehaviour {
     public ActorProperty property;
     public FCopActor actor;
     public ActorEditMode controller;
+    [HideInInspector]
     public ActorPropertiesView view;
 
 

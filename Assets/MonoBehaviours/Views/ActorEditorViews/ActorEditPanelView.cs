@@ -7,12 +7,14 @@ public class ActorEditPanelView : MonoBehaviour {
     // - Prefabs -
     public GameObject actorPropertiesView;
     public GameObject actorSchematicViewFab;
+    public GameObject supportingActorDataViewFab;
 
     // - Unity Refs -
     public ContextMenuHandler addActorContextMenu;
 
     public ActorPropertiesView activeActorPropertiesView;
     public ActorSchematicView activeActorSchematicView;
+    public SupportingActorDataView activeSupportingActorDataView;
 
     void Start() {
 
@@ -82,7 +84,7 @@ public class ActorEditPanelView : MonoBehaviour {
 
     }
 
-    public void CloseActorPropertiesView() {
+    public void CloseActorSchematicsView() {
 
         if (activeActorSchematicView != null) {
             Destroy(activeActorSchematicView.gameObject);
@@ -106,4 +108,30 @@ public class ActorEditPanelView : MonoBehaviour {
 
     }
 
+    public void OpenSupportingActorDataPanel() {
+
+        if (activeSupportingActorDataView != null) {
+            CloseSupportingActorDataPanel();
+        }
+        else {
+
+            var obj = Instantiate(supportingActorDataViewFab);
+
+            activeSupportingActorDataView = obj.GetComponent<SupportingActorDataView>();
+            activeSupportingActorDataView.level = controller.main.level;
+
+            obj.transform.SetParent(transform.parent, false);
+
+        }
+
+    }
+
+    public void CloseSupportingActorDataPanel() {
+
+        if (activeSupportingActorDataView != null) {
+            Destroy(activeSupportingActorDataView.gameObject);
+            activeSupportingActorDataView = null;
+        }
+
+    }
 }

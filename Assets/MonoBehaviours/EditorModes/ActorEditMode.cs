@@ -112,6 +112,8 @@ public class ActorEditMode : EditMode {
         actorGroupObjects.Clear();
 
         view.CloseActorPorpertiesView();
+        view.CloseActorSchematicsView();
+        view.CloseSupportingActorDataPanel();
 
     }
 

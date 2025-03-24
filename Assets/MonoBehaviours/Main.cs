@@ -102,6 +102,7 @@ public class Main : MonoBehaviour {
     public GameObject escMenuPrefab;
     public GameObject assetManagerPrefab;
     public GameObject miniAssetManagerPrefab;
+    public GameObject universialDataManagerPrefab;
 
 
     // Temp

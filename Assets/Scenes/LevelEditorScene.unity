@@ -2682,6 +2682,7 @@ MonoBehaviour:
   escMenuPrefab: {fileID: 2543452746665536543, guid: 0b1cfcc4ead36d44cbd2aa5e5fd5b8cc, type: 3}
   assetManagerPrefab: {fileID: 3399766673076906555, guid: 5f10661846b707244a9d972a571a924f, type: 3}
   miniAssetManagerPrefab: {fileID: 6400905306875826594, guid: 7302d547288ed174a9f45365b04b6245, type: 3}
+  universialDataManagerPrefab: {fileID: 6400905306875826594, guid: 7f16703ede258d846944188c40b147d3, type: 3}
   boundsPrefab: {fileID: 2168547336867362444, guid: 9ea2ba9bd14a6d84f92bbce323964dbf, type: 3}
   canvas: {fileID: 494504592}
   uiScaler: {fileID: 494504594}

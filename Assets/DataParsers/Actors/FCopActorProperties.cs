@@ -231,6 +231,35 @@ namespace FCopParser {
 
     }
 
+    public class AssetActorProperty : ActorProperty {
+
+        public string name { get; set; }
+        public BitCount bitCount { get; set; }
+        public string commonName { get; set; }
+        public string dictatesOverload { get; set; }
+
+        public int GetCompiledValue() {
+            return assetID;
+        }
+
+        public int assetID;
+        public AssetType assetType;
+
+        public AssetActorProperty(string name, int assetID, AssetType assetType, BitCount bitCount) {
+            this.name = name;
+            this.assetID = assetID;
+            this.assetType = assetType;
+            this.bitCount = bitCount;
+            this.commonName = "";
+
+        }
+
+        public AssetActorProperty(string name, int assetID, AssetType assetType, BitCount bitCount, string commonName) : this(name, assetID, assetType, bitCount) {
+            this.commonName = commonName;
+        }
+
+    }
+
     public class OverloadedProperty : ActorProperty {
 
         public string name { get; set; }

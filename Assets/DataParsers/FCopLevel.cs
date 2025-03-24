@@ -724,6 +724,25 @@ namespace FCopParser {
             total.AddRange(actorGroupData);
             #endregion
 
+            #region Teams
+
+            var teamsData = new List<byte>();
+
+            foreach (var team in sceneActors.teams) {
+
+                teamsData.AddRange(BitConverter.GetBytes(team.Value.Count()));
+                teamsData.AddRange(Encoding.ASCII.GetBytes(team.Value));
+                teamsData.AddRange(BitConverter.GetBytes(team.Key));
+
+            }
+
+            total.AddRange(Encoding.ASCII.GetBytes("ACTTEAMS"));
+            total.AddRange(BitConverter.GetBytes(teamsData.Count + 16));
+            total.AddRange(BitConverter.GetBytes(sceneActors.teams.Count()));
+            total.AddRange(teamsData);
+
+            #endregion
+
             #region Everything Else
             foreach (var file in fileManager.files) {
 
@@ -790,6 +809,7 @@ namespace FCopParser {
             List<IFFDataFile> rawCwavs = new();
             IFFDataFile rawCshd = null;
             List<ActorGroup> actorGroups = new();
+            Dictionary<int, string> teams = new();
             FCopRPNS rpns = null;
             FCopFunctionParser funParser = null;
 
@@ -1003,6 +1023,28 @@ namespace FCopParser {
                     }
 
                 }
+                else if (eightCC == "ACTTEAMS") {
+
+                    i += 8;
+                    var totalSize = BitConverter.ToInt32(dataArray, i);
+                    i += 4;
+                    var teamCount = BitConverter.ToInt32(dataArray, i);
+                    i += 4;
+
+                    foreach (var t in Enumerable.Range(0, teamCount)) {
+
+                        var nameSize = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+                        var name = Encoding.ASCII.GetString(data.GetRange(i, nameSize).ToArray());
+                        i += nameSize;
+                        var id = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+
+                        teams[id] = name;
+
+                    }
+
+                }
                 else {
 
                     var file = CreateDataFile(iBeforeHeader);
@@ -1020,6 +1062,7 @@ namespace FCopParser {
             if (actorGroups.Count != 0) {
                 sceneActors.SetPositionalGroup(actorGroups);
             }
+            sceneActors.teams = teams;
             this.navMeshes = navMeshes;
             this.objects = objects;
             this.textures = textures;

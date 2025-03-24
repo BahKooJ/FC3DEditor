@@ -418,6 +418,10 @@ namespace FCopParser {
         Music,
         MiniAnimation,
         Mixed,
+        Actor,
+        // Having a team be an asset is a little weird, but it functions exactly the same.
+        // A ID tied to a name.
+        Team,
         None
     }
 
