@@ -45,7 +45,7 @@ public class TeamDataListItemView : MonoBehaviour {
 
     void Delete() {
 
-        DialogWindowUtil.Dialog("Delete Team", "Are you sure you would like to delete this team?" +
+        DialogWindowUtil.Dialog("Delete Team", "Are you sure you would like to delete this team? " +
             "Actors that use this team may no longer work properly. Only delete teams if you are sure it is unused. This cannot be undone.", () => {
 
                 if (id == 0) return false;
@@ -63,6 +63,11 @@ public class TeamDataListItemView : MonoBehaviour {
     public void OnFinishNameType() {
 
         teamName = nameField.text;
+
+        if (teamName == "") {
+            teamName = "Team";
+            nameField.text = "Team";
+        }
 
         level.sceneActors.teams[id] = teamName;
         nameText.text = teamName;

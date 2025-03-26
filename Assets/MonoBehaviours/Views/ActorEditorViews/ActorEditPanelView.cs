@@ -119,6 +119,7 @@ public class ActorEditPanelView : MonoBehaviour {
 
             activeSupportingActorDataView = obj.GetComponent<SupportingActorDataView>();
             activeSupportingActorDataView.level = controller.main.level;
+            activeSupportingActorDataView.main = controller.main;
 
             obj.transform.SetParent(transform.parent, false);
 

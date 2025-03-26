@@ -419,9 +419,9 @@ namespace FCopParser {
         MiniAnimation,
         Mixed,
         Actor,
-        // Having a team be an asset is a little weird, but it functions exactly the same.
-        // A ID tied to a name.
+        // Non-IFFDataFile Assets
         Team,
+        TextureSnippet,
         None
     }
 

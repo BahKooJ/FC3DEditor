@@ -21,7 +21,7 @@ namespace FCopParser {
             public const string Cact = "Cact";
             public const string Csac = "Csac";
 
-            public static List<byte> tSACBytes = new() { 67, 64, 83, 116 };
+            public static List<byte> tSACBytes = new() { 67, 65, 83, 116 };
         }
 
         public struct Resource {
@@ -173,7 +173,7 @@ namespace FCopParser {
                 case ActorBehavior.StaticProp:
                     behavior = new FCopBehavior96(this, propertyData);
                     break;
-                case ActorBehavior.Fog:
+                case ActorBehavior.Texture:
                     behavior = new FCopBehavior97(this, propertyData);
                     break;
                 case ActorBehavior.Weapon:
@@ -1951,7 +1951,7 @@ namespace FCopParser {
             properties = new() {
 
                 new ValueActorProperty("Tags", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Cdcs Ref", Read8(0), BitCount.Bit8),
+                new AssetActorProperty("Texture Snippet", Read8(0), AssetType.TextureSnippet, BitCount.Bit8),
                 new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("Width", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("Height", Read16(0), BitCount.Bit16),
@@ -2044,7 +2044,7 @@ namespace FCopParser {
         Behavior94 = 94,
         Trigger = 95,
         StaticProp = 96,
-        Fog = 97,
+        Texture = 97,
         Weapon = 98,
         PlayerWeapon = 99
 

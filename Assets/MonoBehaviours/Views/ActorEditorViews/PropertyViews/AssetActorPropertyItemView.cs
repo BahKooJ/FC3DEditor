@@ -2,6 +2,8 @@
 using UnityEngine;
 using TMPro;
 using FCopParser;
+using System.Linq;
+using System.Collections.Generic;
 
 public class AssetActorPropertyItemView : ActorPropertyItemView {
 
@@ -54,6 +56,16 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
             case AssetType.Team:
                 assetNameText.text = controller.main.level.sceneActors.teams[assetProperty.assetID];
                 break;
+            case AssetType.TextureSnippet:
+
+                try {
+                    assetNameText.text = controller.main.level.textureSnippets.First(t => t.id == assetProperty.assetID).name;
+                }
+                catch {
+                    assetNameText.text = "Missing";
+                }
+
+                break;
             case AssetType.None:
                 assetNameText.text = "TODO";
                 break;
@@ -71,6 +83,21 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
             });
 
         }
+        else if (assetProperty.assetType == AssetType.TextureSnippet) {
+
+            var snippetDic = new Dictionary<int, string>();
+
+            foreach (var ts in controller.main.level.textureSnippets) {
+                snippetDic[ts.id] = ts.name;
+            }
+
+            MiniAssetManagerUtil.RequestUniversalData(snippetDic, controller.main, id => {
+                assetProperty.assetID = id;
+                Refresh();
+            });
+
+        }
+
         else {
 
             MiniAssetManagerUtil.RequestAsset(assetProperty.assetType, controller.main, asset => {

@@ -17,6 +17,7 @@ namespace FCopParser {
         public List<FCopLevelSection> sections = new();
         public FCopAudioParser audio;
         public List<FCopTexture> textures = new();
+        public List<TextureSnippet> textureSnippets = new();
         public List<FCopNavMesh> navMeshes = new();
         public List<FCopObject> objects = new();
         public FCopScriptingProject scripting;
@@ -106,6 +107,15 @@ namespace FCopParser {
 
             var rawBitmapFiles = GetFiles("Cbmp");
 
+            try {
+
+                var cdcs = GetFile("Cdcs");
+
+                textureSnippets = TextureSnippet.Parse(cdcs.data);
+
+            }
+            catch { }
+
             var rawNavMeshFiles = GetFiles("Cnet");
 
             var rawObjectFiles = GetFiles("Cobj");
@@ -135,6 +145,7 @@ namespace FCopParser {
             sceneActors = new FCopSceneActors(actors, this);
 
             audio = new FCopAudioParser(rawCwavs, rawCshd, fileManager.subFiles, fileManager.music);
+
 
         }
 
@@ -215,6 +226,14 @@ namespace FCopParser {
                     navMeshes.Remove(navMesh);
 
                     break;
+                case AssetType.TextureSnippet:
+                    
+                    var textureSnippet = textureSnippets.First(n => n.id == id);
+
+                    textureSnippets.Remove(textureSnippet);
+
+                    break;
+
                 case AssetType.SndsSound:
                     // TODO
                     break;
@@ -371,7 +390,7 @@ namespace FCopParser {
 
         }
 
-        List<string> dataAccountedFor = new List<string>() { "RPNS", "Cshd", "Cwav", "Ctos", "Cptc", "Ctil", "Cfun", "Cnet", "Cbmp", "Cobj", "Cact", "Csac", "Cctr" };
+        List<string> dataAccountedFor = new List<string>() { "RPNS", "Cshd", "Cwav", "Ctos", "Cptc", "Ctil", "Cfun", "Cnet", "Cbmp", "Cdcs", "Cobj", "Cact", "Csac", "Cctr" };
 
         void UpdateRPNSOffsets() {
 
@@ -419,6 +438,8 @@ namespace FCopParser {
             foreach (var texture in textures) {
                 newFileManager.files.Add(texture.Compile());
             }
+
+            newFileManager.files.Add(TextureSnippet.Compile(textureSnippets, scripting.emptyOffset));
 
             foreach (var obj in objects) {
                 newFileManager.files.Add(obj.Compile());
@@ -573,6 +594,8 @@ namespace FCopParser {
             foreach (var texture in textures) {
                 CreateHeaderWithFile(texture.Compile(), "FCopCbmp", texture.name);
             }
+
+            CreateHeaderWithFile(TextureSnippet.Compile(textureSnippets, scripting.emptyOffset), "FCopCdcs", "");
 
             foreach (var obj in objects) {
                 CreateHeaderWithFile(obj.Compile(), "FCopCobj", obj.name);
@@ -743,6 +766,30 @@ namespace FCopParser {
 
             #endregion
 
+            #region Texture Snippets
+
+            var tSnippetData = new List<byte>();
+
+            foreach (var snippet in textureSnippets) {
+
+                tSnippetData.AddRange(BitConverter.GetBytes(snippet.name.Count()));
+                tSnippetData.AddRange(Encoding.ASCII.GetBytes(snippet.name));
+                tSnippetData.AddRange(BitConverter.GetBytes(snippet.x));
+                tSnippetData.AddRange(BitConverter.GetBytes(snippet.y));
+                tSnippetData.AddRange(BitConverter.GetBytes(snippet.width));
+                tSnippetData.AddRange(BitConverter.GetBytes(snippet.height));
+                tSnippetData.AddRange(BitConverter.GetBytes(snippet.texturePaletteID));
+                tSnippetData.AddRange(BitConverter.GetBytes(snippet.id));
+
+            }
+
+            total.AddRange(Encoding.ASCII.GetBytes("TEXTSNIP"));
+            total.AddRange(BitConverter.GetBytes(tSnippetData.Count + 16));
+            total.AddRange(BitConverter.GetBytes(textureSnippets.Count()));
+            total.AddRange(tSnippetData);
+
+            #endregion
+
             #region Everything Else
             foreach (var file in fileManager.files) {
 
@@ -806,6 +853,7 @@ namespace FCopParser {
             List<FCopNavMesh> navMeshes = new();
             List<FCopObject> objects = new();
             List<FCopTexture> textures = new();
+            List<TextureSnippet> texturesSnippets = new();
             List<IFFDataFile> rawCwavs = new();
             IFFDataFile rawCshd = null;
             List<ActorGroup> actorGroups = new();
@@ -1045,6 +1093,38 @@ namespace FCopParser {
                     }
 
                 }
+                else if (eightCC == "TEXTSNIP") {
+
+                    i += 8;
+                    var totalSize = BitConverter.ToInt32(dataArray, i);
+                    i += 4;
+                    var snippetCount = BitConverter.ToInt32(dataArray, i);
+                    i += 4;
+
+                    foreach (var s in Enumerable.Range(0, snippetCount)) {
+
+                        var nameSize = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+                        var name = Encoding.ASCII.GetString(data.GetRange(i, nameSize).ToArray());
+                        i += nameSize;
+                        var x = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+                        var y = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+                        var width = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+                        var height = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+                        var textureID = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+                        var id = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+
+                        texturesSnippets.Add(new TextureSnippet(name, id, x, y, width, height, textureID));
+
+                    }
+
+                }
                 else {
 
                     var file = CreateDataFile(iBeforeHeader);
@@ -1066,6 +1146,7 @@ namespace FCopParser {
             this.navMeshes = navMeshes;
             this.objects = objects;
             this.textures = textures;
+            this.textureSnippets = texturesSnippets;
 
             scripting = new FCopScriptingProject(rpns, funParser);
 
