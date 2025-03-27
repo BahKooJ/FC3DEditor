@@ -39,6 +39,7 @@ public class TextureSnippetItemView : MonoBehaviour {
         infoBoxHandler.message = textureSnippet.name;
 
         contextMenu.items = new() {
+            ("Edit", Edit),
             ("Rename", Rename),
             ("Delete", Delete)
         };
@@ -118,6 +119,12 @@ public class TextureSnippetItemView : MonoBehaviour {
 
         DestroyImmediate(meshObj);
         DestroyImmediate(camera);
+
+    }
+
+    void Edit() {
+
+        view.RequestSnippetEdit(this);
 
     }
 

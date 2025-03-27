@@ -330,6 +330,45 @@ namespace FCopParser {
 
         }
 
+        public void AddTextureSnippet(int x, int y, int width, int height, int texturePaletteID) {
+
+            int newID = -1;
+
+            if (textureSnippets.Count != 0) {
+
+                var snippetsByAscending = textureSnippets.OrderBy(t => t.id).ToList();
+
+                var previousID = snippetsByAscending[0].id;
+                foreach (var snippet in snippetsByAscending) {
+
+                    if (snippet.id == previousID + 1 || snippet.id == previousID) {
+                        previousID = snippet.id;
+                        continue;
+                    }
+                    else {
+                        newID = previousID + 1;
+                        break;
+                    }
+
+                }
+
+                if (newID == -1) {
+
+                    newID = snippetsByAscending.Last().id + 1;
+
+                }
+
+            }
+            else {
+
+                newID = 1;
+
+            }
+
+            textureSnippets.Add(new TextureSnippet(x, y, width, height, texturePaletteID, newID));
+
+        }
+
         public IFFDataFile CreateEmptyAssetFile(AssetType assetType) {
 
             int maxID;

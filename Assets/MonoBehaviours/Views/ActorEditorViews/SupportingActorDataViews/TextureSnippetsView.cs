@@ -13,6 +13,7 @@ public class TextureSnippetsView : MonoBehaviour {
     // - Unity Refs -
     public Transform listContent;
     public Transform addSnippetButtonTrans;
+    public UniversalUVMapperView universalUVMapper;
 
     // - Parameters -
     [HideInInspector]
@@ -22,6 +23,8 @@ public class TextureSnippetsView : MonoBehaviour {
     List<TextureSnippetItemView> listItems = new();
 
     void Start() {
+
+        universalUVMapper.main = main;
 
         Refresh();
 
@@ -55,13 +58,54 @@ public class TextureSnippetsView : MonoBehaviour {
 
     }
 
+    public void RequestSnippetEdit(TextureSnippetItemView snippetItem) {
+
+        universalUVMapper.gameObject.SetActive(true);
+        universalUVMapper.bmpID = snippetItem.textureSnippet.texturePaletteID;
+        universalUVMapper.uvs = snippetItem.textureSnippet.ConvertToUVs();
+        universalUVMapper.forceRect = true;
+        universalUVMapper.Refresh();
+
+        universalUVMapper.onFinishCallback = (uvs, bmpID) => {
+
+            var x = uvs.Min(uv => { return TextureCoordinate.GetXPixel(uv); });
+            var y = uvs.Min(uv => { return TextureCoordinate.GetYPixel(uv); });
+
+            var maxX = uvs.Max(uv => { return TextureCoordinate.GetXPixel(uv); });
+            var maxY = uvs.Max(uv => { return TextureCoordinate.GetYPixel(uv); });
+
+            snippetItem.textureSnippet.x = x;
+            snippetItem.textureSnippet.y = y;
+            snippetItem.textureSnippet.width = maxX - x;
+            snippetItem.textureSnippet.height = maxY - y;
+            snippetItem.textureSnippet.texturePaletteID = bmpID;
+
+            Refresh();
+            universalUVMapper.gameObject.SetActive(false);
+
+        };
+
+
+    }
+
     public void AddSnippet() {
 
-        
+        if (level.textureSnippets.Count == 0) {
+            level.AddTextureSnippet(20, 20, 20, 20, 0);
+
+        }
+        else {
+
+            var lastSnippet = level.textureSnippets.Last();
+
+            level.AddTextureSnippet(lastSnippet.x, lastSnippet.y, lastSnippet.width, lastSnippet.height, lastSnippet.texturePaletteID);
+
+        }
+
+
 
         Refresh();
 
-        listItems.Last().Rename();
 
     }
 

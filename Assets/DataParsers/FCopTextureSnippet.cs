@@ -93,6 +93,17 @@ namespace FCopParser {
             this.texturePaletteID = texturePaletteID;
         }
 
+        public List<int> ConvertToUVs() {
+
+            return new List<int> {
+                (y * 256) + x,
+                (y * 256) + x + width,
+                ((y + height) * 256) + x + width,
+                ((y + height) * 256) + x
+            };
+
+        }
+
         public List<byte> Compile() {
 
             return new List<byte> {
