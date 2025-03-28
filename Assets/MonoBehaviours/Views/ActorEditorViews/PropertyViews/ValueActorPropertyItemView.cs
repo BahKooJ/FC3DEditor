@@ -23,7 +23,15 @@ public class ValueActorPropertyItemView : ActorPropertyItemView {
 
     }
 
+    public void OnStartTyping() {
+
+        Main.ignoreAllInputs = true;
+
+    }
+
     public void OnFinishTyping() {
+
+        Main.ignoreAllInputs = false;
 
         ActorEditMode.AddActorPropertyCounterAction(property);
 

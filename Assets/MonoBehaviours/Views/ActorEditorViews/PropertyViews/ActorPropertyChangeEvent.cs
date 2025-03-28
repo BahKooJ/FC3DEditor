@@ -42,7 +42,94 @@ public class ActorPropertyChangeEvent {
             }
 
         } },
-    };
+        {"Rotation", controller => {
 
+            if (controller.selectedActorObject != null) {
+
+                var aObj = controller.actorObjectsByID[controller.selectedActor.DataID];
+
+                aObj.RefreshRotation();
+
+            }
+
+        } },
+        {"Rotation X", controller => {
+
+            if (controller.selectedActorObject != null) {
+
+                var aObj = controller.actorObjectsByID[controller.selectedActor.DataID];
+
+                aObj.RefreshRotation();
+
+            }
+
+        } },
+        {"Rotation Y", controller => {
+
+            if (controller.selectedActorObject != null) {
+
+                var aObj = controller.actorObjectsByID[controller.selectedActor.DataID];
+
+                aObj.RefreshRotation();
+
+            }
+
+        } },
+        {"Rotation Z", controller => {
+
+            if (controller.selectedActorObject != null) {
+
+                var aObj = controller.actorObjectsByID[controller.selectedActor.DataID];
+
+                aObj.RefreshRotation();
+
+            }
+
+        } },
+        {"Base Rotation", controller => {
+
+            if (controller.selectedActorObject != null) {
+
+                var aObj = controller.actorObjectsByID[controller.selectedActor.DataID];
+
+                aObj.RefreshRotation();
+
+            }
+
+        } },
+        {"Scale X", controller => {
+
+            if (controller.selectedActorObject != null) {
+
+                var aObj = controller.actorObjectsByID[controller.selectedActor.DataID];
+
+                aObj.RefreshRotation();
+
+            }
+
+        } },
+        {"Scale Y", controller => {
+
+            if (controller.selectedActorObject != null) {
+
+                var aObj = controller.actorObjectsByID[controller.selectedActor.DataID];
+
+                aObj.RefreshRotation();
+
+            }
+
+        } },
+        {"Scale Z", controller => {
+
+            if (controller.selectedActorObject != null) {
+
+                var aObj = controller.actorObjectsByID[controller.selectedActor.DataID];
+
+                aObj.RefreshRotation();
+
+            }
+
+        } },
+    };
 
 }

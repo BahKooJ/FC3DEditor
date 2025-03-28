@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace FCopParser {
 
@@ -454,8 +455,7 @@ namespace FCopParser {
     public class FCopActorBehavior {
 
         public int expectedRawFileSize;
-        public string[] assetRefNames;
-        public AssetType[] assetRefType;
+        public ActorAssetReference[] assetReferences;
 
         FCopActor actor;
         public List<byte> propertyData;
@@ -646,6 +646,89 @@ namespace FCopParser {
 
     }
 
+    public struct ActorAssetReference {
+
+        public string name;
+        public AssetType type;
+        public int dependantRefIndex;
+        public int positionIndex;
+
+        public ActorAssetReference(string name, AssetType type) : this() {
+            this.name = name;
+            this.type = type;
+            this.dependantRefIndex = -1;
+            this.positionIndex = -1;
+        }
+
+        public ActorAssetReference(string name, AssetType type, int dependantRefIndex, int positionIndex) : this(name, type) {
+            this.dependantRefIndex = dependantRefIndex;
+            this.positionIndex = positionIndex;
+        }
+
+    }
+
+    public interface FCopObjectMutating {
+
+        public ObjectMutation[] GetMutations();
+
+    }
+
+    public struct ObjectMutation {
+
+        public int refIndex;
+        public int uvOffset;
+        public float rotationX;
+        public float rotationY;
+        public float rotationZ;
+        public float scaleX;
+        public float scaleY;
+        public float scaleZ;
+
+        public ObjectMutation(int refIndex, int uvOffset, float rotationX, float rotationY, float rotationZ, float scaleX, float scaleY, float scaleZ) {
+            this.refIndex = refIndex;
+            this.uvOffset = uvOffset;
+            this.rotationX = rotationX;
+            this.rotationY = rotationY;
+            this.rotationZ = rotationZ;
+            this.scaleX = scaleX;
+            this.scaleY = scaleY;
+            this.scaleZ = scaleZ;
+        }
+
+        public ObjectMutation(int refIndex, int uvOffset) : this() {
+            this.refIndex = refIndex;
+            this.uvOffset = uvOffset;
+            this.rotationX = 0;
+            this.rotationY = 0;
+            this.rotationZ = 0;
+            this.scaleX = 1;
+            this.scaleY = 1;
+            this.scaleZ = 1;
+        }
+
+        public ObjectMutation(int refIndex, int uvOffset, float rotationY) : this(refIndex, uvOffset) {
+            this.rotationY = rotationY;
+        }
+
+        public ObjectMutation(int refIndex, int uvOffset, float rotationX, float rotationY, float rotationZ) : this(refIndex, uvOffset, rotationX) {
+            this.rotationY = rotationY;
+            this.rotationZ = rotationZ;
+        }
+
+    }
+
+    public interface FCopHeightOffsetting {
+
+        public void SetHeight(float height);
+
+        public float GetHeight();
+
+        public ActorProperty GetHeightProperty();
+
+        public ActorGroundCast GetGroundCast();
+
+    }
+
     public abstract class FCopEntity: FCopActorBehavior {
 
         public FCopEntity(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
@@ -798,8 +881,8 @@ namespace FCopParser {
                 new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8, "Turret Properties"),
                 new ValueActorProperty("unknown10", Read8(0), BitCount.Bit8, "Turret Properties"),
                 new ValueActorProperty("unknown11", Read16(0), BitCount.Bit16, "Turret Properties"),
-                new RotationActorProperty("Rotation", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { 0 }, "Turret Properties"),
-                new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16, "Turret Properties"),
+                new RangeActorProperty("Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16, "Turret Properties"),
+                new NormalizedValueProperty ("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
                 new ValueActorProperty("Turn Speed", Read16(0), BitCount.Bit16, "Turret Properties"),
                 new ValueActorProperty("unknown13", Read16(0), BitCount.Bit16, "Turret Properties"),
                 new ValueActorProperty("unknown14", Read16(0), BitCount.Bit16, "Turret Properties")
@@ -807,12 +890,12 @@ namespace FCopParser {
 
         }
 
-        public void SetHeight(int height) {
-            ((ValueActorProperty)propertiesByName["Height Offset"]).SafeSetSigned(height);
+        public void SetHeight(float height) {
+            ((NormalizedValueProperty)propertiesByName["Height Offset"]).Set(height);
         }
 
-        public int GetHeight() {
-            return propertiesByName["Height Offset"].GetCompiledValue();
+        public float GetHeight() {
+            return ((NormalizedValueProperty)propertiesByName["Height Offset"]).value;
         }
 
         public ActorProperty GetHeightProperty() {
@@ -823,9 +906,11 @@ namespace FCopParser {
             return (ActorGroundCast)((EnumDataActorProperty)propertiesByName["Ground Cast"]).caseValue;
         }
 
-        public virtual RotationActorProperty[] GetRotations() {
-            return new RotationActorProperty[] {
-                (RotationActorProperty)propertiesByName["Rotation"]
+        public virtual ObjectMutation[] GetMutations() {
+            return new ObjectMutation[] {
+
+                new ObjectMutation(0, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value)
+
             };
         }
 
@@ -883,33 +968,13 @@ namespace FCopParser {
 
     }
 
-    public interface FCopObjectMutating {
-
-        public RotationActorProperty[] GetRotations();
-
-    }
-
-    public interface FCopHeightOffsetting {
-
-        public int heightMultiplier { get; set; }
-
-        public void SetHeight(int height);
-
-        public int GetHeight();
-
-        public ActorProperty GetHeightProperty();
-
-        public ActorGroundCast GetGroundCast();
-
-    }
-
     // - Parsed -
     public class FCopBehavior1 : FCopEntity, FCopObjectMutating {
 
         public FCopBehavior1(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            // FIXME: for some odd reason players facing can be negative. Allow the property to be negative
-            properties.Add(new RotationActorProperty("Rotation", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { 0, 2, 3, 4, 5 }));
+            properties.Add(new RangeActorProperty("Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16));
+
 
             // Implies ground cast but Future Cop won't react except with 0x01 which will crash. Leaving at default 0xFF
             properties.Add(new FillerActorProperty(Read8(0), BitCount.Bit8));
@@ -918,8 +983,20 @@ namespace FCopParser {
             InitPropertiesByName();
         }
 
-        public RotationActorProperty[] GetRotations() {
-            return new RotationActorProperty[] { (RotationActorProperty)propertiesByName["Rotation"] };
+
+
+        public ObjectMutation[] GetMutations() {
+
+            return new ObjectMutation[] {
+
+                new ObjectMutation(0, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value),
+                new ObjectMutation(2, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value),
+                new ObjectMutation(3, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value),
+                new ObjectMutation(4, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value),
+                new ObjectMutation(5, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value)
+
+            };
+
         }
 
     }
@@ -954,8 +1031,10 @@ namespace FCopParser {
 
         public FCopBehavior6(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            assetRefNames = new string[] { "Object", "Destroyed Object" };
-            assetRefType = new AssetType[] { AssetType.Object, AssetType.Object };
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("Object", AssetType.Object),
+                new ActorAssetReference("Destroyed Object", AssetType.Object)
+            };
 
             properties.AddRange(new List<ActorProperty>() {
                 new FillerActorProperty(Read16(0), BitCount.Bit16)
@@ -972,25 +1051,33 @@ namespace FCopParser {
 
         public FCopBehavior8(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            assetRefNames = new string[] { "Head Object", "Object", "Base Object", "Destroyed Object" };
-            assetRefType = new AssetType[] { AssetType.Object, AssetType.Object, AssetType.Object, AssetType.Object };
+            assetReferences = new ActorAssetReference[] { 
+                new ActorAssetReference("Head Object", AssetType.Object, 2, 0),
+                new ActorAssetReference("Object", AssetType.Object),
+                new ActorAssetReference("Base Object", AssetType.Object),
+                new ActorAssetReference("Destroyed Object", AssetType.Object),
+            };
 
             properties.AddRange(new List<ActorProperty>() {
                 //new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new ValueActorProperty("8unknownFill", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("8unknown0", Read16(0), BitCount.Bit16),
-                new RotationActorProperty("Base Rotation", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { 2 })
+                new RangeActorProperty("Base Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16)
             });
 
             InitPropertiesByName();
 
         }
 
-        override public RotationActorProperty[] GetRotations() {
-            return new RotationActorProperty[] { 
-                (RotationActorProperty)propertiesByName["Rotation"], 
-                (RotationActorProperty)propertiesByName["Base Rotation"] 
+        public override ObjectMutation[] GetMutations() {
+
+            return new ObjectMutation[] {
+
+                new ObjectMutation(0, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value),
+                new ObjectMutation(2, GetUVOffset(), ((RangeActorProperty)propertiesByName["Base Rotation"]).value)
+
             };
+
         }
 
     }
@@ -1034,19 +1121,17 @@ namespace FCopParser {
         public const int assetRefCount = 2;
         public const int blocks = 20;
 
-        public int heightMultiplier { get; set; }
-
         public FCopBehavior10(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            heightMultiplier = 8192;
-
-            assetRefNames = new string[] { "Object", "Destroyed Object" };
-            assetRefType = new AssetType[] { AssetType.Object, AssetType.Object };
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("Object", AssetType.Object),
+                new ActorAssetReference("Destroyed Object", AssetType.Object)
+            };
 
             properties.AddRange(new List<ActorProperty>() {
                 new EnumDataActorProperty("Number Of Stops", (ElevatorStops)Read8(2), BitCount.Bit8),
                 new EnumDataActorProperty("Starting Position", (ElevatorStartingPoint)Read8(2), BitCount.Bit8),
-                new ValueActorProperty("1st Height Offset", Read16(0), BitCount.Bit16),
+                new NormalizedValueProperty("1st Height Offset", Read16(0), short.MinValue, short.MaxValue, 8192f, BitCount.Bit16),
                 new ValueActorProperty("2nt Height Offset", Read16(600), BitCount.Bit16),
                 new ValueActorProperty("3rd Height Offset", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("1st Stop Time", Read16(0), BitCount.Bit16),
@@ -1054,7 +1139,7 @@ namespace FCopParser {
                 new ValueActorProperty("3rd Stop Time", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("Up Speed", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("Down Speed", Read16(0), BitCount.Bit16),
-                new RotationActorProperty("Rotation", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { 0 }),
+                new RangeActorProperty("Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16),
                 new EnumDataActorProperty("Trigger Type", (ElevatorTrigger)Read8(0), BitCount.Bit8),
                 new EnumDataActorProperty("Tile Effect", (TileEffectType)Read8(0), BitCount.Bit8),
                 new ValueActorProperty("End Sound", Read16(0), BitCount.Bit16),
@@ -1065,12 +1150,12 @@ namespace FCopParser {
 
         }
 
-        public void SetHeight(int height) {
-            ((ValueActorProperty)propertiesByName["1st Height Offset"]).SafeSetSigned(height);
+        public void SetHeight(float height) {
+            ((NormalizedValueProperty)propertiesByName["1st Height Offset"]).Set(height);
         }
 
-        public int GetHeight() {
-            return propertiesByName["1st Height Offset"].GetCompiledValue();
+        public float GetHeight() {
+            return ((NormalizedValueProperty)propertiesByName["1st Height Offset"]).value;
         }
 
         public ActorProperty GetHeightProperty() {
@@ -1081,8 +1166,14 @@ namespace FCopParser {
             return ActorGroundCast.Highest;
         }
 
-        public RotationActorProperty[] GetRotations() {
-            return new RotationActorProperty[] { (RotationActorProperty)propertiesByName["Rotation"] };
+        public ObjectMutation[] GetMutations() {
+
+            return new ObjectMutation[] {
+
+                new ObjectMutation(0, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value)
+
+            };
+
         }
 
     }
@@ -1099,13 +1190,15 @@ namespace FCopParser {
 
             heightMultiplier = 8192;
 
-            assetRefNames = new string[] { "Object", "Destroyed Object" };
-            assetRefType = new AssetType[] { AssetType.Object, AssetType.Object };
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("Object", AssetType.Object),
+                new ActorAssetReference("Destroyed Object", AssetType.Object)
+            };
 
             properties.AddRange(new List<ActorProperty>() {
                 new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read16(0), BitCount.Bit16),
-                new RotationActorProperty("Rotation", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { 0, 1 }),
-                new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
+                new RangeActorProperty("Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16),
+                new NormalizedValueProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, 8192f, BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16)
             });
 
@@ -1113,12 +1206,12 @@ namespace FCopParser {
 
         }
 
-        public void SetHeight(int height) {
-            ((ValueActorProperty)propertiesByName["Height Offset"]).SafeSetSigned(height);
+        public void SetHeight(float height) {
+            ((NormalizedValueProperty)propertiesByName["Height Offset"]).Set(height);
         }
 
-        public int GetHeight() {
-            return propertiesByName["Height Offset"].GetCompiledValue();
+        public float GetHeight() {
+            return ((NormalizedValueProperty)propertiesByName["Height Offset"]).value;
         }
 
         public ActorProperty GetHeightProperty() {
@@ -1129,8 +1222,16 @@ namespace FCopParser {
             return (ActorGroundCast)((EnumDataActorProperty)propertiesByName["Ground Cast"]).caseValue;
         }
 
-        public RotationActorProperty[] GetRotations() {
-            return new RotationActorProperty[] { (RotationActorProperty)propertiesByName["Rotation"] };
+        public ObjectMutation[] GetMutations() {
+
+            return new ObjectMutation[] {
+
+                new ObjectMutation(0, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value),
+                new ObjectMutation(1, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value)
+
+
+            };
+
         }
 
     }
@@ -1145,15 +1246,15 @@ namespace FCopParser {
 
         public FCopBehavior12(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            heightMultiplier = 512;
-
-            assetRefNames = new string[] { "Object", "Destroyed Object" };
-            assetRefType = new AssetType[] { AssetType.Object, AssetType.Object };
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("Object", AssetType.Object),
+                new ActorAssetReference("Destroyed Object", AssetType.Object)
+            };
 
             properties.AddRange(new List<ActorProperty>() {
-                new RotationActorProperty("Rotation Y", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { 0 }),
-                new RotationActorProperty("Rotation X", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.X, new int[] { 0 }),
-                new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
+                new RangeActorProperty("Rotation Y", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16),
+                new RangeActorProperty("Rotation X", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16),
+                new NormalizedValueProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
                 new EnumDataActorProperty("Tile Effect", (TileEffectType)Read8(0), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8)
             });
@@ -1162,12 +1263,12 @@ namespace FCopParser {
 
         }
 
-        public void SetHeight(int height) {
-            ((ValueActorProperty)propertiesByName["Height Offset"]).SafeSetSigned(height);
+        public void SetHeight(float height) {
+            ((NormalizedValueProperty)propertiesByName["Height Offset"]).Set(height);
         }
 
-        public int GetHeight() {
-            return propertiesByName["Height Offset"].GetCompiledValue();
+        public float GetHeight() {
+            return ((NormalizedValueProperty)propertiesByName["Height Offset"]).value;
         }
 
         public ActorProperty GetHeightProperty() {
@@ -1178,11 +1279,14 @@ namespace FCopParser {
             return ActorGroundCast.Highest;
         }
 
-        public RotationActorProperty[] GetRotations() {
-            return new RotationActorProperty[] { 
-                (RotationActorProperty)propertiesByName["Rotation Y"],
-                (RotationActorProperty)propertiesByName["Rotation X"],
+        public ObjectMutation[] GetMutations() {
+
+            return new ObjectMutation[] {
+
+                new ObjectMutation(0, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation X"]).value, ((RangeActorProperty)propertiesByName["Rotation Y"]).value, 0),
+
             };
+
         }
 
     }
@@ -1222,8 +1326,10 @@ namespace FCopParser {
 
         public FCopBehavior16(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            assetRefNames = new string[] { "Object", "Unused",};
-            assetRefType = new AssetType[] { AssetType.Object, AssetType.None };
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("Object", AssetType.Object),
+                new ActorAssetReference("None", AssetType.None)
+            };
 
             properties.AddRange(new List<ActorProperty>() {
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
@@ -1318,10 +1424,10 @@ namespace FCopParser {
 
         public FCopBehavior25(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            heightMultiplier = 512;
-
-            assetRefNames = new string[] { "Object", "Destroyed Object" };
-            assetRefType = new AssetType[] { AssetType.Object, AssetType.Object };
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("Object", AssetType.Object),
+                new ActorAssetReference("Destroyed Object", AssetType.Object)
+            };
 
             properties.Add(new EnumDataActorProperty("Move Axis", (MoveablePropMoveAxis)Read8(0), BitCount.Bit8));
 
@@ -1344,10 +1450,10 @@ namespace FCopParser {
 
                 new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8),
                 new ValueActorProperty("Start Sound", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
-                new RotationActorProperty("Rotation", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { 0, 1 }),
+                new NormalizedValueProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
+                new RangeActorProperty("Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16),
                 new ValueActorProperty("Ending Position Offset", Read16(0), BitCount.Bit16),
-                new RotationActorProperty("Ending Rotation Offset", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { }),
+                new RangeActorProperty("Ending Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16),
                 new ValueActorProperty("Position Speed", Read16(0), BitCount.Bit16),
                 new ValueActorProperty("Rotation Speed", Read16(0), BitCount.Bit16),
 
@@ -1357,12 +1463,12 @@ namespace FCopParser {
 
         }
 
-        public void SetHeight(int height) {
-            ((ValueActorProperty)propertiesByName["Height Offset"]).SafeSetSigned(height);
+        public void SetHeight(float height) {
+            ((NormalizedValueProperty)propertiesByName["Height Offset"]).Set(height);
         }
 
-        public int GetHeight() {
-            return propertiesByName["Height Offset"].GetCompiledValue();
+        public float GetHeight() {
+            return ((NormalizedValueProperty)propertiesByName["Height Offset"]).value;
         }
 
         public ActorProperty GetHeightProperty() {
@@ -1373,8 +1479,16 @@ namespace FCopParser {
             return (ActorGroundCast)((EnumDataActorProperty)propertiesByName["Ground Cast"]).caseValue;
         }
 
-        public RotationActorProperty[] GetRotations() {
-            return new RotationActorProperty[] { (RotationActorProperty)propertiesByName["Rotation"] };
+        public ObjectMutation[] GetMutations() {
+
+            return new ObjectMutation[] {
+
+                new ObjectMutation(0, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value),
+                new ObjectMutation(1, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value)
+
+
+            };
+
         }
 
     }
@@ -1887,42 +2001,40 @@ namespace FCopParser {
     public class FCopBehavior96 : FCopActorBehavior, FCopObjectMutating, FCopHeightOffsetting {
 
         public const int assetRefCount = 1;
-        public int heightMultiplier { get; set; }
 
         public FCopBehavior96(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            assetRefNames = new string[] { "Object" };
-            assetRefType = new AssetType[] { AssetType.Object };
-
-            heightMultiplier = 512;
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("Object", AssetType.Object)
+            };
 
             properties = new() {
 
-                new RotationActorProperty("Rotation Y", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Y, new int[] { 0 }),
-                new RotationActorProperty("Rotation Z", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.Z, new int[] { 0 }),
-                new RotationActorProperty("Rotation X", new ActorRotation().SetRotationCompiled(Read16(0)), BitCount.Bit16, Axis.X, new int[] { 0 }),
-                new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
+                new RangeActorProperty("Rotation Y", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16),
+                new RangeActorProperty("Rotation Z", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16),
+                new RangeActorProperty("Rotation X", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16),
+                new NormalizedValueProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
                 new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8),
                 new ValueActorProperty("Unknown Tags", Read8(0), BitCount.Bit8),
                 new ValueActorProperty("Animation Speed", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Scale X", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Scale Y", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Scale Z", Read8(0), BitCount.Bit8),
+                new RangeActorProperty("Scale X", Read8(0), 0, 127, 64f, BitCount.Bit8),
+                new RangeActorProperty("Scale Y", Read8(0), 0, 127, 64f, BitCount.Bit8),
+                new RangeActorProperty("Scale Z", Read8(0), 0, 127, 64f, BitCount.Bit8),
                 new ValueActorProperty("Spin Speed", Read8(0), BitCount.Bit8),
                 new ValueActorProperty("Spin Angle", Read8(0), BitCount.Bit8)
 
             };
 
-            InitPropertiesByName();
+             InitPropertiesByName();
 
         }
 
-        public void SetHeight(int height) {
-            ((ValueActorProperty)propertiesByName["Height Offset"]).SafeSetSigned(height);
+        public void SetHeight(float height) {
+            ((NormalizedValueProperty)propertiesByName["Height Offset"]).Set(height);
         }
 
-        public int GetHeight() {
-            return propertiesByName["Height Offset"].GetCompiledValue();
+        public float GetHeight() {
+            return ((NormalizedValueProperty)propertiesByName["Height Offset"]).value;
         }
 
         public ActorProperty GetHeightProperty() {
@@ -1933,12 +2045,20 @@ namespace FCopParser {
             return (ActorGroundCast)((EnumDataActorProperty)propertiesByName["Ground Cast"]).caseValue;
         }
 
-        public RotationActorProperty[] GetRotations() {
-            return new RotationActorProperty[] { 
-                (RotationActorProperty)propertiesByName["Rotation Y"],
-                (RotationActorProperty)propertiesByName["Rotation Z"],
-                (RotationActorProperty)propertiesByName["Rotation X"]
+        public ObjectMutation[] GetMutations() {
+
+            return new ObjectMutation[] {
+
+                new ObjectMutation(0, 0, 
+                ((RangeActorProperty)propertiesByName["Rotation X"]).value, 
+                ((RangeActorProperty)propertiesByName["Rotation Y"]).value,
+                ((RangeActorProperty)propertiesByName["Rotation Z"]).value,
+                ((RangeActorProperty)propertiesByName["Scale X"]).value,
+                ((RangeActorProperty)propertiesByName["Scale Y"]).value,
+                ((RangeActorProperty)propertiesByName["Scale Z"]).value)
+
             };
+
         }
 
     }

@@ -347,6 +347,12 @@ namespace FCopParser {
 
         }
 
+        public Vertex GetPosition(int index) {
+
+            return firstElementGroup.vertices[positions[index]];
+
+        }
+
         public void SetTexturePalette(int index) {
 
             foreach (var i in Enumerable.Range(0, surfaces.Count)) {

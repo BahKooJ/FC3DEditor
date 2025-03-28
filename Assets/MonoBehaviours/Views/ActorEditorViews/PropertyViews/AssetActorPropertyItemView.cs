@@ -4,12 +4,19 @@ using TMPro;
 using FCopParser;
 using System.Linq;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class AssetActorPropertyItemView : ActorPropertyItemView {
+
+    // - Asset Refs =
+    public Sprite actorIconSprite;
+    public Sprite textureSnippetIconSprite;
+    public Sprite teamIconSprite;
 
     // - Unity Refs -
     public TMP_Text nameText;
     public TMP_Text assetNameText;
+    public Image assetIcon;
 
     public AssetActorProperty assetProperty;
 
@@ -18,6 +25,7 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
         assetProperty = (AssetActorProperty)property;
 
         Refresh();
+
 
     }
 
@@ -52,9 +60,11 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
                 break;
             case AssetType.Actor:
                 assetNameText.text = controller.main.level.sceneActors.actorsByID[assetProperty.assetID].name;
+                assetIcon.sprite = actorIconSprite;
                 break;
             case AssetType.Team:
                 assetNameText.text = controller.main.level.sceneActors.teams[assetProperty.assetID];
+                assetIcon.sprite = teamIconSprite;
                 break;
             case AssetType.TextureSnippet:
 
@@ -64,6 +74,8 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
                 catch {
                     assetNameText.text = "Missing";
                 }
+
+                assetIcon.sprite = textureSnippetIconSprite;
 
                 break;
             case AssetType.None:

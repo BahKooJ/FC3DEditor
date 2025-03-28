@@ -60,23 +60,23 @@ public class ActorAssetReferencesItemView : MonoBehaviour {
 
         }
 
-        if (fcopActor.behavior?.assetRefNames == null) {
+        if (fcopActor.behavior?.assetReferences == null) {
             resourceName.text = "Resource " + refIndex + ":";
         }
         else {
-            resourceName.text = fcopActor.behavior.assetRefNames[refIndex] + ":";
+            resourceName.text = fcopActor.behavior.assetReferences[refIndex].name + ":";
         }
 
     }
 
     public void OnClick() {
 
-        if (fcopActor.behavior?.assetRefType == null) {
+        if (fcopActor.behavior?.assetReferences == null) {
             return;
         }
 
         var resourceRef = fcopActor.resourceReferences[refIndex];
-        var type = fcopActor.behavior.assetRefType[refIndex];
+        var type = fcopActor.behavior.assetReferences[refIndex].type;
 
         switch (type) {
 

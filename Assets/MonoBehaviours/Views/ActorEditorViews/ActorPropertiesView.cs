@@ -10,7 +10,7 @@ public class ActorPropertiesView : MonoBehaviour {
     //Prefabs
     public GameObject valueActorPropertyItem;
     public GameObject toggleActorPropertyItem;
-    public GameObject rotationActorPropertyItem;
+    public GameObject rangeActorPropertyItem;
     public GameObject enumDataActorPropertyItem;
     public GameObject actorScriptCallItem;
     public GameObject actorAssetRefItem;
@@ -18,6 +18,7 @@ public class ActorPropertiesView : MonoBehaviour {
     public GameObject overloadActorPropertyItem;
     public GameObject spawningPropertiesItem;
     public GameObject assetActorPropertyItem;
+    public GameObject normalizedValueActorPorpertyItem;
 
     //View refs
     public Transform propertiesContent;
@@ -32,6 +33,9 @@ public class ActorPropertiesView : MonoBehaviour {
     public List<GroupActorPropertyItemView> initedGroups = new();
 
     public ActorEditMode controller;
+
+    [HideInInspector]
+    public HashSet<string> openedGroups = new();
 
     void Start() {
 
@@ -53,8 +57,8 @@ public class ActorPropertiesView : MonoBehaviour {
             case ToggleActorProperty:
                 obj = Instantiate(toggleActorPropertyItem);
                 break;
-            case RotationActorProperty:
-                obj = Instantiate(rotationActorPropertyItem);
+            case RangeActorProperty:
+                obj = Instantiate(rangeActorPropertyItem);
                 break;
             case EnumDataActorProperty:
                 obj = Instantiate(enumDataActorPropertyItem);
@@ -64,6 +68,9 @@ public class ActorPropertiesView : MonoBehaviour {
                 break;
             case OverloadedProperty:
                 obj = Instantiate(overloadActorPropertyItem);
+                break;
+            case NormalizedValueProperty:
+                obj = Instantiate(normalizedValueActorPorpertyItem);
                 break;
         }
 

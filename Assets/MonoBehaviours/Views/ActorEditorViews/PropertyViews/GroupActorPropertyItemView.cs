@@ -28,6 +28,10 @@ public class GroupActorPropertyItemView : MonoBehaviour {
         
         nameText.text = commonName;
 
+        if (view.openedGroups.Contains(commonName)) {
+            OnClick();
+        }
+
     }
 
     public void OnClick() {
@@ -41,6 +45,8 @@ public class GroupActorPropertyItemView : MonoBehaviour {
             initedProperties.Clear();
 
             dropdownIcon.transform.localEulerAngles = new Vector3(0f, 0f, -90f);
+
+            view.openedGroups.Remove(commonName);
 
         }
         else {
@@ -59,6 +65,8 @@ public class GroupActorPropertyItemView : MonoBehaviour {
             }
 
             dropdownIcon.transform.localEulerAngles = new Vector3(0f, 0f, 0f);
+
+            view.openedGroups.Add(commonName);
 
         }
 

@@ -61,7 +61,7 @@ public class ActorObject : MonoBehaviour {
 
             if (actor.behavior is FCopHeightOffsetting heightOffseting) {
                 // Height offset is relative to ground cast
-                heightOffseting.SetHeight(Mathf.RoundToInt(pos.y * heightOffseting.heightMultiplier) - Mathf.RoundToInt(GroundCast() * heightOffseting.heightMultiplier));
+                heightOffseting.SetHeight(pos.y - GroundCast());
                 controller.view.activeActorPropertiesView.RequestPropertyRefresh(heightOffseting.GetHeightProperty());
             }
 
@@ -77,7 +77,7 @@ public class ActorObject : MonoBehaviour {
             return;
         }
 
-        SetRotation();
+        SetObjectMutations();
 
     }
 
@@ -159,15 +159,32 @@ public class ActorObject : MonoBehaviour {
 
         }
 
-        if (actor.behavior is FCopBehavior36 || actor.behavior is FCopBehavior8) {
+        if (actor.behavior.assetReferences != null) {
 
-            var headPos = objects[0].transform.localPosition;
-            headPos.y = objects[2].maxY;
-            objects[0].transform.localPosition = headPos;
+            var ari = 0;
+            foreach (var assetRef in actor.behavior.assetReferences) {
+
+                if (assetRef.dependantRefIndex != -1 && assetRef.type == AssetType.Object) {
+
+                    var obj = objects[ari];
+
+                    var dependantObj = objects[assetRef.dependantRefIndex];
+
+                    if (assetRef.positionIndex != -1) {
+
+                        var fCopVert = dependantObj.fCopObject.GetPosition(assetRef.positionIndex);
+                        var pos = new Vector3(fCopVert.x / ObjectMesh.scale, fCopVert.y / ObjectMesh.scale, fCopVert.z / ObjectMesh.scale);
+
+                        obj.transform.localPosition = pos;
+
+                    }
+                }
+                ari++;
+            }
 
         }
 
-        SetRotation();
+        SetObjectMutations();
 
     }
 
@@ -231,14 +248,14 @@ public class ActorObject : MonoBehaviour {
         var pos = new Vector3(actor.x / 8192f, GroundCast(), -(actor.y / 8192f));
 
         if (actor.behavior is FCopHeightOffsetting offset) {
-            pos.y += offset.GetHeight() / (float)offset.heightMultiplier;
+            pos.y += offset.GetHeight();
         }
 
         transform.position = pos;
 
     }
 
-    void SetRotation() {
+    void SetObjectMutations() {
 
         foreach (var obj in objects) {
 
@@ -250,33 +267,27 @@ public class ActorObject : MonoBehaviour {
 
         if (actor.behavior is FCopObjectMutating objectMutating) {
 
-            var rotations = objectMutating.GetRotations();
+            foreach (var mutation in objectMutating.GetMutations()) {
 
-            foreach (var rot in rotations) {
+                var potentialObject = objects[mutation.refIndex];
 
-                foreach (var i in rot.affectedRefIndexes) {
+                if (potentialObject != null) {
 
-                    var potentialObject = objects[i];
+                    var objRot = potentialObject.transform.localRotation.eulerAngles;
 
-                    if (potentialObject != null) {
+                    objRot.x = -mutation.rotationX;
+                    objRot.y = mutation.rotationY;
+                    objRot.z = -mutation.rotationZ;
 
-                        var objRot = potentialObject.transform.localRotation.eulerAngles;
+                    potentialObject.transform.localRotation = Quaternion.Euler(objRot);
 
-                        switch (rot.axis) {
-                            case Axis.X:
-                                objRot.x = -rot.value.parsedRotation;
-                                break;
-                            case Axis.Y:
-                                objRot.y = rot.value.parsedRotation;
-                                break;
-                            case Axis.Z:
-                                objRot.z = -rot.value.parsedRotation;
-                                break;
-                        }
+                    var objScale = potentialObject.transform.localScale;
 
-                        potentialObject.transform.localRotation = Quaternion.Euler(objRot);
+                    objScale.x = -mutation.scaleX;
+                    objScale.y = mutation.scaleY;
+                    objScale.z = -mutation.scaleZ;
 
-                    }
+                    potentialObject.transform.localScale = objScale;
 
                 }
 

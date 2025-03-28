@@ -97,26 +97,48 @@ namespace FCopParser {
 
     }
 
-    public class IDReferenceActorProperty : ActorProperty {
+    public class NormalizedValueProperty : ActorProperty {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
         public string dictatesOverload { get; set; }
 
+        public float min;
+        public float max;
+        public float multiplier;
+        public float value;
+
         public int GetCompiledValue() {
-            return value;
+            return (int)(value * multiplier);
         }
 
-        public int value;
+        public void Set(float value) {
 
-        public IDReferenceActorProperty(string name, int value) {
+            if (value > max) {
+                max = value;
+            }
+            else if (value < min) {
+                min = value;
+            }
+            else {
+                this.value = value;
+            }
+
+        }
+
+        public NormalizedValueProperty(string name, int value, int min, int max, float multiplier, BitCount bitCount) {
             this.name = name;
-            this.value = value;
+            this.value = value / multiplier;
+            this.min = min / multiplier;
+            this.max = max / multiplier;
+            this.multiplier = multiplier;
+            this.bitCount = bitCount;
             this.commonName = "";
-
         }
 
-
+        public NormalizedValueProperty(string name, int value, int min, int max, float multiplier, BitCount bitCount, string commonName): this(name, value, min, max, multiplier, bitCount) {
+            this.commonName = commonName;
+        }
 
     }
 
@@ -157,53 +179,40 @@ namespace FCopParser {
         public string commonName { get; set; }
         public string dictatesOverload { get; set; }
 
-        public int GetCompiledValue() {
-            return value;
-        }
-
-        public int value;
-
-        public int max;
-        public int min;
-
-        public RangeActorProperty(string name, int value, int max, int min) {
-            this.name = name;
-            this.value = value;
-            this.max = max;
-            this.min = min;
-            this.commonName = "";
-
-        }
-
-
-
-    }
-
-    public class RotationActorProperty : ActorProperty {
-        public string name { get; set; }
-        public BitCount bitCount { get; set; }
-        public string commonName { get; set; }
-        public string dictatesOverload { get; set; }
-
-        public int[] affectedRefIndexes;
-        public ActorRotation value;
-        public Axis axis;
+        public float min;
+        public float max;
+        public float multiplier;
+        public float value;
 
         public int GetCompiledValue() {
-            return value.compiledRotation;
+            return (int)(value * multiplier);
         }
 
-        public RotationActorProperty(string name, ActorRotation value, BitCount bitCount, Axis axis, int[] affectedRefIndexes) {
+        public void Set(float value) {
+
+            if (value > max) {
+                max = value;
+            }
+            else if (value < min) {
+                min = value;
+            }
+            else {
+                this.value = value;
+            }
+
+        }
+
+        public RangeActorProperty(string name, int value, int min, int max, float multiplier, BitCount bitCount) {
             this.name = name;
-            this.value = value;
+            this.value = value / multiplier;
+            this.min = min / multiplier;
+            this.max = max / multiplier;
+            this.multiplier = multiplier;
             this.bitCount = bitCount;
-            this.axis = axis;
-            this.affectedRefIndexes = affectedRefIndexes;
             this.commonName = "";
-
         }
 
-        public RotationActorProperty(string name, ActorRotation value, BitCount bitCount, Axis axis, int[] affectedRefIndexes, string commonName) : this(name, value, bitCount, axis, affectedRefIndexes) {
+        public RangeActorProperty(string name, int value, int min, int max, float multiplier, BitCount bitCount, string commonName) : this(name, value, min, max, multiplier, bitCount) {
             this.commonName = commonName;
         }
 

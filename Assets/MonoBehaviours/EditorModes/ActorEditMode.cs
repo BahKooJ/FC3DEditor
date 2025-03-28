@@ -883,11 +883,7 @@ public class ActorEditMode : EditMode {
                     var enumProp = (EnumDataActorProperty)property;
                     enumProp.caseValue = (Enum)Enum.ToObject(enumProp.caseValue.GetType(), value);
                     break;
-                case RotationActorProperty:
-                    var rotationProp = (RotationActorProperty)property;
-                    rotationProp.value.SetRotationCompiled(value);
-                    editMode.actorObjectsByID[editMode.selectedActor.DataID].RefreshRotation();
-                    break;
+
             }
 
 
@@ -989,10 +985,7 @@ public class ActorEditMode : EditMode {
                 var enumProp = (EnumDataActorProperty)property;
                 Main.AddCounterAction(new ActorPropertyCounterAction(enumProp, Convert.ToInt32(enumProp.caseValue)));
                 break;
-            case RotationActorProperty:
-                var rotationProp = (RotationActorProperty)property;
-                Main.AddCounterAction(new ActorPropertyCounterAction(rotationProp, rotationProp.value.compiledRotation));
-                break;
+
 
         }
 
