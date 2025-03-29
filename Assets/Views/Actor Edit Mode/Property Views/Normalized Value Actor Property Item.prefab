@@ -242,7 +242,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e15972b3831d1d4984425e94c55863c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  backgroundImage: {fileID: 8391581157960298882}
   view: {fileID: 0}
+  defaultColor: {r: 0.13333334, g: 0.13333334, b: 0.13333334, a: 1}
   nameText: {fileID: 2027988190790879124}
   valueField: {fileID: 2538293424116175811}
 --- !u!1 &5046199430847248829

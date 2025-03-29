@@ -2,11 +2,32 @@
 
 using System;
 using System.Collections.Generic;
+using FCopParser;
 
 public class ActorPropertyChangeEvent {
 
-    public static Dictionary<string, Action<ActorEditMode>> changeEventsByPropertyName = new() {
-        {"Height Offset", controller => { 
+    static void RefreshActorEditPosition(ActorEditMode controller, ActorProperty prop) {
+
+        foreach (var node in controller.actorEditingNodes) {
+
+            if (node.controlledProperties.Contains(prop)) {
+
+                node.SetToPosition();
+
+                if (controller.selectedActorEditingNode != null) {
+                    controller.selectedActorEditingNode.RefreshPosition();
+                }
+
+                break;
+
+            }
+
+        }
+
+    }
+
+    public static Dictionary<string, Action<ActorEditMode, ActorProperty>> changeEventsByPropertyName = new() {
+        {"Height Offset", (controller, prop) => { 
             
             if (controller.selectedActorObject != null) {
 
@@ -18,7 +39,7 @@ public class ActorPropertyChangeEvent {
             }
 
         } },
-        {"1st Height Offset", controller => {
+        {"1st Height Offset", (controller, prop) => {
 
             if (controller.selectedActorObject != null) {
 
@@ -30,7 +51,7 @@ public class ActorPropertyChangeEvent {
             }
 
         } },
-        {"Ground Cast", controller => {
+        {"Ground Cast", (controller, prop) => {
 
             if (controller.selectedActorObject != null) {
 
@@ -42,7 +63,7 @@ public class ActorPropertyChangeEvent {
             }
 
         } },
-        {"Rotation", controller => {
+        {"Rotation", (controller, prop) => {
 
             if (controller.selectedActorObject != null) {
 
@@ -53,7 +74,7 @@ public class ActorPropertyChangeEvent {
             }
 
         } },
-        {"Rotation X", controller => {
+        {"Rotation X", (controller, prop) => {
 
             if (controller.selectedActorObject != null) {
 
@@ -64,7 +85,7 @@ public class ActorPropertyChangeEvent {
             }
 
         } },
-        {"Rotation Y", controller => {
+        {"Rotation Y", (controller, prop) => {
 
             if (controller.selectedActorObject != null) {
 
@@ -75,7 +96,7 @@ public class ActorPropertyChangeEvent {
             }
 
         } },
-        {"Rotation Z", controller => {
+        {"Rotation Z", (controller, prop) => {
 
             if (controller.selectedActorObject != null) {
 
@@ -86,7 +107,7 @@ public class ActorPropertyChangeEvent {
             }
 
         } },
-        {"Base Rotation", controller => {
+        {"Base Rotation", (controller, prop) => {
 
             if (controller.selectedActorObject != null) {
 
@@ -97,7 +118,7 @@ public class ActorPropertyChangeEvent {
             }
 
         } },
-        {"Scale X", controller => {
+        {"Scale X", (controller, prop) => {
 
             if (controller.selectedActorObject != null) {
 
@@ -108,7 +129,7 @@ public class ActorPropertyChangeEvent {
             }
 
         } },
-        {"Scale Y", controller => {
+        {"Scale Y", (controller, prop) => {
 
             if (controller.selectedActorObject != null) {
 
@@ -119,7 +140,7 @@ public class ActorPropertyChangeEvent {
             }
 
         } },
-        {"Scale Z", controller => {
+        {"Scale Z", (controller, prop) => {
 
             if (controller.selectedActorObject != null) {
 
@@ -130,6 +151,88 @@ public class ActorPropertyChangeEvent {
             }
 
         } },
+        #region MapNodes
+        {"Node 1 X", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        {"Node 1 Y", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        {"Node 2 X", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        {"Node 2 Y", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        {"Node 3 X", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        {"Node 3 Y", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        {"Node 4 X", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        {"Node 4 Y", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        {"Node 5 X", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        {"Node 5 Y", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        {"Node 6 X", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        {"Node 6 Y", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        {"Node 7 X", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        {"Node 7 Y", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        {"Node 8 X", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        {"Node 8 Y", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        #endregion
     };
 
 }

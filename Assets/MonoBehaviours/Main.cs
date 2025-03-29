@@ -89,9 +89,11 @@ public class Main : MonoBehaviour {
     public GameObject schematicMesh;
 
     public GameObject BlankActor;
+    public GameObject MapObjectiveNodesActor;
     public GameObject ObjectMesh;
     public GameObject actorGroupObjectFab;
     public GameObject ArrowModelFab;
+    // Editing Nodes
     public GameObject MapNodeFab;
 
     public GameObject playerCamera;

@@ -14,6 +14,7 @@ public class ActorObject : MonoBehaviour {
     public Collider actCollider;
     public TextFieldPopupHandler renameTextFeild;
     public GameObject placeholderObject;
+    public float yPadding = 0f;
 
     // - Parameters -
     public ActorEditMode controller;
@@ -226,7 +227,7 @@ public class ActorObject : MonoBehaviour {
 
     public void SetToCurrentPosition() {
 
-        var pos = new Vector3(actor.x / 8192f, GroundCast(), -(actor.y / 8192f));
+        var pos = new Vector3(actor.x / 8192f, GroundCast() + yPadding, -(actor.y / 8192f));
 
         if (actor.behavior is FCopHeightOffsetting offset) {
             pos.y += offset.GetHeight();

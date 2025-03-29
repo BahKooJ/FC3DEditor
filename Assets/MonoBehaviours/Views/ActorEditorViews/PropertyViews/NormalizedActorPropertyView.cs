@@ -47,7 +47,7 @@ public class NormalizedActorPropertyView : ActorPropertyItemView {
 
             if (ActorPropertyChangeEvent.changeEventsByPropertyName.ContainsKey(property.name)) {
 
-                ActorPropertyChangeEvent.changeEventsByPropertyName[property.name](controller);
+                ActorPropertyChangeEvent.changeEventsByPropertyName[property.name](controller, property);
 
             }
 

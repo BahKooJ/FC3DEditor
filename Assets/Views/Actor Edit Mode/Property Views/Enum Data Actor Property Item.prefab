@@ -550,7 +550,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b1120d88ea7aa146a03bb1b91f0bd4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  backgroundImage: {fileID: 8391581157960298882}
   view: {fileID: 0}
+  defaultColor: {r: 0.13333334, g: 0.13333334, b: 0.13333334, a: 1}
   nameText: {fileID: 2027988190790879124}
   caseDropDown: {fileID: 7902671573561095008}
 --- !u!1 &5073591004980224579

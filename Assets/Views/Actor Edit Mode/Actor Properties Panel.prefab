@@ -2234,6 +2234,7 @@ MonoBehaviour:
   assetActorPropertyItem: {fileID: 3486778975069844253, guid: 8f4e13b8b532e4842aea0259cf164bbd, type: 3}
   normalizedValueActorPorpertyItem: {fileID: 5020871495025236756, guid: d5b2e595f0605eb4091169a5c83fb37a, type: 3}
   propertiesContent: {fileID: 4429559707500750907}
+  contentScrollview: {fileID: 62381313911760272}
   actorName: {fileID: 75131811161702472}
   idText: {fileID: 3775939840264087208}
   actorTypeText: {fileID: 3304625165926856517}

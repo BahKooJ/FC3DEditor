@@ -50,7 +50,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c5467ef9b2f4044ebed511985d8aa94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  backgroundImage: {fileID: 0}
   view: {fileID: 0}
+  defaultColor: {r: 0.13333334, g: 0.13333334, b: 0.13333334, a: 1}
 --- !u!114 &2428859208548543234
 MonoBehaviour:
   m_ObjectHideFlags: 0

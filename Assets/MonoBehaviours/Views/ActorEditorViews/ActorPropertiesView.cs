@@ -2,8 +2,10 @@
 
 using FCopParser;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ActorPropertiesView : MonoBehaviour {
 
@@ -22,6 +24,7 @@ public class ActorPropertiesView : MonoBehaviour {
 
     //View refs
     public Transform propertiesContent;
+    public ScrollRect contentScrollview;
     public TMP_Text actorName;
     public TMP_Text idText;
     public TMP_Text actorTypeText;
@@ -196,6 +199,66 @@ public class ActorPropertiesView : MonoBehaviour {
             }
 
         }
+
+    }
+
+    public void JumpToPropety(ActorProperty property) {
+
+        foreach (var group in initedGroups) {
+
+            if (group.properties.Contains(property)) {
+
+                if (group.initedProperties.Count == 0) {
+
+                    group.OnClick();
+
+                }
+
+            }
+
+        }
+
+        var propertyView = initedProperties.FirstOrDefault(v => v.property == property);
+
+        if (propertyView == null) {
+            
+            foreach (var group in initedGroups) {
+
+                propertyView = group.initedProperties.FirstOrDefault(v => v.property == property);
+
+                if (propertyView != null) { break; }
+
+            }
+
+        }
+
+        if (propertyView == null) { return; }
+
+        var normalizedPos = ((decimal)propertyView.transform.GetSiblingIndex()) / ((decimal)propertyView.transform.parent.childCount - 0);
+
+        contentScrollview.verticalNormalizedPosition = (float)(1 - normalizedPos);
+
+    }
+
+    public void HighlightProperty(ActorProperty property) {
+
+        var propertyView = initedProperties.FirstOrDefault(v => v.property == property);
+
+        if (propertyView == null) {
+
+            foreach (var group in initedGroups) {
+
+                propertyView = group.initedProperties.FirstOrDefault(v => v.property == property);
+
+                if (propertyView != null) { break; }
+
+            }
+
+        }
+
+        if (propertyView == null) { return; }
+
+        propertyView.backgroundImage.color = new Color(0f, 0.8f, 0f);
 
     }
 

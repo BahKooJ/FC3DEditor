@@ -51,7 +51,7 @@ public class EnumDataActorPropertyItemView: ActorPropertyItemView {
 
         if (ActorPropertyChangeEvent.changeEventsByPropertyName.ContainsKey(property.name)) {
 
-            ActorPropertyChangeEvent.changeEventsByPropertyName[property.name](controller);
+            ActorPropertyChangeEvent.changeEventsByPropertyName[property.name](controller, property);
 
         }
         if (enumProperty.dictatesOverload != "") {

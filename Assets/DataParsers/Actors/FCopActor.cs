@@ -1184,11 +1184,7 @@ namespace FCopParser {
         public const int assetRefCount = 2;
         public const int blocks = 12;
 
-        public int heightMultiplier { get; set; }
-
         public FCopBehavior11(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
-
-            heightMultiplier = 8192;
 
             assetReferences = new ActorAssetReference[] {
                 new ActorAssetReference("Object", AssetType.Object),
@@ -1665,13 +1661,18 @@ namespace FCopParser {
 
     }
 
-    // - Parsed - (One unknown)
+    // - Completed - (One unknown)
     public class FCopBehavior35 : FCopActorBehavior {
 
         public const int assetRefCount = 2;
         public const int blocks = 32;
 
         public FCopBehavior35(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("None", AssetType.None),
+                new ActorAssetReference("None", AssetType.None)
+            };
 
             properties.Add(new ValueActorProperty("Unknown", Read16(0), BitCount.Bit16));
 
@@ -1743,20 +1744,20 @@ namespace FCopParser {
 
                 new NormalizedValueProperty("Node 1 X", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 1 Properties"),
                 new NormalizedValueProperty("Node 1 Y", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 1 Properties"),
-                new ValueActorProperty("Node 2 X", Read16(0), BitCount.Bit16, "Node 2 Properties"),
-                new ValueActorProperty("Node 2 Y", Read16(0), BitCount.Bit16, "Node 2 Properties"),
-                new ValueActorProperty("Node 3 X", Read16(0), BitCount.Bit16, "Node 3 Properties"),
-                new ValueActorProperty("Node 3 Y", Read16(0), BitCount.Bit16, "Node 3 Properties"),
-                new ValueActorProperty("Node 4 X", Read16(0), BitCount.Bit16, "Node 4 Properties"),
-                new ValueActorProperty("Node 4 Y", Read16(0), BitCount.Bit16, "Node 4 Properties"),
-                new ValueActorProperty("Node 5 X", Read16(0), BitCount.Bit16, "Node 5 Properties"),
-                new ValueActorProperty("Node 5 Y", Read16(0), BitCount.Bit16, "Node 5 Properties"),
-                new ValueActorProperty("Node 6 X", Read16(0), BitCount.Bit16, "Node 6 Properties"),
-                new ValueActorProperty("Node 6 Y", Read16(0), BitCount.Bit16, "Node 6 Properties"),
-                new ValueActorProperty("Node 7 X", Read16(0), BitCount.Bit16, "Node 7 Properties"),
-                new ValueActorProperty("Node 7 Y", Read16(0), BitCount.Bit16, "Node 7 Properties"),
-                new ValueActorProperty("Node 8 X", Read16(0), BitCount.Bit16, "Node 8 Properties"),
-                new ValueActorProperty("Node 8 Y", Read16(0), BitCount.Bit16, "Node 8 Properties"),
+                new NormalizedValueProperty("Node 2 X", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 2 Properties"),
+                new NormalizedValueProperty("Node 2 Y", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 2 Properties"),
+                new NormalizedValueProperty("Node 3 X", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 3 Properties"),
+                new NormalizedValueProperty("Node 3 Y", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 3 Properties"),
+                new NormalizedValueProperty("Node 4 X", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 4 Properties"),
+                new NormalizedValueProperty("Node 4 Y", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 4 Properties"),
+                new NormalizedValueProperty("Node 5 X", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 5 Properties"),
+                new NormalizedValueProperty("Node 5 Y", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 5 Properties"),
+                new NormalizedValueProperty("Node 6 X", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 6 Properties"),
+                new NormalizedValueProperty("Node 6 Y", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 6 Properties"),
+                new NormalizedValueProperty("Node 7 X", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 7 Properties"),
+                new NormalizedValueProperty("Node 7 Y", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 7 Properties"),
+                new NormalizedValueProperty("Node 8 X", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 8 Properties"),
+                new NormalizedValueProperty("Node 8 Y", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 8 Properties"),
 
             });
 

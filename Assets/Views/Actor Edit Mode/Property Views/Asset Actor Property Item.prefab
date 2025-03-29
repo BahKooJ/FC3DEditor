@@ -253,7 +253,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40fb1b26e0afbc34596bf65434ab0cf0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  backgroundImage: {fileID: 8180946720053942262}
   view: {fileID: 0}
+  defaultColor: {r: 0.13333334, g: 0.13333334, b: 0.13333334, a: 1}
   actorIconSprite: {fileID: 21300000, guid: 310ee314fcbbeb547a40695ee740b82b, type: 3}
   textureSnippetIconSprite: {fileID: 21300000, guid: fc72d45f971d9e5429a14fd3602e603e, type: 3}
   teamIconSprite: {fileID: 21300000, guid: 6b9a673d89acab149ad884ec3cc77f9b, type: 3}

@@ -4,20 +4,42 @@ using UnityEngine;
 
 public class MapNodeEditingNode : ActorEditingNode {
 
+    // - Prefab -
+    public GameObject editingNodeLine;
 
     // - Parameters -
     public NormalizedValueProperty propertyX;
     public NormalizedValueProperty propertyY;
+    [HideInInspector]
+    public ActorObject actorObject;
 
-    private void Start() {
+    LineRenderer lineToActor;
+
+    void Start() {
         SetToPosition();
+
+        var obj = Instantiate(editingNodeLine);
+        obj.transform.SetParent(transform, false);
+
+        lineToActor = obj.GetComponent<LineRenderer>();
+
+        lineToActor.SetPosition(0, transform.position);
+        lineToActor.SetPosition(1, actorObject.transform.position);
+
     }
 
-    void SetToPosition() {
+    void Update() {
+
+        lineToActor.SetPosition(0, transform.position);
+        lineToActor.SetPosition(1, actorObject.transform.position);
+
+    }
+
+    public override void SetToPosition() {
 
         var pos = new Vector3(
             propertyX.value, 
-            ObjectUtil.GroundCast(ActorGroundCast.Highest, new Vector2(propertyX.value, -propertyY.value)), 
+            ObjectUtil.GroundCast(ActorGroundCast.Highest, new Vector2(propertyX.value, -propertyY.value)) + 0.5f, 
             -propertyY.value);
 
         transform.position = pos;

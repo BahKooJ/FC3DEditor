@@ -37,8 +37,9 @@ public class AxisControl: MonoBehaviour {
         var addComp = controlledObject.AddComponent<Outline>();
 
         addComp.OutlineMode = Outline.Mode.OutlineVisible;
-        addComp.OutlineWidth = 6;
+        addComp.OutlineWidth = 7;
         addComp.OutlineColor = Color.green;
+        addComp.OutlineMode = Outline.Mode.OutlineAll;
 
     }
 

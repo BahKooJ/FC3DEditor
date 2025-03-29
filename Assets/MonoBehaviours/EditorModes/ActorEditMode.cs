@@ -16,7 +16,7 @@ public class ActorEditMode : EditMode {
     List<ActorObject> actorObjects = new();
     public Dictionary<int, ActorObject> actorObjectsByID = new();
     List<ActorGroupObject> actorGroupObjects = new();
-    List<ActorEditingNode> actorEditingNodes = new();
+    public List<ActorEditingNode> actorEditingNodes = new();
 
     public AxisControl selectedActorObject = null;
     public AxisControl selectedActorEditingNode = null;
@@ -57,7 +57,17 @@ public class ActorEditMode : EditMode {
 
     public ActorObject CreateActorObject(FCopActor actor, ActorGroupObject group = null) {
 
-        var nodeObject = Object.Instantiate(main.BlankActor);
+        GameObject nodeObject;
+
+        switch (actor.behavior) {
+            case FCopBehavior35:
+                nodeObject = Object.Instantiate(main.MapObjectiveNodesActor);
+                break;
+            default:
+                nodeObject = Object.Instantiate(main.BlankActor);
+                break;
+        }
+
 
         var script = nodeObject.GetComponent<ActorObject>();
 
@@ -188,15 +198,21 @@ public class ActorEditMode : EditMode {
 
         }
 
+        // Actor editing node take priority
         if (selectedActorEditingNode != null) {
 
             if (selectedActorEditingNode.TestCollision()) {
                 return;
             }
 
-        }
+            if (Controls.IsDown("MoveToCursor")) {
 
-        if (selectedActorObject != null) {
+                MoveActorToCursor();
+
+            }
+
+        }
+        else if (selectedActorObject != null) {
 
             if (selectedActorObject.TestCollision()) {
                 return;
@@ -218,81 +234,9 @@ public class ActorEditMode : EditMode {
 
             if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, 8)) {
 
-                foreach (var node in actorEditingNodes) {
+                if (!TestEditingNodeSelection(hit)) {
 
-                    if (hit.colliderInstanceID == node.nodeCollider.GetInstanceID()) {
-
-                        SelectActorEditingNode(node);
-
-                        break;
-
-                    }
-
-                }
-                
-                foreach (var act in actorObjects) {
-
-                    var didHit = false;
-
-
-                    if (act.actCollider != null) {
-
-                        if (hit.colliderInstanceID == act.actCollider.GetInstanceID()) {
-                            didHit = true;
-                        }
-
-                    }
-                    else if (act.missingObjectGameobj != null && act.missingObjectGameobj.activeSelf) {
-
-                        if (hit.colliderInstanceID == act.missingObjectGameobj.GetComponentInChildren<MeshCollider>().GetInstanceID()) {
-                            didHit = true;
-                        }
-
-                    }
-                    else {
-
-                        foreach (var obj in act.objects) {
-
-                            if (obj == null) {
-                                continue;
-                            }
-
-                            if (hit.colliderInstanceID == obj.meshCollider.GetInstanceID()) {
-                                didHit = true;
-                            }
-                            else {
-
-                                foreach (var specialObj in obj.specialPrimitives) {
-
-                                    if (hit.colliderInstanceID == specialObj.GetComponent<MeshCollider>().GetInstanceID()) {
-                                        didHit = true;
-                                        break;
-                                    }
-
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-                    if (didHit) {
-
-                        if (actorToGroup != null) {
-                            GroupActor(main.level.sceneActors.ActorNodeByIDPositional(act.actor.DataID));
-                            actorToGroup = null;
-                        }
-                        else if (Input.GetMouseButtonDown(1)) {
-                            ContextMenuUtil.CreateContextMenu(act.contextMenuItems);
-                        }
-                        else {
-                            SelectActor(act);
-                        }
-
-                        break;
-
-                    }
+                    TestActorSelection(hit);
 
                 }
 
@@ -306,7 +250,16 @@ public class ActorEditMode : EditMode {
         }
 
         if (Controls.OnDown("Unselect")) {
-            UnselectActorCompletely();
+
+            if (selectedActorEditingNode != null) {
+                UnSelectActorEditingNode();
+            }
+            else {
+
+                UnselectActorCompletely();
+
+            }
+
         }
 
         if (Input.GetKeyDown(KeyCode.F10)) {
@@ -314,6 +267,95 @@ public class ActorEditMode : EditMode {
 
 
         }
+
+    }
+
+    bool TestEditingNodeSelection(RaycastHit hit) {
+
+        foreach (var node in actorEditingNodes) {
+
+            if (hit.colliderInstanceID == node.nodeCollider.GetInstanceID()) {
+
+                SelectActorEditingNode(node);
+
+                return true;
+
+            }
+
+        }
+
+        return false;
+
+    }
+
+    bool TestActorSelection(RaycastHit hit) {
+
+        foreach (var act in actorObjects) {
+
+            var didHit = false;
+
+            if (act.actCollider != null) {
+
+                if (hit.colliderInstanceID == act.actCollider.GetInstanceID()) {
+                    didHit = true;
+                }
+
+            }
+            else if (act.missingObjectGameobj != null && act.missingObjectGameobj.activeSelf) {
+
+                if (hit.colliderInstanceID == act.missingObjectGameobj.GetComponentInChildren<MeshCollider>().GetInstanceID()) {
+                    didHit = true;
+                }
+
+            }
+            else {
+
+                foreach (var obj in act.objects) {
+
+                    if (obj == null) {
+                        continue;
+                    }
+
+                    if (hit.colliderInstanceID == obj.meshCollider.GetInstanceID()) {
+                        didHit = true;
+                    }
+                    else {
+
+                        foreach (var specialObj in obj.specialPrimitives) {
+
+                            if (hit.colliderInstanceID == specialObj.GetComponent<MeshCollider>().GetInstanceID()) {
+                                didHit = true;
+                                break;
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+            if (didHit) {
+
+                if (actorToGroup != null) {
+                    GroupActor(main.level.sceneActors.ActorNodeByIDPositional(act.actor.DataID));
+                    actorToGroup = null;
+                }
+                else if (Input.GetMouseButtonDown(1)) {
+                    ContextMenuUtil.CreateContextMenu(act.contextMenuItems);
+                }
+                else {
+                    SelectActor(act);
+                }
+
+                return didHit;
+
+            }
+
+        }
+
+        return false;
 
     }
 
@@ -381,27 +423,39 @@ public class ActorEditMode : EditMode {
 
     #region Selection And GameObjects
 
-    public void AddActorEditingNodes() {
+    void AddActorEditingNodes() {
+
+        void InitMapNode(NormalizedValueProperty propX, NormalizedValueProperty propY) {
+
+            var obj = Object.Instantiate(main.MapNodeFab);
+
+            var editingNode = obj.GetComponent<MapNodeEditingNode>();
+            editingNode.controller = this;
+            editingNode.actor = selectedActor;
+            editingNode.controlledProperties = new() { 
+                propX, 
+                propY 
+            };
+            editingNode.propertyX = propX;
+            editingNode.propertyY = propY;
+            editingNode.actorObject = selectedActorObject.controlledObject.GetComponent<ActorObject>();
+
+            actorEditingNodes.Add(editingNode);
+
+        }
 
         switch (selectedActor.behavior) {
 
             case FCopBehavior35:
 
-                var obj = Object.Instantiate(main.MapNodeFab);
-
-                var editingNode = obj.GetComponent<MapNodeEditingNode>();
-                editingNode.controller = this;
-                editingNode.actor = selectedActor;
-                editingNode.controlledProperties = new() {
-
-                    selectedActor.behavior.propertiesByName["Node 1 X"],
-                    selectedActor.behavior.propertiesByName["Node 1 Y"],
-
-                };
-                editingNode.propertyX = (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 1 X"];
-                editingNode.propertyY = (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 1 Y"];
-
-                actorEditingNodes.Add(editingNode);
+                InitMapNode((NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 1 X"], (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 1 Y"]);
+                InitMapNode((NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 2 X"], (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 2 Y"]);
+                InitMapNode((NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 3 X"], (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 3 Y"]);
+                InitMapNode((NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 4 X"], (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 4 Y"]);
+                InitMapNode((NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 5 X"], (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 5 Y"]);
+                InitMapNode((NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 6 X"], (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 6 Y"]);
+                InitMapNode((NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 7 X"], (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 7 Y"]);
+                InitMapNode((NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 8 X"], (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 8 Y"]);
 
                 break;
 
@@ -409,7 +463,19 @@ public class ActorEditMode : EditMode {
 
     }
 
-    public void SelectActorEditingNode(ActorEditingNode node) {
+    void ClearEditingNodes() {
+
+        UnSelectActorEditingNode();
+
+        foreach (var obj in actorEditingNodes) {
+            Object.Destroy(obj.gameObject);
+        }
+
+        actorEditingNodes.Clear();
+
+    }
+
+    void SelectActorEditingNode(ActorEditingNode node) {
 
         UnSelectActorEditingNode();
 
@@ -434,10 +500,14 @@ public class ActorEditMode : EditMode {
         };
 
         selectedActorEditingNode = script;
+        view.activeActorPropertiesView.JumpToPropety(node.controlledProperties[0]);
+        foreach (var prop in node.controlledProperties) {
+            view.activeActorPropertiesView.HighlightProperty(prop);
+        }
 
     }
 
-    public void UnSelectActorEditingNode() {
+    void UnSelectActorEditingNode() {
 
         if (selectedActorEditingNode != null) {
 
@@ -458,6 +528,8 @@ public class ActorEditMode : EditMode {
     }
 
     public void UnselectActorCompletely() {
+
+        ClearEditingNodes();
 
         if (selectedActor == null) {
             return;
@@ -482,6 +554,8 @@ public class ActorEditMode : EditMode {
     }
 
     public void UnselectActor() {
+
+        ClearEditingNodes();
 
         if (selectedActorObject != null) {
 
@@ -670,9 +744,20 @@ public class ActorEditMode : EditMode {
 
             nnHitPost.y = 0;
 
-            selectedActorObject.moveCallback(nnHitPost, AxisControl.Axis.IgnoreY);
+            if (selectedActorEditingNode != null) {
 
-            selectedActorObject.transform.position = selectedActorObject.controlledObject.transform.position;
+                selectedActorEditingNode.moveCallback(nnHitPost, AxisControl.Axis.IgnoreY);
+
+                selectedActorEditingNode.transform.position = selectedActorEditingNode.controlledObject.transform.position;
+
+            }
+            else if (selectedActorObject != null) {
+
+                selectedActorObject.moveCallback(nnHitPost, AxisControl.Axis.IgnoreY);
+
+                selectedActorObject.transform.position = selectedActorObject.controlledObject.transform.position;
+
+            }
 
         }
 
