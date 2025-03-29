@@ -1741,8 +1741,8 @@ namespace FCopParser {
                 new EnumDataActorProperty("Map Icon Color 7", (MapIconColor)Read8(0), BitCount.Bit8, "Node 7 Properties"),
                 new EnumDataActorProperty("Map Icon Color 8", (MapIconColor)Read8(0), BitCount.Bit8, "Node 8 Properties"),
 
-                new ValueActorProperty("Node 1 X", Read16(0), BitCount.Bit16, "Node 1 Properties"),
-                new ValueActorProperty("Node 1 Y", Read16(0), BitCount.Bit16, "Node 1 Properties"),
+                new NormalizedValueProperty("Node 1 X", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 1 Properties"),
+                new NormalizedValueProperty("Node 1 Y", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16, "Node 1 Properties"),
                 new ValueActorProperty("Node 2 X", Read16(0), BitCount.Bit16, "Node 2 Properties"),
                 new ValueActorProperty("Node 2 Y", Read16(0), BitCount.Bit16, "Node 2 Properties"),
                 new ValueActorProperty("Node 3 X", Read16(0), BitCount.Bit16, "Node 3 Properties"),

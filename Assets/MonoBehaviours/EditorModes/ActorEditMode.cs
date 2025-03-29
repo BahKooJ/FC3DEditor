@@ -3,6 +3,7 @@ using FCopParser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -15,8 +16,10 @@ public class ActorEditMode : EditMode {
     List<ActorObject> actorObjects = new();
     public Dictionary<int, ActorObject> actorObjectsByID = new();
     List<ActorGroupObject> actorGroupObjects = new();
+    List<ActorEditingNode> actorEditingNodes = new();
 
     public AxisControl selectedActorObject = null;
+    public AxisControl selectedActorEditingNode = null;
     public FCopActor selectedActor = null;
     public FCopActor actorToGroup = null;
 
@@ -185,15 +188,19 @@ public class ActorEditMode : EditMode {
 
         }
 
-        if (selectedActorObject != null) {
+        if (selectedActorEditingNode != null) {
 
-            if (selectedActorObject.TestCollision()) {
+            if (selectedActorEditingNode.TestCollision()) {
                 return;
             }
 
         }
 
         if (selectedActorObject != null) {
+
+            if (selectedActorObject.TestCollision()) {
+                return;
+            }
 
             // Moves object to cursor
             if (Controls.IsDown("MoveToCursor")) {
@@ -202,8 +209,8 @@ public class ActorEditMode : EditMode {
 
             }
 
-
         }
+
 
         if ((Controls.OnDown("Select") || Input.GetMouseButtonDown(1)) && !Main.IsMouseOverUI()) {
 
@@ -211,6 +218,18 @@ public class ActorEditMode : EditMode {
 
             if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, 8)) {
 
+                foreach (var node in actorEditingNodes) {
+
+                    if (hit.colliderInstanceID == node.nodeCollider.GetInstanceID()) {
+
+                        SelectActorEditingNode(node);
+
+                        break;
+
+                    }
+
+                }
+                
                 foreach (var act in actorObjects) {
 
                     var didHit = false;
@@ -361,6 +380,76 @@ public class ActorEditMode : EditMode {
     }
 
     #region Selection And GameObjects
+
+    public void AddActorEditingNodes() {
+
+        switch (selectedActor.behavior) {
+
+            case FCopBehavior35:
+
+                var obj = Object.Instantiate(main.MapNodeFab);
+
+                var editingNode = obj.GetComponent<MapNodeEditingNode>();
+                editingNode.controller = this;
+                editingNode.actor = selectedActor;
+                editingNode.controlledProperties = new() {
+
+                    selectedActor.behavior.propertiesByName["Node 1 X"],
+                    selectedActor.behavior.propertiesByName["Node 1 Y"],
+
+                };
+                editingNode.propertyX = (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 1 X"];
+                editingNode.propertyY = (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 1 Y"];
+
+                actorEditingNodes.Add(editingNode);
+
+                break;
+
+        }
+
+    }
+
+    public void SelectActorEditingNode(ActorEditingNode node) {
+
+        UnSelectActorEditingNode();
+
+        var axisControl = Object.Instantiate(main.axisControl);
+        var script = axisControl.GetComponent<AxisControl>();
+
+        script.controlledObject = node.gameObject;
+        script.moveCallback = (newPos, axis) => {
+
+            if (Controls.IsDown("SnapActorPosition")) {
+
+                var lockPos = new Vector3(MathF.Round(newPos.x * 2) / 2, MathF.Round(newPos.y * 2) / 2, MathF.Round(newPos.z * 2) / 2);
+                node.OnPositionChange(lockPos, axis);
+            }
+            else {
+
+                node.OnPositionChange(newPos, axis);
+
+            }
+
+            return true;
+        };
+
+        selectedActorEditingNode = script;
+
+    }
+
+    public void UnSelectActorEditingNode() {
+
+        if (selectedActorEditingNode != null) {
+
+            selectedActorEditingNode.ClearOutlineOnObject();
+
+            Object.Destroy(selectedActorEditingNode.gameObject);
+
+        }
+
+        selectedActorEditingNode = null;
+
+    }
 
     public void RequestActorRefresh(int id) {
 
@@ -533,6 +622,8 @@ public class ActorEditMode : EditMode {
 
         view.RefreshActorPropertiesView();
         view.activeActorPropertiesView.sceneActorsView.RefreshSelection(jump);
+
+        AddActorEditingNodes();
 
     }
 

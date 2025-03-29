@@ -210,36 +210,17 @@ public class ActorObject : MonoBehaviour {
 
     public float GroundCast() {
 
-        Vector3 castDirection = Vector3.down;
-        float startingHeight = 100f;
-
         if (actor.behavior is FCopHeightOffsetting groundCast) {
 
-            switch (groundCast.GetGroundCast()) {
-                case ActorGroundCast.Highest:
-                    break;
-                case ActorGroundCast.Lowest:
-                    castDirection = Vector3.up;
-                    startingHeight = -100f;
-                    break;
-                case ActorGroundCast.Default:
-                    break;
-            }
-
-        }
-
-        var castPos = new Vector3(actor.x / 8192f, startingHeight, -(actor.y / 8192f));
-
-        if (Physics.Raycast(castPos, castDirection, out RaycastHit hit, Mathf.Infinity, 1)) {
-
-            return hit.point.y;
+            return ObjectUtil.GroundCast(groundCast.GetGroundCast(), new Vector2(actor.x / 8192f, -(actor.y / 8192f)));
 
         }
         else {
 
-            return 6f;
+            return ObjectUtil.GroundCast(ActorGroundCast.Highest, new Vector2(actor.x / 8192f, -(actor.y / 8192f)));
 
         }
+
 
     }
 

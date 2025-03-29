@@ -92,6 +92,7 @@ public class Main : MonoBehaviour {
     public GameObject ObjectMesh;
     public GameObject actorGroupObjectFab;
     public GameObject ArrowModelFab;
+    public GameObject MapNodeFab;
 
     public GameObject playerCamera;
     public GameObject playModePlayer;
@@ -149,7 +150,16 @@ public class Main : MonoBehaviour {
 
         Physics.queriesHitBackfaces = true;
 
-        level = FileManagerMain.level;
+        if (FileManagerMain.level == null) {
+            level = new FCopLevel(new IFFParser(File.ReadAllBytes("MissionFiles/Mp")).parsedData);
+            if (SettingsManager.keyBinds.Count == 0) {
+                SettingsManager.ParseSettings();
+            }
+        }
+        else {
+            level = FileManagerMain.level;
+        }
+
 
         Application.targetFrameRate = 60;
 
