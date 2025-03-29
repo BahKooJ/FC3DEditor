@@ -569,10 +569,40 @@ Key objective nodes that are seen in the satellite view. Used for objectives, ou
 **Unit Measurement Value, 16bit:** Node 8 Y  
 
 ## Behavior 36, Claimable Turret: Behavior 8
+This is the player's primary opponent in Precinct Assault. Inherits from a behavior rather than an object.
+
+#### Properties:
+**Constant,  8 bit:** 1
+**Constant, 16 bit:** 0
+**Constant,  8 bit:** 0
+**Constant, 16 bit:** 8
+**Constant, 16 bit:** 578
+**Constant,  8 bit:** 1
+**Constant,  8 bit:** 4
+**Constant, 16 bit:** 1
+**Constant, 32 bit?:** 268439552 or 0x10001000
+**Constant, 16 bit:** 6144
+**Constant, 16 bit:** 16
+**Constant, 16 bit:** 9
+**Constant, 16 bit:** 578
+**Constant,  8 bit:** 1
+**Constant,  8 bit:** 4
+**Constant, 16 bit:** 1
+**Constant, 32 bit?:** 268439552 or 0x10001000
+**Constant, 16 bit:** 6144
+**Constant, 16 bit:** 16
+
+## Behavior 37, Sky Captain: Behavior 9
 The claimable turret in Precinct Assault. Inherits from a behavior rather than an object.
 
 #### Properties:
-Have not been observed yet  
+**Constant, 8 bit:** 1
+**Constant, 8 bit:** 2
+**Constant, 8 bit:** 1
+**Constant, 8 bit:** 2
+**Unknown,  8 bit:** 0 or 50 or 60
+**Unknown,  8 bit:** 0 or 33
+**Unknown, 16 bit:** 1024 or 1638 or 1843
 
 ## Behavior 95, Trigger
 Actor used for triggering events.
