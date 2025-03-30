@@ -10,7 +10,11 @@ public class ValueActorPropertyItemView : ActorPropertyItemView {
     public TMP_Text nameText;
     public TMP_InputField valueField;
 
+    ValueActorProperty valueActorProperty;
+
     void Start() {
+
+        valueActorProperty = (ValueActorProperty)property;
 
         Refresh();
 
@@ -35,26 +39,24 @@ public class ValueActorPropertyItemView : ActorPropertyItemView {
 
         ActorEditMode.AddActorPropertyCounterAction(property);
 
-        var value = Int32.Parse(valueField.text);
+        try {
 
-        var valueProperty = (ValueActorProperty)property;
+            var value = int.Parse(valueField.text);
 
-        //if (valueProperty.bitCount != BitCount.Bit3) {
+            valueActorProperty.Set(value);
 
-            //valueProperty.SafeSetSigned(value);
+            valueField.text = property.GetCompiledValue().ToString();
 
-        //}
-        //else {
+            if (ActorPropertyChangeEvent.changeEventsByPropertyName.ContainsKey(property.name)) {
 
-            valueProperty.value = value;
+                ActorPropertyChangeEvent.changeEventsByPropertyName[property.name](controller, property);
 
-        //}
+            }
 
-        valueField.text = valueProperty.value.ToString();
-        
-        if (ActorPropertyChangeEvent.changeEventsByPropertyName.ContainsKey(property.name)) {
+        }
+        catch {
 
-            ActorPropertyChangeEvent.changeEventsByPropertyName[property.name](controller, property);
+            valueField.text = valueActorProperty.value.ToString();
 
         }
 

@@ -35,37 +35,40 @@ namespace FCopParser {
         public string commonName { get; set; }
         public string dictatesOverload { get; set; }
 
+        public int min;
+        public int max;
+        public int value;
+
         public int GetCompiledValue() {
             return value;
         }
 
-        public void SafeSetSigned(int newValue) {
+        public void Set(int value) {
 
-            var maxValue = (int)((Math.Pow(2, (int)bitCount) - 1) / 2);
-            var minValue = -(int)(Math.Pow(2, (int)bitCount) / 2);
-
-            value = newValue;
-
-            if (value > maxValue) {
-                value = maxValue;
+            if (value > max) {
+                this.value = max;
             }
-            if (value < minValue) {
-                value = minValue;
+            else if (value < min) {
+                this.value = min;
+            }
+            else {
+                this.value = value;
             }
 
         }
 
-        public int value;
 
-        public ValueActorProperty(string name, int value, BitCount bitCount) {
+        public ValueActorProperty(string name, int value, int min, int max, BitCount bitCount) {
             this.name = name;
             this.value = value;
+            this.min = min;
+            this.max = max;
             this.bitCount = bitCount;
             this.commonName = "";
 
         }
 
-        public ValueActorProperty(string name, int value, BitCount bitCount, string commonName) : this(name, value, bitCount) {
+        public ValueActorProperty(string name, int value, int min, int max, BitCount bitCount, string commonName) : this(name, value, min, max, bitCount) {
             this.commonName = commonName;
         }
 
@@ -115,10 +118,10 @@ namespace FCopParser {
         public void Set(float value) {
 
             if (value > max) {
-                max = value;
+                this.value = max;
             }
             else if (value < min) {
-                min = value;
+                this.value = min;
             }
             else {
                 this.value = value;
@@ -191,10 +194,10 @@ namespace FCopParser {
         public void Set(float value) {
 
             if (value > max) {
-                max = value;
+                this.value = max;
             }
             else if (value < min) {
-                min = value;
+                this.value = min;
             }
             else {
                 this.value = value;

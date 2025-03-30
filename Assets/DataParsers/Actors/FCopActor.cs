@@ -760,7 +760,7 @@ namespace FCopParser {
                 new ToggleActorProperty("unknown8", Read1(0x04, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("unknown7", Read1(0x08, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Disable Destroyed Collision", Read1(0x10, false), BitCount.Bit1, "Entity Tags"),
-                new ToggleActorProperty("unknown6", Read1(0x20, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Obstruct Actor Path", Read1(0x20, false), BitCount.Bit1, "Entity Tags"),
                 new FillerActorProperty(0, BitCount.Bit1),
                 new ToggleActorProperty("unknown4", Read1(0x80, false), BitCount.Bit1, "Entity Tags"),
 
@@ -790,15 +790,15 @@ namespace FCopParser {
         List<ActorProperty> InitEntityProperties() {
 
             return new List<ActorProperty>() {
-                new ValueActorProperty("Health", Read16(0), BitCount.Bit16, "Entity Properties"),
-                new ValueActorProperty("Collide Damage", Read16(0), BitCount.Bit16, "Entity Properties"),
+                new ValueActorProperty("Health", Read16(0), 0, 30000, BitCount.Bit16, "Entity Properties"),
+                new ValueActorProperty("Collide Damage", Read16(0), 0, 30000, BitCount.Bit16, "Entity Properties"),
                 new AssetActorProperty("Team", Read8(0), AssetType.Team, BitCount.Bit8, "Entity Properties"),
-                new ValueActorProperty("Group?", Read8(0), BitCount.Bit8, "Entity Properties"),
+                new ValueActorProperty("Group?", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Entity Properties"),
                 new EnumDataActorProperty("Map Icon Color", (MapIconColor)Read8(0), BitCount.Bit8, "Entity Properties"),
-                new ValueActorProperty("Target Priority", Read8(0), BitCount.Bit8, "Entity Properties"),
-                new ValueActorProperty("Explosion (Unknown)", Read8(0), BitCount.Bit8, "Entity Properties"),
-                new ValueActorProperty("Ambient Sound", Read8(0), BitCount.Bit8, "Entity Properties"),
-                new ValueActorProperty("UV Offset", Read16(0), BitCount.Bit16, "Entity Properties")
+                new ValueActorProperty("Target Priority", Read8(0), 0, 127, BitCount.Bit8, "Entity Properties"),
+                new ValueActorProperty("Explosion (Unknown)", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Entity Properties"),
+                new AssetActorProperty("Ambient Sound", Read8(0), AssetType.WavSound, BitCount.Bit8, "Entity Properties"),
+                new ValueActorProperty("UV Offset", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Entity Properties")
             };
 
         }
@@ -818,7 +818,7 @@ namespace FCopParser {
         public FCopShooter(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("Weapon ID", Read16(0), BitCount.Bit16, "Shooter Properties")
+                new ValueActorProperty("Weapon ID", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Shooter Properties")
             });
 
             properties.AddRange(new List<ActorProperty>() {
@@ -850,19 +850,19 @@ namespace FCopParser {
             offset++;
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("unknown5 - 48", Read8(0), BitCount.Bit8, "Shooter Properties"),
+                new ValueActorProperty("unknown5 - 48", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Shooter Properties"),
                 new EnumDataActorProperty("Target Type", (TargetType)Read8(0), BitCount.Bit8, "Shooter Properties", "OverloadAttack"),
 
                 new OverloadedProperty("OverloadAttack", new() {
                     (new AssetActorProperty("Attack Team", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type"].GetCompiledValue() == TargetType.Team),
-                    (new ValueActorProperty("Attack Actor", Read16(0), BitCount.Bit16), () => true),
+                    (new ValueActorProperty("Attack Actor", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
 
                 }, BitCount.Bit16, "Shooter Properties"),
 
-                new ValueActorProperty("Detection FOV? - 52", Read16(4096), BitCount.Bit16, "Shooter Properties"),
-                new ValueActorProperty("unknown9 - 54", Read16(4096), BitCount.Bit16, "Shooter Properties"),
-                new ValueActorProperty("Engage Range", Read16(6144), BitCount.Bit16, "Shooter Properties"),
-                new ValueActorProperty("Targeting Delay", Read16(32), BitCount.Bit16, "Shooter Properties"),
+                new ValueActorProperty("Detection FOV? - 52", Read16(4096), short.MinValue, short.MaxValue, BitCount.Bit16, "Shooter Properties"),
+                new ValueActorProperty("unknown9 - 54", Read16(4096), short.MinValue, short.MaxValue, BitCount.Bit16, "Shooter Properties"),
+                new ValueActorProperty("Engage Range", Read16(6144), short.MinValue, short.MaxValue, BitCount.Bit16, "Shooter Properties"),
+                new ValueActorProperty("Targeting Delay", Read16(32), short.MinValue, short.MaxValue, BitCount.Bit16, "Shooter Properties"),
             });
 
         }
@@ -879,13 +879,13 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
                 new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8, "Turret Properties"),
-                new ValueActorProperty("unknown10", Read8(0), BitCount.Bit8, "Turret Properties"),
-                new ValueActorProperty("unknown11", Read16(0), BitCount.Bit16, "Turret Properties"),
+                new ValueActorProperty("unknown10", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Turret Properties"),
+                new ValueActorProperty("unknown11", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Turret Properties"),
                 new RangeActorProperty("Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16, "Turret Properties"),
                 new NormalizedValueProperty ("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
-                new ValueActorProperty("Turn Speed", Read16(0), BitCount.Bit16, "Turret Properties"),
-                new ValueActorProperty("unknown13", Read16(0), BitCount.Bit16, "Turret Properties"),
-                new ValueActorProperty("unknown14", Read16(0), BitCount.Bit16, "Turret Properties")
+                new ValueActorProperty("Turn Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Turret Properties"),
+                new ValueActorProperty("unknown13", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Turret Properties"),
+                new ValueActorProperty("unknown14", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Turret Properties")
             });
 
         }
@@ -949,16 +949,16 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("Move Speed", Read16(0), BitCount.Bit16, "Pathing Properties"),
-                new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16, "Pathing Properties"),
-                new ValueActorProperty("Move Speed Multiplier 66:", Read16(0), BitCount.Bit16, "Pathing Properties"),
-                new ValueActorProperty("Acceleration", Read16(0), BitCount.Bit16, "Pathing Properties"),
-                new ValueActorProperty("Path_Unknown3 70:", Read16(0), BitCount.Bit16, "Pathing Properties"),
-                new ValueActorProperty("Path_Unknown4 72:", Read16(0), BitCount.Bit16, "Pathing Properties"),
-                new ValueActorProperty("Path_Unknown5 74:", Read16(0), BitCount.Bit16, "Pathing Properties"),
-                new ValueActorProperty("Path_Unknown6 76:", Read16(0), BitCount.Bit16, "Pathing Properties"),
-                new ValueActorProperty("Path_Unknown7 78:", Read8(0), BitCount.Bit8, "Pathing Properties"),
-                new ValueActorProperty("Path_Unknown8 79:", Read8(0), BitCount.Bit8, "Pathing Properties"),
+                new ValueActorProperty("Move Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Move Speed Multiplier 66:", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Acceleration", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Path_Unknown3 70:", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Path_Unknown4 72:", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Path_Unknown5 74:", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Path_Unknown6 76:", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Path_Unknown7 78:", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Pathing Properties"),
+                new ValueActorProperty("Path_Unknown8 79:", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Pathing Properties"),
 
             });
 
@@ -974,7 +974,6 @@ namespace FCopParser {
         public FCopBehavior1(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.Add(new RangeActorProperty("Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16));
-
 
             // Implies ground cast but Future Cop won't react except with 0x01 which will crash. Leaving at default 0xFF
             properties.Add(new FillerActorProperty(Read8(0), BitCount.Bit8));
@@ -1008,10 +1007,10 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("5_Unknown9 80:", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("5_Unknown10 81:", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("5_Unknown11 82:", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("5_Unknown12 83:", Read8(0), BitCount.Bit8)
+                new ValueActorProperty("5_Unknown9 80:", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("5_Unknown10 81:", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("5_Unknown11 82:", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("5_Unknown12 83:", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8)
 
             });
 
@@ -1060,8 +1059,8 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
                 //new FillerActorProperty(Read16(0), BitCount.Bit16),
-                new ValueActorProperty("8unknownFill", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("8unknown0", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("8unknownFill", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("8unknown0", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
                 new RangeActorProperty("Base Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16)
             });
 
@@ -1088,24 +1087,24 @@ namespace FCopParser {
         public FCopBehavior9(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("60", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("61", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("62", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("64", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("60", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("61", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("62", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("64", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
                 new EnumDataActorProperty("Spawn Type", (AircraftSpawnType)Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Target Detection Range", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("68", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("70", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Time To Descend", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Turn Rate", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Move Speed", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Orbit Area X", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Orbit Area Y", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("84", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("86", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Spawn Pos X", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Spawn Pos Y", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Target Detection Range", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("68", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("70", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Time To Descend", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Turn Rate", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Move Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Orbit Area X", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Orbit Area Y", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("84", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("86", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Spawn Pos X", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Spawn Pos Y", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
 
             });
             
@@ -1132,17 +1131,17 @@ namespace FCopParser {
                 new EnumDataActorProperty("Number Of Stops", (ElevatorStops)Read8(2), BitCount.Bit8),
                 new EnumDataActorProperty("Starting Position", (ElevatorStartingPoint)Read8(2), BitCount.Bit8),
                 new NormalizedValueProperty("1st Height Offset", Read16(0), short.MinValue, short.MaxValue, 8192f, BitCount.Bit16),
-                new ValueActorProperty("2nt Height Offset", Read16(600), BitCount.Bit16),
-                new ValueActorProperty("3rd Height Offset", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("1st Stop Time", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("2nt Stop Time", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("3rd Stop Time", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Up Speed", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Down Speed", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("2nt Height Offset", Read16(600), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("3rd Height Offset", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("1st Stop Time", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("2nt Stop Time", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("3rd Stop Time", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Up Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Down Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
                 new RangeActorProperty("Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16),
                 new EnumDataActorProperty("Trigger Type", (ElevatorTrigger)Read8(0), BitCount.Bit8),
                 new EnumDataActorProperty("Tile Effect", (TileEffectType)Read8(0), BitCount.Bit8),
-                new ValueActorProperty("End Sound", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("End Sound", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
 
             });
 
@@ -1293,21 +1292,21 @@ namespace FCopParser {
         public FCopBehavior14(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("28", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("29", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("30", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("31", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("32", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("28", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("29", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("30", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("31", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("32", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Interact Radius", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("46", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("48", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("49", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("50", Read16(0), BitCount.Bit16)
+                new ValueActorProperty("Interact Radius", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("46", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("48", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("49", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("50", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16)
 
             });
 
@@ -1379,7 +1378,7 @@ namespace FCopParser {
                 new FillerActorProperty(Read8(3), BitCount.Bit8),
                 new FillerActorProperty(Read8(255), BitCount.Bit8),
                 new FillerActorProperty(Read8(255), BitCount.Bit8),
-                new ValueActorProperty("Rotation Speed", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Rotation Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
             });
 
             InitPropertiesByName();
@@ -1395,10 +1394,10 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("Turn Speed", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Head Rotation", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("84", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("85", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Turn Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Head Rotation", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("84", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("85", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8)
 
@@ -1445,13 +1444,13 @@ namespace FCopParser {
             properties.AddRange(new List<ActorProperty>() {
 
                 new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Start Sound", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Start Sound", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
                 new NormalizedValueProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
                 new RangeActorProperty("Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16),
-                new ValueActorProperty("Ending Position Offset", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Ending Position Offset", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
                 new RangeActorProperty("Ending Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16),
-                new ValueActorProperty("Position Speed", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Rotation Speed", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Position Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Rotation Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
 
             });
 
@@ -1496,14 +1495,14 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("80", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("81", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("82", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("83", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("84", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("85", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("86", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("87", Read8(0), BitCount.Bit8)
+                new ValueActorProperty("80", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("81", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("82", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("83", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("84", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("85", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("86", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("87", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8)
 
             });
 
@@ -1520,7 +1519,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1537,7 +1536,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1554,8 +1553,8 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("X", Read32(0), BitCount.Bit32),
-                new ValueActorProperty("Y", Read32(0), BitCount.Bit32),
+                new ValueActorProperty("X", Read32(0), short.MinValue, short.MaxValue, BitCount.Bit32),
+                new ValueActorProperty("Y", Read32(0), short.MinValue, short.MaxValue, BitCount.Bit32),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
@@ -1564,7 +1563,7 @@ namespace FCopParser {
                 new FillerActorProperty(Read8(1), BitCount.Bit8),
                 new FillerActorProperty(Read8(1), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
-                new ValueActorProperty("60", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("60", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
                 new FillerActorProperty(Read8(204), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8)
 
@@ -1583,7 +1582,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1600,7 +1599,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1617,7 +1616,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1634,7 +1633,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1651,7 +1650,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1674,7 +1673,7 @@ namespace FCopParser {
                 new ActorAssetReference("None", AssetType.None)
             };
 
-            properties.Add(new ValueActorProperty("Unknown", Read16(0), BitCount.Bit16));
+            properties.Add(new ValueActorProperty("Unknown", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16));
 
             properties.AddRange(new List<ActorProperty>() {
 
@@ -1773,10 +1772,10 @@ namespace FCopParser {
         public FCopBehavior36(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("nt_unknown8", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("nt_unknown9", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("nt_unknown10", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("nt_unknown11", Read16(0), BitCount.Bit16)
+                new ValueActorProperty("nt_unknown8", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("nt_unknown9", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("nt_unknown10", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("nt_unknown11", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16)
             });
 
             InitPropertiesByName();
@@ -1792,7 +1791,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1809,7 +1808,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1826,7 +1825,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1843,7 +1842,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1860,7 +1859,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1877,7 +1876,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1894,7 +1893,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1911,7 +1910,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1928,7 +1927,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1945,7 +1944,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -1962,10 +1961,10 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("Width", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Length", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Height", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("34", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Width", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Length", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Height", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("34", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
 
 
             });
@@ -1986,7 +1985,7 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("Triggering Actor", Read16(0), BitCount.Bit16),
+                new ValueActorProperty("Triggering Actor", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8)
 
@@ -2016,13 +2015,13 @@ namespace FCopParser {
                 new RangeActorProperty("Rotation X", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16),
                 new NormalizedValueProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
                 new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Unknown Tags", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Animation Speed", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Unknown Tags", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("Animation Speed", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
                 new RangeActorProperty("Scale X", Read8(0), 0, 127, 64f, BitCount.Bit8),
                 new RangeActorProperty("Scale Y", Read8(0), 0, 127, 64f, BitCount.Bit8),
                 new RangeActorProperty("Scale Z", Read8(0), 0, 127, 64f, BitCount.Bit8),
-                new ValueActorProperty("Spin Speed", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Spin Angle", Read8(0), BitCount.Bit8)
+                new ValueActorProperty("Spin Speed", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("Spin Angle", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8)
 
             };
 
@@ -2071,18 +2070,18 @@ namespace FCopParser {
 
             properties = new() {
 
-                new ValueActorProperty("Tags", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Tags", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
                 new AssetActorProperty("Texture Snippet", Read8(0), AssetType.TextureSnippet, BitCount.Bit8),
-                new ValueActorProperty("Height Offset", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Width", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Height", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("RotationY", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("RotationZ", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("RotationX", Read16(0), BitCount.Bit16),
-                new ValueActorProperty("42", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Red", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Green", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Blue", Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Width", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Height", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("RotationY", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("RotationZ", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("RotationX", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("42", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("Red", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("Green", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("Blue", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8)
 
@@ -2101,7 +2100,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
@@ -2118,7 +2117,7 @@ namespace FCopParser {
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), BitCount.Bit16);
+                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
                 properties.Add(property);
             }
 
