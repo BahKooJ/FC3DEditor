@@ -743,7 +743,7 @@ namespace FCopParser {
 
             var total = new List<ActorProperty>() {
                 new ToggleActorProperty("Disable Actor Targeting", Read1(0x01, false), BitCount.Bit1, "Entity Tags"),
-                new ToggleActorProperty("unknown3", Read1(0x02, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Unknown", Read1(0x02, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Disable Collision", Read1(0x04, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Always Active", Read1(0x08, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Disable Map Icon", Read1(0x10, false), BitCount.Bit1, "Entity Tags"),
