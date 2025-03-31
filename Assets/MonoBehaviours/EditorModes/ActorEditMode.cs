@@ -3,7 +3,6 @@ using FCopParser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -264,7 +263,16 @@ public class ActorEditMode : EditMode {
 
         if (Input.GetKeyDown(KeyCode.F10)) {
 
+            var actors = main.level.sceneActors.actors.Where(a => {
 
+                if (a.behavior is FCopEntity e) {
+                    return e.propertiesByName["unknown7"].GetCompiledValue() == 1;
+                }
+                return false;
+
+            }).ToList();
+
+            MoveToActor(actors[UnityEngine.Random.Range(0, actors.Count)].DataID);
 
         }
 

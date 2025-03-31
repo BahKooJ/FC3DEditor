@@ -742,11 +742,11 @@ namespace FCopParser {
         List<ActorProperty> InitTags() {
 
             var total = new List<ActorProperty>() {
-                new ToggleActorProperty("disableTargeting", Read1(0x01, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Disable Actor Targeting", Read1(0x01, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("unknown3", Read1(0x02, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Disable Collision", Read1(0x04, false), BitCount.Bit1, "Entity Tags"),
-                new ToggleActorProperty("unknown2", Read1(0x08, false), BitCount.Bit1, "Entity Tags"),
-                new ToggleActorProperty("unknown1", Read1(0x10, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Always Active", Read1(0x08, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Disable Map Icon", Read1(0x10, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Disable Rendering", Read1(0x20, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Player Physics", Read1(0x40, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Is Invincible", Read1(0x80, false), BitCount.Bit1, "Entity Tags"),
@@ -755,9 +755,9 @@ namespace FCopParser {
             offset++;
             total.AddRange(new List<ActorProperty>() {
 
-                new ToggleActorProperty("unknown9", Read1(0x01, false), BitCount.Bit1, "Entity Tags"),
-                new ToggleActorProperty("hurtBySameTeam", Read1(0x02, false), BitCount.Bit1, "Entity Tags"),
-                new ToggleActorProperty("unknown8", Read1(0x04, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Always Interactable", Read1(0x01, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Actor Collision", Read1(0x02, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Strong Pushback", Read1(0x04, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("unknown7", Read1(0x08, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Disable Destroyed Collision", Read1(0x10, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Obstruct Actor Path", Read1(0x20, false), BitCount.Bit1, "Entity Tags"),

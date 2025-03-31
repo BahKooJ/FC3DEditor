@@ -51,15 +51,15 @@ public class ObjectMesh : MonoBehaviour {
     bool alreadyCreated = false;
     void Start() {
 
-        if (alreadyCreated) return;
-
-        ForceMake();
-
         //var gobj = Instantiate(boundingBoxFab);
         //gobj.transform.SetParent(transform, false);
 
         //boundingBox = gobj.GetComponent<ObjectBoundingBox>();
         //boundingBox.fCopObject = fCopObject;
+
+        if (alreadyCreated) return;
+
+        ForceMake();
 
     }
 
