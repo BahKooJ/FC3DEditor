@@ -183,26 +183,28 @@ VTOLSpawnPos = 12
 The base inheritance for most actors. Handles meta data for collision and other useful values used by many actors.
 
 #### Properties:
-**Toggle, 1bit:** disable Targeting? Unknown.  
+**Toggle, 1bit:** Disable Actor Targeting  
 **Toggle, 1bit:** Unknown  
 **Toggle, 1bit:** Disable Collision  
-**Toggle, 1bit:** Unknown  
-**Toggle, 1bit:** Unknown  
+**Toggle, 1bit:** Always Active  
+	Future Cop will only update actors within a radius of the player, if this toggle is enabled it will always update.  
+**Toggle, 1bit:** Disable Map Icon  
 **Toggle, 1bit:** Disable Rendering  
 **Toggle, 1bit:** Player Physics  
 **Toggle, 1bit:** Is Invincible  
 
-**Toggle, 1bit:** Unknown  
-**Toggle, 1bit:** hurt by same team? Unknown  
-**Toggle, 1bit:** Unknown  
+**Toggle, 1bit:** Always Interactable  
+	Similar to Always Active, actors will not interact with each other (like shoot or trigger) outside player's update radius unless this is toggled.  
+**Toggle, 1bit:** Actor Collision  
+**Toggle, 1bit:** String Pushback  
 **Toggle, 1bit:** Unknown  
 **Toggle, 1bit:** Disable Destroyed Collision  
-**Toggle, 1bit:** Unknown  
+**Toggle, 1bit:** Obstruct Actor Path  
 **Constant, 1bit:** False  
 **Toggle, 1bit:** Unknown  
 
 **Toggle, 1bit:** Unknown  
-**Toggle, 1bit:** disable team? Unknown  
+**Toggle, 1bit:** Disable Player Targeting  
 **Toggle, 1bit:** Disable Explosion  
 **Toggle, 1bit:** Has Shadow  
 **Toggle, 1bit:** Unknown  

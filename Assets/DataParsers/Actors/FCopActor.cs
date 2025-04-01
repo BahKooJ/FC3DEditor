@@ -758,22 +758,22 @@ namespace FCopParser {
                 new ToggleActorProperty("Always Interactable", Read1(0x01, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Actor Collision", Read1(0x02, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Strong Pushback", Read1(0x04, false), BitCount.Bit1, "Entity Tags"),
-                new ToggleActorProperty("unknown7", Read1(0x08, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Unknown 2", Read1(0x08, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Disable Destroyed Collision", Read1(0x10, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Obstruct Actor Path", Read1(0x20, false), BitCount.Bit1, "Entity Tags"),
                 new FillerActorProperty(0, BitCount.Bit1),
-                new ToggleActorProperty("unknown4", Read1(0x80, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Unknown 3", Read1(0x80, false), BitCount.Bit1, "Entity Tags"),
 
             });
             offset++;
             total.AddRange(new List<ActorProperty>() {
 
-                new ToggleActorProperty("unknown14", Read1(0x01, false), BitCount.Bit1, "Entity Tags"),
-                new ToggleActorProperty("disableTeam", Read1(0x02, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Unknown 4", Read1(0x01, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Disable Player Targeting", Read1(0x02, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Disable Explosion", Read1(0x04, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Has Shadow", Read1(0x08, false), BitCount.Bit1, "Entity Tags"),
-                new ToggleActorProperty("unknown13", Read1(0x10, false), BitCount.Bit1, "Entity Tags"),
-                new ToggleActorProperty("unknown12", Read1(0x20, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Unknown (Scripting 3)", Read1(0x10, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Unknown (Scropting)", Read1(0x20, false), BitCount.Bit1, "Entity Tags"),
                 new FillerActorProperty(0, BitCount.Bit1),
                 new FillerActorProperty(0, BitCount.Bit1),
 
@@ -798,14 +798,20 @@ namespace FCopParser {
                 new ValueActorProperty("Target Priority", Read8(0), 0, 127, BitCount.Bit8, "Entity Properties"),
                 new ValueActorProperty("Explosion (Unknown)", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Entity Properties"),
                 new AssetActorProperty("Ambient Sound", Read8(0), AssetType.WavSound, BitCount.Bit8, "Entity Properties"),
-                new ValueActorProperty("UV Offset", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Entity Properties")
+                new ValueActorProperty("UV Offset X", Read8(0), 0, 255, BitCount.Bit8, "Entity Properties"),
+                new ValueActorProperty("UV Offset Y", Read8(0), 0, 255, BitCount.Bit8, "Entity Properties")
+
             };
 
         }
 
         public int GetUVOffset() {
             try {
-                return propertiesByName["UV Offset"].GetCompiledValue();
+
+                var x = propertiesByName["UV Offset X"].GetCompiledValue();
+                var y = propertiesByName["UV Offset Y"].GetCompiledValue();
+
+                return (y * 256) + x;
             } catch {
                 return 0;
             }
@@ -879,13 +885,13 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
                 new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8, "Turret Properties"),
-                new ValueActorProperty("unknown10", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Turret Properties"),
-                new ValueActorProperty("unknown11", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Turret Properties"),
+                new ValueActorProperty("Tunknown10", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Turret Properties"),
+                new ValueActorProperty("Tunknown11", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Turret Properties"),
                 new RangeActorProperty("Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16, "Turret Properties"),
-                new NormalizedValueProperty ("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty ("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16, "Turret Properties"),
                 new ValueActorProperty("Turn Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Turret Properties"),
-                new ValueActorProperty("unknown13", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Turret Properties"),
-                new ValueActorProperty("unknown14", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Turret Properties")
+                new ValueActorProperty("Tunknown13", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Turret Properties"),
+                new ValueActorProperty("Tunknown14", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Turret Properties")
             });
 
         }
