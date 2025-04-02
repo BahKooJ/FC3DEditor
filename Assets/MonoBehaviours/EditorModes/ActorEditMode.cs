@@ -265,17 +265,17 @@ public class ActorEditMode : EditMode {
 
             var actors = main.level.sceneActors.actors.Where(a => {
 
-                //return a.behavior is FCopEntity e;
+                //return a.behavior is FCopShooter e;
 
-                if (a.behavior is FCopEntity e) {
-                    return e.propertiesByName["unknown12"].GetCompiledValue() == 1;
+                if (a.behavior is FCopShooter es) {
+                    return es.propertiesByName["STag unknown7"].GetCompiledValue() == 1;
                 }
                 return false;
 
             }).ToList();
 
             //foreach (var actor in actors) {
-            //    ((ToggleActorProperty)actor.behavior.propertiesByName["unknown14"]).value = false;
+            //    ((ToggleActorProperty)actor.behavior.propertiesByName["STag unknown4"]).value = true;
             //}
 
             MoveToActor(actors[UnityEngine.Random.Range(0, actors.Count)].DataID);

@@ -500,6 +500,14 @@ namespace FCopParser {
         Team = 4
     }
 
+    public enum AcquiringType {
+        ForceFirstPlayer = 0,
+        NormalIgnoreWalls = 1,
+        Random = 2,
+        Normal = 3
+    }
+
+
     public enum ElevatorStops {
         Two = 2,
         Three = 3,

@@ -773,7 +773,7 @@ namespace FCopParser {
                 new ToggleActorProperty("Disable Explosion", Read1(0x04, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Has Shadow", Read1(0x08, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Unknown (Scripting 3)", Read1(0x10, false), BitCount.Bit1, "Entity Tags"),
-                new ToggleActorProperty("Unknown (Scropting)", Read1(0x20, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Unknown (Scripting)", Read1(0x20, false), BitCount.Bit1, "Entity Tags"),
                 new FillerActorProperty(0, BitCount.Bit1),
                 new FillerActorProperty(0, BitCount.Bit1),
 
@@ -830,23 +830,22 @@ namespace FCopParser {
             properties.AddRange(new List<ActorProperty>() {
 
                 new FillerActorProperty(0, BitCount.Bit1),
-                new ToggleActorProperty("STag unknown1", Read1(0x02, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("Prevent Back Shooting", Read1(0x02, false), BitCount.Bit1, "Shooter Tags"),
                 new ToggleActorProperty("Shoot When Facing", Read1(0x04, false), BitCount.Bit1, "Shooter Tags"),
-                new ToggleActorProperty("STag unknown2", Read1(0x08, false), BitCount.Bit1, "Shooter Tags"),
-                new ToggleActorProperty("STag unknown3", Read1(0x10, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("STag Unknown", Read1(0x08, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("STag Unknown 2", Read1(0x10, false), BitCount.Bit1, "Shooter Tags"),
                 new ToggleActorProperty("Fire Alternations", Read1(0x20, false), BitCount.Bit1, "Shooter Tags"),
                 new ToggleActorProperty("Target Priority", Read1(0x40, false), BitCount.Bit1, "Shooter Tags"),
-                new ToggleActorProperty("STag unknown4", Read1(0x80, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("STag Unknown 3", Read1(0x80, false), BitCount.Bit1, "Shooter Tags"),
 
             });
             offset++;
             properties.AddRange(new List<ActorProperty>() {
 
-
                 new ToggleActorProperty("Disabled", Read1(0x01, false), BitCount.Bit1, "Shooter Tags"),
                 new ToggleActorProperty("Weapon Actor Collision", Read1(0x02, false), BitCount.Bit1, "Shooter Tags"),
                 new ToggleActorProperty("Attackable Weapon", Read1(0x04, false), BitCount.Bit1, "Shooter Tags"),
-                new ToggleActorProperty("STag unknown5", Read1(0x08, false), BitCount.Bit1, "Shooter Tags"),
+                new FillerActorProperty(0, BitCount.Bit1),
                 new ToggleActorProperty("STag unknown6", Read1(0x10, false), BitCount.Bit1, "Shooter Tags"),
                 new ToggleActorProperty("STag unknown7", Read1(0x20, false), BitCount.Bit1, "Shooter Tags"),
                 new ToggleActorProperty("Allow Switch Target", Read1(0x40, false), BitCount.Bit1, "Shooter Tags"),
@@ -856,19 +855,20 @@ namespace FCopParser {
             offset++;
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("unknown5 - 48", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Shooter Properties"),
-                new EnumDataActorProperty("Target Type", (TargetType)Read8(0), BitCount.Bit8, "Shooter Properties", "OverloadAttack"),
+                new EnumDataActorProperty("Acquiring Type", (AcquiringType)Read8(0), BitCount.Bit8, "Shooter Properties"),
+                new EnumDataActorProperty("Target Type", (TargetType)Read8(1), BitCount.Bit8, "Shooter Properties", "OverloadAttack"),
 
                 new OverloadedProperty("OverloadAttack", new() {
                     (new AssetActorProperty("Attack Team", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type"].GetCompiledValue() == TargetType.Team),
-                    (new ValueActorProperty("Attack Actor", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
+                    (new AssetActorProperty("Attack Actor", Read16NoIt(0), AssetType.Actor, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type"].GetCompiledValue() == TargetType.Actor),
+                    (new ValueActorProperty("S_Unknown Attack", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
 
                 }, BitCount.Bit16, "Shooter Properties"),
 
-                new ValueActorProperty("Detection FOV? - 52", Read16(4096), short.MinValue, short.MaxValue, BitCount.Bit16, "Shooter Properties"),
-                new ValueActorProperty("unknown9 - 54", Read16(4096), short.MinValue, short.MaxValue, BitCount.Bit16, "Shooter Properties"),
-                new ValueActorProperty("Engage Range", Read16(6144), short.MinValue, short.MaxValue, BitCount.Bit16, "Shooter Properties"),
-                new ValueActorProperty("Targeting Delay", Read16(32), short.MinValue, short.MaxValue, BitCount.Bit16, "Shooter Properties"),
+                new NormalizedValueProperty("Detection FOV?", Read16(4096), 0, 4096, 4096f / 360f, BitCount.Bit16, "Shooter Properties"),
+                new NormalizedValueProperty("Shooting FOV?", Read16(4096), 0, 4096, 4096f / 360f, BitCount.Bit16, "Shooter Properties"),
+                new NormalizedValueProperty("Engage Range", Read16(6144), 0, short.MaxValue, 512f, BitCount.Bit16, "Shooter Properties"),
+                new NormalizedValueProperty("Targeting Delay", Read16(32), 0, 320, 32f, BitCount.Bit16, "Shooter Properties"),
             });
 
         }

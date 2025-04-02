@@ -63,8 +63,13 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
                 assetIcon.sprite = actorIconSprite;
                 break;
             case AssetType.Team:
-                assetNameText.text = controller.main.level.sceneActors.teams[assetProperty.assetID];
-                assetIcon.sprite = teamIconSprite;
+                try {
+                    assetNameText.text = controller.main.level.sceneActors.teams[assetProperty.assetID];
+                    assetIcon.sprite = teamIconSprite;
+                }
+                catch {
+                    assetNameText.text = "Missing";
+                }
                 break;
             case AssetType.TextureSnippet:
 
