@@ -232,7 +232,8 @@ Used by actors that shoot weapons
 **Actor Reference 98, 16bit:** Weapon ID  
 
 **Constant, 1bit:** False  
-**Toggle, 1bit:** Unknown  
+**Toggle, 1bit:** Prevent Back Shooting  
+	Actor will not shoot at target if about 15 degrees behide facing.
 **Toggle, 1bit:** Shoot When Facing  
 **Toggle, 1bit:** Unknown  
 **Toggle, 1bit:** Unknown  
@@ -247,39 +248,58 @@ Used by actors that shoot weapons
 	If the weapon shot can also collide with actors alongside the player  
 **Toggle, 1bit:** Attackable Weapon  
 **Toggle, 1bit:** Unknown  
+	Used once in the entire game, maybe ignored  
 **Toggle, 1bit:** Unknown  
 **Toggle, 1bit:** Unknown  
 **Toggle, 1bit:** Allow Switch Target  
 **Toggle, 1bit:** Unknown  
 
-**Enum, 8bit:** Unknown (0, 1, 2, 3)  
+**Enum, 8bit:** Acquiring Type 
 **Enum, 8bit:** Target Type  
 **OVERLOADED, 16bit:**  
 **If Target Type is Team: Value:** Attack Team  
 **Otherwise: Value:** Attack Actor  
-**Normalized Value, 16bit:** FOV? Unknown  
+**Normalized Value, 16bit:** Detection FOV? 
 	Developer Notes:  
 	It tests out to almost be an detection FOV
 	Range of 0-4096 makes sense, same range used for rotation
 	However does not function as expected. Anything below 2048
 	Will Cause the actor to not detect, anything above is 360.
 	2048 exactly is 180.  
-**Normalized Value, 16bit:** Unknown  
-**Unit Measurement Value, 16bit:** Engage Range  
-**Unit Measurement Value, 16bit:** Targeting Delay  
+**Normalized Value, 16bit:** Shooting FOV?  
+**Unit Measurement Value, 512, 16bit:** Engage Range  
+**Unit Measurement Value, 32, 16bit:** Targeting Delay  
 
 ## Turret: Shooter
 A shoot but with more data on how to control the model attached to the actor.
 
 #### Properties:
 **Enum, 8bit:** Ground Cast  
-**Unknown, 8bit:** Unknown  
-**Unknown, 16bit:** Unknown  
+**Enum, 8bit:** Facing Target Type  
+**OVERLOADED, 16bit:**  
+**If Facing Target Type is Team: Value:** Attack Team  
+**Otherwise: Value:** Attack Actor  
 **Normalized Value, 16bit:** Y Axis Rotation  
 **Unit Measurement Value, 512, 16bit:** Height Offset  
 **Unit Measurement Value, 16bit:** Turn Speed  
-**Unknown, 16bit:** Unknown  
-**Unknown, 16bit:** Turn Type? Unknown  
+**Unit Measurement Value, 16bit:** Facing Engage Range  
+
+**Toggle, 1bit:** Use Shooter Data for Facing  
+	Uses the parent targeting data for turret facing. Overrides "Use Turret Data for Facing"  
+**Toggle, 1bit:** Look at Target X Axis  
+**Toggle, 1bit:** Use Turret Data for Facing  
+	Uses the turret facing targeting data for turret facing.  
+**Toggle, 1bit:** Spin Z Axis  
+	Turret will spin across Z axis if no valid targeting data is provided.  
+**Toggle, 1bit:** Walkable  
+	If the player can walk on turret  
+**Toggle, 1bit:** 135 Degrees Forward Facing  
+	Will lock the facing to about 135 degrees forward  
+**Toggle, 1bit:** Unknown  
+**Toggle, 1bit:** Unknown   
+
+**Constant, 8bit:** 0  
+
 
 ## Pathed Entity: Shooter
 An actor that uses the Cnet navigation mesh.
