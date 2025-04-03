@@ -846,10 +846,10 @@ namespace FCopParser {
                 new ToggleActorProperty("Weapon Actor Collision", Read1(0x02, false), BitCount.Bit1, "Shooter Tags"),
                 new ToggleActorProperty("Attackable Weapon", Read1(0x04, false), BitCount.Bit1, "Shooter Tags"),
                 new FillerActorProperty(0, BitCount.Bit1),
-                new ToggleActorProperty("STag unknown6", Read1(0x10, false), BitCount.Bit1, "Shooter Tags"),
-                new ToggleActorProperty("STag unknown7", Read1(0x20, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("STag Unknown 4", Read1(0x10, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("STag Unknown 5", Read1(0x20, false), BitCount.Bit1, "Shooter Tags"),
                 new ToggleActorProperty("Allow Switch Target", Read1(0x40, false), BitCount.Bit1, "Shooter Tags"),
-                new ToggleActorProperty("STag unknown8", Read1(0x80, false), BitCount.Bit1, "Shooter Tags"),
+                new ToggleActorProperty("STag Unknown 6", Read1(0x80, false), BitCount.Bit1, "Shooter Tags"),
 
             });
             offset++;
@@ -877,22 +877,40 @@ namespace FCopParser {
 
     public abstract class FCopTurret : FCopShooter, FCopObjectMutating, FCopHeightOffsetting {
 
-        public int heightMultiplier { get; set; }
-
         public FCopTurret(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
-
-            heightMultiplier = 512;
 
             properties.AddRange(new List<ActorProperty>() {
                 new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8, "Turret Properties"),
-                new ValueActorProperty("Tunknown10", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Turret Properties"),
-                new ValueActorProperty("Tunknown11", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Turret Properties"),
+                new EnumDataActorProperty("Facing Target Type", (TargetType)Read8(1), BitCount.Bit8, "Turret Properties", "FacingOverloadAttack"),
+
+                new OverloadedProperty("FacingOverloadAttack", new() {
+                    (new AssetActorProperty("Face Team", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type"].GetCompiledValue() == TargetType.Team),
+                    (new AssetActorProperty("Face Actor", Read16NoIt(0), AssetType.Actor, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type"].GetCompiledValue() == TargetType.Actor),
+                    (new ValueActorProperty("S_Unknown Face", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
+
+                }, BitCount.Bit16, "Turret Properties"),
                 new RangeActorProperty("Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16, "Turret Properties"),
-                new NormalizedValueProperty ("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16, "Turret Properties"),
-                new ValueActorProperty("Turn Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Turret Properties"),
-                new ValueActorProperty("Tunknown13", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Turret Properties"),
-                new ValueActorProperty("Tunknown14", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Turret Properties")
+                new NormalizedValueProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16, "Turret Properties"),
+                new NormalizedValueProperty("Turn Speed", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16, "Turret Properties"),
+                new NormalizedValueProperty("Face Engage Range", Read16(6144), 0, short.MaxValue, 512f, BitCount.Bit16, "Turret Properties"),
+
             });
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ToggleActorProperty("Use Shooter Data for Facing", Read1(0x01, false), BitCount.Bit1, "Turret Tags"),
+                new ToggleActorProperty("Look at Target X-Axis", Read1(0x02, false), BitCount.Bit1, "Turret Tags"),
+                new ToggleActorProperty("Use Turret Data for Facing", Read1(0x04, false), BitCount.Bit1, "Turret Tags"),
+                new ToggleActorProperty("Spin Z Axis", Read1(0x08, false), BitCount.Bit1, "Turret Tags"),
+                new ToggleActorProperty("Walkable", Read1(0x10, false), BitCount.Bit1, "Turret Tags"),
+                new ToggleActorProperty("135 Degrees Forward Facing", Read1(0x20, false), BitCount.Bit1, "Turret Tags"),
+                new ToggleActorProperty("TTag Unknown 1", Read1(0x40, false), BitCount.Bit1, "Turret Tags"),
+                new ToggleActorProperty("TTag Unknown 2", Read1(0x80, false), BitCount.Bit1, "Turret Tags"),
+
+                new FillerActorProperty(0, BitCount.Bit8)
+
+            });
+            offset += 2;
 
         }
 
