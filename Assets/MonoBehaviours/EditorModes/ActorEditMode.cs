@@ -267,8 +267,8 @@ public class ActorEditMode : EditMode {
 
                 //return a.behavior is FCopShooter e;
 
-                if (a.behavior is FCopTurret es) {
-                    return es.propertiesByName["TTag Unknown 2"].GetCompiledValue() == 1;
+                if (a.behavior is FCopBehavior5 es) {
+                    return es.propertiesByName["5_Unknown11 82:"].GetCompiledValue() != 255;
                 }
                 return false;
 

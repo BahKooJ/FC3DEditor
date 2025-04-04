@@ -940,7 +940,7 @@ namespace FCopParser {
 
     }
 
-    public abstract class FCopPathedEntity : FCopShooter {
+    public abstract class FCopPathedEntity : FCopShooter, FCopHeightOffsetting {
 
         public FCopPathedEntity(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
@@ -974,7 +974,7 @@ namespace FCopParser {
             properties.AddRange(new List<ActorProperty>() {
 
                 new ValueActorProperty("Move Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
-                new ValueActorProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
+                new NormalizedValueProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16, "Pathing Properties"),
                 new ValueActorProperty("Move Speed Multiplier 66:", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
                 new ValueActorProperty("Acceleration", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
                 new ValueActorProperty("Path_Unknown3 70:", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
@@ -988,6 +988,22 @@ namespace FCopParser {
 
             InitPropertiesByName();
 
+        }
+
+        public void SetHeight(float height) {
+            ((NormalizedValueProperty)propertiesByName["Height Offset"]).Set(height);
+        }
+
+        public float GetHeight() {
+            return ((NormalizedValueProperty)propertiesByName["Height Offset"]).value;
+        }
+
+        public ActorProperty GetHeightProperty() {
+            return propertiesByName["Height Offset"];
+        }
+
+        public ActorGroundCast GetGroundCast() {
+            return ActorGroundCast.Highest;
         }
 
     }
@@ -1027,7 +1043,15 @@ namespace FCopParser {
     // Observed
     public class FCopBehavior5 : FCopPathedEntity {
 
+        public const int assetRefCount = 3;
+
         public FCopBehavior5(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("Object", AssetType.Object),
+                new ActorAssetReference("Destroyed Object", AssetType.Object),
+                new ActorAssetReference("Nav Mesh", AssetType.NavMesh),
+            };
 
             properties.AddRange(new List<ActorProperty>() {
 
