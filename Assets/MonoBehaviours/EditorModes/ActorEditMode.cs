@@ -267,8 +267,8 @@ public class ActorEditMode : EditMode {
 
                 //return a.behavior is FCopShooter e;
 
-                if (a.behavior is FCopBehavior5 es) {
-                    return es.propertiesByName["5_Unknown11 82:"].GetCompiledValue() != 255;
+                if (a.behavior is FCopBehavior8 es) {
+                    return es.propertiesByName["8unknown0"].GetCompiledValue() != 0;
                 }
                 return false;
 
@@ -458,8 +458,31 @@ public class ActorEditMode : EditMode {
 
         }
 
+        void InitElevatorStopNode(int stop, NormalizedValueProperty heightOffset) {
+
+            var obj = Object.Instantiate(main.ElevatorStopNodeFab);
+
+            var editingNode = obj.GetComponent<ElevatorStopNode>();
+            editingNode.controller = this;
+            editingNode.actor = selectedActor;
+            editingNode.controlledProperties = new() {
+                heightOffset
+            };
+            editingNode.stopIndex = stop;
+            editingNode.heightOffset = heightOffset;
+
+            actorEditingNodes.Add(editingNode);
+
+        }
+
         switch (selectedActor.behavior) {
 
+            case FCopBehavior10:
+
+                InitElevatorStopNode(2, (NormalizedValueProperty)selectedActor.behavior.propertiesByName["2nt Height Offset"]);
+                InitElevatorStopNode(3, (NormalizedValueProperty)selectedActor.behavior.propertiesByName["3rd Height Offset"]);
+
+                break;
             case FCopBehavior35:
 
                 InitMapNode((NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 1 X"], (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 1 Y"]);

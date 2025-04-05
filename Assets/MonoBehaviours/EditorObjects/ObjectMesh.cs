@@ -29,7 +29,7 @@ public class ObjectMesh : MonoBehaviour {
 
 
     Mesh mesh;
-    Material material;
+    public Material material;
     [HideInInspector]
     public MeshCollider meshCollider;
 

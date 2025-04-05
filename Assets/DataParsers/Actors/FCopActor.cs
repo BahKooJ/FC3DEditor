@@ -1040,7 +1040,7 @@ namespace FCopParser {
 
     }
 
-    // Observed
+    // - Animation Dependant, Implemented -
     public class FCopBehavior5 : FCopPathedEntity {
 
         public const int assetRefCount = 3;
@@ -1055,10 +1055,10 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("5_Unknown9 80:", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("5_Unknown10 81:", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("5_Unknown11 82:", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("5_Unknown12 83:", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8)
+                new ValueActorProperty("Move Animation (Unk)", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("Sub Model (Unknown)", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("5_Unknown", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8)
 
             });
 
@@ -1071,6 +1071,7 @@ namespace FCopParser {
     // Ok instead of have the "Turret" Object the parent object may just be behavior 6.
     // The only issues is from what I can tell, the only property is always zero which
     // makes it hard to actually confirm that.
+    // - Completed -
     public class FCopBehavior6 : FCopTurret {
 
         public const int assetRefCount = 2;
@@ -1093,22 +1094,24 @@ namespace FCopParser {
 
     }
 
-    // Observed
+    // - Completed -
     public class FCopBehavior8 : FCopTurret {
+
+        public const int assetRefCount = 4;
 
         public FCopBehavior8(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             assetReferences = new ActorAssetReference[] { 
                 new ActorAssetReference("Head Object", AssetType.Object, 2, 0),
-                new ActorAssetReference("Object", AssetType.Object),
+                new ActorAssetReference("None", AssetType.None),
                 new ActorAssetReference("Base Object", AssetType.Object),
                 new ActorAssetReference("Destroyed Object", AssetType.Object),
             };
 
             properties.AddRange(new List<ActorProperty>() {
-                //new FillerActorProperty(Read16(0), BitCount.Bit16),
-                new ValueActorProperty("8unknownFill", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("8unknown0", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read16(0), BitCount.Bit16),
+                // This value is only ever used in M3A, either 1 or 0, making it a fill.
+                new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new RangeActorProperty("Base Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16)
             });
 
@@ -1162,7 +1165,7 @@ namespace FCopParser {
 
     }
 
-    // - Parsed -
+    // - Completed -
     public class FCopBehavior10 : FCopEntity, FCopHeightOffsetting, FCopObjectMutating {
 
         public const int assetRefCount = 2;
@@ -1178,18 +1181,18 @@ namespace FCopParser {
             properties.AddRange(new List<ActorProperty>() {
                 new EnumDataActorProperty("Number Of Stops", (ElevatorStops)Read8(2), BitCount.Bit8),
                 new EnumDataActorProperty("Starting Position", (ElevatorStartingPoint)Read8(2), BitCount.Bit8),
-                new NormalizedValueProperty("1st Height Offset", Read16(0), short.MinValue, short.MaxValue, 8192f, BitCount.Bit16),
-                new ValueActorProperty("2nt Height Offset", Read16(600), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("3rd Height Offset", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("1st Stop Time", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("2nt Stop Time", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("3rd Stop Time", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Up Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Down Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new NormalizedValueProperty("1st Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("2nt Height Offset", Read16(600), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("3rd Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("1st Stop Time", Read16(0), 0, short.MaxValue, 256f, BitCount.Bit16),
+                new NormalizedValueProperty("2nt Stop Time", Read16(0), 0, short.MaxValue, 256f, BitCount.Bit16),
+                new NormalizedValueProperty("3rd Stop Time", Read16(0), 0, short.MaxValue, 256f, BitCount.Bit16),
+                new NormalizedValueProperty("Up Speed", Read16(0), 0, short.MaxValue, 128f, BitCount.Bit16),
+                new NormalizedValueProperty("Down Speed", Read16(0), 0, short.MaxValue, 128f, BitCount.Bit16),
                 new RangeActorProperty("Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16),
                 new EnumDataActorProperty("Trigger Type", (ElevatorTrigger)Read8(0), BitCount.Bit8),
                 new EnumDataActorProperty("Tile Effect", (TileEffectType)Read8(0), BitCount.Bit8),
-                new ValueActorProperty("End Sound", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new AssetActorProperty("End Sound", Read16(0), AssetType.WavSound, BitCount.Bit16),
 
             });
 
@@ -1225,7 +1228,7 @@ namespace FCopParser {
 
     }
 
-    // - Parsed -
+    // - Completed -
     public class FCopBehavior11 : FCopEntity, FCopHeightOffsetting, FCopObjectMutating {
 
         public const int assetRefCount = 2;
@@ -1279,7 +1282,7 @@ namespace FCopParser {
 
     }
 
-    // - Parsed -
+    // - Completed -
     public class FCopBehavior12 : FCopEntity, FCopHeightOffsetting, FCopObjectMutating {
 
         public int heightMultiplier { get; set; }
@@ -1364,8 +1367,10 @@ namespace FCopParser {
 
     }
 
-    // - Parsed -
+    // - Completed -
     public class FCopBehavior16 : FCopEntity {
+
+        public const int assetRefCount = 2;
 
         public FCopBehavior16(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
@@ -1375,7 +1380,7 @@ namespace FCopParser {
             };
 
             properties.AddRange(new List<ActorProperty>() {
-                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8),
                 new FillerActorProperty(Read8(1), BitCount.Bit8),
                 new FillerActorProperty(Read8(1), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
@@ -1426,7 +1431,7 @@ namespace FCopParser {
                 new FillerActorProperty(Read8(3), BitCount.Bit8),
                 new FillerActorProperty(Read8(255), BitCount.Bit8),
                 new FillerActorProperty(Read8(255), BitCount.Bit8),
-                new ValueActorProperty("Rotation Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new NormalizedValueProperty("Rotation Speed", Read16(0), short.MinValue, short.MaxValue, 1024f, BitCount.Bit16),
             });
 
             InitPropertiesByName();
