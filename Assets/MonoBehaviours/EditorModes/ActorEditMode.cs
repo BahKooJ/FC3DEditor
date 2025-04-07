@@ -267,8 +267,8 @@ public class ActorEditMode : EditMode {
 
                 //return a.behavior is FCopShooter e;
 
-                if (a.behavior is FCopBehavior8 es) {
-                    return es.propertiesByName["8unknown0"].GetCompiledValue() != 0;
+                if (a.behavior is FCopBehavior20 es) {
+                    return es.propertiesByName["85"].GetCompiledValue() != 0;
                 }
                 return false;
 

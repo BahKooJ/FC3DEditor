@@ -113,6 +113,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   missingObjectPrefab: {fileID: 8277653005507222693, guid: d66b457816a66cb48a2aa4ff45ef03e0, type: 3}
+  rootParent: {fileID: 6415589794773881703}
   actCollider: {fileID: 509455666974134385}
   renameTextFeild: {fileID: -4830967494353530035}
   placeholderObject: {fileID: 1430015761629357658}

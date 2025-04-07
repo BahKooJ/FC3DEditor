@@ -11,6 +11,7 @@ public class ActorObject : MonoBehaviour {
     public GameObject missingObjectPrefab;
 
     // - Unity Refs -
+    public Transform rootParent;
     public Collider actCollider;
     public TextFieldPopupHandler renameTextFeild;
     public GameObject placeholderObject;
@@ -160,31 +161,6 @@ public class ActorObject : MonoBehaviour {
 
         }
 
-        if (actor.behavior.assetReferences != null) {
-
-            var ari = 0;
-            foreach (var assetRef in actor.behavior.assetReferences) {
-
-                if (assetRef.dependantRefIndex != -1 && assetRef.type == AssetType.Object) {
-
-                    var obj = objects[ari];
-
-                    var dependantObj = objects[assetRef.dependantRefIndex];
-
-                    if (assetRef.positionIndex != -1) {
-
-                        var fCopVert = dependantObj.fCopObject.GetPosition(assetRef.positionIndex);
-                        var pos = new Vector3(fCopVert.x / ObjectMesh.scale, fCopVert.y / ObjectMesh.scale, fCopVert.z / ObjectMesh.scale);
-
-                        obj.transform.localPosition = pos;
-
-                    }
-                }
-                ari++;
-            }
-
-        }
-
         SetObjectMutations();
 
     }
@@ -222,6 +198,41 @@ public class ActorObject : MonoBehaviour {
 
         }
 
+
+    }
+
+    void SetToCurrentObjPositions() {
+
+        if (actor.behavior.assetReferences != null) {
+
+            var ari = 0;
+            foreach (var assetRef in actor.behavior.assetReferences) {
+
+                if (assetRef.dependantRefIndex != -1 && assetRef.type == AssetType.Object) {
+
+                    var obj = objects[ari];
+
+                    var dependantObj = objects[assetRef.dependantRefIndex];
+
+                    if (assetRef.positionIndex != -1) {
+
+                        var fCopVert = dependantObj.fCopObject.GetPosition(assetRef.positionIndex);
+
+                        obj.transform.SetParent(dependantObj.transform, true);
+
+                        var pos = new Vector3(fCopVert.x / ObjectMesh.scale, fCopVert.y / ObjectMesh.scale, fCopVert.z / ObjectMesh.scale);
+
+                        obj.transform.localPosition = pos;
+
+                        obj.transform.SetParent(rootParent, true);
+
+                    }
+
+                }
+                ari++;
+            }
+
+        }
 
     }
 
@@ -276,6 +287,8 @@ public class ActorObject : MonoBehaviour {
             }
 
         }
+
+        SetToCurrentObjPositions();
 
     }
 

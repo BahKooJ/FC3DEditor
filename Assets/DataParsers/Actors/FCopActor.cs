@@ -1441,15 +1441,40 @@ namespace FCopParser {
     }
 
     // Observed
-    public class FCopBehavior20 : FCopPathedEntity {
+    public class FCopBehavior20 : FCopPathedEntity, FCopObjectMutating {
 
         public FCopBehavior20(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("Base Object", AssetType.Object),
+                new ActorAssetReference("Destroyed Object", AssetType.Object),
+                new ActorAssetReference("Nav Mesh", AssetType.NavMesh),
+                new ActorAssetReference("Head Object", AssetType.Object, 0, 0),
+            };
+
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("Turn Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Head Rotation", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("84", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new NormalizedValueProperty("Turn Speed", Read16(0), 0, 256, 64f, BitCount.Bit16),
+                new RangeActorProperty("Head Rotation", Read16(0), -1, 4096, 4096f / 360f, BitCount.Bit16),
+
+            });
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Thruster Behavior Override", Read1(0x02, false), BitCount.Bit1, "Pathed Turret Tags"),
+                new ToggleActorProperty("Spin Head (No Engaging)", Read1(0x04, false), BitCount.Bit1, "Pathed Turret Tags"),
+                new ToggleActorProperty("Shoot With Base Object", Read1(0x08, false), BitCount.Bit1, "Pathed Turret Tags"),
+                new ToggleActorProperty("Look at Target X-Axis", Read1(0x10, false), BitCount.Bit1, "Pathed Turret Tags"),
+                new ToggleActorProperty("Lock Head", Read1(0x20, false), BitCount.Bit1, "Pathed Turret Tags"),
+                new ToggleActorProperty("Targetable Head Object", Read1(0x40, false), BitCount.Bit1, "Pathed Turret Tags"),
+                new ToggleActorProperty("PTTag Unknown", Read1(0x80, false), BitCount.Bit1, "Pathed Turret Tags"),
+
+            });
+            offset++;
+
+            properties.AddRange(new List<ActorProperty>() {
+
                 new ValueActorProperty("85", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8)
@@ -1457,6 +1482,16 @@ namespace FCopParser {
             });
 
             InitPropertiesByName();
+
+        }
+
+        public ObjectMutation[] GetMutations() {
+
+            return new ObjectMutation[] {
+
+                new ObjectMutation(3, GetUVOffset(), ((RangeActorProperty)propertiesByName["Head Rotation"]).value)
+
+            };
 
         }
 

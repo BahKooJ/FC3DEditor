@@ -47,9 +47,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   missingObjectPrefab: {fileID: 8277653005507222693, guid: d66b457816a66cb48a2aa4ff45ef03e0, type: 3}
+  rootParent: {fileID: 2917671509246049090}
   actCollider: {fileID: 586320845033451150}
   renameTextFeild: {fileID: 6673128335193514363}
   placeholderObject: {fileID: 8775187337990704097}
+  yPadding: 0
   group: {fileID: 0}
   objects: []
   missingObjectGameobj: {fileID: 0}

@@ -118,6 +118,17 @@ public class ActorPropertyChangeEvent {
             }
 
         } },
+        {"Head Rotation", (controller, prop) => {
+
+            if (controller.selectedActorObject != null) {
+
+                var aObj = controller.actorObjectsByID[controller.selectedActor.DataID];
+
+                aObj.RefreshRotation();
+
+            }
+
+        } },
         {"Scale X", (controller, prop) => {
 
             if (controller.selectedActorObject != null) {
