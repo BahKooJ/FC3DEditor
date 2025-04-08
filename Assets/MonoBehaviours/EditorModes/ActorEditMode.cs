@@ -475,6 +475,34 @@ public class ActorEditMode : EditMode {
 
         }
 
+        void InitMoveablePropStop() {
+
+            var obj = Object.Instantiate(main.MovablePropStopFab);
+
+            var editingNode = obj.GetComponent<MovablePropStop>();
+            editingNode.controller = this;
+            editingNode.actor = selectedActor;
+
+            var moveAxis = selectedActor.behavior.propertiesByName["Move Axis"];
+            var moveOffset = selectedActor.behavior.propertiesByName["Ending Position Offset"];
+            var rotationOffset = selectedActor.behavior.propertiesByName["Ending Rotation"];
+            var rotation = selectedActor.behavior.propertiesByName["Rotation"];
+
+
+            editingNode.controlledProperties = new() {
+                moveOffset, rotationOffset
+            };
+
+            editingNode.actorObject = selectedActorObject.controlledObject.GetComponent<ActorObject>();
+            editingNode.moveAxis = (EnumDataActorProperty)moveAxis;
+            editingNode.moveOffset = (NormalizedValueProperty)moveOffset;
+            editingNode.rotationOffset = (RangeActorProperty)rotationOffset;
+            editingNode.rotation = (RangeActorProperty)rotation;
+
+            actorEditingNodes.Add(editingNode);
+
+        }
+
         switch (selectedActor.behavior) {
 
             case FCopBehavior10:
@@ -482,6 +510,9 @@ public class ActorEditMode : EditMode {
                 InitElevatorStopNode(2, (NormalizedValueProperty)selectedActor.behavior.propertiesByName["2nt Height Offset"]);
                 InitElevatorStopNode(3, (NormalizedValueProperty)selectedActor.behavior.propertiesByName["3rd Height Offset"]);
 
+                break;
+            case FCopBehavior25:
+                InitMoveablePropStop();
                 break;
             case FCopBehavior35:
 

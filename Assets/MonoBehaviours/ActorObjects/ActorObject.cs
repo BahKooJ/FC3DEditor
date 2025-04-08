@@ -1,6 +1,7 @@
 ﻿
 
 using FCopParser;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -214,9 +215,17 @@ public class ActorObject : MonoBehaviour {
 
                     var dependantObj = objects[assetRef.dependantRefIndex];
 
-                    if (assetRef.positionIndex != -1) {
+                    if (assetRef.positionIndex != -1 && obj != null) {
 
-                        var fCopVert = dependantObj.fCopObject.GetPosition(assetRef.positionIndex);
+                        FCopObject.Vertex fCopVert;
+
+                        try {
+                            fCopVert = dependantObj.fCopObject.GetPosition(assetRef.positionIndex);
+                        }
+                        catch {
+                            ari++;
+                            continue;
+                        }
 
                         obj.transform.SetParent(dependantObj.transform, true);
 

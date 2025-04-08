@@ -96,6 +96,7 @@ public class Main : MonoBehaviour {
     // Editing Nodes
     public GameObject MapNodeFab;
     public GameObject ElevatorStopNodeFab;
+    public GameObject MovablePropStopFab;
 
     public GameObject playerCamera;
     public GameObject playModePlayer;
