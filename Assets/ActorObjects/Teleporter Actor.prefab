@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -1122766675641614602}
   - component: {fileID: -4830967494353530035}
   m_Layer: 3
-  m_Name: Map Objective Nodes Actor
+  m_Name: Teleporter Actor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -77,7 +77,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 832fc57a35ddfbb42bdfc54e4a743bd9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: db66725d1aef8db4d900032cc1edeab0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 1
   m_FlipY: 0

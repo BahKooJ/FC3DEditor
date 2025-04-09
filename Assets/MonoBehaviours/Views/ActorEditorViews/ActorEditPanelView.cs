@@ -25,6 +25,7 @@ public class ActorEditPanelView : MonoBehaviour {
             ("Elevator", () => { controller.StartAdd(FCopParser.ActorBehavior.Elevator); }),
             ("Dynamic Prop", () => { controller.StartAdd(FCopParser.ActorBehavior.DynamicProp); }),
             ("Static Prop", () => { controller.StartAdd(FCopParser.ActorBehavior.StaticProp); }),
+            ("Teleporter", () => { controller.StartAdd(FCopParser.ActorBehavior.Teleporter); }),
 
         };
 

@@ -59,6 +59,9 @@ public class ActorEditMode : EditMode {
         GameObject nodeObject;
 
         switch (actor.behavior) {
+            case FCopBehavior29:
+                nodeObject = Object.Instantiate(main.TeleporterActor);
+                break;
             case FCopBehavior35:
                 nodeObject = Object.Instantiate(main.MapObjectiveNodesActor);
                 break;
@@ -503,6 +506,25 @@ public class ActorEditMode : EditMode {
 
         }
 
+        void InitTeleporterNode(NormalizedValueProperty propX, NormalizedValueProperty propY) {
+
+            var obj = Object.Instantiate(main.TeleporterLocationNodeFab);
+
+            var editingNode = obj.GetComponent<TeleporterLocationEditingNode>();
+            editingNode.controller = this;
+            editingNode.actor = selectedActor;
+            editingNode.controlledProperties = new() {
+                propX,
+                propY
+            };
+            editingNode.propertyX = propX;
+            editingNode.propertyY = propY;
+            editingNode.actorObject = selectedActorObject.controlledObject.GetComponent<ActorObject>();
+
+            actorEditingNodes.Add(editingNode);
+
+        }
+
         switch (selectedActor.behavior) {
 
             case FCopBehavior10:
@@ -513,6 +535,9 @@ public class ActorEditMode : EditMode {
                 break;
             case FCopBehavior25:
                 InitMoveablePropStop();
+                break;
+            case FCopBehavior29:
+                InitTeleporterNode((NormalizedValueProperty)selectedActor.behavior.propertiesByName["X"], (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Y"]);
                 break;
             case FCopBehavior35:
 

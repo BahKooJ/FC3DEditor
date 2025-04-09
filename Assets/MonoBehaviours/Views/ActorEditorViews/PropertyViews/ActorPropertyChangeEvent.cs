@@ -162,6 +162,17 @@ public class ActorPropertyChangeEvent {
             }
 
         } },
+        {"X", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+        {"Y", (controller, prop) => {
+
+            RefreshActorEditPosition(controller, prop);
+
+        } },
+
         #region MapNodes
         {"Node 1 X", (controller, prop) => {
 

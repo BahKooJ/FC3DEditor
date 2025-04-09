@@ -5,8 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Unity.VisualScripting;
-using UnityEngine;
 
 namespace FCopParser {
 
@@ -112,7 +110,7 @@ namespace FCopParser {
                 case ActorBehavior.Behavior27:
                     behavior = new FCopBehavior27(this, propertyData);
                     break;
-                case ActorBehavior.Behavior28:
+                case ActorBehavior.PathedMultiTurret:
                     behavior = new FCopBehavior28(this, propertyData);
                     break;
                 case ActorBehavior.Teleporter:
@@ -226,6 +224,10 @@ namespace FCopParser {
 
                     InitResourceAndRawFile(FCopBehavior11.assetRefCount);
                     this.behavior = new FCopBehavior11(this, new());
+                    break;
+                case ActorBehavior.Teleporter:
+                    InitResourceAndRawFile(FCopBehavior29.assetRefCount);
+                    this.behavior = new FCopBehavior29(this, new());
                     break;
                 case ActorBehavior.StaticProp:
                     InitResourceAndRawFile(FCopBehavior96.assetRefCount);
@@ -566,10 +568,20 @@ namespace FCopParser {
 
         }
 
-        public void InitPropertiesByName() {
+        public void InitPropertiesByName(List<string> commonNameSort = null) {
 
             propertiesByName.Clear();
             propertiesByCommonName.Clear();
+
+            if (commonNameSort != null) {
+
+                foreach (var commonName in commonNameSort) {
+
+                    propertiesByCommonName[commonName] = new();
+
+                }
+
+            }
 
             foreach (var prop in properties) {
                 propertiesByName[prop.name] = prop;
@@ -1634,6 +1646,7 @@ namespace FCopParser {
 
     }
 
+    // - Implemented, One Unknown, Explosion Dependant, Many unknows from other types (Shooter, Path Turret) -
     public class FCopBehavior28 : FCopPathedEntity {
 
         public FCopBehavior28(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
@@ -1650,68 +1663,269 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("80", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("82", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("84", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("85", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("86", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("87", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("88", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("89", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("90", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("91", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-
-                new ValueActorProperty("92", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("94", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("96", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("97", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("98", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("100", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("102", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("104", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("106", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-
-                new ValueActorProperty("108", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("110", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("112", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("113", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("114", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("116", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("118", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("120", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("122", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-
-                new ValueActorProperty("124", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("126", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("128", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("129", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("130", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("132", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("134", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("136", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("138", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-
-
+                new NormalizedValueProperty("Turn Speed", Read16(64), 0, 256, 64f, BitCount.Bit16),
+                new ValueActorProperty("Unknown", Read16(0), 0, 1, BitCount.Bit16),
 
             });
 
+            properties.AddRange(new List<ActorProperty>() {
 
-            InitPropertiesByName();
+                new ToggleActorProperty("Independent Object (H1)", Read1(0x01, false), BitCount.Bit1, "Turret Properties Head 1"),
+                new ToggleActorProperty("Thruster Behavior Override (H1)", Read1(0x02, false), BitCount.Bit1, "Turret Properties Head 1"),
+                new ToggleActorProperty("Spin Head (No Engaging) (H1)", Read1(0x04, false), BitCount.Bit1, "Turret Properties Head 1"),
+                new ToggleActorProperty("Shoot With Base Object (H1)", Read1(0x08, false), BitCount.Bit1, "Turret Properties Head 1"),
+                new ToggleActorProperty("Look at Target X-Axis (H1)", Read1(0x10, false), BitCount.Bit1, "Turret Properties Head 1"),
+                new ToggleActorProperty("Lock Head (H1)", Read1(0x20, false), BitCount.Bit1, "Turret Properties Head 1"),
+                new ToggleActorProperty("Targetable Head Object (H1)", Read1(0x40, false), BitCount.Bit1, "Turret Properties Head 1"),
+                new ToggleActorProperty("PTTag Unknown (H1)", Read1(0x80, false), BitCount.Bit1, "Turret Properties Head 1"),
+
+            });
+            offset++;
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ToggleActorProperty("Independent Object (H2)", Read1(0x01, false), BitCount.Bit1, "Turret Properties Head 2"),
+                new ToggleActorProperty("Thruster Behavior Override (H2)", Read1(0x02, false), BitCount.Bit1, "Turret Properties Head 2"),
+                new ToggleActorProperty("Spin Head (No Engaging) (H2)", Read1(0x04, false), BitCount.Bit1, "Turret Properties Head 2"),
+                new ToggleActorProperty("Shoot With Base Object (H2)", Read1(0x08, false), BitCount.Bit1, "Turret Properties Head 2"),
+                new ToggleActorProperty("Look at Target X-Axis (H2)", Read1(0x10, false), BitCount.Bit1, "Turret Properties Head 2"),
+                new ToggleActorProperty("Lock Head (H2)", Read1(0x20, false), BitCount.Bit1, "Turret Properties Head 2"),
+                new ToggleActorProperty("Targetable Head Object (H2)", Read1(0x40, false), BitCount.Bit1, "Turret Properties Head 2"),
+                new ToggleActorProperty("PTTag Unknown (H2)", Read1(0x80, false), BitCount.Bit1, "Turret Properties Head 2"),
+
+            });
+            offset++;
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ToggleActorProperty("Independent Object (H3)", Read1(0x01, false), BitCount.Bit1, "Turret Properties Head 3"),
+                new ToggleActorProperty("Thruster Behavior Override (H3)", Read1(0x02, false), BitCount.Bit1, "Turret Properties Head 3"),
+                new ToggleActorProperty("Spin Head (No Engaging) (H3)", Read1(0x04, false), BitCount.Bit1, "Turret Properties Head 3"),
+                new ToggleActorProperty("Shoot With Base Object (H3)", Read1(0x08, false), BitCount.Bit1, "Turret Properties Head 3"),
+                new ToggleActorProperty("Look at Target X-Axis (H3)", Read1(0x10, false), BitCount.Bit1, "Turret Properties Head 3"),
+                new ToggleActorProperty("Lock Head (H3)", Read1(0x20, false), BitCount.Bit1, "Turret Properties Head 3"),
+                new ToggleActorProperty("Targetable Head Object (H3)", Read1(0x40, false), BitCount.Bit1, "Turret Properties Head 3"),
+                new ToggleActorProperty("PTTag Unknown (H3)", Read1(0x80, false), BitCount.Bit1, "Turret Properties Head 3"),
+
+            });
+            offset++;
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ToggleActorProperty("Independent Object (H4)", Read1(0x01, false), BitCount.Bit1, "Turret Properties Head 4"),
+                new ToggleActorProperty("Thruster Behavior Override (H4)", Read1(0x02, false), BitCount.Bit1, "Turret Properties Head 4"),
+                new ToggleActorProperty("Spin Head (No Engaging) (H4)", Read1(0x04, false), BitCount.Bit1, "Turret Properties Head 4"),
+                new ToggleActorProperty("Shoot With Base Object (H4)", Read1(0x08, false), BitCount.Bit1, "Turret Properties Head 4"),
+                new ToggleActorProperty("Look at Target X-Axis (H4)", Read1(0x10, false), BitCount.Bit1, "Turret Properties Head 4"),
+                new ToggleActorProperty("Lock Head (H4)", Read1(0x20, false), BitCount.Bit1, "Turret Properties Head 4"),
+                new ToggleActorProperty("Targetable Head Object (H4)", Read1(0x40, false), BitCount.Bit1, "Turret Properties Head 4"),
+                new ToggleActorProperty("PTTag Unknown (H4)", Read1(0x80, false), BitCount.Bit1, "Turret Properties Head 4"),
+
+            });
+            offset++;
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ValueActorProperty("Head 1 Explosion", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Turret Properties Head 1"),
+                new ValueActorProperty("Head 2 Explosion", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Turret Properties Head 2"),
+                new ValueActorProperty("Head 3 Explosion", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Turret Properties Head 3"),
+                new ValueActorProperty("Head 4 Explosion", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Turret Properties Head 4"),
+
+            });
+
+            #region Head 2
+
+            properties.AddRange(new List<ActorProperty>() {
+                new ValueActorProperty("Weapon ID (H2)", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Shooter Properties Head 2")
+            });
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Prevent Back Shooting (H2)", Read1(0x02, false), BitCount.Bit1, "Shooter Tags Head 2"),
+                new ToggleActorProperty("Shoot When Facing (H2)", Read1(0x04, false), BitCount.Bit1, "Shooter Tags Head 2"),
+                new ToggleActorProperty("STag Unknown (H2)", Read1(0x08, false), BitCount.Bit1, "Shooter Tags Head 2"),
+                new ToggleActorProperty("STag Unknown 2 (H2)", Read1(0x10, false), BitCount.Bit1, "Shooter Tags Head 2"),
+                new ToggleActorProperty("Fire Alternations (H2)", Read1(0x20, false), BitCount.Bit1, "Shooter Tags Head 2"),
+                new ToggleActorProperty("Target Priority (H2)", Read1(0x40, false), BitCount.Bit1, "Shooter Tags Head 2"),
+                new ToggleActorProperty("STag Unknown 3 (H2)", Read1(0x80, false), BitCount.Bit1, "Shooter Tags Head 2"),
+
+            });
+            offset++;
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ToggleActorProperty("Disabled (H2)", Read1(0x01, false), BitCount.Bit1, "Shooter Tags Head 2"),
+                new ToggleActorProperty("Weapon Actor Collision (H2)", Read1(0x02, false), BitCount.Bit1, "Shooter Tags Head 2"),
+                new ToggleActorProperty("Attackable Weapon (H2)", Read1(0x04, false), BitCount.Bit1, "Shooter Tags Head 2"),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("STag Unknown 4 (H2)", Read1(0x10, false), BitCount.Bit1, "Shooter Tags Head 2"),
+                new ToggleActorProperty("STag Unknown 5 (H2)", Read1(0x20, false), BitCount.Bit1, "Shooter Tags Head 2"),
+                new ToggleActorProperty("Allow Switch Target (H2)", Read1(0x40, false), BitCount.Bit1, "Shooter Tags Head 2"),
+                new ToggleActorProperty("STag Unknown 6 (H2)", Read1(0x80, false), BitCount.Bit1, "Shooter Tags Head 2"),
+
+            });
+            offset++;
+
+            properties.AddRange(new List<ActorProperty>() {
+                new EnumDataActorProperty("Acquiring Type (H2)", (AcquiringType)Read8(0), BitCount.Bit8, "Shooter Properties Head 2"),
+                new EnumDataActorProperty("Target Type (H2)", (TargetType)Read8(1), BitCount.Bit8, "Shooter Properties Head 2", "OverloadAttack2"),
+
+                new OverloadedProperty("OverloadAttack2", new() {
+                    (new AssetActorProperty("Attack Team (H2)", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H2)"].GetCompiledValue() == TargetType.Team),
+                    (new AssetActorProperty("Attack Actor (H2)", Read16NoIt(0), AssetType.Actor, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H2)"].GetCompiledValue() == TargetType.Actor),
+                    (new ValueActorProperty("S_Unknown Attack (H2)", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
+
+                }, BitCount.Bit16, "Shooter Properties Head 2"),
+
+                new NormalizedValueProperty("Detection FOV? (H2)", Read16(4096), 0, 4096, 4096f / 360f, BitCount.Bit16, "Shooter Properties Head 2"),
+                new NormalizedValueProperty("Shooting FOV? (H2)", Read16(4096), 0, 4096, 4096f / 360f, BitCount.Bit16, "Shooter Properties Head 2"),
+                new NormalizedValueProperty("Engage Range (H2)", Read16(6144), 0, short.MaxValue, 512f, BitCount.Bit16, "Shooter Properties Head 2"),
+                new NormalizedValueProperty("Targeting Delay (H2)", Read16(32), 0, 320, 32f, BitCount.Bit16, "Shooter Properties Head 2"),
+            });
+
+            #endregion
+
+            #region Head 3
+
+            properties.AddRange(new List<ActorProperty>() {
+                new ValueActorProperty("Weapon ID (H3)", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Shooter Properties Head 3")
+            });
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Prevent Back Shooting (H3)", Read1(0x02, false), BitCount.Bit1, "Shooter Tags Head 3"),
+                new ToggleActorProperty("Shoot When Facing (H3)", Read1(0x04, false), BitCount.Bit1, "Shooter Tags Head 3"),
+                new ToggleActorProperty("STag Unknown (H3)", Read1(0x08, false), BitCount.Bit1, "Shooter Tags Head 3"),
+                new ToggleActorProperty("STag Unknown 2 (H3)", Read1(0x10, false), BitCount.Bit1, "Shooter Tags Head 3"),
+                new ToggleActorProperty("Fire Alternations (H3)", Read1(0x20, false), BitCount.Bit1, "Shooter Tags Head 3"),
+                new ToggleActorProperty("Target Priority (H3)", Read1(0x40, false), BitCount.Bit1, "Shooter Tags Head 3"),
+                new ToggleActorProperty("STag Unknown 3 (H3)", Read1(0x80, false), BitCount.Bit1, "Shooter Tags Head 3"),
+
+            });
+            offset++;
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ToggleActorProperty("Disabled (H3)", Read1(0x01, false), BitCount.Bit1, "Shooter Tags Head 3"),
+                new ToggleActorProperty("Weapon Actor Collision (H3)", Read1(0x02, false), BitCount.Bit1, "Shooter Tags Head 3"),
+                new ToggleActorProperty("Attackable Weapon (H3)", Read1(0x04, false), BitCount.Bit1, "Shooter Tags Head 3"),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("STag Unknown 4 (H3)", Read1(0x10, false), BitCount.Bit1, "Shooter Tags Head 3"),
+                new ToggleActorProperty("STag Unknown 5 (H3)", Read1(0x20, false), BitCount.Bit1, "Shooter Tags Head 3"),
+                new ToggleActorProperty("Allow Switch Target (H3)", Read1(0x40, false), BitCount.Bit1, "Shooter Tags Head 3"),
+                new ToggleActorProperty("STag Unknown 6 (H3)", Read1(0x80, false), BitCount.Bit1, "Shooter Tags Head 3"),
+
+            });
+            offset++;
+
+            properties.AddRange(new List<ActorProperty>() {
+                new EnumDataActorProperty("Acquiring Type (H3)", (AcquiringType)Read8(0), BitCount.Bit8, "Shooter Properties Head 3"),
+                new EnumDataActorProperty("Target Type (H3)", (TargetType)Read8(1), BitCount.Bit8, "Shooter Properties Head 3", "OverloadAttack3"),
+
+                new OverloadedProperty("OverloadAttack3", new() {
+                    (new AssetActorProperty("Attack Team (H3)", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H3)"].GetCompiledValue() == TargetType.Team),
+                    (new AssetActorProperty("Attack Actor (H3)", Read16NoIt(0), AssetType.Actor, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H3)"].GetCompiledValue() == TargetType.Actor),
+                    (new ValueActorProperty("S_Unknown Attack (H3)", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
+
+                }, BitCount.Bit16, "Shooter Properties Head 3"),
+
+                new NormalizedValueProperty("Detection FOV? (H3)", Read16(4096), 0, 4096, 4096f / 360f, BitCount.Bit16, "Shooter Properties Head 3"),
+                new NormalizedValueProperty("Shooting FOV? (H3)", Read16(4096), 0, 4096, 4096f / 360f, BitCount.Bit16, "Shooter Properties Head 3"),
+                new NormalizedValueProperty("Engage Range (H3)", Read16(6144), 0, short.MaxValue, 512f, BitCount.Bit16, "Shooter Properties Head 3"),
+                new NormalizedValueProperty("Targeting Delay (H3)", Read16(32), 0, 320, 32f, BitCount.Bit16, "Shooter Properties Head 3"),
+            });
+
+            #endregion
+
+            #region Head 4
+
+            properties.AddRange(new List<ActorProperty>() {
+                new ValueActorProperty("Weapon ID (H4)", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Shooter Properties Head 4")
+            });
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Prevent Back Shooting (H4)", Read1(0x02, false), BitCount.Bit1, "Shooter Tags Head 4"),
+                new ToggleActorProperty("Shoot When Facing (H4)", Read1(0x04, false), BitCount.Bit1, "Shooter Tags Head 4"),
+                new ToggleActorProperty("STag Unknown (H4)", Read1(0x08, false), BitCount.Bit1, "Shooter Tags Head 4"),
+                new ToggleActorProperty("STag Unknown 2 (H4)", Read1(0x10, false), BitCount.Bit1, "Shooter Tags Head 4"),
+                new ToggleActorProperty("Fire Alternations (H4)", Read1(0x20, false), BitCount.Bit1, "Shooter Tags Head 4"),
+                new ToggleActorProperty("Target Priority (H4)", Read1(0x40, false), BitCount.Bit1, "Shooter Tags Head 4"),
+                new ToggleActorProperty("STag Unknown 3 (H4)", Read1(0x80, false), BitCount.Bit1, "Shooter Tags Head 4"),
+
+            });
+            offset++;
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ToggleActorProperty("Disabled (H4)", Read1(0x01, false), BitCount.Bit1, "Shooter Tags Head 4"),
+                new ToggleActorProperty("Weapon Actor Collision (H4)", Read1(0x02, false), BitCount.Bit1, "Shooter Tags Head 4"),
+                new ToggleActorProperty("Attackable Weapon (H4)", Read1(0x04, false), BitCount.Bit1, "Shooter Tags Head 4"),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("STag Unknown 4 (H4)", Read1(0x10, false), BitCount.Bit1, "Shooter Tags Head 4"),
+                new ToggleActorProperty("STag Unknown 5 (H4)", Read1(0x20, false), BitCount.Bit1, "Shooter Tags Head 4"),
+                new ToggleActorProperty("Allow Switch Target (H4)", Read1(0x40, false), BitCount.Bit1, "Shooter Tags Head 4"),
+                new ToggleActorProperty("STag Unknown 6 (H4)", Read1(0x80, false), BitCount.Bit1, "Shooter Tags Head 4"),
+
+            });
+            offset++;
+
+            properties.AddRange(new List<ActorProperty>() {
+                new EnumDataActorProperty("Acquiring Type (H4)", (AcquiringType)Read8(0), BitCount.Bit8, "Shooter Properties Head 4"),
+                new EnumDataActorProperty("Target Type (H4)", (TargetType)Read8(1), BitCount.Bit8, "Shooter Properties Head 4", "OverloadAttack4"),
+
+                new OverloadedProperty("OverloadAttack4", new() {
+                    (new AssetActorProperty("Attack Team (H4)", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H4)"].GetCompiledValue() == TargetType.Team),
+                    (new AssetActorProperty("Attack Actor (H4)", Read16NoIt(0), AssetType.Actor, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H4)"].GetCompiledValue() == TargetType.Actor),
+                    (new ValueActorProperty("S_Unknown Attack (H4)", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
+
+                }, BitCount.Bit16, "Shooter Properties Head 4"),
+
+                new NormalizedValueProperty("Detection FOV? (H4)", Read16(4096), 0, 4096, 4096f / 360f, BitCount.Bit16, "Shooter Properties Head 4"),
+                new NormalizedValueProperty("Shooting FOV? (H4)", Read16(4096), 0, 4096, 4096f / 360f, BitCount.Bit16, "Shooter Properties Head 4"),
+                new NormalizedValueProperty("Engage Range (H4)", Read16(6144), 0, short.MaxValue, 512f, BitCount.Bit16, "Shooter Properties Head 4"),
+                new NormalizedValueProperty("Targeting Delay (H4)", Read16(32), 0, 320, 32f, BitCount.Bit16, "Shooter Properties Head 4"),
+            });
+
+            #endregion
+
+            InitPropertiesByName(new() {
+                "Entity Tags",
+                "Entity Properties",
+                "Shooter Tags",
+                "Shooter Properties",
+                "Pathing Tags",
+                "Pathing Properties",
+                "Turret Properties Head 1",
+                "Turret Properties Head 2",
+                "Shooter Tags Head 2",
+                "Shooter Properties Head 2",
+                "Turret Properties Head 3",
+                "Shooter Tags Head 3",
+                "Shooter Properties Head 3",
+                "Turret Properties Head 4",
+                "Shooter Tags Head 4",
+                "Shooter Properties Head 4"
+            });
 
 
         }
 
     }
 
-    // Observed
+    // - Completed -
     public class FCopBehavior29 : FCopEntity {
+
+        public const int assetRefCount = 2;
 
         public FCopBehavior29(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("None", AssetType.None),
+                new ActorAssetReference("None", AssetType.None)
+            };
+
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("X", Read32(0), short.MinValue, short.MaxValue, BitCount.Bit32),
-                new ValueActorProperty("Y", Read32(0), short.MinValue, short.MaxValue, BitCount.Bit32),
+                new NormalizedValueProperty("X", Read32(0), 0, int.MaxValue, 4096f, BitCount.Bit32),
+                new NormalizedValueProperty("Y", Read32(0), 0, int.MaxValue, 4096f, BitCount.Bit32),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
@@ -1720,7 +1934,7 @@ namespace FCopParser {
                 new FillerActorProperty(Read8(1), BitCount.Bit8),
                 new FillerActorProperty(Read8(1), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
-                new ValueActorProperty("60", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new NormalizedValueProperty("Trigger Radius", Read16(0), 0, short.MaxValue, 512f, BitCount.Bit16),
                 new FillerActorProperty(Read8(204), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8)
 
@@ -1732,23 +1946,40 @@ namespace FCopParser {
 
     }
 
-    public class FCopBehavior30 : FCopShooter {
+    // - Implemented..?, Very script dependent -
+    public class FCopBehavior30 : FCopTurret {
 
         public FCopBehavior30(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (propertyData.Count - offset) / 2;
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("Object 1", AssetType.Object),
+                new ActorAssetReference("Object 2", AssetType.Object),
+                new ActorAssetReference("Object 3", AssetType.Object),
+                new ActorAssetReference("Object 4", AssetType.Object),
+                new ActorAssetReference("Object 5", AssetType.Object)
+            };
 
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
-                properties.Add(property);
-            }
+            properties.Add(new FillerActorProperty(Read16(0), BitCount.Bit16));
 
             InitPropertiesByName();
 
         }
 
+        public override ObjectMutation[] GetMutations() {
+            return new ObjectMutation[] {
+
+                new ObjectMutation(0, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value),
+                new ObjectMutation(1, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value),
+                new ObjectMutation(2, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value),
+                new ObjectMutation(3, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value),
+                new ObjectMutation(4, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value)
+
+            };
+        }
+
     }
 
+    // Low Priority
     public class FCopBehavior31 : FCopEntity {
 
         public FCopBehavior31(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
@@ -1766,6 +1997,7 @@ namespace FCopParser {
 
     }
 
+    // TODO, Reloader
     public class FCopBehavior32 : FCopEntity {
 
         public FCopBehavior32(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
@@ -1783,6 +2015,7 @@ namespace FCopParser {
 
     }
 
+    // Low Priority
     public class FCopBehavior33 : FCopEntity {
 
         public FCopBehavior33(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
@@ -1800,6 +2033,7 @@ namespace FCopParser {
 
     }
 
+    // TODO, Delayed Trigger?
     public class FCopBehavior34 : FCopActorBehavior {
 
         public FCopBehavior34(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
@@ -1941,6 +2175,7 @@ namespace FCopParser {
 
     }
 
+    // Low Priority, Sky Captain
     public class FCopBehavior37 : FCopEntity {
 
         public FCopBehavior37(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
@@ -1958,6 +2193,7 @@ namespace FCopParser {
 
     }
 
+    // Low Priority, Actor Controller?
     public class FCopBehavior38 : FCopEntity {
 
         public FCopBehavior38(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
@@ -2300,7 +2536,7 @@ namespace FCopParser {
         MovableProp = 25,
         Behavior26 = 26,
         Behavior27 = 27,
-        Behavior28 = 28,
+        PathedMultiTurret = 28,
         Teleporter = 29,
         Behavior30 = 30,
         Behavior31 = 31,
