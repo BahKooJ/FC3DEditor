@@ -1997,19 +1997,96 @@ namespace FCopParser {
 
     }
 
-    // TODO, Reloader
-    public class FCopBehavior32 : FCopEntity {
+    // - Completed, One Unknown -
+    public class FCopBehavior32 : FCopEntity, FCopObjectMutating, FCopHeightOffsetting {
+
+        public const int assetRefCount = 3;
 
         public FCopBehavior32(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (propertyData.Count - offset) / 2;
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("Base Object", AssetType.Object),
+                new ActorAssetReference("None", AssetType.None),
+                new ActorAssetReference("Item Object", AssetType.Object)
+            };
 
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
-                properties.Add(property);
-            }
+            properties.AddRange(new List<ActorProperty>() {
+                new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(1), BitCount.Bit8),
+                new FillerActorProperty(Read16(1), BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new NormalizedValueProperty("Open Radius", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
+
+            });
+
+            properties.AddRange(new List<ActorProperty>() {
+                new ToggleActorProperty("Reload Gun", Read1(0x01, false), BitCount.Bit1),
+                new ToggleActorProperty("Reload Heavy", Read1(0x02, false), BitCount.Bit1),
+                new ToggleActorProperty("Reload Special", Read1(0x04, false), BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Power Up Gun", Read1(0x10, false), BitCount.Bit1),
+                new ToggleActorProperty("Power Up Heavy", Read1(0x20, false), BitCount.Bit1),
+                new ToggleActorProperty("Power Up Special", Read1(0x40, false), BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+            });
+            offset++;
+
+            properties.Add(new FillerActorProperty(Read8(0), BitCount.Bit8));
+
+            properties.AddRange(new List<ActorProperty>() {
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Restore Health", Read1(0x02, false), BitCount.Bit1),
+                new ToggleActorProperty("Invisibility", Read1(0x04, false), BitCount.Bit1),
+                new ToggleActorProperty("Invincibility", Read1(0x08, false), BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1)
+            });
+            offset++;
+
+            properties.Add(new FillerActorProperty(Read8(0), BitCount.Bit8));
+
+            properties.AddRange(new List<ActorProperty>() {
+                new RangeActorProperty("Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16),
+                new ValueActorProperty("Unknown", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(255), BitCount.Bit8),
+                new FillerActorProperty(Read8(255), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+            });
 
             InitPropertiesByName();
+
+        }
+
+        public void SetHeight(float height) {
+
+        }
+
+        public float GetHeight() {
+            return 0f;
+        }
+
+        public ActorProperty GetHeightProperty() {
+            return null;
+        }
+
+        public ActorGroundCast GetGroundCast() {
+            return (ActorGroundCast)((EnumDataActorProperty)propertiesByName["Ground Cast"]).caseValue;
+        }
+
+        public ObjectMutation[] GetMutations() {
+
+            return new ObjectMutation[] {
+
+                new ObjectMutation(0, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value),
+                new ObjectMutation(1, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value),
+                new ObjectMutation(2, GetUVOffset(), ((RangeActorProperty)propertiesByName["Rotation"]).value)
+
+
+            };
 
         }
 
@@ -2157,16 +2234,19 @@ namespace FCopParser {
 
     }
 
-    // Found implications that this inherits all of behavior 8.
+    // - Completed -
     public class FCopBehavior36 : FCopBehavior8 {
 
         public FCopBehavior36(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("nt_unknown8", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("nt_unknown9", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("nt_unknown10", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("nt_unknown11", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16)
+                new AssetActorProperty("1st Interact Team", Read8(0), AssetType.Team, BitCount.Bit8),
+                new AssetActorProperty("2nt Interact Team", Read8(0), AssetType.Team, BitCount.Bit8),
+                new EnumDataActorProperty("First Map Icon Color", (MapIconColor)Read8(0), BitCount.Bit8),
+                new EnumDataActorProperty("Second Map Icon Color", (MapIconColor)Read8(0), BitCount.Bit8),
+                new ValueActorProperty("Interact UV Offset X", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("Interact UV Offset Y", Read8(0), 0, 255, BitCount.Bit8),
+                new NormalizedValueProperty("Trigger Radius", Read16(0), 0, short.MaxValue, 512f, BitCount.Bit16)
             });
 
             InitPropertiesByName();
@@ -2215,6 +2295,12 @@ namespace FCopParser {
 
         public FCopBehavior87(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
+            properties.AddRange(new List<ActorProperty>() {
+                new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
+
+            });
+
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
@@ -2249,6 +2335,12 @@ namespace FCopParser {
 
         public FCopBehavior89(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
+            properties.AddRange(new List<ActorProperty>() {
+                new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
+
+            });
+
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
@@ -2265,6 +2357,12 @@ namespace FCopParser {
     public class FCopBehavior90 : FCopActorBehavior {
 
         public FCopBehavior90(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            properties.AddRange(new List<ActorProperty>() {
+                new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
+
+            });
 
             var propertyCount = (propertyData.Count - offset) / 2;
 
@@ -2283,12 +2381,36 @@ namespace FCopParser {
 
         public FCopBehavior91(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (propertyData.Count - offset) / 2;
+            properties.AddRange(new List<ActorProperty>() {
+                new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("30", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("32", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("33", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("34", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("35", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("36", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("37", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("38", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("39", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("40", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("41", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("42", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("43", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("44", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("45", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("46", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("47", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("48", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("49", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("50", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("51", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("52", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("53", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("54", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("55", Read8(0), 0, 255, BitCount.Bit8),
 
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
-                properties.Add(property);
-            }
+            });
 
             InitPropertiesByName();
 
@@ -2299,6 +2421,12 @@ namespace FCopParser {
     public class FCopBehavior92 : FCopActorBehavior {
 
         public FCopBehavior92(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            properties.AddRange(new List<ActorProperty>() {
+                new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
+
+            });
 
             var propertyCount = (propertyData.Count - offset) / 2;
 
