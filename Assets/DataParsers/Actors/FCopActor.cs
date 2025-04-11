@@ -2318,6 +2318,12 @@ namespace FCopParser {
 
         public FCopBehavior88(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
+            properties.AddRange(new List<ActorProperty>() {
+                new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
+
+            });
+
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
@@ -2445,6 +2451,12 @@ namespace FCopParser {
 
         public FCopBehavior93(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
+            properties.AddRange(new List<ActorProperty>() {
+                new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
+
+            });
+
             var propertyCount = (propertyData.Count - offset) / 2;
 
             foreach (var i in Enumerable.Range(0, propertyCount)) {
@@ -2461,6 +2473,12 @@ namespace FCopParser {
     public class FCopBehavior94 : FCopActorBehavior {
 
         public FCopBehavior94(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            properties.AddRange(new List<ActorProperty>() {
+                new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
+
+            });
 
             var propertyCount = (propertyData.Count - offset) / 2;
 

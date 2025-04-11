@@ -112,6 +112,7 @@ public class ActorEditMode : EditMode {
     public void OnDestroy() {
 
         UnselectActor();
+        EndAddSchematic();
 
         foreach (var actor in actorObjects) {
             Object.Destroy(actor.gameObject);
@@ -161,7 +162,7 @@ public class ActorEditMode : EditMode {
 
                     AddActor(schematicToAdd.actor, hitPos.Value);
 
-                    EndAddSchematic();
+                    //EndAddSchematic();
 
                 }
 
