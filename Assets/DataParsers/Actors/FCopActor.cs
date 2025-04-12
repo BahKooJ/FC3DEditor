@@ -2493,38 +2493,57 @@ namespace FCopParser {
 
     }
 
-    // Observed
-    public class FCopBehavior95 : FCopActorBehavior {
+    // - Completed, Two Unknowns -
+    public class FCopBehavior95 : FCopActorBehavior, FCopHeightOffsetting {
+
+        public const int assetRefCount = 1;
 
         public FCopBehavior95(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("None", AssetType.None)
+            };
+
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("Width", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Length", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Height", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("34", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new NormalizedValueProperty("Width Area", Read16(0), 0, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("Length Area", Read16(0), 0, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("Height Area", Read16(0), 0, short.MaxValue, 512f, BitCount.Bit16),
+                new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8),
 
 
             });
 
             properties.AddRange(new List<ActorProperty>() {
 
-                new ToggleActorProperty("Unknown1", Read1(0x01, false), BitCount.Bit1, "Trigger Tags"),
+                new ToggleActorProperty("Unknown", Read1(0x01, false), BitCount.Bit1, "Trigger Tags"),
                 new ToggleActorProperty("Can Retrigger", Read1(0x02, false), BitCount.Bit1, "Trigger Tags"),
                 new ToggleActorProperty("Trigger By Action", Read1(0x04, false), BitCount.Bit1, "Trigger Tags"),
                 new FillerActorProperty(0, BitCount.Bit1),
                 new ToggleActorProperty("Disable Trigger", Read1(0x10, false), BitCount.Bit1, "Trigger Tags"),
                 new FillerActorProperty(0, BitCount.Bit1),
-                new ToggleActorProperty("Unknown2", Read1(0x40, false), BitCount.Bit1, "Trigger Tags"),
+                new ToggleActorProperty("Unknown (Crowd Control)", Read1(0x40, false), BitCount.Bit1, "Trigger Tags"),
                 new FillerActorProperty(0, BitCount.Bit1)
 
             });
             offset++;
 
+            // This one is a little confusing, so if "Triggering Actor" is -1 it will only target the player, otherwise it references an actor.
+            // For a more use friendly way, I may an overload that doesn't read any actual property data.
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("Triggering Actor", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new EnumDataActorProperty("Actor Triggering Type", Read16NoIt(0) > -1 ? TriggeringActorType.Actor : TriggeringActorType.Player, BitCount.NA, "", "TriggeringActorOverload"),
+                new OverloadedProperty("TriggeringActorOverload", new() {
+                    (new AssetActorProperty("Triggering Actor", Read16NoIt(0), AssetType.Actor, BitCount.Bit16), () => (TriggeringActorType)propertiesByName["Actor Triggering Type"].GetCompiledValue() == TriggeringActorType.Actor),
+                    (new FillerActorProperty(-1, BitCount.Bit16), () => (TriggeringActorType)propertiesByName["Actor Triggering Type"].GetCompiledValue() == TriggeringActorType.Player),
+                }, BitCount.Bit16),
+
+            });
+
+            offset += 2;
+
+            properties.AddRange(new List<ActorProperty>() {
+
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8)
 
@@ -2532,6 +2551,22 @@ namespace FCopParser {
 
             InitPropertiesByName();
 
+        }
+
+        public void SetHeight(float height) {
+
+        }
+
+        public float GetHeight() {
+            return 0f;
+        }
+
+        public ActorProperty GetHeightProperty() {
+            return null;
+        }
+
+        public ActorGroundCast GetGroundCast() {
+            return (ActorGroundCast)((EnumDataActorProperty)propertiesByName["Ground Cast"]).caseValue;
         }
 
     }

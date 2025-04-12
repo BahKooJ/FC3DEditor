@@ -65,6 +65,9 @@ public class ActorEditMode : EditMode {
             case FCopBehavior35:
                 nodeObject = Object.Instantiate(main.MapObjectiveNodesActor);
                 break;
+            case FCopBehavior95:
+                nodeObject = Object.Instantiate(main.TriggerActorFab);
+                break;
             default:
                 nodeObject = Object.Instantiate(main.BlankActor);
                 break;
@@ -271,8 +274,8 @@ public class ActorEditMode : EditMode {
 
                 //return a.behavior is FCopShooter e;
 
-                if (a.behavior is FCopBehavior20 es) {
-                    return es.propertiesByName["85"].GetCompiledValue() != 0;
+                if (a.behavior is FCopBehavior95 es) {
+                    return es.propertiesByName["Unknown2"].GetCompiledValue() == 1;
                 }
                 return false;
 
@@ -456,7 +459,7 @@ public class ActorEditMode : EditMode {
             };
             editingNode.propertyX = propX;
             editingNode.propertyY = propY;
-            editingNode.actorObject = selectedActorObject.controlledObject.GetComponent<ActorObject>();
+            editingNode.actorObject = actorObjectsByID[selectedActor.DataID];
 
             actorEditingNodes.Add(editingNode);
 
@@ -520,7 +523,20 @@ public class ActorEditMode : EditMode {
             };
             editingNode.propertyX = propX;
             editingNode.propertyY = propY;
-            editingNode.actorObject = selectedActorObject.controlledObject.GetComponent<ActorObject>();
+            editingNode.actorObject = actorObjectsByID[selectedActor.DataID];
+
+            actorEditingNodes.Add(editingNode);
+
+        }
+
+        void InitTriggerNode() {
+
+            var obj = Object.Instantiate(main.TriggerActorNodeFab);
+
+            var editingNode = obj.GetComponent<TriggerActorNode>();
+            editingNode.controller = this;
+            editingNode.actor = selectedActor;
+            editingNode.actorObject = actorObjectsByID[selectedActor.DataID];
 
             actorEditingNodes.Add(editingNode);
 
@@ -550,6 +566,10 @@ public class ActorEditMode : EditMode {
                 InitMapNode((NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 6 X"], (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 6 Y"]);
                 InitMapNode((NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 7 X"], (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 7 Y"]);
                 InitMapNode((NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 8 X"], (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Node 8 Y"]);
+
+                break;
+            case FCopBehavior95:
+                InitTriggerNode();
 
                 break;
 

@@ -11,6 +11,8 @@ public class ActorEditingNode : MonoBehaviour {
     // - Parameters -
     public ActorEditMode controller;
     public FCopActor actor;
+    [HideInInspector]
+    public ActorObject actorObject;
     public List<ActorProperty> controlledProperties = new();
 
     virtual public void SetToPosition() {
@@ -18,6 +20,11 @@ public class ActorEditingNode : MonoBehaviour {
     }
 
     virtual public void OnPositionChange(Vector3 position, AxisControl.Axis axis) {
+
+    }
+
+    virtual public void Refresh() {
+
 
     }
 

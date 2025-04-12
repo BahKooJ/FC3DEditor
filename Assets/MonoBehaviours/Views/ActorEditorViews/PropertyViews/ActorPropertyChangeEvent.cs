@@ -26,6 +26,16 @@ public class ActorPropertyChangeEvent {
 
     }
 
+    static void RefreshActorEditingNodes(ActorEditMode controller) {
+
+        foreach (var node in controller.actorEditingNodes) {
+            
+            node.Refresh();
+
+        }
+
+    }
+
     public static Dictionary<string, Action<ActorEditMode, ActorProperty>> changeEventsByPropertyName = new() {
         {"Height Offset", (controller, prop) => { 
             
@@ -172,7 +182,21 @@ public class ActorPropertyChangeEvent {
             RefreshActorEditPosition(controller, prop);
 
         } },
+        {"Width Area", (controller, prop) => {
 
+            RefreshActorEditingNodes(controller);
+
+        } },
+        {"Length Area", (controller, prop) => {
+
+            RefreshActorEditingNodes(controller);
+
+        } },
+        {"Height Area", (controller, prop) => {
+
+            RefreshActorEditingNodes(controller);
+
+        } },
         #region MapNodes
         {"Node 1 X", (controller, prop) => {
 

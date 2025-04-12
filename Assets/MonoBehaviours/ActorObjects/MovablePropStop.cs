@@ -10,8 +10,6 @@ public class MovablePropStop : ActorEditingNode {
 
     // - Parameter-
     [HideInInspector]
-    public ActorObject actorObject;
-    [HideInInspector]
     public EnumDataActorProperty moveAxis;
     public NormalizedValueProperty moveOffset;
     public RangeActorProperty rotationOffset;

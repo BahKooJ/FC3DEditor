@@ -549,4 +549,10 @@ namespace FCopParser {
         VTOLSpawnPos = 12
 
     }
+
+    public enum TriggeringActorType {
+        Player = 0,
+        Actor = 1
+    }
+
 }

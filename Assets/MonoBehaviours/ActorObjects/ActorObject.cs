@@ -84,7 +84,7 @@ public class ActorObject : MonoBehaviour {
 
     }
 
-    public void Create() {
+    public virtual void Create() {
 
         if (actor.behavior is FCopObjectMutating) {
 

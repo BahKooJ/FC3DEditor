@@ -10,8 +10,6 @@ public class MapNodeEditingNode : ActorEditingNode {
     // - Parameters -
     public NormalizedValueProperty propertyX;
     public NormalizedValueProperty propertyY;
-    [HideInInspector]
-    public ActorObject actorObject;
 
     LineRenderer lineToActor;
 
