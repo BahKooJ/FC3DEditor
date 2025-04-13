@@ -22,9 +22,9 @@ public class ActorEditPanelView : MonoBehaviour {
         OpenActorPropertiesView();
 
         addActorContextMenu.items = new() {
-            ("Elevator", () => { controller.StartAdd(FCopParser.ActorBehavior.Elevator); }),
             ("Dynamic Prop", () => { controller.StartAdd(FCopParser.ActorBehavior.DynamicProp); }),
             ("Static Prop", () => { controller.StartAdd(FCopParser.ActorBehavior.StaticProp); }),
+            ("Elevator", () => { controller.StartAdd(FCopParser.ActorBehavior.Elevator); }),
             ("Teleporter", () => { controller.StartAdd(FCopParser.ActorBehavior.Teleporter); }),
 
         };

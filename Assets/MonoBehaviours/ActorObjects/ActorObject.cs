@@ -74,7 +74,7 @@ public class ActorObject : MonoBehaviour {
 
     }
 
-    public void RefreshRotation() {
+    public virtual void RefreshRotation() {
 
         if (actor.behavior == null) {
             return;
@@ -92,7 +92,6 @@ public class ActorObject : MonoBehaviour {
                 var obj = Instantiate(missingObjectPrefab);
                 obj.transform.SetParent(transform, false);
                 missingObjectGameobj = obj;
-                missingObjectGameobj.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
             }
 
             missingObjectGameobj.SetActive(false);
@@ -166,7 +165,7 @@ public class ActorObject : MonoBehaviour {
 
     }
 
-    public void Refresh() {
+    public virtual void Refresh() {
 
         foreach (var obj in objects) {
 

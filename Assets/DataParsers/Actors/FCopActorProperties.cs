@@ -488,7 +488,7 @@ namespace FCopParser {
         Highest = 0,
         Lowest = 1,
         Middle = 3,
-        Default = 255
+        NoCast = 255
 
     }
 

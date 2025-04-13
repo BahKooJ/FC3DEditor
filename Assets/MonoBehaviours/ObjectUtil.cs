@@ -17,11 +17,12 @@ public abstract class ObjectUtil {
                 castDirection = Vector3.up;
                 startingHeight = -100f;
                 break;
-            case ActorGroundCast.Default:
-                break;
+            case ActorGroundCast.NoCast:
+                return 0f;
         }
 
-        var castPos = new Vector3(position.x, startingHeight, position.y);
+        // Future Cop has a slight offset to the groundcast
+        var castPos = new Vector3(position.x + 0.001f, startingHeight, position.y - 0.001f);
 
         if (Physics.Raycast(castPos, castDirection, out RaycastHit hit, Mathf.Infinity, 1)) {
 

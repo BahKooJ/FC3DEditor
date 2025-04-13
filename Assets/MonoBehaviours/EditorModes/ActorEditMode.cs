@@ -68,6 +68,9 @@ public class ActorEditMode : EditMode {
             case FCopBehavior95:
                 nodeObject = Object.Instantiate(main.TriggerActorFab);
                 break;
+            case FCopBehavior97:
+                nodeObject = Object.Instantiate(main.TextureActorFab);
+                break;
             default:
                 nodeObject = Object.Instantiate(main.BlankActor);
                 break;
@@ -165,7 +168,7 @@ public class ActorEditMode : EditMode {
 
                     AddActor(schematicToAdd.actor, hitPos.Value);
 
-                    //EndAddSchematic();
+                    EndAddSchematic();
 
                 }
 
@@ -274,7 +277,7 @@ public class ActorEditMode : EditMode {
 
                 //return a.behavior is FCopShooter e;
 
-                if (a.behavior is FCopBehavior95 es) {
+                if (a.behavior is FCopBehavior96 es) {
                     return es.propertiesByName["Unknown2"].GetCompiledValue() == 1;
                 }
                 return false;
@@ -315,16 +318,16 @@ public class ActorEditMode : EditMode {
 
             var didHit = false;
 
-            if (act.actCollider != null) {
+            if (act.missingObjectGameobj != null && act.missingObjectGameobj.activeSelf) {
 
-                if (hit.colliderInstanceID == act.actCollider.GetInstanceID()) {
+                if (hit.colliderInstanceID == act.missingObjectGameobj.GetComponentInChildren<Collider>().GetInstanceID()) {
                     didHit = true;
                 }
 
             }
-            else if (act.missingObjectGameobj != null && act.missingObjectGameobj.activeSelf) {
+            else if (act.actCollider != null) {
 
-                if (hit.colliderInstanceID == act.missingObjectGameobj.GetComponentInChildren<MeshCollider>().GetInstanceID()) {
+                if (hit.colliderInstanceID == act.actCollider.GetInstanceID()) {
                     didHit = true;
                 }
 

@@ -97,6 +97,12 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
             MiniAssetManagerUtil.RequestUniversalData(controller.main.level.sceneActors.teams, controller.main, id => {
                 assetProperty.assetID = id;
                 Refresh();
+
+                if (ActorPropertyChangeEvent.changeEventsByPropertyName.ContainsKey(property.name)) {
+
+                    ActorPropertyChangeEvent.changeEventsByPropertyName[property.name](controller, property);
+
+                }
             });
 
         }
@@ -111,6 +117,12 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
             MiniAssetManagerUtil.RequestUniversalData(snippetDic, controller.main, id => {
                 assetProperty.assetID = id;
                 Refresh();
+
+                if (ActorPropertyChangeEvent.changeEventsByPropertyName.ContainsKey(property.name)) {
+
+                    ActorPropertyChangeEvent.changeEventsByPropertyName[property.name](controller, property);
+
+                }
             });
 
         }
@@ -120,6 +132,12 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
             MiniAssetManagerUtil.RequestAsset(assetProperty.assetType, controller.main, asset => {
                 assetProperty.assetID = asset.DataID;
                 Refresh();
+
+                if (ActorPropertyChangeEvent.changeEventsByPropertyName.ContainsKey(property.name)) {
+
+                    ActorPropertyChangeEvent.changeEventsByPropertyName[property.name](controller, property);
+
+                }
             });
 
         }

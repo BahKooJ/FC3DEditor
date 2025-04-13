@@ -540,6 +540,23 @@ namespace FCopParser {
 
         }
 
+        int ReadS8() {
+
+            var value = (sbyte)propertyData[offset];
+            offset += 1;
+            return value;
+
+        }
+
+        protected int ReadS8(int defaultValue) {
+
+            if (propertyData.Count == 0) {
+                return defaultValue;
+            }
+            return ReadS8();
+
+        }
+
         protected int Read8NoIt(int defaultValue) {
 
             if (propertyData.Count == 0) {
@@ -2571,7 +2588,7 @@ namespace FCopParser {
 
     }
 
-    // Observed, closed to parsed
+    // - Completed, Three Unknowns -
     public class FCopBehavior96 : FCopActorBehavior, FCopObjectMutating, FCopHeightOffsetting {
 
         public const int assetRefCount = 1;
@@ -2589,17 +2606,36 @@ namespace FCopParser {
                 new RangeActorProperty("Rotation X", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16),
                 new NormalizedValueProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
                 new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Unknown Tags", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("Animation Speed", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new RangeActorProperty("Scale X", Read8(0), 0, 127, 64f, BitCount.Bit8),
-                new RangeActorProperty("Scale Y", Read8(0), 0, 127, 64f, BitCount.Bit8),
-                new RangeActorProperty("Scale Z", Read8(0), 0, 127, 64f, BitCount.Bit8),
-                new ValueActorProperty("Spin Speed", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("Spin Angle", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8)
 
             };
 
-             InitPropertiesByName();
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ToggleActorProperty("Unknown (Rendering Order)", Read1(0x01, false), BitCount.Bit1, "Tags"),
+                new ToggleActorProperty("Unknown1", Read1(0x02, false), BitCount.Bit1, "Tags"),
+                new ToggleActorProperty("Unknown2", Read1(0x04, false), BitCount.Bit1, "Tags"),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Disable Rendering", Read1(0x10, false), BitCount.Bit1, "Tags"),
+                new ToggleActorProperty("Disable Animation", Read1(0x20, false), BitCount.Bit1, "Tags"),
+                new ToggleActorProperty("Reverse Animation", Read1(0x40, false), BitCount.Bit1, "Tags"),
+                new FillerActorProperty(0, BitCount.Bit1)
+
+            });
+            offset++;
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new RangeActorProperty("Animation Speed", Read8(0), 0, 32, 1f, BitCount.Bit8),
+                new RangeActorProperty("Scale X", Read8(64), 0, 127, 64f, BitCount.Bit8),
+                new RangeActorProperty("Scale Y", Read8(64), 0, 127, 64f, BitCount.Bit8),
+                new RangeActorProperty("Scale Z", Read8(64), 0, 127, 64f, BitCount.Bit8),
+                new RangeActorProperty("Spin Speed", ReadS8(0), -16, 16, 1f, BitCount.Bit8),
+                new RangeActorProperty("Spin Angle", Read8(0), 0, 180, 1f, BitCount.Bit8)
+
+
+            });
+
+            InitPropertiesByName();
 
         }
 
@@ -2637,32 +2673,61 @@ namespace FCopParser {
 
     }
 
-    // Observed, closed to parsed
-    public class FCopBehavior97 : FCopActorBehavior {
+    // - Completed -
+    public class FCopBehavior97 : FCopActorBehavior, FCopHeightOffsetting {
 
         public FCopBehavior97(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            properties = new() {
+            properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("Tags", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Transparent", Read1(0x02, false), BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Additive", Read1(0x10, false), BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1)
+
+            });
+            offset++;
+
+            properties.AddRange(new List<ActorProperty>() {
+
                 new AssetActorProperty("Texture Snippet", Read8(0), AssetType.TextureSnippet, BitCount.Bit8),
-                new ValueActorProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Width", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Height", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("RotationY", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("RotationZ", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("RotationX", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("42", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("Red", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("Green", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("Blue", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new NormalizedValueProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("Width", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("Height", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
+                new RangeActorProperty("Rotation Y", Read16(0), 0, 4096, 4096f / 360f, BitCount.Bit16),
+                new RangeActorProperty("Rotation X", Read16(0), 0, 4096, 4096f / 360f, BitCount.Bit16),
+                new RangeActorProperty("Rotation Z", Read16(0), 0, 4096, 4096f / 360f, BitCount.Bit16),
+                new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8),
+                new RangeActorProperty("Red", Read8(0), 0, 128, 128f, BitCount.Bit8),
+                new RangeActorProperty("Green", Read8(0), 0, 128, 128f, BitCount.Bit8),
+                new RangeActorProperty("Blue", Read8(0), 0, 128, 128f, BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8)
 
-            };
+            });
 
             InitPropertiesByName();
 
+        }
+
+        public void SetHeight(float height) {
+            ((NormalizedValueProperty)propertiesByName["Height Offset"]).Set(height);
+        }
+
+        public float GetHeight() {
+            return ((NormalizedValueProperty)propertiesByName["Height Offset"]).value;
+        }
+
+        public ActorProperty GetHeightProperty() {
+            return propertiesByName["Height Offset"];
+        }
+
+        public ActorGroundCast GetGroundCast() {
+            return (ActorGroundCast)((EnumDataActorProperty)propertiesByName["Ground Cast"]).caseValue;
         }
 
     }

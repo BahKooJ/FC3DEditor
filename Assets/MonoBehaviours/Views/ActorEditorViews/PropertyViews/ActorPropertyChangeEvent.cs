@@ -36,6 +36,12 @@ public class ActorPropertyChangeEvent {
 
     }
 
+    static void RefreshActor(ActorEditMode controller) {
+
+        controller.actorObjectsByID[controller.selectedActor.DataID].Refresh();
+
+    }
+
     public static Dictionary<string, Action<ActorEditMode, ActorProperty>> changeEventsByPropertyName = new() {
         {"Height Offset", (controller, prop) => { 
             
@@ -195,6 +201,46 @@ public class ActorPropertyChangeEvent {
         {"Height Area", (controller, prop) => {
 
             RefreshActorEditingNodes(controller);
+
+        } },
+        {"Width", (controller, prop) => {
+
+            RefreshActor(controller);
+
+        } },
+        {"Height", (controller, prop) => {
+
+            RefreshActor(controller);
+
+        } },
+        {"Transparent", (controller, prop) => {
+
+            RefreshActor(controller);
+
+        } },
+        {"Additive", (controller, prop) => {
+
+            RefreshActor(controller);
+
+        } },
+        {"Red", (controller, prop) => {
+
+            RefreshActor(controller);
+
+        } },
+        {"Green", (controller, prop) => {
+
+            RefreshActor(controller);
+
+        } },
+        {"Blue", (controller, prop) => {
+
+            RefreshActor(controller);
+
+        } },
+        {"Texture Snippet", (controller, prop) => {
+
+            RefreshActor(controller);
 
         } },
         #region MapNodes

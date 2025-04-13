@@ -92,6 +92,7 @@ public class Main : MonoBehaviour {
     public GameObject MapObjectiveNodesActor;
     public GameObject TeleporterActor;
     public GameObject TriggerActorFab;
+    public GameObject TextureActorFab;
     public GameObject ObjectMesh;
     public GameObject actorGroupObjectFab;
     public GameObject ArrowModelFab;
