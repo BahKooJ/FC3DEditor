@@ -2736,12 +2736,38 @@ namespace FCopParser {
 
         public FCopBehavior98(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
-            var propertyCount = (propertyData.Count - offset) / 2;
+            assetReferences = new ActorAssetReference[] {
 
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
-                properties.Add(property);
-            }
+                new ActorAssetReference("Object", AssetType.Object),
+                new ActorAssetReference("None", AssetType.None),
+                new ActorAssetReference("None", AssetType.None),
+                new ActorAssetReference("None", AssetType.None)
+
+            };
+
+            properties.AddRange(new List<ActorProperty>() {
+                new ValueActorProperty("ID", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("Type", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("Max Shots", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("32", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Burst Shot Count", Read16(0), 0, 100, BitCount.Bit16),
+                new NormalizedValueProperty("Fire Delay", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16),
+                new NormalizedValueProperty("Burst Fire Delay", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16),
+                new ValueActorProperty("Damage", Read16(0), 0, short.MaxValue, BitCount.Bit16),
+                new NormalizedValueProperty("Blast Radius", Read16(0), 0, short.MaxValue, 512f, BitCount.Bit16),
+                new ValueActorProperty("44", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new NormalizedValueProperty("Velocity", Read16(0), 0, short.MaxValue, 1024f, BitCount.Bit16),
+                new ValueActorProperty("48", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new NormalizedValueProperty("Max Range", Read16(0), 0, short.MaxValue, 512f,  BitCount.Bit16),
+                new ValueActorProperty("52", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Impact Effect", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("Trail Effect", Read8(0), 0, 255, BitCount.Bit8),
+                //new AssetActorProperty("Shoot Sound", Read8(0), AssetType.WavSound, BitCount.Bit8),
+                new ValueActorProperty("Shoot Sound", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("57", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("Echo Sound", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("59", Read8(0), 0, 255, BitCount.Bit8),
+            });
 
             InitPropertiesByName();
 
