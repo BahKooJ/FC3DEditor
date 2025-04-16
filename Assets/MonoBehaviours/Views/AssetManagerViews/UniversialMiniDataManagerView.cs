@@ -3,6 +3,7 @@
 using FCopParser;
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class UniversialMiniDataManagerView : MonoBehaviour {
@@ -12,6 +13,7 @@ public class UniversialMiniDataManagerView : MonoBehaviour {
 
     // - Unity Refs -
     public Transform fileContent;
+    public TMP_InputField searchBar;
 
     // - Parameters -
     public FCopLevel level;
@@ -49,6 +51,33 @@ public class UniversialMiniDataManagerView : MonoBehaviour {
 
         onDataSelected(id);
         Destroy(gameObject);
+
+    }
+
+    public void StartType() {
+        Main.ignoreAllInputs = true;
+    }
+
+    public void StopType() {
+        Main.ignoreAllInputs = false;
+    }
+
+    public void OnTypeInSearch() {
+
+        foreach (var file in files) {
+
+            if (file.id != -1) {
+
+                if (file.dataName.Contains(searchBar.text) || searchBar.text == "") {
+                    file.gameObject.SetActive(true);
+                }
+                else {
+                    file.gameObject.SetActive(false);
+                }
+
+            }
+
+        }
 
     }
 

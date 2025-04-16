@@ -7,6 +7,13 @@ using UnityEngine.UI;
 
 public class MiniAssetFileView : MonoBehaviour {
 
+    // - Asset Refs -
+    public Sprite wavIconSprite;
+    public Sprite actorIconSprite;
+    public Sprite textureIconSprite;
+    public Sprite objectIconSprite;
+    public Sprite navMeshIconSprite;
+
     // - Unity Refs -
     public TMP_Text title;
     public Image icon;
@@ -23,6 +30,30 @@ public class MiniAssetFileView : MonoBehaviour {
         }
         else {
             title.text = asset.name;
+        }
+
+        switch (view.requestAssetType) {
+            case AssetType.WavSound:
+                icon.sprite = wavIconSprite;
+                break;
+            case AssetType.Texture:
+                icon.sprite = textureIconSprite;
+                break;
+            case AssetType.Object:
+                icon.sprite = objectIconSprite;
+                break;
+            case AssetType.NavMesh:
+                icon.sprite = navMeshIconSprite;
+                break;
+            case AssetType.SndsSound:
+                icon.sprite = wavIconSprite;
+                break;
+            case AssetType.Music:
+                icon.sprite = wavIconSprite;
+                break;
+            case AssetType.Actor:
+                icon.sprite = actorIconSprite;
+                break;
         }
 
     }

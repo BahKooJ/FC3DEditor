@@ -8,7 +8,8 @@ using UnityEngine.UI;
 
 public class AssetActorPropertyItemView : ActorPropertyItemView {
 
-    // - Asset Refs =
+    // - Asset Refs -
+    public Sprite wavIconSprite;
     public Sprite actorIconSprite;
     public Sprite textureSnippetIconSprite;
     public Sprite teamIconSprite;
@@ -33,9 +34,29 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
 
         nameText.text = property.name;
 
+        void NameCheck() {
+
+            if (assetProperty.assetID == 0) {
+                assetNameText.text = "None";
+            }
+            else {
+                assetNameText.text = "Missing";
+            }
+
+        }
+
         switch (assetProperty.assetType) {
             case AssetType.WavSound:
-                assetNameText.text = "TODO";
+
+                try {
+                    assetNameText.text = controller.main.level.audio.soundEffects.First(t => t.scriptingID == assetProperty.assetID).name;
+                }
+                catch {
+                    NameCheck();
+                }
+
+                assetIcon.sprite = wavIconSprite;
+
                 break;
             case AssetType.Texture:
                 assetNameText.text = "TODO";
@@ -55,21 +76,29 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
             case AssetType.MiniAnimation:
                 assetNameText.text = "TODO";
                 break;
-            case AssetType.Mixed:
-                assetNameText.text = "TODO";
-                break;
             case AssetType.Actor:
-                assetNameText.text = controller.main.level.sceneActors.actorsByID[assetProperty.assetID].name;
-                assetIcon.sprite = actorIconSprite;
-                break;
-            case AssetType.Team:
+
                 try {
-                    assetNameText.text = controller.main.level.sceneActors.teams[assetProperty.assetID];
-                    assetIcon.sprite = teamIconSprite;
+                    assetNameText.text = controller.main.level.sceneActors.actorsByID[assetProperty.assetID].name;
                 }
                 catch {
-                    assetNameText.text = "Missing";
+                    NameCheck();
                 }
+
+                assetIcon.sprite = actorIconSprite;
+
+                break;
+            case AssetType.Team:
+
+                try {
+                    assetNameText.text = controller.main.level.sceneActors.teams[assetProperty.assetID];
+                }
+                catch {
+                    NameCheck();
+                }
+
+                assetIcon.sprite = teamIconSprite;
+
                 break;
             case AssetType.TextureSnippet:
 
@@ -77,7 +106,7 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
                     assetNameText.text = controller.main.level.textureSnippets.First(t => t.id == assetProperty.assetID).name;
                 }
                 catch {
-                    assetNameText.text = "Missing";
+                    NameCheck();
                 }
 
                 assetIcon.sprite = textureSnippetIconSprite;
@@ -130,7 +159,35 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
         else {
 
             MiniAssetManagerUtil.RequestAsset(assetProperty.assetType, controller.main, asset => {
-                assetProperty.assetID = asset.DataID;
+
+                if (asset != null) {
+
+                    if (asset is FCopAudio audio) {
+
+                        if (audio.rawDataHasHeader) {
+
+                            assetProperty.assetID = audio.scriptingID;
+
+                        }
+                        else {
+
+                            assetProperty.assetID = asset.DataID;
+
+                        }
+
+
+                    }
+                    else {
+
+                        assetProperty.assetID = asset.DataID;
+
+                    }
+
+                }
+                else {
+                    assetProperty.assetID = 0;
+                }
+
                 Refresh();
 
                 if (ActorPropertyChangeEvent.changeEventsByPropertyName.ContainsKey(property.name)) {

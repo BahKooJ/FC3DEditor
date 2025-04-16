@@ -4,6 +4,7 @@ using FCopParser;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class MiniAssetManagerView : MonoBehaviour {
 
@@ -12,6 +13,7 @@ public class MiniAssetManagerView : MonoBehaviour {
 
     // - Unity Refs -
     public Transform fileContent;
+    public TMP_InputField searchBar;
 
     // - Parameters -
     public FCopLevel level;
@@ -44,7 +46,7 @@ public class MiniAssetManagerView : MonoBehaviour {
 
             case AssetType.WavSound:
                 foreach (var sound in level.audio.soundEffects) {
-                    
+
                     InitFile(sound);
 
                 }
@@ -63,6 +65,24 @@ public class MiniAssetManagerView : MonoBehaviour {
 
                 }
                 break;
+            case AssetType.NavMesh:
+
+                foreach (var navMesh in level.navMeshes) {
+                    
+                    InitFile(navMesh);
+
+                }
+
+                break;
+            case AssetType.Actor:
+
+                foreach (var act in level.sceneActors.actors) {
+                    
+                    InitFile(act);
+
+                }
+
+                break;
             case AssetType.SndsSound:
                 break;
             case AssetType.Music:
@@ -80,6 +100,33 @@ public class MiniAssetManagerView : MonoBehaviour {
 
         onAssetSelected(asset);
         Destroy(gameObject);
+
+    }
+
+    public void StartType() {
+        Main.ignoreAllInputs = true;
+    }
+
+    public void StopType() {
+        Main.ignoreAllInputs = false;
+    }
+
+    public void OnTypeInSearch() {
+
+        foreach (var file in files) {
+
+            if (file.asset != null) {
+
+                if (file.asset.name.Contains(searchBar.text) || searchBar.text == "") {
+                    file.gameObject.SetActive(true);
+                }
+                else {
+                    file.gameObject.SetActive(false);
+                }
+
+            }
+
+        }
 
     }
 
