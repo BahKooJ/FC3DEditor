@@ -148,6 +148,12 @@ public class ActorNodeListItemView : MonoBehaviour {
 
     }
 
+    public void ClearSelection() {
+
+        background.color = Main.mainColor;
+
+    }
+
     void JumpViewToListItem() {
 
         var normalizedPos = ((decimal)transform.GetSiblingIndex()) / ((decimal)transform.parent.childCount - 10);

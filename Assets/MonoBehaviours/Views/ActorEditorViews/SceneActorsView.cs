@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 public class SceneActorsView : MonoBehaviour {
 
@@ -21,11 +22,16 @@ public class SceneActorsView : MonoBehaviour {
     public FCopLevel level;
     public ActorEditMode controller;
 
+    [HideInInspector]
     public List<ActorNodeListItemView> actorNodes = new();
+    [HideInInspector]
     public Dictionary<int, ActorNodeListItemView> actorNodesByID = null;
 
+    [HideInInspector]
     public ActorNodeListItemView lookingToReorder = null;
+    [HideInInspector]
     public float delayedScrollPos = 0f;
+    [HideInInspector]
     public int delayScrollPosCount = -1;
 
     void Start() {
@@ -130,6 +136,64 @@ public class SceneActorsView : MonoBehaviour {
             }
             else {
                 actorNode.RefreshSelection(jump);
+            }
+
+        }
+
+    }
+
+    public void ClearSelection() {
+
+        foreach (var actorNode in actorNodes) {
+
+            if (actorNode.node.nestedActors.Count > 1 || actorNode.forceGroup) {
+
+                foreach (var actorNodeN in actorNode.actorNodes) {
+                    actorNodeN.ClearSelection();
+                }
+
+            }
+            else {
+
+                actorNode.ClearSelection();
+
+            }
+
+        }
+
+    }
+
+    public void RemoveNode(FCopActor actor) {
+
+        if (actorNodesByID.ContainsKey(actor.DataID)) {
+
+            var node = actorNodesByID[actor.DataID];
+
+            actorNodesByID.Remove(actor.DataID);
+            actorNodes.Remove(node);
+            Destroy(node.gameObject);
+
+        }
+        else {
+
+            ActorNodeListItemView nodeToDestroy = null;
+
+            foreach (var node in actorNodes) {  
+            
+                if (node.actorNodes.Count > 1) {
+
+                    foreach (var nestedNode in node.actorNodes) {
+
+                        if (nestedNode.actor == actor) {
+
+
+
+                        }
+
+                    }
+
+                }
+            
             }
 
         }

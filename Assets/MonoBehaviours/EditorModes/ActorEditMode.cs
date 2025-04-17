@@ -666,7 +666,7 @@ public class ActorEditMode : EditMode {
         selectedActorObject = null;
 
         view.activeActorPropertiesView.Refresh();
-        view.activeActorPropertiesView.sceneActorsView.Refresh(true);
+        view.activeActorPropertiesView.sceneActorsView.ClearSelection();
 
     }
 
