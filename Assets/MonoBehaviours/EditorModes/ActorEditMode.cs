@@ -392,15 +392,7 @@ public class ActorEditMode : EditMode {
 
         var newAct = new FCopActor(new IFFDataFile(3, new(schematic.actorData), "Cact", main.level.sceneActors.FindNextID(), main.level.scripting.emptyOffset));
 
-        var obj = Object.Instantiate(main.BlankActor);
-        obj.layer = 8; // UI Mesh
-        var actorObject = obj.GetComponent<ActorObject>();
-        actorObject.actor = newAct;
-        actorObject.controller = this;
-
-        actorObject.Create();
-
-        schematicToAdd = actorObject;
+        schematicToAdd = CreateActorObject(newAct);
 
         UnselectActorCompletely();
 

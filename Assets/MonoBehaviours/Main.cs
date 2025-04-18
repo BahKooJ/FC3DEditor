@@ -16,6 +16,7 @@ public class Main : MonoBehaviour {
     public static Color selectedColor = new Color(0f, 0x33 / 255f, 0f);
 
     public static bool ignoreAllInputs = false;
+    public static DragableUIElement draggingElement = null;
     public static bool debug = false;
     public bool isEscMenuOpen = false;
     public static float uiScaleFactor = 1f;

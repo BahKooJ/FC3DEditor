@@ -15,6 +15,15 @@ public class ActorSchematics {
 
     public List<ActorSchematic> schematics = new List<ActorSchematic>();
 
+    public ActorSchematics(ActorSchematics parent, string name) { 
+        this.directoryName = name;
+        this.parent = parent;
+    }
+
+    public ActorSchematics() {
+        directoryName = "";
+    }
+
     public string Compile() {
 
         if (parent != null) { return ""; }

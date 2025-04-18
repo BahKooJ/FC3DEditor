@@ -7,6 +7,11 @@ using UnityEngine.UI;
 
 public class ActorSchematicItemView : MonoBehaviour {
 
+    // - Unity Asset Refs -
+    public Texture2D missingObjectIcon;
+    public Texture2D teleporterIcon;
+    public Texture2D triggerIcon;
+
     // - Prefabs -
     public GameObject objectPreviewCamera;
     public RenderTexture objectRenderTexture;
@@ -28,9 +33,28 @@ public class ActorSchematicItemView : MonoBehaviour {
 
     private void Start() {
 
-        createdActor = new FCopActor(new IFFDataFile(0, new(actorSchematic.actorData), "", 0, 0));
-        InitSchematicMeshOverlay();
-        RenderMesh();
+        if (actorSchematic.behavior == ActorBehavior.Teleporter) {
+            meshPreview.texture = teleporterIcon;
+        }
+        else if (actorSchematic.behavior == ActorBehavior.Trigger) {
+            meshPreview.texture = triggerIcon;
+        }
+        else {
+
+            createdActor = new FCopActor(new IFFDataFile(0, new(actorSchematic.actorData), "", 0, 0));
+            InitSchematicMeshOverlay();
+
+            if (actorObject.missingObjects) {
+                DestroyImmediate(actorObject.gameObject);
+                meshPreview.texture = missingObjectIcon;
+            }
+            else {
+
+                RenderMesh();
+
+            }
+
+        }
 
         infoBoxHandler.message = actorSchematic.name;
 
@@ -51,7 +75,19 @@ public class ActorSchematicItemView : MonoBehaviour {
     float savedMaxY = 0f;
     void InitSchematicMeshOverlay() {
 
-        var obj = Instantiate(controller.main.BlankActor);
+        GameObject obj;
+
+        if (actorSchematic.behavior == ActorBehavior.Texture) {
+
+            obj = Instantiate(controller.main.TextureActorFab);
+
+        }
+        else {
+
+            obj = Instantiate(controller.main.BlankActor);
+
+        }
+
         obj.layer = 8; // UI Mesh
         var actorObject = obj.GetComponent<ActorObject>();
         actorObject.actor = createdActor;
@@ -70,6 +106,11 @@ public class ActorSchematicItemView : MonoBehaviour {
 
         foreach (Transform trans in actorObject.transform) {
             trans.gameObject.layer = 8; // UI Mesh
+
+            foreach (Transform nestTrans in trans.transform) {
+                nestTrans.gameObject.layer = 8;
+            }
+
         }
         obj.transform.position = new Vector3(0, 0, 0);
 
@@ -86,6 +127,12 @@ public class ActorSchematicItemView : MonoBehaviour {
         camera.transform.position = new Vector3(0, height, 0);
         camera.transform.eulerAngles = new Vector3(35, 320, 0);
         camera.transform.position -= camera.transform.forward * 3;
+
+        if (actorSchematic.behavior == ActorBehavior.Texture) {
+
+            actorObject.transform.GetChild(0).LookAt(camera.transform.position);
+            actorObject.transform.GetChild(0).Rotate(new Vector3(90, 0, 0));
+        }
 
         camera.GetComponent<Camera>().Render();
 
@@ -127,6 +174,62 @@ public class ActorSchematicItemView : MonoBehaviour {
         controller.StartAddSchematic(actorSchematic);
 
         view.OnClickDone();
+
+    }
+
+    public void ReceiveReorderLeft() {
+
+        if (Main.draggingElement.TryGetComponent<ActorSchematicItemView>(out var viewItem)) {
+
+            var indexOfItem = view.currentDirectory.schematics.IndexOf(viewItem.actorSchematic);
+            var indexOfThis = view.currentDirectory.schematics.IndexOf(actorSchematic);
+
+            view.currentDirectory.schematics.Remove(viewItem.actorSchematic);
+
+            if (indexOfThis > indexOfItem) {
+
+                view.currentDirectory.schematics.Insert(indexOfThis - 1, viewItem.actorSchematic);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+
+            }
+            else {
+
+                view.currentDirectory.schematics.Insert(indexOfThis, viewItem.actorSchematic);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex());
+
+            }
+
+        }
+
+    }
+
+    public void ReceiveReorderRight() {
+
+        if (Main.draggingElement.TryGetComponent<ActorSchematicItemView>(out var viewItem)) {
+
+            var indexOfItem = view.currentDirectory.schematics.IndexOf(viewItem.actorSchematic);
+            var indexOfThis = view.currentDirectory.schematics.IndexOf(actorSchematic);
+
+            view.currentDirectory.schematics.Remove(viewItem.actorSchematic);
+
+            if (indexOfThis > indexOfItem) {
+
+                view.currentDirectory.schematics.Insert(indexOfThis, viewItem.actorSchematic);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex());
+
+            }
+            else {
+
+                view.currentDirectory.schematics.Insert(indexOfThis + 1, viewItem.actorSchematic);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
+
+            }
+
+        }
 
     }
 

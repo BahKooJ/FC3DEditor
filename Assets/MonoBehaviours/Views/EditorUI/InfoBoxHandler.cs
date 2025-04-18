@@ -10,6 +10,10 @@ public class InfoBoxHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     private GameObject infoBox;
 
     public void OnPointerEnter(PointerEventData eventData) {
+
+        if (Main.draggingElement != null) {
+            return;
+        }
         
         var view = Instantiate(InfoPopUp);
 

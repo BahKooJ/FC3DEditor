@@ -17,6 +17,10 @@ public class ContextMenuContainer : MonoBehaviour, IPointerEnterHandler, IPointe
 
     void Update() {
 
+        if (Main.draggingElement != null) {
+            Destroy(gameObject);
+        }
+
         if (Input.GetMouseButtonDown(0)) {
 
             if (!insideItem) {

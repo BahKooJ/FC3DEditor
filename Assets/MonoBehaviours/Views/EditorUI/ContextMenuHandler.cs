@@ -13,6 +13,10 @@ public class ContextMenuHandler : MonoBehaviour, IPointerClickHandler {
 
     public void OnPointerClick(PointerEventData eventData) {
 
+        if (Main.draggingElement != null) {
+            return;
+        }
+
         if (isRightClick) {
             if (eventData.button == PointerEventData.InputButton.Right) {
                 OpenContextMenu();

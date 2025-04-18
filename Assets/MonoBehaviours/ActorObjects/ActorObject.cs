@@ -29,6 +29,9 @@ public class ActorObject : MonoBehaviour {
     [HideInInspector]
     public GameObject missingObjectGameobj;
 
+    [HideInInspector]
+    public bool missingObjects = false;
+
     public List<(string, System.Action)> contextMenuItems = new();
 
     private void Start() {
@@ -86,6 +89,17 @@ public class ActorObject : MonoBehaviour {
 
     public virtual void Create() {
 
+        void ShowMissingObject() {
+
+            missingObjects = true;
+
+            placeholderObject.SetActive(false);
+            actCollider = null;
+
+            missingObjectGameobj.SetActive(true);
+
+        }
+
         if (actor.behavior is FCopObjectMutating) {
 
             if (missingObjectGameobj == null) {
@@ -104,7 +118,15 @@ public class ActorObject : MonoBehaviour {
 
             if (resRef.fourCC == FCopActor.FourCC.Cobj) {
 
-                var obj = controller.main.level.objects.First(obj => { return obj.rawFile.dataID == resRef.id; });
+                var obj = controller.main.level.objects.FirstOrDefault(obj => { return obj.rawFile.dataID == resRef.id; });
+
+                if (obj == null) {
+
+                    objects.Add(null);
+                    ShowMissingObject();
+                    continue;
+
+                }
 
                 var gameObject = Instantiate(controller.main.ObjectMesh);
                 gameObject.transform.SetParent(transform, false);
@@ -152,10 +174,7 @@ public class ActorObject : MonoBehaviour {
 
             if (!hasObj) {
 
-                placeholderObject.SetActive(false);
-                actCollider = null;
-
-                missingObjectGameobj.SetActive(true);
+                ShowMissingObject();
 
             }
 

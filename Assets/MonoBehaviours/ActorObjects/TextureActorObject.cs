@@ -90,6 +90,7 @@ public class TextureActorObject : ActorObject {
             }
 
             missingObjectGameobj.SetActive(true);
+            missingObjects = true;
 
             return;
         }
