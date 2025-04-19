@@ -2315,15 +2315,52 @@ namespace FCopParser {
             properties.AddRange(new List<ActorProperty>() {
                 new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
-
+                new ValueActorProperty("30", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("34", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("36", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("38", Read8(0), 0, 255, BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("40", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("41", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("42", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("43", Read8(0), 0, 255, BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("45", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("48", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("50", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("54", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("56", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("58", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("60", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("62", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("64", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("65", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("66", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("67", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("68", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("69", Read8(0), 0, 255, BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("71", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("72", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("73", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("74", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("76", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("78", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("80", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("82", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("84", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("86", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("88", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("90", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("94", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
             });
-
-            var propertyCount = (propertyData.Count - offset) / 2;
-
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
-                properties.Add(property);
-            }
 
             InitPropertiesByName();
 
@@ -2338,15 +2375,45 @@ namespace FCopParser {
             properties.AddRange(new List<ActorProperty>() {
                 new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
-
+                new ValueActorProperty("30", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("34", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("36", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("38", Read8(0), 0, 255, BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("41", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(255), BitCount.Bit8),
+                new FillerActorProperty(Read8(255), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("54", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("56", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("58", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("60", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("62", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("64", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("67", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("68", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("69", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("70", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("72", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("74", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("78", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("80", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("82", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
             });
-
-            var propertyCount = (propertyData.Count - offset) / 2;
-
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
-                properties.Add(property);
-            }
 
             InitPropertiesByName();
 
@@ -2361,15 +2428,58 @@ namespace FCopParser {
             properties.AddRange(new List<ActorProperty>() {
                 new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("30", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("34", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("36", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(255), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("40", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("41", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("42", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("43", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("44", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("45", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("46", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("47", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("48", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("50", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("58", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("60", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("62", Read8(0), 0, 255, BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("64", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("66", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("68", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("70", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("71", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("72", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("73", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("74", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("75", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("76", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("77", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("78", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("79", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("80", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("81", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("82", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("84", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("86", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("88", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("90", Read8(0), 0, 255, BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("92", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("94", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
 
             });
-
-            var propertyCount = (propertyData.Count - offset) / 2;
-
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
-                properties.Add(property);
-            }
 
             InitPropertiesByName();
 
@@ -2384,15 +2494,52 @@ namespace FCopParser {
             properties.AddRange(new List<ActorProperty>() {
                 new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("30", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("34", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("38", Read8(0), 0, 255, BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("40", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("41", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("42", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("43", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("44", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("45", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("46", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("47", Read8(0), 0, 255, BitCount.Bit8),
+                new FillerActorProperty(Read8(255), BitCount.Bit8),
+                new FillerActorProperty(Read8(255), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("58", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("60", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("61", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("62", Read8(0), 0, 255, BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("64", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("66", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("68", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("70", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("74", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("76", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("78", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("80", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("81", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("82", Read8(0), 0, 255, BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
 
             });
-
-            var propertyCount = (propertyData.Count - offset) / 2;
-
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
-                properties.Add(property);
-            }
 
             InitPropertiesByName();
 
@@ -2406,29 +2553,29 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
                 new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("29 Ref", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("30", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
                 new ValueActorProperty("32", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("33", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("34", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("35", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("36", Read8(0), 0, 255, BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("36 Ref?", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("37", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("38", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("39", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("40", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("40 Ref?", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("41", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("42", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("43", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("44", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("44 Ref?", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("45", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("46", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("47", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("48", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("48 Ref?", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("49", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("50", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("51", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("52", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("52 Ref?", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("53", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("54", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("55", Read8(0), 0, 255, BitCount.Bit8),
@@ -2448,15 +2595,51 @@ namespace FCopParser {
             properties.AddRange(new List<ActorProperty>() {
                 new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("30", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("34", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("36", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(255), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("44", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("45", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("46", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("47", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("48", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("50", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("54", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("58", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("60", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("62", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("64", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("66", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("68", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("70", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("72", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("74", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("75", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("76", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("77", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("78", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("79", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("80", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("84", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("86", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("88", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("90", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
 
             });
-
-            var propertyCount = (propertyData.Count - offset) / 2;
-
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
-                properties.Add(property);
-            }
 
             InitPropertiesByName();
 
@@ -2471,15 +2654,51 @@ namespace FCopParser {
             properties.AddRange(new List<ActorProperty>() {
                 new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
-
+                new ValueActorProperty("30", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("32", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("34", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("36", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("38", Read8(0), 0, 255, BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("40", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("41", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("42", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("43", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("44", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("45", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("46", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("47", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("48", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("50", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("54", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("56", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("58", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("60", Read8(0), 0, 255, BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("62", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("64", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("66", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("68", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("70", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("73", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("74", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("75", Read8(0), 0, 255, BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("77", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("78", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("79", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("80", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("82", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("84", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("86", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("88", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("90", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("92", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("94", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
             });
-
-            var propertyCount = (propertyData.Count - offset) / 2;
-
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
-                properties.Add(property);
-            }
 
             InitPropertiesByName();
 
@@ -2494,15 +2713,59 @@ namespace FCopParser {
             properties.AddRange(new List<ActorProperty>() {
                 new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("30", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("32", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("34", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("36", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(255), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("40", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("41", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("42", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("43", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("44", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("45", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("46", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("47", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("48", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("50", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("58", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("60", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("62", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("64", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("66", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("68", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("70", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("72", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("74", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("76", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("78", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("80", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("82", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("84", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("86", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("88", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("89", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("90", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("91", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("92", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("93", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("94", Read8(0), 0, 255, BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
+                new ValueActorProperty("96", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("98", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("99", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("100", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("102", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("103", Read8(0), 0, 255, BitCount.Bit8),
 
             });
-
-            var propertyCount = (propertyData.Count - offset) / 2;
-
-            foreach (var i in Enumerable.Range(0, propertyCount)) {
-                var property = new ValueActorProperty("value " + offset.ToString(), Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16);
-                properties.Add(property);
-            }
 
             InitPropertiesByName();
 

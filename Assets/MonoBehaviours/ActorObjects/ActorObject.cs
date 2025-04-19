@@ -100,17 +100,13 @@ public class ActorObject : MonoBehaviour {
 
         }
 
-        if (actor.behavior is FCopObjectMutating) {
-
-            if (missingObjectGameobj == null) {
-                var obj = Instantiate(missingObjectPrefab);
-                obj.transform.SetParent(transform, false);
-                missingObjectGameobj = obj;
-            }
-
-            missingObjectGameobj.SetActive(false);
-
+        if (missingObjectGameobj == null) {
+            var obj = Instantiate(missingObjectPrefab);
+            obj.transform.SetParent(transform, false);
+            missingObjectGameobj = obj;
         }
+
+        missingObjectGameobj.SetActive(false);
 
         SetToCurrentPosition();
 
