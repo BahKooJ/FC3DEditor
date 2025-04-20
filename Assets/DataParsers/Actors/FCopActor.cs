@@ -759,6 +759,10 @@ namespace FCopParser {
 
     }
 
+    public interface SpecializedID {
+        public int GetID();
+    }
+
     public abstract class FCopEntity: FCopActorBehavior {
 
         public FCopEntity(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
@@ -826,7 +830,7 @@ namespace FCopParser {
                 new ValueActorProperty("Group?", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Entity Properties"),
                 new EnumDataActorProperty("Map Icon Color", (MapIconColor)Read8(0), BitCount.Bit8, "Entity Properties"),
                 new ValueActorProperty("Target Priority", Read8(0), 0, 127, BitCount.Bit8, "Entity Properties"),
-                new ValueActorProperty("Explosion (Unknown)", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Entity Properties"),
+                new ExplosionActorProperty("Explosion", Read8(0), BitCount.Bit8, "Entity Properties"),
                 new AssetActorProperty("Ambient Sound", Read8(0), AssetType.WavSound, BitCount.Bit8, "Entity Properties"),
                 new ValueActorProperty("UV Offset X", Read8(0), 0, 255, BitCount.Bit8, "Entity Properties"),
                 new ValueActorProperty("UV Offset Y", Read8(0), 0, 255, BitCount.Bit8, "Entity Properties")
@@ -2547,12 +2551,12 @@ namespace FCopParser {
 
     }
 
-    public class FCopBehavior91 : FCopActorBehavior {
+    public class FCopBehavior91 : FCopActorBehavior, SpecializedID {
 
         public FCopBehavior91(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("ID", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("29 Ref", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("30", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
                 new ValueActorProperty("32", Read8(0), 0, 255, BitCount.Bit8),
@@ -2586,6 +2590,9 @@ namespace FCopParser {
 
         }
 
+        public int GetID() {
+            return propertiesByName["ID"].GetCompiledValue();
+        }
     }
 
     public class FCopBehavior92 : FCopActorBehavior {

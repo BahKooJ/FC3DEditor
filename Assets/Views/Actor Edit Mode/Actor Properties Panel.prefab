@@ -2170,7 +2170,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 260, y: 0}
+  m_SizeDelta: {x: 300, y: 0}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &2835877620279318244
 CanvasRenderer:
@@ -2233,6 +2233,7 @@ MonoBehaviour:
   spawningPropertiesItem: {fileID: 8213937852208876216, guid: cda48b90ed7d6ec45adb939a85db987b, type: 3}
   assetActorPropertyItem: {fileID: 3486778975069844253, guid: 8f4e13b8b532e4842aea0259cf164bbd, type: 3}
   normalizedValueActorPorpertyItem: {fileID: 5020871495025236756, guid: d5b2e595f0605eb4091169a5c83fb37a, type: 3}
+  explosionActorPropertyItem: {fileID: 3486778975069844253, guid: 22ff3b485e146444b933801a49cc2d5f, type: 3}
   propertiesContent: {fileID: 4429559707500750907}
   contentScrollview: {fileID: 62381313911760272}
   actorName: {fileID: 75131811161702472}

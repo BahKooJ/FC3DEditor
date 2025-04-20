@@ -54,6 +54,12 @@ namespace FCopParser {
 
         }
 
+        public List<FCopActor> FindActorsByBehavior(ActorBehavior behavior) {
+
+            return actors.Where(a => a.behaviorType == behavior).ToList();
+
+        }
+
         public void AddActor(FCopActor actor, ActorNode toGroup) {
 
             actors.Add(actor);

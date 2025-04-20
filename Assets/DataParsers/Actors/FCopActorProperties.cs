@@ -272,6 +272,32 @@ namespace FCopParser {
 
     }
 
+    public class ExplosionActorProperty : ActorProperty {
+        public string name { get; set; }
+        public BitCount bitCount { get; set; }
+        public string commonName { get; set; }
+        public string dictatesOverload { get; set; }
+
+        public int GetCompiledValue() {
+            return id;
+        }
+
+        public int id;
+
+        public ExplosionActorProperty(string name, int id, BitCount bitCount) {
+            this.name = name;
+            this.id = id;
+            this.bitCount = bitCount;
+            this.commonName = "";
+
+        }
+
+        public ExplosionActorProperty(string name, int id, BitCount bitCount, string commonName) : this(name, id, bitCount) {
+            this.commonName = commonName;
+        }
+
+    }
+
     public class OverloadedProperty : ActorProperty {
 
         public string name { get; set; }
@@ -360,6 +386,30 @@ namespace FCopParser {
         public static ActorRotation operator +(ActorRotation a, float b) {
             return a.SetRotationDegree(a.parsedRotation + b);
         }
+
+    }
+
+    public abstract class FCopExplosion {
+
+        public static Dictionary<int, string> globalExplosions = new() {
+            {10, "X1 Alpha"},
+            {20, "Alive Flaming Crumble"},
+            {21, "Alive Flaming Steam Disappear"},
+            {22, "Small Green Flame Explosion"},
+            {23, "Flaming Crumble"},
+            {24, "Particle Shockwave"},
+            {25, "Small Shockwave"},
+            {26, "Small Explosion"},
+            {27, "Red Shockwave With Launch"},
+            {28, "Crumble"},
+            {50, "Small Spark Explosion"},
+            {91, "Infantry Explosion"},
+            {99, "Fall Large Flash Explosion"},
+            {100, "Multi-Shockwave Explosion"},
+            {101, "Flaming Crumble Dupe"},
+            {102, "Energy Explosion"},
+            {109, "Launch Crumble"},
+        };
 
     }
 
