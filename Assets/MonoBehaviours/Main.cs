@@ -94,6 +94,9 @@ public class Main : MonoBehaviour {
     public GameObject TeleporterActor;
     public GameObject TriggerActorFab;
     public GameObject TextureActorFab;
+    public GameObject VisualEffectsActorFab;
+    public GameObject ActorExplosionActorFab;
+    public GameObject ParticleEmitterFab;
     public GameObject ObjectMesh;
     public GameObject actorGroupObjectFab;
     public GameObject ArrowModelFab;

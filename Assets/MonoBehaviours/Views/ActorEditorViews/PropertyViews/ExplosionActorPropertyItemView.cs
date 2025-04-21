@@ -28,7 +28,7 @@ public class ExplosionActorPropertyItemView : ActorPropertyItemView {
 
         nameText.text = property.name;
 
-        var explosionActors = controller.main.level.sceneActors.FindActorsByBehavior(ActorBehavior.Behavior91);
+        var explosionActors = controller.main.level.sceneActors.FindActorsByBehavior(ActorBehavior.ActorExplosion);
 
         var selectedActor = explosionActors.FirstOrDefault(a => ((SpecializedID)a.behavior).GetID() == explosionProperty.id);
 

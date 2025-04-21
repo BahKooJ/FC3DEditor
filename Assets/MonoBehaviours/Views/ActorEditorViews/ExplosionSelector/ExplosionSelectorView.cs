@@ -22,7 +22,7 @@ public class ExplosionSelectorView : MonoBehaviour {
 
     void Start() {
 
-        var explosionActors = controller.main.level.sceneActors.FindActorsByBehavior(ActorBehavior.Behavior91);
+        var explosionActors = controller.main.level.sceneActors.FindActorsByBehavior(ActorBehavior.ActorExplosion);
 
         foreach (var actor in explosionActors) {
 

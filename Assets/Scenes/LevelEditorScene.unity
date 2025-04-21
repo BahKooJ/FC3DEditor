@@ -2676,6 +2676,9 @@ MonoBehaviour:
   TeleporterActor: {fileID: 1430015761629357658, guid: e83e15fd2a70b2d48aaeb655b554bb8a, type: 3}
   TriggerActorFab: {fileID: 1430015761629357658, guid: bf296f914accf914a981b6bf86564e44, type: 3}
   TextureActorFab: {fileID: 1640186847095666650, guid: 9aaae90836eadfe47b4457d232743dbb, type: 3}
+  VisualEffectsActorFab: {fileID: 1430015761629357658, guid: fae92abb416d4d74f8044b5dee1d4db9, type: 3}
+  ActorExplosionActorFab: {fileID: 1430015761629357658, guid: ceda3bd10930bac4ab5444f5aed1534e, type: 3}
+  ParticleEmitterFab: {fileID: 1430015761629357658, guid: 3be5dd46c8578e6409b1d85fc40ff38a, type: 3}
   ObjectMesh: {fileID: 3982175839306991789, guid: 8d9aa84093398e5458aa180203865e97, type: 3}
   actorGroupObjectFab: {fileID: 7382528864980433952, guid: 8495c4d72b0fa3e46abae712537dd032, type: 3}
   ArrowModelFab: {fileID: 7536541538266289565, guid: d6d06713eaa37c14b85b79a87c481f49, type: 3}

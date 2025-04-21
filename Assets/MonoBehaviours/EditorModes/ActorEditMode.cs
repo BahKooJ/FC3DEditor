@@ -65,6 +65,30 @@ public class ActorEditMode : EditMode {
             case FCopBehavior35:
                 nodeObject = Object.Instantiate(main.MapObjectiveNodesActor);
                 break;
+            case FCopBehavior87:
+                nodeObject = Object.Instantiate(main.VisualEffectsActorFab);
+                break;
+            case FCopBehavior88:
+                nodeObject = Object.Instantiate(main.VisualEffectsActorFab);
+                break;
+            case FCopBehavior89:
+                nodeObject = Object.Instantiate(main.VisualEffectsActorFab);
+                break;
+            case FCopBehavior90:
+                nodeObject = Object.Instantiate(main.VisualEffectsActorFab);
+                break;
+            case FCopBehavior91:
+                nodeObject = Object.Instantiate(main.ActorExplosionActorFab);
+                break;
+            case FCopBehavior92:
+                nodeObject = Object.Instantiate(main.VisualEffectsActorFab);
+                break;
+            case FCopBehavior93:
+                nodeObject = Object.Instantiate(main.ParticleEmitterFab);
+                break;
+            case FCopBehavior94:
+                nodeObject = Object.Instantiate(main.VisualEffectsActorFab);
+                break;
             case FCopBehavior95:
                 nodeObject = Object.Instantiate(main.TriggerActorFab);
                 break;

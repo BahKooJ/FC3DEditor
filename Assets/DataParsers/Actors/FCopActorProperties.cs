@@ -409,6 +409,7 @@ namespace FCopParser {
             {101, "Flaming Crumble Dupe"},
             {102, "Energy Explosion"},
             {109, "Launch Crumble"},
+            {110, "Dynamic Infantry Death"},
         };
 
     }

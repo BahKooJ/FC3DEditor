@@ -143,28 +143,28 @@ namespace FCopParser {
                 case ActorBehavior.Behavior38:
                     behavior = new FCopBehavior38(this, propertyData);
                     break;
-                case ActorBehavior.Behavior87:
+                case ActorBehavior.VisualEffects87:
                     behavior = new FCopBehavior87(this, propertyData);
                     break;
-                case ActorBehavior.Behavior88:
+                case ActorBehavior.VisualEffects88:
                     behavior = new FCopBehavior88(this, propertyData);
                     break;
-                case ActorBehavior.Behavior89:
+                case ActorBehavior.VisualEffects89:
                     behavior = new FCopBehavior89(this, propertyData);
                     break;
-                case ActorBehavior.Behavior90:
+                case ActorBehavior.VisualEffects90:
                     behavior = new FCopBehavior90(this, propertyData);
                     break;
-                case ActorBehavior.Behavior91:
+                case ActorBehavior.ActorExplosion:
                     behavior = new FCopBehavior91(this, propertyData);
                     break;
-                case ActorBehavior.Behavior92:
+                case ActorBehavior.VisualEffects92:
                     behavior = new FCopBehavior92(this, propertyData);
                     break;
-                case ActorBehavior.Behavior93:
+                case ActorBehavior.ParticleEmitter:
                     behavior = new FCopBehavior93(this, propertyData);
                     break;
-                case ActorBehavior.Behavior94:
+                case ActorBehavior.VisualEffects94:
                     behavior = new FCopBehavior94(this, propertyData);
                     break;
                 case ActorBehavior.Trigger:
@@ -1744,10 +1744,10 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("Head 1 Explosion", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Turret Properties Head 1"),
-                new ValueActorProperty("Head 2 Explosion", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Turret Properties Head 2"),
-                new ValueActorProperty("Head 3 Explosion", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Turret Properties Head 3"),
-                new ValueActorProperty("Head 4 Explosion", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Turret Properties Head 4"),
+                new ExplosionActorProperty("Head 1 Explosion", Read8(0), BitCount.Bit8, "Turret Properties Head 1"),
+                new ExplosionActorProperty("Head 2 Explosion", Read8(0), BitCount.Bit8, "Turret Properties Head 2"),
+                new ExplosionActorProperty("Head 3 Explosion", Read8(0), BitCount.Bit8, "Turret Properties Head 3"),
+                new ExplosionActorProperty("Head 4 Explosion", Read8(0), BitCount.Bit8, "Turret Properties Head 4"),
 
             });
 
@@ -3089,14 +3089,14 @@ namespace FCopParser {
         ClaimableTurret = 36,
         Behavior37 = 37,
         Behavior38 = 38,
-        Behavior87 = 87,
-        Behavior88 = 88,
-        Behavior89 = 89,
-        Behavior90 = 90,
-        Behavior91 = 91,
-        Behavior92 = 92,
-        Behavior93 = 93,
-        Behavior94 = 94,
+        VisualEffects87 = 87,
+        VisualEffects88 = 88,
+        VisualEffects89 = 89,
+        VisualEffects90 = 90,
+        ActorExplosion = 91,
+        VisualEffects92 = 92,
+        ParticleEmitter = 93,
+        VisualEffects94 = 94,
         Trigger = 95,
         StaticProp = 96,
         Texture = 97,
