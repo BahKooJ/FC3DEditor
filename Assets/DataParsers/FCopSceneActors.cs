@@ -76,7 +76,7 @@ namespace FCopParser {
                 behaviorGroupedActors[(int)actor.behaviorType].nestedActors.Add(actor);
             }
             else {
-                behaviorGroupedActors[(int)actor.behaviorType] = new ActorNode(ActorGroupType.Position, "Group " + (int)actor.behaviorType, actor);
+                behaviorGroupedActors[(int)actor.behaviorType] = new ActorNode(ActorGroupType.Behavior, "Group " + actor.behaviorType, actor);
             }
 
         }
@@ -125,6 +125,10 @@ namespace FCopParser {
         public bool PositionalUngroupActor(FCopActor actor) {
 
             var node = positionalGroupedActors.FirstOrDefault(n => {
+
+                if (n.nestedActors.Count == 1) {
+                    return false;
+                }
 
                 foreach (var nestedN in n.nestedActors) {
 
@@ -320,7 +324,7 @@ namespace FCopParser {
 
         }
 
-        void FindTeams() {
+        public void FindTeams() {
 
             var teamedActors = actors.Where(a => a.behavior is FCopEntity);
 

@@ -331,6 +331,7 @@ public class Main : MonoBehaviour {
         Presets.shaderPresets = new ShaderPresets("Shader Presets", null);
         Presets.colorPresets = new ColorPresets("Color Presets", null);
         Presets.levelSchematics = new();
+        Presets.actorSchematics = new ActorSchematics("Actor Schematics", null);
 
         ignoreAllInputs = false;
         counterActions.Clear();

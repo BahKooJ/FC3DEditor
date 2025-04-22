@@ -15,7 +15,7 @@ public class ActorSchematics {
 
     public List<ActorSchematic> schematics = new List<ActorSchematic>();
 
-    public ActorSchematics(ActorSchematics parent, string name) { 
+    public ActorSchematics(string name, ActorSchematics parent) { 
         this.directoryName = name;
         this.parent = parent;
     }

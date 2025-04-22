@@ -96,7 +96,7 @@ public class ActorSchematicView : MonoBehaviour {
 
     public void OnClickAddFolder() {
 
-        var newFolder = new ActorSchematics(currentDirectory, "Folder");
+        var newFolder = new ActorSchematics("Folder", currentDirectory);
 
         currentDirectory.subFolders.Add(newFolder);
 

@@ -165,7 +165,7 @@ public class SceneActorsView : MonoBehaviour {
 
     public void RemoveNode(FCopActor actor) {
 
-        if (actorNodesByID.ContainsKey(actor.DataID)) {
+        if (actorNodesByID != null && actorNodesByID.ContainsKey(actor.DataID)) {
 
             var node = actorNodesByID[actor.DataID];
 
@@ -178,22 +178,52 @@ public class SceneActorsView : MonoBehaviour {
 
             ActorNodeListItemView nodeToDestroy = null;
 
-            foreach (var node in actorNodes) {  
-            
-                if (node.actorNodes.Count > 1) {
+            foreach (var node in actorNodes) {
 
-                    foreach (var nestedNode in node.actorNodes) {
+                foreach (var nestedNode in node.actorNodes) {
 
-                        if (nestedNode.actor == actor) {
+                    if (nestedNode.actor == actor) {
 
-
-
-                        }
+                        nodeToDestroy = nestedNode;
+                        break;
 
                     }
 
                 }
-            
+
+                if (nodeToDestroy != null) {
+
+                    node.actorNodesByID?.Remove(actor.DataID);
+                    node.actorNodes.Remove(nodeToDestroy);
+                    Destroy(nodeToDestroy.gameObject);
+
+                    if (node.actorNodes.Count == 1 && !node.forceGroup) {
+
+                        foreach (var nestedNode in node.actorNodes) {
+                            Destroy(nestedNode.gameObject);
+                        }
+
+                        var fcopNode = node.node;
+                        var siblingIndex = node.transform.GetSiblingIndex();
+
+                        actorNodesByID?.Remove(actor.DataID);
+                        actorNodes.Remove(node);
+                        Destroy(node.gameObject);
+
+                        InitListNode(fcopNode, false);
+                        actorNodes.Last().transform.SetSiblingIndex(siblingIndex);
+
+                    }
+                    else if (node.actorNodes.Count == 0) {
+                        actorNodesByID?.Remove(actor.DataID);
+                        actorNodes.Remove(node);
+                        Destroy(node.gameObject);
+                    }
+
+                    break;
+
+                }
+
             }
 
         }

@@ -14,7 +14,7 @@ public abstract class Presets {
     public static ShaderPresets shaderPresets = new ShaderPresets("Shader Presets", null);
     public static ColorPresets colorPresets = new ColorPresets("Color Presets", null);
     public static List<Schematic> levelSchematics = new();
-    public static ActorSchematics actorSchematics = new(null, "Actor Schematics");
+    public static ActorSchematics actorSchematics = new("Actor Schematics", null);
 
     static List<char> numbers = new List<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-' };
 

@@ -1181,7 +1181,12 @@ namespace FCopParser {
             if (actorGroups.Count != 0) {
                 sceneActors.SetPositionalGroup(actorGroups);
             }
-            sceneActors.teams = teams;
+            if (teams.Count != 0) {
+                sceneActors.FindTeams();
+            }
+            else {
+                sceneActors.teams = teams;
+            }
             this.navMeshes = navMeshes;
             this.objects = objects;
             this.textures = textures;

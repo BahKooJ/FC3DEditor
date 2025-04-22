@@ -24,7 +24,8 @@ public class ActorEditMode : EditMode {
 
     GameObject arrowModel = null;
     ActorBehavior? actorToAdd = null;
-    ActorObject schematicToAdd = null;
+    ActorObject schematicObjectToAdd = null;
+    ActorSchematic schematicToAdd = null;
 
     static int counterActionID = 0;
 
@@ -178,21 +179,33 @@ public class ActorEditMode : EditMode {
             return;
         }
 
-        if (schematicToAdd != null) {
+        if (schematicObjectToAdd != null) {
 
             var hitPos = main.CursorOnLevelMesh();
 
             if (hitPos != null) {
-                schematicToAdd.transform.position = hitPos.Value;
+
+                if (Controls.IsDown("SnapActorPosition")) {
+
+                    hitPos = new Vector3(MathF.Round(hitPos.Value.x * 2) / 2, MathF.Round(hitPos.Value.y * 2) / 2, MathF.Round(hitPos.Value.z * 2) / 2);
+
+                }
+
+                schematicObjectToAdd.transform.position = hitPos.Value;
+
             }
 
             if (Input.GetMouseButtonDown(0)) {
 
                 if (hitPos != null) {
 
-                    AddActor(schematicToAdd.actor, hitPos.Value);
+                    AddActor(new FCopActor(new IFFDataFile(3, new(schematicToAdd.actorData), "Cact", main.level.sceneActors.FindNextID(), main.level.scripting.emptyOffset)), hitPos.Value);
 
-                    EndAddSchematic();
+                    if (!Input.GetKey(KeyCode.LeftShift)) {
+
+                        EndAddSchematic();
+
+                    }
 
                 }
 
@@ -301,8 +314,8 @@ public class ActorEditMode : EditMode {
 
                 //return a.behavior is FCopShooter e;
 
-                if (a.behavior is FCopEntity es) {
-                    return es.propertiesByName["Explosion (Unknown)"].GetCompiledValue() == 91;
+                if (a.behavior is FCopShooter es) {
+                    return es.propertiesByName["Weapon ID"].GetCompiledValue() == 14;
                 }
                 return false;
 
@@ -414,9 +427,11 @@ public class ActorEditMode : EditMode {
 
     public void StartAddSchematic(ActorSchematic schematic) {
 
+        schematicToAdd = schematic;
+
         var newAct = new FCopActor(new IFFDataFile(3, new(schematic.actorData), "Cact", main.level.sceneActors.FindNextID(), main.level.scripting.emptyOffset));
 
-        schematicToAdd = CreateActorObject(newAct);
+        schematicObjectToAdd = CreateActorObject(newAct);
 
         UnselectActorCompletely();
 
@@ -424,14 +439,14 @@ public class ActorEditMode : EditMode {
 
     public void EndAddSchematic() {
 
-        if (schematicToAdd == null) {
+        if (schematicObjectToAdd == null) {
             return;
         }
 
-        Object.Destroy(schematicToAdd.gameObject);
+        Object.Destroy(schematicObjectToAdd.gameObject);
 
+        schematicObjectToAdd = null;
         schematicToAdd = null;
-
     }
 
     public void StartAdd(ActorBehavior behavior) {
@@ -957,7 +972,7 @@ public class ActorEditMode : EditMode {
         ValidateGrouping();
 
         view.activeActorPropertiesView.Refresh();
-        view.activeActorPropertiesView.sceneActorsView.Refresh(true);
+        view.activeActorPropertiesView.sceneActorsView.RemoveNode(actor);
 
     }
 
@@ -1017,6 +1032,9 @@ public class ActorEditMode : EditMode {
 
             view.activeActorPropertiesView.sceneActorsView.Refresh(true);
 
+        }
+        else {
+            QuickLogHandler.Log("Actor is not in group.", LogSeverity.Info);
         }
 
     }
