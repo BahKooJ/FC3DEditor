@@ -10,7 +10,7 @@ namespace FCopParser {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
-        public string dictatesOverload { get; set; }
+        public List<string> dictatesOverload { get; set; }
 
         public int GetCompiledValue();
 
@@ -33,7 +33,7 @@ namespace FCopParser {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
-        public string dictatesOverload { get; set; }
+        public List<string> dictatesOverload { get; set; }
 
         public int min;
         public int max;
@@ -79,7 +79,7 @@ namespace FCopParser {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
-        public string dictatesOverload { get; set; }
+        public List<string> dictatesOverload { get; set; }
 
         public int GetCompiledValue() {
             return value ? 1 : 0;
@@ -104,7 +104,7 @@ namespace FCopParser {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
-        public string dictatesOverload { get; set; }
+        public List<string> dictatesOverload { get; set; }
 
         public float min;
         public float max;
@@ -149,7 +149,7 @@ namespace FCopParser {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
-        public string dictatesOverload { get; set; }
+        public List<string> dictatesOverload { get; set; }
 
         public int GetCompiledValue() {
             return Convert.ToInt32(caseValue);
@@ -162,16 +162,14 @@ namespace FCopParser {
             this.caseValue = caseValue;
             this.bitCount = bitCount;
             this.commonName = "";
-            this.dictatesOverload = "";
         }
 
         public EnumDataActorProperty(string name, Enum caseValue, BitCount bitCount, string commonName) : this(name, caseValue, bitCount) {
             this.commonName = commonName;
-            this.dictatesOverload = "";
         }
 
 
-        public EnumDataActorProperty(string name, Enum caseValue, BitCount bitCount, string commonName, string dictatesOverload) : this(name, caseValue, bitCount, commonName) {
+        public EnumDataActorProperty(string name, Enum caseValue, BitCount bitCount, string commonName, List<string> dictatesOverload) : this(name, caseValue, bitCount, commonName) {
             this.dictatesOverload = dictatesOverload;
         }
     }
@@ -180,7 +178,7 @@ namespace FCopParser {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
-        public string dictatesOverload { get; set; }
+        public List<string> dictatesOverload { get; set; }
 
         public float min;
         public float max;
@@ -226,7 +224,7 @@ namespace FCopParser {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
-        public string dictatesOverload { get; set; }
+        public List<string> dictatesOverload { get; set; }
 
         public int GetCompiledValue() {
             return value;
@@ -248,7 +246,7 @@ namespace FCopParser {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
-        public string dictatesOverload { get; set; }
+        public List<string> dictatesOverload { get; set; }
 
         public int GetCompiledValue() {
             return assetID;
@@ -276,7 +274,7 @@ namespace FCopParser {
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
-        public string dictatesOverload { get; set; }
+        public List<string> dictatesOverload { get; set; }
 
         public int GetCompiledValue() {
             return id;
@@ -298,12 +296,42 @@ namespace FCopParser {
 
     }
 
+    public class SpecializedActorRefActorProperty : ActorProperty {
+
+        public string name { get; set; }
+        public BitCount bitCount { get; set; }
+        public string commonName { get; set; }
+        public List<string> dictatesOverload { get; set; }
+
+        public int GetCompiledValue() {
+            return id;
+        }
+
+        public int id;
+        public ActorBehavior behaviorType;
+        public bool specializedID;
+
+        public SpecializedActorRefActorProperty(string name, int id, ActorBehavior behaviorType, bool specializedID, BitCount bitCount) {
+            this.name = name;
+            this.id = id;
+            this.behaviorType = behaviorType;
+            this.specializedID = specializedID;
+            this.bitCount = bitCount;
+            this.commonName = "";
+        }
+
+        public SpecializedActorRefActorProperty(string name, int id, ActorBehavior behaviorType, bool specializedID, BitCount bitCount, string commonName) : this(name, id, behaviorType, specializedID, bitCount) {
+            this.commonName = commonName;
+        }
+
+    }
+
     public class OverloadedProperty : ActorProperty {
 
         public string name { get; set; }
         public BitCount bitCount { get; set; }
         public string commonName { get; set; }
-        public string dictatesOverload { get; set; }
+        public List<string> dictatesOverload { get; set; }
 
         public List<(ActorProperty property, Func<bool> overloadCondition)> properties = new();
 
@@ -604,6 +632,26 @@ namespace FCopParser {
     public enum TriggeringActorType {
         Player = 0,
         Actor = 1
+    }
+
+    public enum WeaponType {
+
+        Direct = 1,
+        Lead = 2,
+        Homing = 3,
+        Mortar = 4,
+        Bomb = 6,
+        DirectDupe = 7,
+        Grenade = 9,
+        Unknown = 10,
+        Arch = 11,
+        Bullet = 12,
+        Shield = 13,
+        Flame = 14,
+        Laser = 17,
+        VerticalHoming = 19,
+        ClusterMortar = 20
+
     }
 
 }

@@ -96,6 +96,12 @@ public class ActorEditMode : EditMode {
             case FCopBehavior97:
                 nodeObject = Object.Instantiate(main.TextureActorFab);
                 break;
+            case FCopBehavior98:
+                nodeObject = Object.Instantiate(main.WeaponActorFab);
+                break;
+            case FCopBehavior99:
+                nodeObject = Object.Instantiate(main.PlayerWeaponActorFab);
+                break;
             default:
                 nodeObject = Object.Instantiate(main.BlankActor);
                 break;

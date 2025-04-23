@@ -54,8 +54,14 @@ public class EnumDataActorPropertyItemView: ActorPropertyItemView {
             ActorPropertyChangeEvent.changeEventsByPropertyName[property.name](controller, property);
 
         }
-        if (enumProperty.dictatesOverload != "") {
-            controller.view.activeActorPropertiesView.RequestPropertyRefresh(actor.behavior.propertiesByName[enumProperty.dictatesOverload]);
+        if (enumProperty.dictatesOverload != null) {
+
+            foreach (var name in enumProperty.dictatesOverload) {
+
+                controller.view.activeActorPropertiesView.RequestPropertyRefresh(actor.behavior.propertiesByName[name]);
+
+            }
+
         }
 
     }

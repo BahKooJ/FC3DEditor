@@ -858,7 +858,7 @@ namespace FCopParser {
         public FCopShooter(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("Weapon ID", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Shooter Properties")
+                new SpecializedActorRefActorProperty("Weapon ID", Read16(0), ActorBehavior.Weapon, true, BitCount.Bit16, "Shooter Properties")
             });
 
             properties.AddRange(new List<ActorProperty>() {
@@ -890,7 +890,7 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
                 new EnumDataActorProperty("Acquiring Type", (AcquiringType)Read8(0), BitCount.Bit8, "Shooter Properties"),
-                new EnumDataActorProperty("Target Type", (TargetType)Read8(1), BitCount.Bit8, "Shooter Properties", "OverloadAttack"),
+                new EnumDataActorProperty("Target Type", (TargetType)Read8(1), BitCount.Bit8, "Shooter Properties", new() { "OverloadAttack" }),
 
                 new OverloadedProperty("OverloadAttack", new() {
                     (new AssetActorProperty("Attack Team", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type"].GetCompiledValue() == TargetType.Team),
@@ -915,7 +915,7 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
                 new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8, "Turret Properties"),
-                new EnumDataActorProperty("Facing Target Type", (TargetType)Read8(1), BitCount.Bit8, "Turret Properties", "FacingOverloadAttack"),
+                new EnumDataActorProperty("Facing Target Type", (TargetType)Read8(1), BitCount.Bit8, "Turret Properties", new() { "FacingOverloadAttack" }),
 
                 new OverloadedProperty("FacingOverloadAttack", new() {
                     (new AssetActorProperty("Face Team", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type"].GetCompiledValue() == TargetType.Team),
@@ -1786,7 +1786,7 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
                 new EnumDataActorProperty("Acquiring Type (H2)", (AcquiringType)Read8(0), BitCount.Bit8, "Shooter Properties Head 2"),
-                new EnumDataActorProperty("Target Type (H2)", (TargetType)Read8(1), BitCount.Bit8, "Shooter Properties Head 2", "OverloadAttack2"),
+                new EnumDataActorProperty("Target Type (H2)", (TargetType)Read8(1), BitCount.Bit8, "Shooter Properties Head 2", new() { "OverloadAttack2" }),
 
                 new OverloadedProperty("OverloadAttack2", new() {
                     (new AssetActorProperty("Attack Team (H2)", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H2)"].GetCompiledValue() == TargetType.Team),
@@ -1838,7 +1838,7 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
                 new EnumDataActorProperty("Acquiring Type (H3)", (AcquiringType)Read8(0), BitCount.Bit8, "Shooter Properties Head 3"),
-                new EnumDataActorProperty("Target Type (H3)", (TargetType)Read8(1), BitCount.Bit8, "Shooter Properties Head 3", "OverloadAttack3"),
+                new EnumDataActorProperty("Target Type (H3)", (TargetType)Read8(1), BitCount.Bit8, "Shooter Properties Head 3", new() { "OverloadAttack3" }),
 
                 new OverloadedProperty("OverloadAttack3", new() {
                     (new AssetActorProperty("Attack Team (H3)", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H3)"].GetCompiledValue() == TargetType.Team),
@@ -1890,7 +1890,7 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
                 new EnumDataActorProperty("Acquiring Type (H4)", (AcquiringType)Read8(0), BitCount.Bit8, "Shooter Properties Head 4"),
-                new EnumDataActorProperty("Target Type (H4)", (TargetType)Read8(1), BitCount.Bit8, "Shooter Properties Head 4", "OverloadAttack4"),
+                new EnumDataActorProperty("Target Type (H4)", (TargetType)Read8(1), BitCount.Bit8, "Shooter Properties Head 4", new() { "OverloadAttack4" }),
 
                 new OverloadedProperty("OverloadAttack4", new() {
                     (new AssetActorProperty("Attack Team (H4)", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H4)"].GetCompiledValue() == TargetType.Team),
@@ -2819,7 +2819,7 @@ namespace FCopParser {
             // For a more use friendly way, I may an overload that doesn't read any actual property data.
             properties.AddRange(new List<ActorProperty>() {
 
-                new EnumDataActorProperty("Actor Triggering Type", Read16NoIt(0) > -1 ? TriggeringActorType.Actor : TriggeringActorType.Player, BitCount.NA, "", "TriggeringActorOverload"),
+                new EnumDataActorProperty("Actor Triggering Type", Read16NoIt(0) > -1 ? TriggeringActorType.Actor : TriggeringActorType.Player, BitCount.NA, "", new() { "TriggeringActorOverload" }),
                 new OverloadedProperty("TriggeringActorOverload", new() {
                     (new AssetActorProperty("Triggering Actor", Read16NoIt(0), AssetType.Actor, BitCount.Bit16), () => (TriggeringActorType)propertiesByName["Actor Triggering Type"].GetCompiledValue() == TriggeringActorType.Actor),
                     (new FillerActorProperty(-1, BitCount.Bit16), () => (TriggeringActorType)propertiesByName["Actor Triggering Type"].GetCompiledValue() == TriggeringActorType.Player),
@@ -3002,7 +3002,7 @@ namespace FCopParser {
 
     }
 
-    public class FCopBehavior98 : FCopActorBehavior {
+    public class FCopBehavior98 : FCopActorBehavior, SpecializedID {
 
         public FCopBehavior98(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
@@ -3017,30 +3017,51 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
                 new ValueActorProperty("ID", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("Type", Read8(0), 0, 255, BitCount.Bit8),
+                new EnumDataActorProperty("Type", (WeaponType)Read8(0), BitCount.Bit8, "", new() { "OverloadMaxRange", "Overload52", "OverloadBlastRadius" }),
                 new ValueActorProperty("Ammo Count", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
                 new ValueActorProperty("Reload Count", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
                 new ValueActorProperty("Burst Shot Count", Read16(0), 0, 100, BitCount.Bit16),
                 new NormalizedValueProperty("Fire Delay", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16),
                 new NormalizedValueProperty("Burst Fire Delay", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16),
                 new ValueActorProperty("Damage", Read16(0), 0, short.MaxValue, BitCount.Bit16),
-                new NormalizedValueProperty("Blast Radius", Read16(0), 0, short.MaxValue, 512f, BitCount.Bit16),
-                new ValueActorProperty("44", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+
+                new OverloadedProperty("OverloadBlastRadius", new() {
+                    (new NormalizedValueProperty("Blast Radius (MUST SET!)", Read16NoIt(0), 0, short.MaxValue, 512f, BitCount.Bit16), () => (WeaponType)propertiesByName["Type"].GetCompiledValue() == WeaponType.Grenade),
+                    (new NormalizedValueProperty("Shield Radius", Read16NoIt(0), 0, short.MaxValue, 512f, BitCount.Bit16), () => (WeaponType)propertiesByName["Type"].GetCompiledValue() == WeaponType.Shield),
+                    (new NormalizedValueProperty("Blast Radius", Read16(0), 0, short.MaxValue, 512f, BitCount.Bit16), () => true),
+                }, BitCount.Bit16),
+
+                new ValueActorProperty("Unknown 44", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
                 new NormalizedValueProperty("Velocity", Read16(0), 0, short.MaxValue, 1024f, BitCount.Bit16),
-                new ValueActorProperty("48", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new NormalizedValueProperty("Max Range", Read16(0), 0, short.MaxValue, 512f,  BitCount.Bit16),
-                new ValueActorProperty("52", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Unknown 48", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+
+                new OverloadedProperty("OverloadMaxRange", new() {
+                    (new NormalizedValueProperty("Gravity", Read16NoIt(0), 0, short.MaxValue, 512f,  BitCount.Bit16), () => (WeaponType)propertiesByName["Type"].GetCompiledValue() == WeaponType.Mortar),
+                    (new NormalizedValueProperty("Gravity", Read16NoIt(0), 0, short.MaxValue, 512f,  BitCount.Bit16), () => (WeaponType)propertiesByName["Type"].GetCompiledValue() == WeaponType.Bomb),
+                    (new NormalizedValueProperty("Gravity", Read16NoIt(0), 0, short.MaxValue, 512f,  BitCount.Bit16), () => (WeaponType)propertiesByName["Type"].GetCompiledValue() == WeaponType.Grenade),
+                    (new NormalizedValueProperty("Max Range", Read16(0), 0, short.MaxValue, 512f,  BitCount.Bit16), () => true),
+                }, BitCount.Bit16),
+
+                new OverloadedProperty("Overload52", new() {
+                    (new ValueActorProperty("Fuse Time", Read16NoIt(0), short.MinValue, short.MaxValue, BitCount.Bit16), () => (WeaponType)propertiesByName["Type"].GetCompiledValue() == WeaponType.Grenade),
+                    (new ValueActorProperty("Unknown 52", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
+                }, BitCount.Bit16),
+
                 new ValueActorProperty("Impact Effect", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("Weapon Effects", Read8(0), 0, 255, BitCount.Bit8),
                 //new AssetActorProperty("Shoot Sound", Read8(0), AssetType.WavSound, BitCount.Bit8),
                 new ValueActorProperty("Shoot Sound", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("57", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("Unknown 57", Read8(0), 0, 255, BitCount.Bit8),
                 new ValueActorProperty("Echo Sound", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("59", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("Unknown 59", Read8(0), 0, 255, BitCount.Bit8),
             });
 
             InitPropertiesByName();
 
+        }
+
+        public int GetID() {
+            return propertiesByName["ID"].GetCompiledValue();
         }
 
     }
@@ -3048,34 +3069,6 @@ namespace FCopParser {
     public class FCopBehavior99 : FCopActorBehavior {
 
         public FCopBehavior99(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
-
-            properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("28", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("29", Read8(0), 0, 255, BitCount.Bit8),
-                new FillerActorProperty(Read8(0), BitCount.Bit8),
-                new FillerActorProperty(Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Type", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("33", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("Max Shots", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("32", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Burst Shot Count", Read16(0), 0, 100, BitCount.Bit16),
-                new NormalizedValueProperty("Fire Delay", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16),
-                new NormalizedValueProperty("Burst Fire Delay", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16),
-                new ValueActorProperty("Damage", Read16(0), 0, short.MaxValue, BitCount.Bit16),
-                new NormalizedValueProperty("Blast Radius", Read16(0), 0, short.MaxValue, 512f, BitCount.Bit16),
-                new ValueActorProperty("44", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new NormalizedValueProperty("Velocity", Read16(0), 0, short.MaxValue, 1024f, BitCount.Bit16),
-                new ValueActorProperty("48", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new NormalizedValueProperty("Max Range", Read16(0), 0, short.MaxValue, 512f,  BitCount.Bit16),
-                new ValueActorProperty("52", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Impact Effect", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("Weapon Effects", Read8(0), 0, 255, BitCount.Bit8),
-                //new AssetActorProperty("Shoot Sound", Read8(0), AssetType.WavSound, BitCount.Bit8),
-                new ValueActorProperty("Shoot Sound", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("57", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("Echo Sound", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("59", Read8(0), 0, 255, BitCount.Bit8),
-            });
 
             var propertyCount = (propertyData.Count - offset) / 2;
 

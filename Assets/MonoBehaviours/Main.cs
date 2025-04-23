@@ -96,6 +96,8 @@ public class Main : MonoBehaviour {
     public GameObject TextureActorFab;
     public GameObject VisualEffectsActorFab;
     public GameObject ActorExplosionActorFab;
+    public GameObject WeaponActorFab;
+    public GameObject PlayerWeaponActorFab;
     public GameObject ParticleEmitterFab;
     public GameObject ObjectMesh;
     public GameObject actorGroupObjectFab;

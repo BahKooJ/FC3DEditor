@@ -22,6 +22,7 @@ public class ActorPropertiesView : MonoBehaviour {
     public GameObject assetActorPropertyItem;
     public GameObject normalizedValueActorPorpertyItem;
     public GameObject explosionActorPropertyItem;
+    public GameObject specializedActorPropertyItem;
 
     //View refs
     public Transform propertiesContent;
@@ -78,6 +79,9 @@ public class ActorPropertiesView : MonoBehaviour {
                 break;
             case ExplosionActorProperty:
                 obj = Instantiate(explosionActorPropertyItem);
+                break;
+            case SpecializedActorRefActorProperty:
+                obj = Instantiate(specializedActorPropertyItem);
                 break;
         }
 

@@ -27,7 +27,6 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
 
         Refresh();
 
-
     }
 
     public override void Refresh() {
