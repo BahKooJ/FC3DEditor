@@ -803,6 +803,7 @@ GameObject:
   - component: {fileID: 1629736357014205229}
   - component: {fileID: 2800285407060144835}
   - component: {fileID: 6610176611201806615}
+  - component: {fileID: 7938817516610822134}
   m_Layer: 6
   m_Name: Actor Node List Item
   m_TagString: Untagged
@@ -961,3 +962,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRightClick: 1
+--- !u!114 &7938817516610822134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8681065897720170503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 130a75eb47e1ead4aa6dd7f05232a768, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nestedRevieversInElement: []
+  originalParent: {fileID: 0}

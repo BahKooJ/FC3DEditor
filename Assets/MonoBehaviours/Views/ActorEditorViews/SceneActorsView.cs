@@ -105,6 +105,64 @@ public class SceneActorsView : MonoBehaviour {
 
     }
 
+    public void Validate() {
+
+        foreach (var node in actorNodes) {
+            node.CloseGroup();
+        }
+
+        var unvalidateNodes = new List<ActorNodeListItemView>(actorNodes);
+        var forceGrouping = sortDropdown.value == 1;
+
+        List<ActorNode> nodes = new();
+
+        switch (sortDropdown.value) {
+            case 0:
+                nodes = level.sceneActors.positionalGroupedActors;
+                break;
+            case 1:
+                nodes = level.sceneActors.behaviorGroupedActors.Values.ToList();
+                break;
+            case 2:
+
+                break;
+        }
+
+        var pi = 0;
+        foreach (var node in nodes) {
+
+            var nodeView = unvalidateNodes.FirstOrDefault(n => n.node == node);
+
+            if (nodeView != null) {
+                nodeView.transform.SetSiblingIndex(pi);
+                unvalidateNodes.Remove(nodeView);
+            }
+            else {
+                InitListNode(node, forceGrouping);
+            }
+
+            pi++;
+
+        }
+
+        foreach (var node in unvalidateNodes) {
+
+            foreach (var nestNode in node.actorNodes) {
+                Destroy(nestNode.gameObject);
+            }
+
+            Destroy(node.gameObject);
+
+            actorNodes.Remove(node);
+
+            if (actorNodesByID != null && node.node.nestedActors.Count > 0) {
+                actorNodesByID.Remove(node.node.nestedActors[0].DataID);
+            }
+
+        }
+
+    }
+
     public void RequestDelayedScrollPosUpdate() {
         delayedScrollPos = contentScrollview.verticalNormalizedPosition;
         delayScrollPosCount = 5;

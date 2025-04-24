@@ -12,11 +12,12 @@ public class ActorGroupObject : MonoBehaviour {
     public List<ActorObject> actObjects = new();
 
     public void Init() {
-        SetToCurrentPosition();
 
         foreach (var obj in actObjects) {
             obj.transform.localPosition = Vector3.zero;
         }
+
+        SetToCurrentPosition();
 
     }
 
@@ -46,23 +47,12 @@ public class ActorGroupObject : MonoBehaviour {
                 Debug.LogWarning("Grouped actor positions are desynced");
             }
 
-        }
-
-        transform.position = new Vector3(firstObj.actor.x / 8192f, 100f, -(firstObj.actor.y / 8192f));
-
-
-        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, Mathf.Infinity, 1)) {
-
-            var pos = transform.position;
-
-            pos.y = hit.point.y;
-
-            transform.position = pos;
+            obj.SetToOnlyY();
 
         }
-        else {
-            print("No floor found");
-        }
+
+        transform.position = new Vector3(firstObj.actor.x / 8192f, 0, -(firstObj.actor.y / 8192f));
+
 
     }
 

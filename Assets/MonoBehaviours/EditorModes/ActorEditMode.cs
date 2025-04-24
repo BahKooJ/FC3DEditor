@@ -931,9 +931,22 @@ public class ActorEditMode : EditMode {
             Mathf.RoundToInt(pos.z * -8192f)
             );
 
-        main.level.sceneActors.AddActor(newActor, null);
+        if (behavior == ActorBehavior.Weapon) {
+            main.level.sceneActors.AddActor(newActor, null, true);
+
+            var weaponActors = main.level.sceneActors.actors.Where(a => a.behaviorType == ActorBehavior.Weapon).ToList();
+
+            if (weaponActors.Count > 16) {
+                QuickLogHandler.Log("The maximum amount of weapon actors have been exceeded (16). All shooter actors will no longer work!", LogSeverity.Warning);
+            }
+
+        }
+        else {
+            main.level.sceneActors.AddActor(newActor, null);
+        }
 
         AddNewActorObject(newActor);
+        view.activeActorPropertiesView.sceneActorsView.Validate();
 
     }
 
@@ -942,10 +955,22 @@ public class ActorEditMode : EditMode {
         actor.x = Mathf.RoundToInt(pos.x * 8192f);
         actor.y = Mathf.RoundToInt(pos.z * -8192f);
 
-        main.level.sceneActors.AddActor(actor, null);
+        if (actor.behaviorType == ActorBehavior.Weapon) {
+            main.level.sceneActors.AddActor(actor, null, true);
+
+            var weaponActors = main.level.sceneActors.actors.Where(a => a.behaviorType == ActorBehavior.Weapon).ToList();
+
+            if (weaponActors.Count > 16) {
+                QuickLogHandler.Log("The maximum amount of weapon actors have been exceeded (16). All shooter actors will no longer work!", LogSeverity.Warning);
+            }
+
+        }
+        else {
+            main.level.sceneActors.AddActor(actor, null);
+        }
 
         AddNewActorObject(actor);
-
+        view.activeActorPropertiesView.sceneActorsView.Validate();
     }
 
     public void DeleteActor() {
@@ -1013,7 +1038,7 @@ public class ActorEditMode : EditMode {
 
             actorObj.SetToCurrentPosition();
 
-            view.activeActorPropertiesView.sceneActorsView.Refresh(true);
+            view.activeActorPropertiesView.sceneActorsView.Validate();
 
         }
         else {
@@ -1036,7 +1061,7 @@ public class ActorEditMode : EditMode {
 
             actorObj.SetToCurrentPosition();
 
-            view.activeActorPropertiesView.sceneActorsView.Refresh(true);
+            view.activeActorPropertiesView.sceneActorsView.Validate();
 
         }
         else {

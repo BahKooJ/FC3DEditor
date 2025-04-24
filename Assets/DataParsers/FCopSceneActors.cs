@@ -60,9 +60,15 @@ namespace FCopParser {
 
         }
 
-        public void AddActor(FCopActor actor, ActorNode toGroup) {
+        public void AddActor(FCopActor actor, ActorNode toGroup, bool AddFirst = false) {
 
-            actors.Add(actor);
+            if (AddFirst) {
+                actors.Insert(0, actor);
+            }
+            else {
+                actors.Add(actor);
+            }
+
             actorsByID[actor.DataID] = actor;
 
             if (toGroup != null) {

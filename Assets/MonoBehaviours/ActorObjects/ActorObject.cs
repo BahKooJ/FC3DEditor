@@ -271,6 +271,18 @@ public class ActorObject : MonoBehaviour {
 
     }
 
+    public void SetToOnlyY() {
+
+        var pos = new Vector3(0, GroundCast() + yPadding, 0);
+
+        if (actor.behavior is FCopHeightOffsetting offset) {
+            pos.y += offset.GetHeight();
+        }
+
+        transform.localPosition = pos;
+
+    }
+
     void SetObjectMutations() {
 
         foreach (var obj in objects) {

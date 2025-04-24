@@ -25,9 +25,12 @@ public class ActorNodeListItemView : MonoBehaviour {
     public ActorNode node = null;
     public FCopActor actor = null;
     public ActorNode parent = null;
+    [HideInInspector]
     public SceneActorsView view;
+    [HideInInspector]
     public bool forceGroup = false;
 
+    [HideInInspector]
     public List<ActorNodeListItemView> actorNodes = new();
     public Dictionary<int, ActorNodeListItemView> actorNodesByID = null;
 
@@ -241,6 +244,21 @@ public class ActorNodeListItemView : MonoBehaviour {
 
         view.Refresh();
         view.RequestDelayedScrollPosUpdate();
+
+    }
+
+    public void CloseGroup() {
+
+        if (actorNodes.Count > 0) {
+
+            foreach (var actorNode in actorNodes) {
+                Destroy(actorNode.gameObject);
+            }
+
+            actorNodes.Clear();
+            actorNodesByID = null;
+
+        }
 
     }
 
