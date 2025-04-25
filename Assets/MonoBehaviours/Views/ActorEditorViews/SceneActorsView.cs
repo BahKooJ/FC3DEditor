@@ -107,7 +107,14 @@ public class SceneActorsView : MonoBehaviour {
 
     public void Validate() {
 
+        var openedNodes = new List<ActorNodeListItemView>();
+
         foreach (var node in actorNodes) {
+
+            if (node.actorNodes.Count > 0) {
+                openedNodes.Add(node);
+            }
+
             node.CloseGroup();
         }
 
@@ -142,6 +149,16 @@ public class SceneActorsView : MonoBehaviour {
             }
 
             pi++;
+
+        }
+
+        foreach (var openedNode in openedNodes) {
+
+            if (!unvalidateNodes.Contains(openedNode)) {
+
+                openedNode.OpenGroup();
+
+            }
 
         }
 

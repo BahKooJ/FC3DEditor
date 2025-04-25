@@ -20,6 +20,7 @@ public class ActorNodeListItemView : MonoBehaviour {
     public Image icon;
     public Image background;
     public GameObject pad;
+    public DragableUIElement dragableElement;
 
     // - Parameters -
     public ActorNode node = null;
@@ -39,12 +40,19 @@ public class ActorNodeListItemView : MonoBehaviour {
 
     private void Start() {
 
+        dragableElement.onDragCallback = () => {
+            CloseGroup();
+        };
+
+        foreach (var gobj in transform.GetComponentsInChildren<ReceiveDragable>()) {
+            gobj.expectedTransform = transform.parent;
+        }
+
         contextMenu.items = new() {
             ("Rename", Rename),
             ("Group", StartGroup),
             ("Ungroup", Ungroup),
             ("Delete", Delete),
-            ("Reorder", ReOrder)
         };
 
         actorNodeListItemFab = view.actorNodeListItemFab;
@@ -393,6 +401,33 @@ public class ActorNodeListItemView : MonoBehaviour {
     public void OnStartNameType() {
 
         Main.ignoreAllInputs = true;
+
+    }
+
+    public void OnReceiveInsertDrag() {
+
+        if (node == null) {
+            return;
+        }
+
+        if (node.groupType != ActorGroupType.Position) {
+            return;
+        }
+
+        if (Main.draggingElement.TryGetComponent<ActorNodeListItemView>(out var nodeView)) {
+
+            var indexOfDraged = view.level.sceneActors.positionalGroupedActors.IndexOf(nodeView.node);
+            var indexOfThis = view.level.sceneActors.positionalGroupedActors.IndexOf(node);
+
+            if (indexOfDraged < indexOfThis) {
+                indexOfThis--;
+            }
+
+            view.level.sceneActors.ReorderPositionalGroup(indexOfDraged, indexOfThis);
+
+            view.Validate();
+
+        }
 
     }
 

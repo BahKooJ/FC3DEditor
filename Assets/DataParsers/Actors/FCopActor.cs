@@ -1009,14 +1009,14 @@ namespace FCopParser {
 
                 new ValueActorProperty("Move Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
                 new NormalizedValueProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16, "Pathing Properties"),
-                new ValueActorProperty("Move Speed Multiplier 66:", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
-                new ValueActorProperty("Acceleration", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
-                new ValueActorProperty("Path_Unknown3 70:", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
-                new ValueActorProperty("Path_Unknown4 72:", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
-                new ValueActorProperty("Path_Unknown5 74:", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
+                new RangeActorProperty("Minimum Speed Multiplier", Read16(4096), 0, 8192, 4096f, BitCount.Bit16, "Pathing Properties"),
+                new NormalizedValueProperty("Acceleration", Read16(0), 0, 8192, 4096f, BitCount.Bit16, "Pathing Properties"),
+                new NormalizedValueProperty("Path_Unknown3 70:", Read16(0), 0, short.MaxValue, 4096f, BitCount.Bit16, "Pathing Properties"),
+                new NormalizedValueProperty("Path_Unknown4 72:", Read16(0), 0, short.MaxValue, 4096f, BitCount.Bit16, "Pathing Properties"),
+                new NormalizedValueProperty ("Path_Unknown5 74:", Read16(0), 0, short.MaxValue, 4096f, BitCount.Bit16, "Pathing Properties"),
                 new ValueActorProperty("Path_Unknown6 76:", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
                 new ValueActorProperty("Path_Unknown7 78:", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Pathing Properties"),
-                new ValueActorProperty("Path_Unknown8 79:", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Pathing Properties"),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
 
             });
 

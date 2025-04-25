@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -8,6 +9,7 @@ public class DragableUIElement : MonoBehaviour, IBeginDragHandler, IDragHandler,
 
     // - Parameters -
     public List<ReceiveDragable> nestedRevieversInElement = new();
+    public Action onDragCallback = () => { };
 
     [HideInInspector]
     public Transform originalParent;
@@ -18,6 +20,8 @@ public class DragableUIElement : MonoBehaviour, IBeginDragHandler, IDragHandler,
 
     bool started = false;
     public void OnBeginDrag(PointerEventData eventData) {
+
+        onDragCallback();
 
         if (!Input.GetMouseButton(0) || started) return;
 
