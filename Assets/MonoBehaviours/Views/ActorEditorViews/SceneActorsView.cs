@@ -143,6 +143,7 @@ public class SceneActorsView : MonoBehaviour {
             if (nodeView != null) {
                 nodeView.transform.SetSiblingIndex(pi);
                 unvalidateNodes.Remove(nodeView);
+                nodeView.RefreshDisplay();
             }
             else {
                 InitListNode(node, forceGrouping);
@@ -156,7 +157,9 @@ public class SceneActorsView : MonoBehaviour {
 
             if (!unvalidateNodes.Contains(openedNode)) {
 
-                openedNode.OpenGroup();
+                if (openedNode.node.nestedActors.Count > 1) {
+                    openedNode.OpenGroup();
+                }
 
             }
 

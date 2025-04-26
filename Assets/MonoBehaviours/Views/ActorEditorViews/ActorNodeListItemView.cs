@@ -3,6 +3,7 @@ using FCopParser;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using System.Linq;
 using UnityEngine.UI;
 
 public class ActorNodeListItemView : MonoBehaviour {
@@ -12,6 +13,7 @@ public class ActorNodeListItemView : MonoBehaviour {
 
     // - Unity Asset -
     public Sprite folderTexture;
+    public Sprite actorTexture;
 
     // - Unity Refs -
     public TMP_Text nameText;
@@ -86,6 +88,33 @@ public class ActorNodeListItemView : MonoBehaviour {
         
         if (clickTimer > 0) {
             clickTimer--;
+        }
+
+    }
+
+    public void RefreshDisplay() {
+
+        if (node != null) {
+
+            if (node.nestedActors.Count == 1 && node.groupType == ActorGroupType.Position) {
+                nameText.text = node.nestedActors[0].name;
+            }
+            else {
+                nameText.text = node.name;
+            }
+
+            if (node.nestedActors.Count > 1 || forceGroup) {
+                icon.sprite = folderTexture;
+            }
+            else {
+                icon.sprite = actorTexture;
+            }
+
+        }
+        else {
+            nameText.text = actor.name;
+
+            pad.SetActive(true);
         }
 
     }
@@ -406,7 +435,41 @@ public class ActorNodeListItemView : MonoBehaviour {
 
     public void OnReceiveInsertDrag() {
 
+        ActorNodeListItemView nodeView;
+
+        // If this passes, then node view is nested inside a group
         if (node == null) {
+
+            if (Main.draggingElement.TryGetComponent(out nodeView)) {
+
+                // If this passes, then the node is in the root.
+                if (nodeView.node != null) {
+
+                    // This checks to make sure it is not a group in the root.
+                    if (nodeView.node.nestedActors.Count == 1 && !nodeView.forceGroup) {
+                        view.controller.GroupActor(nodeView.node.nestedActors[0], parent);
+                    }
+
+                }
+                // Both are not in root, makes sure they're under the same parent for reordering.
+                // By the way, for the view, nested nodes go from last first.
+                else if (parent == nodeView.parent) {
+
+                    var indexOfDraged = parent.nestedActors.IndexOf(nodeView.actor);
+                    var indexOfThis = parent.nestedActors.IndexOf(actor);
+
+                    if (indexOfDraged > indexOfThis) {
+                        indexOfThis++;
+                    }
+
+                    view.level.sceneActors.ReorderInsideNode(nodeView.actor, indexOfThis, parent);
+
+                    view.Validate();
+
+                }
+
+            }
+
             return;
         }
 
@@ -414,16 +477,91 @@ public class ActorNodeListItemView : MonoBehaviour {
             return;
         }
 
-        if (Main.draggingElement.TryGetComponent<ActorNodeListItemView>(out var nodeView)) {
+        if (Main.draggingElement.TryGetComponent(out nodeView)) {
 
             var indexOfDraged = view.level.sceneActors.positionalGroupedActors.IndexOf(nodeView.node);
             var indexOfThis = view.level.sceneActors.positionalGroupedActors.IndexOf(node);
+
+            // This node is not in root
+            if (nodeView.node == null) {
+                view.controller.UngroupActor(nodeView.actor);
+                
+                // When ungrouping, the dragged node got destroyed. It refinds the node.
+                var newNodeView = view.level.sceneActors.positionalGroupedActors.FirstOrDefault(n => n.nestedActors[0] == nodeView.actor);
+                indexOfDraged = view.level.sceneActors.positionalGroupedActors.IndexOf(newNodeView);
+
+            }
 
             if (indexOfDraged < indexOfThis) {
                 indexOfThis--;
             }
 
             view.level.sceneActors.ReorderPositionalGroup(indexOfDraged, indexOfThis);
+
+            view.Validate();
+
+        }
+
+    }
+
+    public void OnReceiveGroupDrag() {
+
+        ActorNodeListItemView nodeView;
+
+        // If this passes, then the receiving node view is nested inside a group
+        if (node == null) {
+
+            if (Main.draggingElement.TryGetComponent(out nodeView)) {
+
+                // If this passes, then the dragged node is in the root.
+                if (nodeView.node != null) {
+
+                    // This checks to make sure it is not a group in the root.
+                    if (nodeView.node.nestedActors.Count == 1 && !nodeView.forceGroup) {
+                        view.controller.GroupActor(nodeView.node.nestedActors[0], parent);
+                    }
+
+                }
+                // Both are not in root, checks to see if they're under different parents.
+                // (If they are it doesn't matter)
+                else if (parent != nodeView.parent) {
+
+                    view.controller.UngroupActor(nodeView.actor);
+
+                    // When ungrouping, the dragged node got destroyed. It refinds the node.
+                    var newNodeView = view.level.sceneActors.positionalGroupedActors.FirstOrDefault(n => n.nestedActors[0] == nodeView.actor);
+
+                    view.controller.GroupActor(newNodeView.nestedActors[0], parent);
+
+                }
+
+            }
+
+            return;
+
+        }
+
+        if (node.groupType != ActorGroupType.Position) {
+            return;
+        }
+
+        if (Main.draggingElement.TryGetComponent(out nodeView)) {
+
+            // Dragged node is not in root
+            if (nodeView.node == null) {
+                view.controller.UngroupActor(nodeView.actor);
+
+                // When ungrouping, the dragged node got destroyed. It refinds the node.
+                var newNodeView = view.level.sceneActors.positionalGroupedActors.FirstOrDefault(n => n.nestedActors[0] == nodeView.actor);
+
+                view.controller.GroupActor(newNodeView.nestedActors[0], node);
+
+            }
+            else if (nodeView.node.nestedActors.Count == 1) {
+
+                view.controller.GroupActor(nodeView.node.nestedActors[0], node);
+
+            }
 
             view.Validate();
 

@@ -128,6 +128,13 @@ namespace FCopParser {
 
         }
 
+        public void ReorderInsideNode(FCopActor actorToReorder, int index, ActorNode group) {
+
+            group.nestedActors.Remove(actorToReorder);
+            group.nestedActors.Insert(index, actorToReorder);
+
+        }
+
         public bool PositionalUngroupActor(FCopActor actor) {
 
             var node = positionalGroupedActors.FirstOrDefault(n => {

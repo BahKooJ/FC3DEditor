@@ -1049,6 +1049,31 @@ public class ActorEditMode : EditMode {
 
     }
 
+    public void GroupActor(FCopActor actorToGroup, ActorNode toGroup) {
+
+        HeadsUpTextUtil.End();
+
+        if (actorToGroup == null) return;
+
+        var didGroup = main.level.sceneActors.PositionalGroupActor(actorToGroup, toGroup);
+
+        if (didGroup) {
+
+            ValidateGrouping();
+
+            var actorObj = actorObjectsByID[actorToGroup.DataID];
+
+            actorObj.SetToCurrentPosition();
+
+            view.activeActorPropertiesView.sceneActorsView.Validate();
+
+        }
+        else {
+            QuickLogHandler.Log("Unable to group actors", LogSeverity.Error);
+        }
+
+    }
+
     public void UngroupActor(FCopActor actor) {
 
         var didUngroup = main.level.sceneActors.PositionalUngroupActor(actor);
