@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FCopParser;
+using UnityEngine;
 
 public class TileEditPanel : MonoBehaviour {
 
@@ -108,6 +109,15 @@ public class TileEditPanel : MonoBehaviour {
     public void OnClickSaveSchematic() {
 
         if (controller.HasSelection) {
+
+            foreach (var selectedItem in controller.selectedItems) {
+
+                if (MeshType.IDFromVerticies(selectedItem.tile.verticies) == null) {
+                    QuickLogHandler.Log("Selection has an invalid mesh ID!", LogSeverity.Error);
+                    return;
+                }
+
+            }
 
             Presets.levelSchematics.Add(new Schematic(controller.selectedItems, "Level Schematic #" + Presets.levelSchematics.Count.ToString()));
 

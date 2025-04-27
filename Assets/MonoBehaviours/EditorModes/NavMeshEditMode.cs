@@ -34,6 +34,10 @@ public class NavMeshEditMode : EditMode {
 
     public void OnCreateMode() {
 
+        if (selectedNavMeshIndex >= main.level.navMeshes.Count) {
+            selectedNavMeshIndex = 0;
+        }
+
         foreach (var node in SelectedNavMesh.nodes) {
 
             var nodeObject = Object.Instantiate(main.NavMeshPoint);

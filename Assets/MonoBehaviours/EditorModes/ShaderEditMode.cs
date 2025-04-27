@@ -76,9 +76,8 @@ public class ShaderEditMode : TileMutatingEditMode {
             }
             else {
 
-                var didHitCorner = TestVertexColorCornerSelection();
-
-                testForSelection = didHitCorner ? false : testForSelection;
+                // This has to be check everyframe because of selection painting.
+                testForSelection = !TestVertexColorCornerSelection();
 
                 if (Painting) {
 
@@ -609,7 +608,7 @@ public class ShaderEditMode : TileMutatingEditMode {
             return false;
         }
 
-        if (!Controls.OnDown("Select") && !Controls.OnDown("Interact") && !Painting) {
+        if (!Controls.IsDown("Select") && !Controls.IsDown("Interact") && !Painting) {
             return false;
         }
 

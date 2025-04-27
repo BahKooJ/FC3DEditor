@@ -39,8 +39,6 @@ public class Main : MonoBehaviour {
 
         counterActionAddedOnCurrentSelectHold = Input.GetMouseButton(0) || Controls.IsDown("Select");
 
-        Debug.Log("Counter-Action Added");
-
         counterActions.Add(counterAction);
 
     }
@@ -371,11 +369,13 @@ public class Main : MonoBehaviour {
         TileAddMode.placementSetting = TileAddMode.SchematicPlacementSetting.Exact;
         TileAddMode.removeAllTilesOnSchematicPlacement = false;
 
+        NavMeshEditMode.selectedNavMeshIndex = 0;
         NavMeshEditMode.copiedNavNodeCoords = null;
 
         ShaderEditMode.showColorPresets = false;
 
         TextureEditMode.openUVMapperByDefault = true;
+
 
     }
 
