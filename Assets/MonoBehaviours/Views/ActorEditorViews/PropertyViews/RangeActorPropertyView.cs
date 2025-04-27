@@ -53,6 +53,8 @@ public class RangeActorPropertyView : ActorPropertyItemView {
 
         if (refuseCallback) return;
 
+        ActorEditMode.AddPropertyChangeCounterAction(property, actor);
+
         try {
 
             var value = float.Parse(valueField.text);
@@ -79,6 +81,8 @@ public class RangeActorPropertyView : ActorPropertyItemView {
     public void OnSliderChange() {
 
         if (refuseCallback) return;
+
+        ActorEditMode.AddPropertyChangeCounterAction(property, actor);
 
         if (Input.GetKey(KeyCode.LeftShift)) {
             slider.value -= slider.value % 5;

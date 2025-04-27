@@ -13,6 +13,8 @@ public class SpecializedActorPropertyItemView : ActorPropertyItemView {
 
     public SpecializedActorRefActorProperty specialProperty;
 
+    bool refuseCallback = false;
+
     private void Start() {
 
         specialProperty = (SpecializedActorRefActorProperty)property;
@@ -23,17 +25,21 @@ public class SpecializedActorPropertyItemView : ActorPropertyItemView {
 
     public override void Refresh() {
 
+        refuseCallback = true;
+
         nameText.text = property.name;
 
         var actors = controller.main.level.sceneActors.actors.Where(a => a.behaviorType == specialProperty.behaviorType).ToList();
 
         if (actors.Count == 0) {
             assetNameText.text = "Missing";
+            refuseCallback = false;
             return;
         }
 
         if (specialProperty.id == 0) {
             assetNameText.text = "None";
+            refuseCallback = false;
             return;
         }
 
@@ -43,6 +49,7 @@ public class SpecializedActorPropertyItemView : ActorPropertyItemView {
 
                 if (specializedID.GetID() == specialProperty.id) {
                     assetNameText.text = actor.name;
+                    refuseCallback = false;
                     return;
                 }
 
@@ -51,6 +58,7 @@ public class SpecializedActorPropertyItemView : ActorPropertyItemView {
 
                 if (actor.DataID == specialProperty.id) {
                     assetNameText.text = actor.name;
+                    refuseCallback = false;
                     return;
                 }
 
@@ -60,9 +68,13 @@ public class SpecializedActorPropertyItemView : ActorPropertyItemView {
 
         assetNameText.text = "Missing";
 
+        refuseCallback = false;
+
     }
 
     public void OnClickAsset() {
+
+        if (refuseCallback) return;
 
         var actorData = new Dictionary<int, string>() {
             { 0, "None" }
@@ -86,6 +98,8 @@ public class SpecializedActorPropertyItemView : ActorPropertyItemView {
         }
 
         MiniAssetManagerUtil.RequestUniversalData(actorData, controller.main, id => {
+
+            ActorEditMode.AddPropertyChangeCounterAction(property, actor);
 
             specialProperty.id = id;
             Refresh();

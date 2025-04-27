@@ -21,6 +21,8 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
 
     public AssetActorProperty assetProperty;
 
+    bool refuseCallback = false;
+
     void Start() {
 
         assetProperty = (AssetActorProperty)property;
@@ -30,6 +32,8 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
     }
 
     public override void Refresh() {
+
+        refuseCallback = true;
 
         nameText.text = property.name;
 
@@ -116,13 +120,18 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
                 break;
         }
 
+        refuseCallback = false;
+
     }
 
     public void OnClickAsset() {
 
+        if (refuseCallback) return;
+
         if (assetProperty.assetType == AssetType.Team) {
 
             MiniAssetManagerUtil.RequestUniversalData(controller.main.level.sceneActors.teams, controller.main, id => {
+                ActorEditMode.AddPropertyChangeCounterAction(property, actor);
                 assetProperty.assetID = id;
                 Refresh();
 
@@ -143,6 +152,7 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
             }
 
             MiniAssetManagerUtil.RequestUniversalData(snippetDic, controller.main, id => {
+                ActorEditMode.AddPropertyChangeCounterAction(property, actor);
                 assetProperty.assetID = id;
                 Refresh();
 
@@ -158,6 +168,8 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
         else {
 
             MiniAssetManagerUtil.RequestAsset(assetProperty.assetType, controller.main, asset => {
+
+                ActorEditMode.AddPropertyChangeCounterAction(property, actor);
 
                 if (asset != null) {
 

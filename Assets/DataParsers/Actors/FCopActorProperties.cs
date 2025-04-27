@@ -14,6 +14,8 @@ namespace FCopParser {
 
         public int GetCompiledValue();
 
+        public void SetCompiledValue(int value);
+
         public List<byte> Compile() {
 
             var value = GetCompiledValue();
@@ -41,6 +43,10 @@ namespace FCopParser {
 
         public int GetCompiledValue() {
             return value;
+        }
+
+        public void SetCompiledValue(int value) {
+            this.value = value;
         }
 
         public void Set(int value) {
@@ -85,6 +91,10 @@ namespace FCopParser {
             return value ? 1 : 0;
         }
 
+        public void SetCompiledValue(int value) {
+            this.value = value == 1;
+        }
+
         public bool value;
 
         public ToggleActorProperty(string name, bool value, BitCount bitCount) {
@@ -113,6 +123,10 @@ namespace FCopParser {
 
         public int GetCompiledValue() {
             return (int)(value * multiplier);
+        }
+
+        public void SetCompiledValue(int value) {
+            this.value = value / multiplier;
         }
 
         public void Set(float value) {
@@ -155,6 +169,10 @@ namespace FCopParser {
             return Convert.ToInt32(caseValue);
         }
 
+        public void SetCompiledValue(int value) {
+            caseValue = (Enum)Enum.ToObject(caseValue.GetType(), value);
+        }
+
         public Enum caseValue;
 
         public EnumDataActorProperty(string name, Enum caseValue, BitCount bitCount) {
@@ -187,6 +205,10 @@ namespace FCopParser {
 
         public int GetCompiledValue() {
             return (int)(value * multiplier);
+        }
+
+        public void SetCompiledValue(int value) {
+            this.value = value / multiplier;
         }
 
         public void Set(float value) {
@@ -230,6 +252,10 @@ namespace FCopParser {
             return value;
         }
 
+        public void SetCompiledValue(int value) {
+            this.value = value;
+        }
+
         public int value;
 
         public FillerActorProperty(int value, BitCount bitCount) {
@@ -250,6 +276,10 @@ namespace FCopParser {
 
         public int GetCompiledValue() {
             return assetID;
+        }
+
+        public void SetCompiledValue(int value) {
+            assetID = value;
         }
 
         public int assetID;
@@ -280,6 +310,10 @@ namespace FCopParser {
             return id;
         }
 
+        public void SetCompiledValue(int value) {
+            this.id = value;
+        }
+
         public int id;
 
         public ExplosionActorProperty(string name, int id, BitCount bitCount) {
@@ -305,6 +339,10 @@ namespace FCopParser {
 
         public int GetCompiledValue() {
             return id;
+        }
+
+        public void SetCompiledValue(int value) {
+            this.id = value;
         }
 
         public int id;
@@ -339,6 +377,10 @@ namespace FCopParser {
             
             return GetOverloadProperty().GetCompiledValue();
 
+        }
+
+        public void SetCompiledValue(int value) {
+            GetOverloadProperty().SetCompiledValue(value);
         }
 
         public ActorProperty GetOverloadProperty() {

@@ -12,6 +12,8 @@ public class ValueActorPropertyItemView : ActorPropertyItemView {
 
     ValueActorProperty valueActorProperty;
 
+    bool refuseCallback = false;
+
     void Start() {
 
         valueActorProperty = (ValueActorProperty)property;
@@ -22,8 +24,12 @@ public class ValueActorPropertyItemView : ActorPropertyItemView {
 
     public override void Refresh() {
 
+        refuseCallback = true;
+
         nameText.text = property.name;
         valueField.text = property.GetCompiledValue().ToString();
+
+        refuseCallback = false;
 
     }
 
@@ -36,6 +42,10 @@ public class ValueActorPropertyItemView : ActorPropertyItemView {
     public void OnFinishTyping() {
 
         Main.ignoreAllInputs = false;
+
+        if (refuseCallback) return;
+
+        ActorEditMode.AddPropertyChangeCounterAction(property, actor);
 
         try {
 

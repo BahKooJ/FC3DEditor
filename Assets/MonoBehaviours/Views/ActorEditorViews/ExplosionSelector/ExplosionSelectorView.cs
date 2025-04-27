@@ -40,6 +40,8 @@ public class ExplosionSelectorView : MonoBehaviour {
 
     public void Select(int id) {
 
+        ActorEditMode.AddPropertyChangeCounterAction((ActorProperty)explosionPropertyView, controller.selectedActor);
+
         explosionPropertyView.explosionProperty.id = id;
         explosionPropertyView.Refresh();
         Destroy(gameObject);

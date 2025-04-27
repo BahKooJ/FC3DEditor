@@ -77,6 +77,8 @@ public class ActorSpawningPropertiesItemView : MonoBehaviour {
 
         if (refuseCallback) return;
 
+        ActorEditMode.AddActorSpawningPropertiesCounterAction(actor, actor.spawningProperties?.Compile());
+
         if (actor.spawningProperties != null) {
 
             actor.spawningProperties = null;
@@ -97,6 +99,8 @@ public class ActorSpawningPropertiesItemView : MonoBehaviour {
         if (refuseCallback) return;
 
         if (actor.spawningProperties != null) {
+
+            ActorEditMode.AddActorSpawningPropertiesCounterAction(actor, actor?.spawningProperties.Compile());
 
             try {
                 var value = float.Parse(respawnTimerField.text);
@@ -127,6 +131,8 @@ public class ActorSpawningPropertiesItemView : MonoBehaviour {
 
         if (actor.spawningProperties != null) {
 
+            ActorEditMode.AddActorSpawningPropertiesCounterAction(actor, actor?.spawningProperties.Compile());
+
             actor.spawningProperties.randomFirstSpawnTime = randomFirstSpawnToggle.isOn;
 
         }
@@ -138,6 +144,8 @@ public class ActorSpawningPropertiesItemView : MonoBehaviour {
         if (refuseCallback) return;
 
         if (actor.spawningProperties != null) {
+
+            ActorEditMode.AddActorSpawningPropertiesCounterAction(actor, actor?.spawningProperties.Compile());
 
             try {
 
@@ -169,6 +177,8 @@ public class ActorSpawningPropertiesItemView : MonoBehaviour {
 
         if (actor.spawningProperties != null) {
 
+            ActorEditMode.AddActorSpawningPropertiesCounterAction(actor, actor?.spawningProperties.Compile());
+
             actor.spawningProperties.disableRespawn = disableRespawnToggle.isOn;
 
         }
@@ -182,6 +192,8 @@ public class ActorSpawningPropertiesItemView : MonoBehaviour {
         refuseCallback = true;
 
         if (actor.spawningProperties != null) {
+
+            ActorEditMode.AddActorSpawningPropertiesCounterAction(actor, actor?.spawningProperties.Compile());
 
             try {
 
@@ -234,6 +246,8 @@ public class ActorSpawningPropertiesItemView : MonoBehaviour {
         refuseCallback = true;
 
         if (actor.spawningProperties != null) {
+
+            ActorEditMode.AddActorSpawningPropertiesCounterAction(actor, actor?.spawningProperties.Compile());
 
             actor.spawningProperties.infiniteRespawns = infiniteRespawnsToggle.isOn;
 

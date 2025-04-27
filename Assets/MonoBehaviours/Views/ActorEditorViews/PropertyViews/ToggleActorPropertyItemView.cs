@@ -11,16 +11,32 @@ public class ToggleActorPropertyItemView : ActorPropertyItemView {
     public TMP_Text nameText;
     public Toggle toggle;
 
+    bool refuseCallback = false;
+
     void Start() {
+
+        Refresh();
+
+    }
+
+    public override void Refresh() {
+
+        refuseCallback = true;
 
         var toggleProperty = (ToggleActorProperty)property;
 
         nameText.text = toggleProperty.name;
         toggle.isOn = toggleProperty.value;
 
+        refuseCallback = false;
+
     }
 
     public void OnToggle() {
+
+        if (refuseCallback) return;
+
+        ActorEditMode.AddPropertyChangeCounterAction(property, actor);
 
         var toggleProperty = (ToggleActorProperty)property;
 

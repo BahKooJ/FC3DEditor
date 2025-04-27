@@ -85,18 +85,13 @@ public class ActorAssetReferencesItemView : MonoBehaviour {
                 MiniAssetManagerUtil.RequestAsset(AssetType.Object, main, asset => {
 
                     if (asset == null) {
-                        fcopActor.resourceReferences[refIndex] = new FCopActor.Resource(FCopActor.FourCC.NULL, 0);
+                        view.controller.ChangeActorResourceRef(fcopActor, refIndex, new FCopActor.Resource(FCopActor.FourCC.NULL, 0), type);
                     }
                     else {
-                        fcopActor.resourceReferences[refIndex] = new FCopActor.Resource(FCopActor.FourCC.Cobj, asset.DataID);
+                        view.controller.ChangeActorResourceRef(fcopActor, refIndex, new FCopActor.Resource(FCopActor.FourCC.Cobj, asset.DataID), type);
                     }
 
-
                     Refresh();
-
-                    view.controller.UnselectActor();
-                    view.controller.RequestActorRefresh(fcopActor.DataID);
-                    view.controller.SelectActorByID(fcopActor.DataID);
 
                 });
 
@@ -106,12 +101,11 @@ public class ActorAssetReferencesItemView : MonoBehaviour {
                 MiniAssetManagerUtil.RequestAsset(AssetType.NavMesh, main, asset => {
 
                     if (asset == null) {
-                        fcopActor.resourceReferences[refIndex] = new FCopActor.Resource(FCopActor.FourCC.NULL, 0);
+                        view.controller.ChangeActorResourceRef(fcopActor, refIndex, new FCopActor.Resource(FCopActor.FourCC.NULL, 0), type);
                     }
                     else {
-                        fcopActor.resourceReferences[refIndex] = new FCopActor.Resource(FCopActor.FourCC.Cnet, asset.DataID);
+                        view.controller.ChangeActorResourceRef(fcopActor, refIndex, new FCopActor.Resource(FCopActor.FourCC.Cnet, asset.DataID), type);
                     }
-
 
                     Refresh();
 

@@ -61,6 +61,15 @@ public class ActorObject : MonoBehaviour {
         if (axis == AxisControl.Axis.AxisY) {
 
             if (actor.behavior is FCopHeightOffsetting heightOffseting) {
+
+                if (!ActorEditMode.preventCounterAction) {
+
+                    ActorEditMode.AddPropertyChangeCounterAction(heightOffseting.GetHeightProperty(), actor);
+
+                }
+
+                ActorEditMode.preventCounterAction = true;
+
                 // Height offset is relative to ground cast
                 heightOffseting.SetHeight(pos.y - GroundCast());
                 controller.view.activeActorPropertiesView.RequestPropertyRefresh(heightOffseting.GetHeightProperty());

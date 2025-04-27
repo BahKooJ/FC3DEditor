@@ -37,6 +37,10 @@ public class ActorPropertiesView : MonoBehaviour {
     public List<ActorPropertyItemView> initedProperties = new();
     [HideInInspector]
     public List<GroupActorPropertyItemView> initedGroups = new();
+    [HideInInspector]
+    public ActorAssetReferencesView activeActorAssetRefView = null;
+    [HideInInspector]
+    public ActorSpawningPropertiesItemView activeSpawningProperties = null;
 
     public ActorEditMode controller;
 
@@ -116,6 +120,8 @@ public class ActorPropertiesView : MonoBehaviour {
 
         initedGroups.Clear();
         initedProperties.Clear();
+        activeActorAssetRefView = null;
+        activeSpawningProperties = null;
 
         if (controller.selectedActor == null) {
             actorName.text = "N/A";
@@ -176,6 +182,8 @@ public class ActorPropertiesView : MonoBehaviour {
 
         actorAssetRefView.transform.SetParent(propertiesContent, false);
 
+        activeActorAssetRefView = actorAssetRefView.GetComponent<ActorAssetReferencesView>();
+
         var actorScriptView = Instantiate(actorScriptCallItem);
 
         actorScriptView.GetComponent<ActorScriptCallItemView>().controller = controller;
@@ -189,6 +197,8 @@ public class ActorPropertiesView : MonoBehaviour {
         actorSpawningView.GetComponent<ActorSpawningPropertiesItemView>().actor = controller.selectedActor;
 
         actorSpawningView.transform.SetParent(propertiesContent, false);
+
+        activeSpawningProperties = actorSpawningView.GetComponent<ActorSpawningPropertiesItemView>();
 
     }
 

@@ -1,6 +1,7 @@
 ﻿
 
 using FCopParser;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ActorAssetReferencesView : MonoBehaviour {
@@ -15,8 +16,21 @@ public class ActorAssetReferencesView : MonoBehaviour {
     public ActorEditMode controller;
     public FCopActor actor;
 
+    public List<ActorAssetReferencesItemView> items = new();
 
     private void Start() {
+
+        Refresh();
+
+    }
+
+    public void Refresh() {
+
+        foreach (var item in items) {
+            Destroy(item.gameObject);
+        }
+
+        items.Clear();
 
         var i = 0;
         foreach (var r in actor.resourceReferences) {
@@ -29,9 +43,11 @@ public class ActorAssetReferencesView : MonoBehaviour {
             item.main = controller.main;
             item.fcopActor = actor;
             item.refIndex = i;
+
+            items.Add(item);
+
             i++;
         }
-
 
     }
 

@@ -14,7 +14,17 @@ public class EnumDataActorPropertyItemView: ActorPropertyItemView {
     string[] cases;
     Array values;
 
+    bool refuseCallback = false;
+
     void Start() {
+
+        Refresh();
+
+    }
+
+    public override void Refresh() {
+
+        refuseCallback = true;
 
         var enumProperty = (EnumDataActorProperty)property;
 
@@ -37,10 +47,15 @@ public class EnumDataActorPropertyItemView: ActorPropertyItemView {
             value++;
         }
 
+        refuseCallback = false;
 
     }
 
     public void OnChange() {
+
+        if (refuseCallback) return;
+
+        ActorEditMode.AddPropertyChangeCounterAction(property, actor);
 
         var enumProperty = (EnumDataActorProperty)property;
 

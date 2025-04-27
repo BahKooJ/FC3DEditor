@@ -12,6 +12,8 @@ public class NormalizedActorPropertyView : ActorPropertyItemView {
 
     NormalizedValueProperty normalizedProperty;
 
+    bool refuseCallback = false;
+
     void Start() {
 
         normalizedProperty = (NormalizedValueProperty)property;
@@ -22,8 +24,12 @@ public class NormalizedActorPropertyView : ActorPropertyItemView {
 
     public override void Refresh() {
 
+        refuseCallback = true;
+
         nameText.text = property.name;
         valueField.text = normalizedProperty.value.ToString();
+
+        refuseCallback = false;
 
     }
 
@@ -36,6 +42,10 @@ public class NormalizedActorPropertyView : ActorPropertyItemView {
     public void OnFinishTyping() {
 
         Main.ignoreAllInputs = false;
+
+        if (refuseCallback) return;
+
+        ActorEditMode.AddPropertyChangeCounterAction(property, actor);
 
         try {
 

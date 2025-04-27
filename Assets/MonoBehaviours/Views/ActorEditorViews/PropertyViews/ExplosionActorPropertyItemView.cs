@@ -16,6 +16,8 @@ public class ExplosionActorPropertyItemView : ActorPropertyItemView {
 
     public ExplosionActorProperty explosionProperty;
 
+    bool refuseCallback = false;
+
     void Start() {
 
         explosionProperty = (ExplosionActorProperty)property;
@@ -25,6 +27,8 @@ public class ExplosionActorPropertyItemView : ActorPropertyItemView {
     }
 
     public override void Refresh() {
+
+        refuseCallback = true;
 
         nameText.text = property.name;
 
@@ -45,9 +49,15 @@ public class ExplosionActorPropertyItemView : ActorPropertyItemView {
             explosionNameText.text = "Missing";
         }
 
+        refuseCallback = false;
+
     }
 
     public void OnClick() {
+
+        if (refuseCallback) return;
+
+        // Counter-action is added by the explosion selector view
 
         var obj = Instantiate(explosionPicker);
         obj.transform.SetParent(controller.main.canvas.transform, false);

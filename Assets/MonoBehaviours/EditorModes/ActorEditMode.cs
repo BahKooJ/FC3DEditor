@@ -49,7 +49,7 @@ public class ActorEditMode : EditMode {
     ActorObject schematicObjectToAdd = null;
     ActorSchematic schematicToAdd = null;
 
-    bool preventCounterAction = false;
+    public static bool preventCounterAction = false;
 
     public ActorEditMode(Main main) {
         this.main = main;
@@ -659,6 +659,12 @@ public class ActorEditMode : EditMode {
         script.controlledObject = node.gameObject;
         script.moveCallback = (newPos, axis) => {
 
+            if (!ActorEditMode.preventCounterAction) {
+                ActorEditMode.AddMultiPropertyChangeCounterAction(node.controlledProperties, node.actor);
+            }
+
+            ActorEditMode.preventCounterAction = true;
+
             if (Controls.IsDown("SnapActorPosition")) {
 
                 var lockPos = new Vector3(MathF.Round(newPos.x * 2) / 2, MathF.Round(newPos.y * 2) / 2, MathF.Round(newPos.z * 2) / 2);
@@ -1092,6 +1098,23 @@ public class ActorEditMode : EditMode {
 
             if (NavMeshEditMode.copiedNavNodeCoords != null) {
 
+                // Guess this is not needed, callbacks do the counter-actions automatically
+                //if (selectedActorObject.controlledObject.TryGetComponent<ActorObject>(out var actorObj)) {
+                //    AddActorPositionCounterAction(actorObj.actor.x, actorObj.actor.y, actorObj.actor);
+                //}
+
+                //if (selectedActorObject.controlledObject.TryGetComponent<ActorGroupObject>(out var groupObj)) {
+
+                //    var actors = new List<FCopActor>();
+
+                //    foreach (var actObj in groupObj.actObjects) {
+                //        actors.Add(actObj.actor);
+                //    }
+
+                //    AddMultiActorPositionCounterAction(actors);
+
+                //}
+
                 selectedActorObject.transform.position = (Vector3)NavMeshEditMode.copiedNavNodeCoords;
                 selectedActorObject.moveCallback((Vector3)NavMeshEditMode.copiedNavNodeCoords, AxisControl.Axis.IgnoreY);
 
@@ -1189,6 +1212,22 @@ public class ActorEditMode : EditMode {
 
     }
 
+    public void ChangeActorResourceRef(FCopActor actor, int refIndex, FCopActor.Resource resource, AssetType assetType) {
+
+        AddActorResourceRefCounterAction(actor, refIndex, actor.resourceReferences[refIndex], assetType);
+
+        actor.resourceReferences[refIndex] = resource;
+
+        if (assetType == AssetType.Object) {
+            UnselectActor();
+            RequestActorRefresh(actor.DataID);
+            preventCounterAction = true;
+            SelectActorByID(actor.DataID);
+            preventCounterAction = false;
+        }
+
+    }
+
     #endregion
 
     #region Counter-Actions
@@ -1250,54 +1289,15 @@ public class ActorEditMode : EditMode {
             editMode.UnselectActor();
 
             if (selectedActorID != null) {
-                editMode.preventCounterAction = true;
+                ActorEditMode.preventCounterAction = true;
                 editMode.SelectActor(editMode.actorObjectsByID[(int)selectedActorID]);
-                editMode.preventCounterAction = false;
+                ActorEditMode.preventCounterAction = false;
 
             }
             else {
                 editMode.view.RefreshActorPropertiesView();
                 editMode.view.activeActorPropertiesView.sceneActorsView.RefreshSelection(false);
             }
-
-        }
-
-    }
-
-    public class ActorPropertyCounterAction : CounterAction {
-
-        public string name { get; set; }
-
-        public ActorProperty property;
-        public int value;
-
-        public ActorPropertyCounterAction(ActorProperty property, int value) {
-            this.property = property;
-            this.value = value;
-
-            name = "Actor Property Change";
-
-        }
-
-        public void Action() {
-
-            var editMode = (ActorEditMode)Main.editMode;
-
-            switch (property) {
-
-                case ValueActorProperty:
-                    var valueProp = (ValueActorProperty)property;
-                    valueProp.value = value;
-                    break;
-                case EnumDataActorProperty:
-                    var enumProp = (EnumDataActorProperty)property;
-                    enumProp.caseValue = (Enum)Enum.ToObject(enumProp.caseValue.GetType(), value);
-                    break;
-
-            }
-
-
-            editMode.view.RefreshActorPropertiesView();
 
         }
 
@@ -1325,11 +1325,11 @@ public class ActorEditMode : EditMode {
 
             var editMode = (ActorEditMode)Main.editMode;
 
-            editMode.preventCounterAction = true;
+            ActorEditMode.preventCounterAction = true;
             editMode.AddActor(deletedActor, Vector3.zero, true);
             editMode.main.level.sceneActors.positionalGroupedActors = positionGroupSaveState;
             editMode.view.activeActorPropertiesView.sceneActorsView.Refresh();
-            editMode.preventCounterAction = false;
+            ActorEditMode.preventCounterAction = false;
 
             // Delayed action because it takes another frame for the node to built so it can ungroup
             // if node is inside group.
@@ -1364,9 +1364,9 @@ public class ActorEditMode : EditMode {
 
             var editMode = (ActorEditMode)Main.editMode;
 
-            editMode.preventCounterAction = true;
+            ActorEditMode.preventCounterAction = true;
             editMode.DeleteByID(addedActor.DataID);
-            editMode.preventCounterAction = false;
+            ActorEditMode.preventCounterAction = false;
 
         }
     }
@@ -1404,6 +1404,111 @@ public class ActorEditMode : EditMode {
             editMode.view.activeActorPropertiesView.sceneActorsView.Refresh();
             editMode.RefreshActorPosition(groupedActor.DataID);
             editMode.ValidateGrouping();
+
+        }
+
+    }
+
+    public class PropertyChangeCounterAction : CounterAction {
+
+        public string name { get; set; }
+
+        int compiledValue;
+        ActorProperty property;
+        FCopActor actor;
+
+        public PropertyChangeCounterAction(int compiledValue, ActorProperty property, FCopActor actor) {
+            this.compiledValue = compiledValue;
+            this.property = property;
+            this.actor = actor;
+
+            name = "Actor Property Change";
+        }
+
+        public void Action() {
+
+            if (Main.editMode is not ActorEditMode) {
+                return;
+            }
+
+            var editMode = (ActorEditMode)Main.editMode;
+
+            property.SetCompiledValue(compiledValue);
+
+            editMode.view.RefreshActorPropertiesView();
+            editMode.RefreshActorPosition(actor.DataID);
+
+            if (ActorPropertyChangeEvent.changeEventsByPropertyName.ContainsKey(property.name)) {
+
+                ActorPropertyChangeEvent.changeEventsByPropertyName[property.name](editMode, property);
+
+            }
+
+        }
+
+    }
+
+    public class ActorResourceRefCounterAction : CounterAction {
+
+        public string name { get; set; }
+
+        FCopActor actor;
+        int refIndex;
+        FCopActor.Resource resource;
+        AssetType assetType;
+
+        public ActorResourceRefCounterAction(FCopActor actor, int refIndex, FCopActor.Resource resource, AssetType assetType) {
+            this.actor = actor;
+            this.refIndex = refIndex;
+            this.resource = resource;
+            this.assetType = assetType;
+
+            name = "Actor Resource Change";
+        }
+
+        public void Action() {
+
+            if (Main.editMode is not ActorEditMode) {
+                return;
+            }
+
+            var editMode = (ActorEditMode)Main.editMode;
+
+            editMode.ChangeActorResourceRef(actor, refIndex, resource, assetType);
+            editMode.view.activeActorPropertiesView.activeActorAssetRefView?.Refresh();
+        }
+
+    }
+
+    public class ActorSpawningPropertiesCounterAction : CounterAction {
+        public string name { get; set; }
+
+        FCopActor actor;
+        public List<byte> spawningPropertiesSaveState;
+
+        public ActorSpawningPropertiesCounterAction(FCopActor actor, List<byte> spawningPropertiesSaveState) {
+            this.actor = actor;
+            this.spawningPropertiesSaveState = spawningPropertiesSaveState;
+
+            name = "Actor Spawn Property Change";
+        }
+
+        public void Action() {
+
+            if (Main.editMode is not ActorEditMode) {
+                return;
+            }
+
+            var editMode = (ActorEditMode)Main.editMode;
+
+            if (spawningPropertiesSaveState == null) {
+                actor.spawningProperties = null;
+            }
+            else {
+                actor.spawningProperties = new FCopActorSpawning(spawningPropertiesSaveState);
+            }
+
+            editMode.view.activeActorPropertiesView.activeSpawningProperties?.Refresh();
 
         }
 
@@ -1460,24 +1565,6 @@ public class ActorEditMode : EditMode {
 
     }
 
-    public static void AddActorPropertyCounterAction(ActorProperty property) {
-
-        switch(property) {
-
-            case ValueActorProperty:
-                var valueProp = (ValueActorProperty)property;
-                Main.AddCounterAction(new ActorPropertyCounterAction(valueProp, valueProp.value));
-                break;
-            case EnumDataActorProperty:
-                var enumProp = (EnumDataActorProperty)property;
-                Main.AddCounterAction(new ActorPropertyCounterAction(enumProp, Convert.ToInt32(enumProp.caseValue)));
-                break;
-
-
-        }
-
-    }
-
     static void AddActorDeleteCounterAction(FCopActor deletedActor, List<ActorNode> positionGroupSaveState) {
 
         Main.AddCounterAction(new ActorDeleteCounterAction(deletedActor, positionGroupSaveState));
@@ -1486,6 +1573,31 @@ public class ActorEditMode : EditMode {
 
     static void AddActorAddCounterAction(FCopActor addedActor) {
         Main.AddCounterAction(new ActorAddCounterAction(addedActor));
+    }
+
+    // This breaks architecture as the property view items change the value.
+    public static void AddPropertyChangeCounterAction(ActorProperty property, FCopActor actor) {
+        Main.AddCounterAction(new PropertyChangeCounterAction(property.GetCompiledValue(), property, actor));
+    }
+
+    public static void AddMultiPropertyChangeCounterAction(List<ActorProperty> properties, FCopActor actor) {
+
+        var counterActions = new List<CounterAction>();
+
+        foreach (var property in properties) {
+            counterActions.Add(new PropertyChangeCounterAction(property.GetCompiledValue(), property, actor));
+        }
+
+        Main.AddCounterAction(new MultiCounterAction(counterActions, () => { }));
+    }
+
+    static void AddActorResourceRefCounterAction(FCopActor actor, int refIndex, FCopActor.Resource resource, AssetType assetType) {
+        Main.AddCounterAction(new ActorResourceRefCounterAction(actor, refIndex, resource, assetType));
+    }
+
+    // This breaks arhcitexture.
+    public static void AddActorSpawningPropertiesCounterAction(FCopActor actor, List<byte> spawningPropertiesSaveState) {
+        Main.AddCounterAction(new ActorSpawningPropertiesCounterAction(actor, spawningPropertiesSaveState));
     }
 
     #endregion
