@@ -30,6 +30,7 @@ public class ActorPropertiesView : MonoBehaviour {
     public TMP_Text actorName;
     public TMP_Text idText;
     public TMP_Text actorTypeText;
+    public GameObject unsupportedActorMessage;
     public SceneActorsView sceneActorsView;
 
     [HideInInspector]
@@ -105,6 +106,11 @@ public class ActorPropertiesView : MonoBehaviour {
     public void Refresh() {
 
         foreach (Transform transform in propertiesContent.transform) {
+
+            if (transform.gameObject == unsupportedActorMessage) {
+                continue;
+            }
+
             Destroy(transform.gameObject);
         }
 
@@ -120,7 +126,9 @@ public class ActorPropertiesView : MonoBehaviour {
 
         actorName.text = controller.selectedActor.name;
         idText.text = controller.selectedActor.DataID.ToString();
-        actorTypeText.text = controller.selectedActor.behaviorType.ToString();
+        actorTypeText.text = Utils.AddSpacesToString(controller.selectedActor.behaviorType.ToString());
+
+        unsupportedActorMessage.SetActive(ActorEditMode.unsupportedBehaviors.Contains(controller.selectedActor.behaviorType));
 
         List<ActorProperty> floatingProperties = new();
 

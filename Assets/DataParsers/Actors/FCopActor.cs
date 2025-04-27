@@ -211,27 +211,77 @@ namespace FCopParser {
             }
 
             switch (behavior) {
+                case ActorBehavior.PathedEntity:
+                    InitResourceAndRawFile(FCopBehavior5.assetRefCount);
+                    this.behavior = new FCopBehavior5(this, new());
+                    break;
                 case ActorBehavior.StationaryEntity:
-
                     InitResourceAndRawFile(FCopBehavior6.assetRefCount);
                     this.behavior = new FCopBehavior6(this, new());
+                    break;
+                case ActorBehavior.StationaryTurret:
+                    InitResourceAndRawFile(FCopBehavior8.assetRefCount);
+                    this.behavior = new FCopBehavior8(this, new());
+                    break;
+                case ActorBehavior.Aircraft:
+                    InitResourceAndRawFile(FCopBehavior9.assetRefCount);
+                    this.behavior = new FCopBehavior9(this, new());
                     break;
                 case ActorBehavior.Elevator:
                     InitResourceAndRawFile(FCopBehavior10.assetRefCount);
                     this.behavior = new FCopBehavior10(this, new());
                     break;
                 case ActorBehavior.DynamicProp:
-
                     InitResourceAndRawFile(FCopBehavior11.assetRefCount);
                     this.behavior = new FCopBehavior11(this, new());
+                    break;
+                case ActorBehavior.WalkableProp:
+                    InitResourceAndRawFile(FCopBehavior12.assetRefCount);
+                    this.behavior = new FCopBehavior12(this, new());
+                    break;
+                case ActorBehavior.FloatingItem:
+                    InitResourceAndRawFile(FCopBehavior16.assetRefCount);
+                    this.behavior = new FCopBehavior16(this, new());
+                    break;
+                case ActorBehavior.PathedTurret:
+                    InitResourceAndRawFile(FCopBehavior20.assetRefCount);
+                    this.behavior = new FCopBehavior20(this, new());
+                    break;
+                case ActorBehavior.MovableProp:
+                    InitResourceAndRawFile(FCopBehavior25.assetRefCount);
+                    this.behavior = new FCopBehavior25(this, new());
+                    break;
+                case ActorBehavior.PathedMultiTurret:
+                    InitResourceAndRawFile(FCopBehavior25.assetRefCount);
+                    this.behavior = new FCopBehavior25(this, new());
                     break;
                 case ActorBehavior.Teleporter:
                     InitResourceAndRawFile(FCopBehavior29.assetRefCount);
                     this.behavior = new FCopBehavior29(this, new());
                     break;
+                case ActorBehavior.Reloader:
+                    InitResourceAndRawFile(FCopBehavior32.assetRefCount);
+                    this.behavior = new FCopBehavior32(this, new());
+                    break;
+                case ActorBehavior.ClaimableTurret:
+                    InitResourceAndRawFile(FCopBehavior36.assetRefCount);
+                    this.behavior = new FCopBehavior36(this, new());
+                    break;
+                case ActorBehavior.Trigger:
+                    InitResourceAndRawFile(FCopBehavior95.assetRefCount);
+                    this.behavior = new FCopBehavior95(this, new());
+                    break;
                 case ActorBehavior.StaticProp:
                     InitResourceAndRawFile(FCopBehavior96.assetRefCount);
                     this.behavior = new FCopBehavior96(this, new());
+                    break;
+                case ActorBehavior.Texture:
+                    InitResourceAndRawFile(FCopBehavior97.assetRefCount);
+                    this.behavior = new FCopBehavior97(this, new());
+                    break;
+                case ActorBehavior.Weapon:
+                    InitResourceAndRawFile(FCopBehavior98.assetRefCount);
+                    this.behavior = new FCopBehavior98(this, new());
                     break;
 
             }
@@ -1169,7 +1219,14 @@ namespace FCopParser {
     // Observed
     public class FCopBehavior9 : FCopShooter {
 
+        public const int assetRefCount = 2;
+
         public FCopBehavior9(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("Object", AssetType.Object),
+                new ActorAssetReference("None", AssetType.None)
+            };
 
             properties.AddRange(new List<ActorProperty>() {
                 new ValueActorProperty("60", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
@@ -1477,6 +1534,8 @@ namespace FCopParser {
     // - Implemented, One Unknown, One Explosion Dependant -
     public class FCopBehavior20 : FCopPathedEntity, FCopObjectMutating {
 
+        public const int assetRefCount = 4;
+
         public FCopBehavior20(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             assetReferences = new ActorAssetReference[] {
@@ -1669,6 +1728,8 @@ namespace FCopParser {
 
     // - Implemented, One Unknown, Explosion Dependant, Many unknows from other types (Shooter, Path Turret) -
     public class FCopBehavior28 : FCopPathedEntity {
+
+        public const int assetRefCount = 7;
 
         public FCopBehavior28(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
@@ -2946,7 +3007,16 @@ namespace FCopParser {
     // - Completed -
     public class FCopBehavior97 : FCopActorBehavior, FCopHeightOffsetting {
 
+        public const int assetRefCount = 4;
+
         public FCopBehavior97(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("None", AssetType.None),
+                new ActorAssetReference("None", AssetType.None),
+                new ActorAssetReference("None", AssetType.None),
+                new ActorAssetReference("None", AssetType.None)
+            };
 
             properties.AddRange(new List<ActorProperty>() {
 
@@ -2966,15 +3036,15 @@ namespace FCopParser {
 
                 new AssetActorProperty("Texture Snippet", Read8(0), AssetType.TextureSnippet, BitCount.Bit8),
                 new NormalizedValueProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
-                new NormalizedValueProperty("Width", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
-                new NormalizedValueProperty("Height", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("Width", Read16(512), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("Height", Read16(512), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
                 new RangeActorProperty("Rotation Y", Read16(0), 0, 4096, 4096f / 360f, BitCount.Bit16),
                 new RangeActorProperty("Rotation X", Read16(0), 0, 4096, 4096f / 360f, BitCount.Bit16),
                 new RangeActorProperty("Rotation Z", Read16(0), 0, 4096, 4096f / 360f, BitCount.Bit16),
                 new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8),
-                new RangeActorProperty("Red", Read8(0), 0, 128, 128f, BitCount.Bit8),
-                new RangeActorProperty("Green", Read8(0), 0, 128, 128f, BitCount.Bit8),
-                new RangeActorProperty("Blue", Read8(0), 0, 128, 128f, BitCount.Bit8),
+                new RangeActorProperty("Red", Read8(128), 0, 128, 128f, BitCount.Bit8),
+                new RangeActorProperty("Green", Read8(128), 0, 128, 128f, BitCount.Bit8),
+                new RangeActorProperty("Blue", Read8(128), 0, 128, 128f, BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8)
 
@@ -3002,7 +3072,10 @@ namespace FCopParser {
 
     }
 
+    // - Implemented, TODO: Effects -
     public class FCopBehavior98 : FCopActorBehavior, SpecializedID {
+
+        public const int assetRefCount = 4;
 
         public FCopBehavior98(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
@@ -3017,29 +3090,29 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
                 new ValueActorProperty("ID", Read8(0), 0, 255, BitCount.Bit8),
-                new EnumDataActorProperty("Type", (WeaponType)Read8(0), BitCount.Bit8, "", new() { "OverloadMaxRange", "Overload52", "OverloadBlastRadius" }),
-                new ValueActorProperty("Ammo Count", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Reload Count", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new EnumDataActorProperty("Type", (WeaponType)Read8(1), BitCount.Bit8, "", new() { "OverloadMaxRange", "Overload52", "OverloadBlastRadius" }),
+                new ValueActorProperty("Ammo Count", Read16(-1), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Reload Count", Read16(100), short.MinValue, short.MaxValue, BitCount.Bit16),
                 new ValueActorProperty("Burst Shot Count", Read16(0), 0, 100, BitCount.Bit16),
-                new NormalizedValueProperty("Fire Delay", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16),
-                new NormalizedValueProperty("Burst Fire Delay", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16),
-                new ValueActorProperty("Damage", Read16(0), 0, short.MaxValue, BitCount.Bit16),
+                new NormalizedValueProperty("Fire Delay", Read16(16), 0, short.MaxValue, 16f, BitCount.Bit16),
+                new NormalizedValueProperty("Burst Fire Delay", Read16(16), 0, short.MaxValue, 16f, BitCount.Bit16),
+                new ValueActorProperty("Damage", Read16(5), 0, short.MaxValue, BitCount.Bit16),
 
                 new OverloadedProperty("OverloadBlastRadius", new() {
-                    (new NormalizedValueProperty("Blast Radius (MUST SET!)", Read16NoIt(0), 0, short.MaxValue, 512f, BitCount.Bit16), () => (WeaponType)propertiesByName["Type"].GetCompiledValue() == WeaponType.Grenade),
+                    (new NormalizedValueProperty("Blast Radius (MUST SET!)", Read16NoIt(256), 0, short.MaxValue, 512f, BitCount.Bit16), () => (WeaponType)propertiesByName["Type"].GetCompiledValue() == WeaponType.Grenade),
                     (new NormalizedValueProperty("Shield Radius", Read16NoIt(0), 0, short.MaxValue, 512f, BitCount.Bit16), () => (WeaponType)propertiesByName["Type"].GetCompiledValue() == WeaponType.Shield),
                     (new NormalizedValueProperty("Blast Radius", Read16(0), 0, short.MaxValue, 512f, BitCount.Bit16), () => true),
                 }, BitCount.Bit16),
 
                 new ValueActorProperty("Unknown 44", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new NormalizedValueProperty("Velocity", Read16(0), 0, short.MaxValue, 1024f, BitCount.Bit16),
+                new NormalizedValueProperty("Velocity", Read16(4096), 0, short.MaxValue, 1024f, BitCount.Bit16),
                 new ValueActorProperty("Unknown 48", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
 
                 new OverloadedProperty("OverloadMaxRange", new() {
-                    (new NormalizedValueProperty("Gravity", Read16NoIt(0), 0, short.MaxValue, 512f,  BitCount.Bit16), () => (WeaponType)propertiesByName["Type"].GetCompiledValue() == WeaponType.Mortar),
-                    (new NormalizedValueProperty("Gravity", Read16NoIt(0), 0, short.MaxValue, 512f,  BitCount.Bit16), () => (WeaponType)propertiesByName["Type"].GetCompiledValue() == WeaponType.Bomb),
-                    (new NormalizedValueProperty("Gravity", Read16NoIt(0), 0, short.MaxValue, 512f,  BitCount.Bit16), () => (WeaponType)propertiesByName["Type"].GetCompiledValue() == WeaponType.Grenade),
-                    (new NormalizedValueProperty("Max Range", Read16(0), 0, short.MaxValue, 512f,  BitCount.Bit16), () => true),
+                    (new NormalizedValueProperty("Gravity", Read16NoIt(6144), 0, short.MaxValue, 512f,  BitCount.Bit16), () => (WeaponType)propertiesByName["Type"].GetCompiledValue() == WeaponType.Mortar),
+                    (new NormalizedValueProperty("Gravity", Read16NoIt(6144), 0, short.MaxValue, 512f,  BitCount.Bit16), () => (WeaponType)propertiesByName["Type"].GetCompiledValue() == WeaponType.Bomb),
+                    (new NormalizedValueProperty("Gravity", Read16NoIt(6144), 0, short.MaxValue, 512f,  BitCount.Bit16), () => (WeaponType)propertiesByName["Type"].GetCompiledValue() == WeaponType.Grenade),
+                    (new NormalizedValueProperty("Max Range", Read16(6144), 0, short.MaxValue, 512f,  BitCount.Bit16), () => true),
                 }, BitCount.Bit16),
 
                 new OverloadedProperty("Overload52", new() {

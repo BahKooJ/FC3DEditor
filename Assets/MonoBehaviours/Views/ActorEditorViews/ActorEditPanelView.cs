@@ -24,8 +24,22 @@ public class ActorEditPanelView : MonoBehaviour {
         addActorContextMenu.items = new() {
             ("Dynamic Prop", () => { controller.StartAdd(FCopParser.ActorBehavior.DynamicProp); }),
             ("Static Prop", () => { controller.StartAdd(FCopParser.ActorBehavior.StaticProp); }),
+            ("Walkable Prop", () => { controller.StartAdd(FCopParser.ActorBehavior.WalkableProp); }),
+            ("Movable Prop", () => { controller.StartAdd(FCopParser.ActorBehavior.MovableProp); }),
+            ("Texture", () => { controller.StartAdd(FCopParser.ActorBehavior.Texture); }),
             ("Elevator", () => { controller.StartAdd(FCopParser.ActorBehavior.Elevator); }),
             ("Teleporter", () => { controller.StartAdd(FCopParser.ActorBehavior.Teleporter); }),
+            ("Pathed Entity", () => { controller.StartAdd(FCopParser.ActorBehavior.PathedEntity); }),
+            ("Stationary Entity", () => { controller.StartAdd(FCopParser.ActorBehavior.StationaryEntity); }),
+            ("Stationary Turret", () => { controller.StartAdd(FCopParser.ActorBehavior.StationaryTurret); }),
+            ("Aircraft", () => { controller.StartAdd(FCopParser.ActorBehavior.Aircraft); }),
+            ("Pathed Turret", () => { controller.StartAdd(FCopParser.ActorBehavior.PathedTurret); }),
+            ("Pathed Multi-Turret", () => { controller.StartAdd(FCopParser.ActorBehavior.PathedMultiTurret); }),
+            ("Claimable Turret", () => { controller.StartAdd(FCopParser.ActorBehavior.ClaimableTurret); }),
+            ("Weapon", () => { controller.StartAdd(FCopParser.ActorBehavior.Weapon); }),
+            ("Floating Item", () => { controller.StartAdd(FCopParser.ActorBehavior.FloatingItem); }),
+            ("Reloader", () => { controller.StartAdd(FCopParser.ActorBehavior.Reloader); }),
+            ("Trigger", () => { controller.StartAdd(FCopParser.ActorBehavior.Trigger); }),
 
         };
 

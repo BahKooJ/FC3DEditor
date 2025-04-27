@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Text;
 
 public class DelayedAction {
 
@@ -144,6 +145,29 @@ namespace FCopParser {
             }
 
             return total;
+
+        }
+
+        public static string AddSpacesToString(string str) {
+
+            var total = new StringBuilder();
+
+            foreach (var c in str) {
+
+                if (c == '_') {
+                    total.Append(' ');
+                }
+                else if (Char.IsUpper(c)) {
+                    total.Append(' ');
+                    total.Append(c);
+                }
+                else {
+                    total.Append(c);
+                }
+
+            }
+
+            return total.ToString();
 
         }
 

@@ -25,27 +25,24 @@ public class EnumDataActorPropertyItemView: ActorPropertyItemView {
 
         caseDropDown.ClearOptions();
 
-        caseDropDown.AddOptions(new List<string>(cases));
-
         var value = 0;
         foreach (var c in cases) {
 
+            caseDropDown.AddOptions(new List<string>() { Utils.AddSpacesToString(c) });
+
             if (Enum.GetName(enumProperty.caseValue.GetType(), enumProperty.caseValue) == c) {
-                break;
+                caseDropDown.value = value;
             }
 
             value++;
         }
 
-        caseDropDown.value = value;
 
     }
 
     public void OnChange() {
 
         var enumProperty = (EnumDataActorProperty)property;
-
-        ActorEditMode.AddActorPropertyCounterAction(property);
 
         enumProperty.caseValue = (Enum)values.GetValue(caseDropDown.value);
 

@@ -37,8 +37,6 @@ public class ValueActorPropertyItemView : ActorPropertyItemView {
 
         Main.ignoreAllInputs = false;
 
-        ActorEditMode.AddActorPropertyCounterAction(property);
-
         try {
 
             var value = int.Parse(valueField.text);

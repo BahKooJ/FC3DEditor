@@ -58,11 +58,6 @@ public class ActorObject : MonoBehaviour {
 
     public void ChangePosition(Vector3 pos, AxisControl.Axis axis) {
 
-        //controller.AddActorPositionCounterAction(actor.x, actor.y, actor, counterActionID);
-
-        actor.x = Mathf.RoundToInt(pos.x * 8192f);
-        actor.y = Mathf.RoundToInt(pos.z * -8192f);
-
         if (axis == AxisControl.Axis.AxisY) {
 
             if (actor.behavior is FCopHeightOffsetting heightOffseting) {
@@ -70,6 +65,13 @@ public class ActorObject : MonoBehaviour {
                 heightOffseting.SetHeight(pos.y - GroundCast());
                 controller.view.activeActorPropertiesView.RequestPropertyRefresh(heightOffseting.GetHeightProperty());
             }
+
+        }
+        else {
+
+            // Why call a method in the controller when the changes can be made here?:
+            // For counter-actions, it also need to know whether the change was made with a group or not.
+            controller.ChangeActorPosition(actor, pos);
 
         }
 

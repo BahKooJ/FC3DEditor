@@ -37,8 +37,6 @@ public class NormalizedActorPropertyView : ActorPropertyItemView {
 
         Main.ignoreAllInputs = false;
 
-        ActorEditMode.AddActorPropertyCounterAction(property);
-
         try {
 
             var value = float.Parse(valueField.text);

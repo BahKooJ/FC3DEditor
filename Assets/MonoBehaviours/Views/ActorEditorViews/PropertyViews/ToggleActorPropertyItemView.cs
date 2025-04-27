@@ -24,8 +24,6 @@ public class ToggleActorPropertyItemView : ActorPropertyItemView {
 
         var toggleProperty = (ToggleActorProperty)property;
 
-        ActorEditMode.AddActorPropertyCounterAction(property);
-
         toggleProperty.value = toggle.isOn;
 
         if (ActorPropertyChangeEvent.changeEventsByPropertyName.ContainsKey(property.name)) {

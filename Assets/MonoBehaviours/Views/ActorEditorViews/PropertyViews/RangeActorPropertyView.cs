@@ -53,8 +53,6 @@ public class RangeActorPropertyView : ActorPropertyItemView {
 
         if (refuseCallback) return;
 
-        ActorEditMode.AddActorPropertyCounterAction(property);
-
         try {
 
             var value = float.Parse(valueField.text);

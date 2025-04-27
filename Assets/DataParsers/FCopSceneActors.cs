@@ -337,6 +337,18 @@ namespace FCopParser {
 
         }
 
+        public List<ActorNode> CreatePositionSaveState() {
+
+            var total = new List<ActorNode>();
+
+            foreach (var node in positionalGroupedActors) {
+                total.Add(node.Clone());
+            }
+
+            return total;
+
+        }
+
         public void FindTeams() {
 
             var teamedActors = actors.Where(a => a.behavior is FCopEntity);
@@ -469,6 +481,12 @@ namespace FCopParser {
             this.nestedActors = nestedActors;
             this.groupType = groupType;
             this.name = name;
+        }
+
+        public ActorNode Clone() {
+
+            return new ActorNode(new(nestedActors), groupType, name);
+
         }
 
     }

@@ -8,6 +8,28 @@ using Object = UnityEngine.Object;
 
 public class ActorEditMode : EditMode {
 
+    public static List<ActorBehavior> unsupportedBehaviors = new() {
+        ActorBehavior.UniversalTrigger,
+        ActorBehavior.Aircraft,
+        ActorBehavior.Behavior26,
+        ActorBehavior.Behavior27,
+        ActorBehavior.Behavior30,
+        ActorBehavior.Behavior31,
+        ActorBehavior.Behavior33,
+        ActorBehavior.Behavior34,
+        ActorBehavior.Behavior37,
+        ActorBehavior.Behavior38,
+        ActorBehavior.VisualEffects87,
+        ActorBehavior.VisualEffects88,
+        ActorBehavior.VisualEffects89,
+        ActorBehavior.VisualEffects90,
+        ActorBehavior.VisualEffects92,
+        ActorBehavior.VisualEffects94,
+        ActorBehavior.ActorExplosion,
+        ActorBehavior.ParticleEmitter,
+        ActorBehavior.PlayerWeapon
+    };
+
     public Main main { get; set; }
 
     public ActorEditPanelView view;
@@ -27,7 +49,7 @@ public class ActorEditMode : EditMode {
     ActorObject schematicObjectToAdd = null;
     ActorSchematic schematicToAdd = null;
 
-    static int counterActionID = 0;
+    bool preventCounterAction = false;
 
     public ActorEditMode(Main main) {
         this.main = main;
@@ -185,6 +207,10 @@ public class ActorEditMode : EditMode {
             return;
         }
 
+        if (Controls.OnUp("MoveToCursor") || Input.GetMouseButtonUp(0)) {
+            preventCounterAction = false;
+        }
+
         if (schematicObjectToAdd != null) {
 
             var hitPos = main.CursorOnLevelMesh();
@@ -241,12 +267,6 @@ public class ActorEditMode : EditMode {
             }
 
             return;
-
-        }
-
-        if (Controls.OnUp("MoveToCursor") || Controls.OnUp("Select") || Input.GetMouseButtonUp(0)) {
-
-            counterActionID++;
 
         }
 
@@ -675,6 +695,22 @@ public class ActorEditMode : EditMode {
 
     }
 
+    public ActorGroupObject FindActorGroupByID(int id) {
+
+        return actorGroupObjects.FirstOrDefault(ag => {
+
+            foreach (var actObj in ag.actObjects) {
+
+                if (actObj.actor.DataID == id) return true;
+
+            }
+
+            return false;
+
+        });
+
+    }
+
     public void RequestActorRefresh(int id) {
 
         actorObjectsByID[id].Refresh();
@@ -773,11 +809,6 @@ public class ActorEditMode : EditMode {
 
         if (selectedActorObject != null) {
 
-            // WTF DO YOU WANT FROM ME UNITY???
-            // "Unity objects should not use null propagation" Ok odd guess I'll do it the verbos wa- OH WAIT
-            // "GetComponent allocates even if no component is found."
-            // FINE GUESS I'LL DO WHATEVER TF THIS IS
-
             if (selectedActorObject.controlledObject.TryGetComponent<ActorObject>(out var actorObj)) {
                 actorObj.SetToCurrentPosition();
             }
@@ -792,9 +823,26 @@ public class ActorEditMode : EditMode {
 
     }
 
+    public void RefreshActorPosition(int id) {
+
+        var actorObj = actorObjectsByID[id];
+
+        if (actorObj.actor == selectedActor) {
+            RefreshSelectedActorPosition();
+        }
+        else {
+            actorObj.SetToCurrentPosition();
+        }
+
+    }
+
     public void SelectActor(ActorObject actorObject, bool jump = true) {
 
-        AddActorSelectCounterAction(selectedActor?.DataID);
+        if (!preventCounterAction) {
+
+            AddActorSelectCounterAction(selectedActor?.DataID);
+
+        }
 
         UnselectActor();
 
@@ -921,6 +969,40 @@ public class ActorEditMode : EditMode {
 
     #region Model Mutating
 
+    public void ChangeActorPosition(FCopActor actor, Vector3 pos) {
+
+        if (!preventCounterAction) {
+
+            AddActorPositionCounterAction(actor.x, actor.y, actor);
+
+        }
+
+        preventCounterAction = true;
+
+        actor.x = Mathf.RoundToInt(pos.x * 8192f);
+        actor.y = Mathf.RoundToInt(pos.z * -8192f);
+
+    }
+
+    public void ChangeActorsPositionFromGroup(List<FCopActor> actors, Vector3 pos) {
+
+        if (!preventCounterAction) {
+
+            AddMultiActorPositionCounterAction(actors);
+
+        }
+
+        preventCounterAction = true;
+
+        foreach (var actor in actors) {
+
+            actor.x = Mathf.RoundToInt(pos.x * 8192f);
+            actor.y = Mathf.RoundToInt(pos.z * -8192f);
+
+        }
+
+    }
+
     public void CreateActor(ActorBehavior behavior, Vector3 pos) {
 
         var newActor = new FCopActor(
@@ -931,29 +1013,20 @@ public class ActorEditMode : EditMode {
             Mathf.RoundToInt(pos.z * -8192f)
             );
 
-        if (behavior == ActorBehavior.Weapon) {
-            main.level.sceneActors.AddActor(newActor, null, true);
-
-            var weaponActors = main.level.sceneActors.actors.Where(a => a.behaviorType == ActorBehavior.Weapon).ToList();
-
-            if (weaponActors.Count > 16) {
-                QuickLogHandler.Log("The maximum amount of weapon actors have been exceeded (16). All shooter actors will no longer work!", LogSeverity.Warning);
-            }
-
-        }
-        else {
-            main.level.sceneActors.AddActor(newActor, null);
-        }
-
-        AddNewActorObject(newActor);
-        view.activeActorPropertiesView.sceneActorsView.Validate();
+        AddActor(newActor, Vector3.zero);
 
     }
 
-    public void AddActor(FCopActor actor, Vector3 pos) {
+    public void AddActor(FCopActor actor, Vector3 pos, bool refuseSceneRefresh = false) {
 
-        actor.x = Mathf.RoundToInt(pos.x * 8192f);
-        actor.y = Mathf.RoundToInt(pos.z * -8192f);
+        if (!preventCounterAction) {
+            AddActorAddCounterAction(actor);
+        }
+
+        if (pos != Vector3.zero) {
+            actor.x = Mathf.RoundToInt(pos.x * 8192f);
+            actor.y = Mathf.RoundToInt(pos.z * -8192f);
+        }
 
         if (actor.behaviorType == ActorBehavior.Weapon) {
             main.level.sceneActors.AddActor(actor, null, true);
@@ -970,7 +1043,11 @@ public class ActorEditMode : EditMode {
         }
 
         AddNewActorObject(actor);
-        view.activeActorPropertiesView.sceneActorsView.Validate();
+
+        if (!refuseSceneRefresh) {
+            view.activeActorPropertiesView.sceneActorsView.Validate();
+        }
+
     }
 
     public void DeleteActor() {
@@ -987,7 +1064,9 @@ public class ActorEditMode : EditMode {
 
         var actor = main.level.sceneActors.actorsByID[id];
         
-        AddActorDeleteCounterAction(actor);
+        if (!preventCounterAction) {
+            AddActorDeleteCounterAction(actor, main.level.sceneActors.CreatePositionSaveState());
+        }
 
         main.level.sceneActors.DeleteActor(id);
 
@@ -1024,26 +1103,7 @@ public class ActorEditMode : EditMode {
 
     public void GroupActor(ActorNode toGroup) {
 
-        HeadsUpTextUtil.End();
-
-        if (actorToGroup == null) return;
-
-        var didGroup = main.level.sceneActors.PositionalGroupActor(actorToGroup, toGroup);
-
-        if (didGroup) {
-
-            ValidateGrouping();
-
-            var actorObj = actorObjectsByID[actorToGroup.DataID];
-
-            actorObj.SetToCurrentPosition();
-
-            view.activeActorPropertiesView.sceneActorsView.Validate();
-
-        }
-        else {
-            QuickLogHandler.Log("Unable to group actors", LogSeverity.Error);
-        }
+        GroupActor(actorToGroup, toGroup);
 
         actorToGroup = null;
 
@@ -1055,9 +1115,14 @@ public class ActorEditMode : EditMode {
 
         if (actorToGroup == null) return;
 
+        // Has to create a state before grouping
+        var counterAction = new GroupCounterAction(main.level.sceneActors.CreatePositionSaveState(), actorToGroup);
+
         var didGroup = main.level.sceneActors.PositionalGroupActor(actorToGroup, toGroup);
 
         if (didGroup) {
+
+            Main.AddCounterAction(counterAction);
 
             ValidateGrouping();
 
@@ -1076,9 +1141,14 @@ public class ActorEditMode : EditMode {
 
     public void UngroupActor(FCopActor actor) {
 
+        // Has to create a state before grouping
+        var counterAction = new GroupCounterAction(main.level.sceneActors.CreatePositionSaveState(), actor);
+
         var didUngroup = main.level.sceneActors.PositionalUngroupActor(actor);
 
         if (didUngroup) {
+
+            Main.AddCounterAction(counterAction);
 
             ValidateGrouping();
 
@@ -1121,10 +1191,6 @@ public class ActorEditMode : EditMode {
 
     #endregion
 
-    // TODO: Convert to state-like saving
-    // So many values would need to be saved in order to a nonsave state undo.
-    // Many methods would need to change and data passed simply for undo which would also break
-    // architecture. Undo will remain incomplete until a save state undo can be made.
     #region Counter-Actions
 
     public class ActorPositionCounterAction : CounterAction {
@@ -1134,17 +1200,11 @@ public class ActorEditMode : EditMode {
         public int savedX;
         public int savedY;
         public FCopActor modifiedActor;
-        // Because it runs a func every frame to move and it needs to add a counter action,
-        // it needs a way to know if a counter action was already added.
-        // Since a type can't be used, an ID will be provided instead.
-        // This isn't super interchangable but it works.
-        public int id;
 
-        public ActorPositionCounterAction(int savedX, int savedY, FCopActor modifiedActor, int id) {
+        public ActorPositionCounterAction(int savedX, int savedY, FCopActor modifiedActor) {
             this.savedX = savedX;
             this.savedY = savedY;
             this.modifiedActor = modifiedActor;
-            this.id = id;
 
             name = "Actor Position Change";
         }
@@ -1160,44 +1220,7 @@ public class ActorEditMode : EditMode {
             modifiedActor.x = savedX; 
             modifiedActor.y = savedY;
 
-            editMode.RefreshSelectedActorPosition();
-
-        }
-
-    }
-
-    public class MultiActorPositionCounterAction : CounterAction {
-
-        public string name { get; set; }
-
-        public int savedX;
-        public int savedY;
-        public List<FCopActor> modifiedActors;
-        public int id;
-
-        public MultiActorPositionCounterAction(int savedX, int savedY, List<FCopActor> modifiedActors, int id) {
-            this.savedX = savedX;
-            this.savedY = savedY;
-            this.modifiedActors = modifiedActors;
-            this.id = id;
-
-            name = "Actor Position Change";
-        }
-
-        public void Action() {
-
-            if (Main.editMode is not ActorEditMode) {
-                return;
-            }
-
-            var editMode = (ActorEditMode)Main.editMode;
-
-            foreach (var actor in modifiedActors) {
-                actor.x = savedX;
-                actor.y = savedY;
-            }
-
-            editMode.RefreshSelectedActorPosition();
+            editMode.RefreshActorPosition(modifiedActor.DataID);
 
         }
 
@@ -1227,9 +1250,13 @@ public class ActorEditMode : EditMode {
             editMode.UnselectActor();
 
             if (selectedActorID != null) {
+                editMode.preventCounterAction = true;
                 editMode.SelectActor(editMode.actorObjectsByID[(int)selectedActorID]);
+                editMode.preventCounterAction = false;
+
             }
             else {
+                editMode.view.RefreshActorPropertiesView();
                 editMode.view.activeActorPropertiesView.sceneActorsView.RefreshSelection(false);
             }
 
@@ -1281,10 +1308,11 @@ public class ActorEditMode : EditMode {
         public string name { get; set; }
 
         public FCopActor deletedActor;
+        List<ActorNode> positionGroupSaveState;
 
-        public ActorDeleteCounterAction(FCopActor deletedActor) {
+        public ActorDeleteCounterAction(FCopActor deletedActor, List<ActorNode> positionGroupSaveState) {
             this.deletedActor = deletedActor;
-
+            this.positionGroupSaveState = positionGroupSaveState;
             name = "Actor Deletion";
 
         }
@@ -1297,56 +1325,132 @@ public class ActorEditMode : EditMode {
 
             var editMode = (ActorEditMode)Main.editMode;
 
-            editMode.main.level.sceneActors.AddActor(deletedActor, null);
-
-            // No need to add group because group is validated for sceneActors.
-            editMode.AddNewActorObject(deletedActor);
-
+            editMode.preventCounterAction = true;
+            editMode.AddActor(deletedActor, Vector3.zero, true);
+            editMode.main.level.sceneActors.positionalGroupedActors = positionGroupSaveState;
             editMode.view.activeActorPropertiesView.sceneActorsView.Refresh();
+            editMode.preventCounterAction = false;
+
+            // Delayed action because it takes another frame for the node to built so it can ungroup
+            // if node is inside group.
+            // JK this causes so many problems I'm leaving it alone for now.
+            //Main.delayedActions.Add(new DelayedAction(1, () => {
+            //    editMode.preventCounterAction = true;
+            //    editMode.SelectActorByID(deletedActor.DataID);
+            //    editMode.preventCounterAction = false;
+
+            //}));
 
         }
 
     }
 
-    static void AddActorPositionCounterAction(int savedX, int savedY, FCopActor modifiedActor, int id) {
+    public class ActorAddCounterAction : CounterAction {
 
-        var last = Main.counterActions.Last();
+        public string name { get; set; }
 
-        if (last is ActorPositionCounterAction posCounterAction) {
+        FCopActor addedActor;
 
-            if (posCounterAction.id != id) {
+        public ActorAddCounterAction(FCopActor addedActor) {
+            this.addedActor = addedActor;
+            name = "Actor Addition";
+        }
 
-                Main.AddCounterAction(new ActorPositionCounterAction(savedX, savedY, modifiedActor, id));
+        public void Action() {
 
+            if (Main.editMode is not ActorEditMode) {
+                return;
             }
 
-        }
-        else {
+            var editMode = (ActorEditMode)Main.editMode;
 
-            Main.AddCounterAction(new ActorPositionCounterAction(savedX, savedY, modifiedActor, id));
+            editMode.preventCounterAction = true;
+            editMode.DeleteByID(addedActor.DataID);
+            editMode.preventCounterAction = false;
+
+        }
+    }
+
+    public class GroupCounterAction : CounterAction {
+
+        public string name { get; set; }
+
+        List<ActorNode> positionGroupSaveState;
+        FCopActor groupedActor;
+        int savedX;
+        int savedY;
+
+        public GroupCounterAction(List<ActorNode> positionGroupSaveState, FCopActor groupedActor) {
+            this.positionGroupSaveState = positionGroupSaveState;
+            this.groupedActor = groupedActor;
+            savedX = groupedActor.x;
+            savedY = groupedActor.y;
+
+            name = "Actor Grouping";
+        }
+
+        public void Action() {
+
+            if (Main.editMode is not ActorEditMode) {
+                return;
+            }
+
+            var editMode = (ActorEditMode)Main.editMode;
+
+            groupedActor.x = savedX;
+            groupedActor.y = savedY;
+
+            editMode.main.level.sceneActors.positionalGroupedActors = positionGroupSaveState;
+            editMode.view.activeActorPropertiesView.sceneActorsView.Refresh();
+            editMode.RefreshActorPosition(groupedActor.DataID);
+            editMode.ValidateGrouping();
 
         }
 
     }
 
-    static void AddMultiActorPositionCounterAction(int savedX, int savedY, List<FCopActor> modifiedActors, int id) {
+    static void AddActorPositionCounterAction(int savedX, int savedY, FCopActor modifiedActor) {
+        Main.AddCounterAction(new ActorPositionCounterAction(savedX, savedY, modifiedActor));
+    }
 
-        var last = Main.counterActions.Last();
+    static void AddMultiActorPositionCounterAction(List<FCopActor> modifiedActors) {
 
-        if (last is MultiActorPositionCounterAction posCounterAction) {
+        var counterActions = new List<CounterAction>();
 
-            if (posCounterAction.id != id) {
+        foreach (var actor in modifiedActors) {
+            counterActions.Add(new ActorPositionCounterAction(actor.x, actor.y, actor));
+        }
 
-                Main.AddCounterAction(new MultiActorPositionCounterAction(savedX, savedY, modifiedActors, id));
+        Main.AddCounterAction(new MultiCounterAction(counterActions, () => {
+
+            if (Main.editMode is not ActorEditMode) {
+                return;
+            }
+
+            var editMode = (ActorEditMode)Main.editMode;
+
+            // The ActorPositionCounterAction object already does the reverting of the actor position
+            // along with refreshing any ActorObjects. Since this is a multi position change, we need
+            // to refresh the groups as well.
+            var groupsToRefresh = new HashSet<ActorGroupObject>();
+
+            foreach (var action in counterActions.Cast<ActorPositionCounterAction>()) {
+
+                var group = editMode.FindActorGroupByID(action.modifiedActor.DataID);
+
+                if (group != null) {
+                    groupsToRefresh.Add(group);
+                }
 
             }
 
-        }
-        else {
+            foreach (var group in groupsToRefresh) {
+                group.SetToCurrentPosition();
+            }
 
-            Main.AddCounterAction(new MultiActorPositionCounterAction(savedX, savedY, modifiedActors, id));
+            editMode.RefreshSelectedActorPosition();
 
-        }
+        }));
 
     }
 
@@ -1374,10 +1478,14 @@ public class ActorEditMode : EditMode {
 
     }
 
-    static void AddActorDeleteCounterAction(FCopActor deletedActor) {
+    static void AddActorDeleteCounterAction(FCopActor deletedActor, List<ActorNode> positionGroupSaveState) {
 
-        Main.AddCounterAction(new ActorDeleteCounterAction(deletedActor));
+        Main.AddCounterAction(new ActorDeleteCounterAction(deletedActor, positionGroupSaveState));
 
+    }
+
+    static void AddActorAddCounterAction(FCopActor addedActor) {
+        Main.AddCounterAction(new ActorAddCounterAction(addedActor));
     }
 
     #endregion

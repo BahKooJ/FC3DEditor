@@ -39,6 +39,8 @@ public class Main : MonoBehaviour {
 
         counterActionAddedOnCurrentSelectHold = Input.GetMouseButton(0) || Controls.IsDown("Select");
 
+        Debug.Log("Counter-Action Added");
+
         counterActions.Add(counterAction);
 
     }
@@ -301,7 +303,10 @@ public class Main : MonoBehaviour {
             QuickLogHandler.Log("Undo " + counterActions.Last().name , LogSeverity.Success);
 
             counterActions.Last().Action();
-            counterActions.RemoveAt(counterActions.Count - 1);
+
+            if (counterActions.Count > 0) {
+                counterActions.RemoveAt(counterActions.Count - 1);
+            }
 
         }
 

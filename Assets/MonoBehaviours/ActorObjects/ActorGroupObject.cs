@@ -27,9 +27,10 @@ public class ActorGroupObject : MonoBehaviour {
 
         foreach (var obj in actObjects) {
             actors.Add(obj.actor);
-            obj.ChangePosition(pos, axis);
             obj.transform.localPosition = Vector3.zero;
         }
+
+        controller.ChangeActorsPositionFromGroup(actors, pos);
 
         // The other actor objects are children to the group,
         // which means we don't need to update their position, just this one.
