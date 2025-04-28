@@ -13,6 +13,10 @@ public class BackShaderPresetsViewItem : MonoBehaviour {
 
     void Start() {
 
+        foreach (var gobj in transform.GetComponentsInChildren<ReceiveDragable>()) {
+            gobj.expectedTransform = transform.parent;
+        }
+
         text.text = controller.currentShaderPresets.parent.directoryName;
 
     }
@@ -22,6 +26,19 @@ public class BackShaderPresetsViewItem : MonoBehaviour {
         controller.currentShaderPresets = controller.currentShaderPresets.parent;
 
         view.Refresh();
+
+    }
+
+    public void OnReceiverDrag() {
+
+        if (Main.draggingElement.TryGetComponent<ShaderPresetViewItem>(out var viewItem)) {
+
+            controller.currentShaderPresets.presets.Remove(viewItem.preset);
+            controller.currentShaderPresets.parent.presets.Add(viewItem.preset);
+
+            Destroy(viewItem.gameObject);
+
+        }
 
     }
 

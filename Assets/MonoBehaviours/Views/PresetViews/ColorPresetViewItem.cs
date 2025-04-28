@@ -21,6 +21,10 @@ public class ColorPresetViewItem : MonoBehaviour {
 
     void Start() {
 
+        foreach (var gobj in transform.GetComponentsInChildren<ReceiveDragable>()) {
+            gobj.expectedTransform = transform.parent;
+        }
+
         contextMenu.items = new() {
             ("Rename", Rename), ("Delete", Delete)
         };
@@ -138,6 +142,33 @@ public class ColorPresetViewItem : MonoBehaviour {
 
         if (controller.colorPicker != null) {
             controller.colorPicker.SetColorFromPreset(preset);
+        }
+
+    }
+    public void OnReceiverDrag() {
+
+        if (Main.draggingElement.TryGetComponent<ColorPresetViewItem>(out var viewItem)) {
+
+            var indexOfItem = controller.currentColorPresets.presets.IndexOf(viewItem.preset);
+            var indexOfThis = controller.currentColorPresets.presets.IndexOf(preset);
+
+            controller.currentColorPresets.presets.Remove(viewItem.preset);
+
+            if (indexOfThis > indexOfItem) {
+
+                controller.currentColorPresets.presets.Insert(indexOfThis - 1, viewItem.preset);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+
+            }
+            else {
+
+                controller.currentColorPresets.presets.Insert(indexOfThis, viewItem.preset);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex());
+
+            }
+
         }
 
     }

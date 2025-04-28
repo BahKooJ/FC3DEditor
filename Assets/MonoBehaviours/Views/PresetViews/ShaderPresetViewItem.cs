@@ -34,6 +34,10 @@ public class ShaderPresetViewItem : MonoBehaviour {
 
     void Start() {
 
+        foreach (var gobj in transform.GetComponentsInChildren<ReceiveDragable>()) {
+            gobj.expectedTransform = transform.parent;
+        }
+
         contextMenu.items = new() {
             ("Rename", Rename), ("Delete", Delete)
         };
@@ -251,6 +255,34 @@ public class ShaderPresetViewItem : MonoBehaviour {
         controller.RefreshTileOverlayShader();
         controller.RefreshShaderMapper();
         controller.RefreshMeshes();
+
+    }
+
+    public void OnReceiverDrag() {
+
+        if (Main.draggingElement.TryGetComponent<ShaderPresetViewItem>(out var viewItem)) {
+
+            var indexOfItem = controller.currentShaderPresets.presets.IndexOf(viewItem.preset);
+            var indexOfThis = controller.currentShaderPresets.presets.IndexOf(preset);
+
+            controller.currentShaderPresets.presets.Remove(viewItem.preset);
+
+            if (indexOfThis > indexOfItem) {
+
+                controller.currentShaderPresets.presets.Insert(indexOfThis - 1, viewItem.preset);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+
+            }
+            else {
+
+                controller.currentShaderPresets.presets.Insert(indexOfThis, viewItem.preset);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex());
+
+            }
+
+        }
 
     }
 

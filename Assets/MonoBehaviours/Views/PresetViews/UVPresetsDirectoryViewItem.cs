@@ -17,6 +17,10 @@ public class UVPresetsDirectoryViewItem : MonoBehaviour {
 
     void Start() {
 
+        foreach (var gobj in transform.GetComponentsInChildren<ReceiveDragable>()) {
+            gobj.expectedTransform = transform.parent;
+        }
+
         nameText.text = presets.directoryName;
 
         contextMenu.items = new() {
@@ -80,6 +84,19 @@ public class UVPresetsDirectoryViewItem : MonoBehaviour {
         controller.currentUVPresets = presets;
 
         view.Refresh();
+
+    }
+
+    public void OnReceiverDrag() {
+
+        if (Main.draggingElement.TryGetComponent<UVPresentViewItem>(out var viewItem)) {
+
+            controller.currentUVPresets.presets.Remove(viewItem.preset);
+            presets.presets.Add(viewItem.preset);
+
+            Destroy(viewItem.gameObject);
+
+        }
 
     }
 

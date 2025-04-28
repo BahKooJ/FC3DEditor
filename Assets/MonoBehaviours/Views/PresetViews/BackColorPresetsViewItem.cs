@@ -12,6 +12,10 @@ public class BackColorPresetsViewItem : MonoBehaviour {
 
     void Start() {
 
+        foreach (var gobj in transform.GetComponentsInChildren<ReceiveDragable>()) {
+            gobj.expectedTransform = transform.parent;
+        }
+
         text.text = controller.currentColorPresets.parent.directoryName;
 
     }
@@ -21,6 +25,19 @@ public class BackColorPresetsViewItem : MonoBehaviour {
         controller.currentColorPresets = controller.currentColorPresets.parent;
 
         view.Refresh();
+
+    }
+
+    public void OnReceiverDrag() {
+
+        if (Main.draggingElement.TryGetComponent<ColorPresetViewItem>(out var viewItem)) {
+
+            controller.currentColorPresets.presets.Remove(viewItem.preset);
+            controller.currentColorPresets.parent.presets.Add(viewItem.preset);
+
+            Destroy(viewItem.gameObject);
+
+        }
 
     }
 

@@ -17,6 +17,10 @@ public class ColorPresetsDirectoryViewItem : MonoBehaviour {
 
     void Start() {
 
+        foreach (var gobj in transform.GetComponentsInChildren<ReceiveDragable>()) {
+            gobj.expectedTransform = transform.parent;
+        }
+
         nameText.text = presets.directoryName;
 
         contextMenu.items = new() {
@@ -83,5 +87,17 @@ public class ColorPresetsDirectoryViewItem : MonoBehaviour {
 
     }
 
+    public void OnReceiverDrag() {
+
+        if (Main.draggingElement.TryGetComponent<ColorPresetViewItem>(out var viewItem)) {
+
+            controller.currentColorPresets.presets.Remove(viewItem.preset);
+            presets.presets.Add(viewItem.preset);
+
+            Destroy(viewItem.gameObject);
+
+        }
+
+    }
 
 }

@@ -36,6 +36,9 @@ public class UVPresentViewItem : MonoBehaviour {
     // All this just to get it to mask in the UI?
     void Start() {
 
+        foreach (var gobj in transform.GetComponentsInChildren<ReceiveDragable>()) {
+            gobj.expectedTransform = transform.parent;
+        }
 
         contextMenu.items = new() {
             ("Rename", Rename), ("Delete", Delete)
@@ -297,6 +300,34 @@ public class UVPresentViewItem : MonoBehaviour {
         controller.RefreshTileOverlayTexture();
         controller.RefreshUVMapper();
         controller.RefreshMeshes();
+
+    }
+
+    public void OnReceiverDrag() {
+
+        if (Main.draggingElement.TryGetComponent<UVPresentViewItem>(out var viewItem)) {
+
+            var indexOfItem = controller.currentUVPresets.presets.IndexOf(viewItem.preset);
+            var indexOfThis = controller.currentUVPresets.presets.IndexOf(preset);
+
+            controller.currentUVPresets.presets.Remove(viewItem.preset);
+
+            if (indexOfThis > indexOfItem) {
+
+                controller.currentUVPresets.presets.Insert(indexOfThis - 1, viewItem.preset);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+
+            }
+            else {
+
+                controller.currentUVPresets.presets.Insert(indexOfThis, viewItem.preset);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex());
+
+            }
+
+        }
 
     }
 
