@@ -119,7 +119,7 @@ public class TileEditPanel : MonoBehaviour {
 
             }
 
-            Presets.levelSchematics.Add(new Schematic(controller.selectedItems, "Level Schematic #" + Presets.levelSchematics.Count.ToString()));
+            Presets.levelSchematics.schematics.Add(new Schematic(controller.selectedItems, "Level Schematic #" + Presets.levelSchematics.schematics.Count.ToString()));
 
             QuickLogHandler.Log("Selection saved to level schematics", LogSeverity.Success);
 

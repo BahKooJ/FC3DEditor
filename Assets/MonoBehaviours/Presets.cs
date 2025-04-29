@@ -13,11 +13,10 @@ public abstract class Presets {
     public static UVPresets uvPresets = new UVPresets("Texture Presets", null);
     public static ShaderPresets shaderPresets = new ShaderPresets("Shader Presets", null);
     public static ColorPresets colorPresets = new ColorPresets("Color Presets", null);
-    public static List<Schematic> levelSchematics = new();
+    public static Schematics levelSchematics = new("Level Schematics", null);
     public static ActorSchematics actorSchematics = new("Actor Schematics", null);
 
     static List<char> numbers = new List<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-' };
-
 
     public static UVPresets ReadUVPresets(string fileName) {
 
@@ -1284,13 +1283,17 @@ public abstract class Presets {
 
         void ReadLevelSchematics() {
 
-            var startIndex = file.IndexOf(Schematic.tag);
+            var startIndex = file.IndexOf(Schematics.tag);
 
             if (startIndex == -1) {
                 return;
             }
 
-            levelSchematics.Clear();
+            var opened = new List<Schematics>();
+
+            var value = "";
+
+            var isReadingValue = false;
 
             var i = startIndex - 1;
 
@@ -1300,12 +1303,62 @@ public abstract class Presets {
 
                 var c = file[i];
 
-                if (c == '(') {
-                    levelSchematics.Add(ReadSchematicObject(file, i, out i));
+                // The only thing the value is really used for is names
+                // If it's ever used for something else this might have problems...
+                if (c == '\"') {
+                    isReadingValue = !isReadingValue;
+
+                    if (!isReadingValue) {
+
+                        opened.Last().directoryName = value;
+                        value = "";
+
+                    }
+
+                    // Continue because " is a keyword and can't be used for anything else
+                    continue;
                 }
 
-                if (c == '}') {
-                    return;
+                // If reading value all it cares is grabing the character
+                if (isReadingValue) {
+                    value += c;
+                    continue;
+                }
+
+                if (c == '(') {
+
+                    opened.Last().schematics.Add(ReadSchematicObject(file, i, out i));
+
+                }
+
+                // Opens or closes a subfolder.
+                if (c == '{') {
+
+                    opened.Add(new Schematics());
+
+                }
+                else if (c == '}') {
+
+                    var last = opened.Last();
+
+                    if (opened.Count() > 1) {
+
+                        // Needs to add itself to the parent
+                        var beforeLast = opened[opened.Count - 2];
+
+                        beforeLast.subFolders.Add(last);
+
+                        last.parent = beforeLast;
+
+                        opened.Remove(last);
+
+                    }
+                    else if (opened.Count() == 1) {
+                        // Finished
+                        levelSchematics = opened[0];
+                        return;
+                    }
+
                 }
 
             }
@@ -1417,18 +1470,7 @@ public abstract class Presets {
         total.Append(UVPresets.tag + uvPresets.Compile());
         total.Append(ShaderPresets.tag + shaderPresets.Compile());
         total.Append(ColorPresets.tag + colorPresets.Compile());
-
-        total.Append(Schematic.tag + "{[");
-
-        foreach (var schem in levelSchematics) {
-            total.Append(schem.Compile());
-            total.Append(",");
-        }
-
-        total.Remove(total.Length - 1, 1);
-
-        total.Append("]}");
-
+        total.Append(Schematics.tag + levelSchematics.Compile());
         total.Append(ActorSchematics.tag + actorSchematics.Compile());
 
         return total.ToString();

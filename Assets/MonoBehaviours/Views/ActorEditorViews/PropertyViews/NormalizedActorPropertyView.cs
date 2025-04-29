@@ -1,7 +1,6 @@
 ﻿
 
 using FCopParser;
-using System;
 using TMPro;
 
 public class NormalizedActorPropertyView : ActorPropertyItemView {

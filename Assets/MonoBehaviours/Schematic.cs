@@ -5,9 +5,90 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-public class Schematic {
+public class Schematics {
 
     public static string tag = "LVSMTAG";
+
+    public string directoryName;
+
+    public Schematics parent = null;
+    public List<Schematics> subFolders = new List<Schematics>();
+    public List<Schematic> schematics = new List<Schematic>();
+
+    public Schematics(string name, Schematics parent) {
+        this.directoryName = name;
+        this.parent = parent;
+    }
+
+    public Schematics() {
+        directoryName = "";
+    }
+
+    public string Compile() {
+
+        if (parent != null) { return ""; }
+
+        string SaveSchematic(List<Schematic> schematics) {
+
+            var total = new StringBuilder();
+
+            foreach (var schem in schematics) {
+
+                total.Append(schem.Compile());
+                total.Append(",");
+
+            }
+
+            // Removes the access comma
+            if (total.Length != 0) {
+                total.Remove(total.Length - 1, 1);
+            }
+
+            return total.ToString();
+
+        }
+
+        string SaveSchematics(Schematics schematics) {
+
+            var total = new StringBuilder();
+
+            total.Append("{\"");
+
+            total.Append(schematics.directoryName + "\",[");
+
+            total.Append(SaveSchematic(schematics.schematics));
+
+            total.Append("],[");
+
+            var comma = false;
+            foreach (var subPresets in schematics.subFolders) {
+
+                if (comma) {
+                    total.Append(",");
+                }
+
+                total.Append(SaveSchematics(subPresets));
+
+                comma = true;
+
+            }
+
+            total.Append("]}");
+
+            return total.ToString();
+
+        }
+
+        var total = SaveSchematics(this);
+
+        return total;
+
+    }
+
+}
+
+public class Schematic {
+
 
     public string name;
 

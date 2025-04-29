@@ -1,7 +1,4 @@
-﻿
-
-using FCopParser;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 
 public class UniversialMiniDataItemView : MonoBehaviour {

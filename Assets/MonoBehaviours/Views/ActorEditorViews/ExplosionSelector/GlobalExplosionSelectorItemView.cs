@@ -1,6 +1,4 @@
-﻿
-using FCopParser;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GlobalExplosionSelectorItemView : MonoBehaviour {
 

@@ -3,7 +3,6 @@ using FCopParser;
 using TMPro;
 using UnityEngine;
 using System.Linq;
-using System.Collections.Generic;
 
 public class ExplosionActorPropertyItemView : ActorPropertyItemView {
 

@@ -110,7 +110,7 @@ public class SchematicMeshItemView : MonoBehaviour {
 
         DialogWindowUtil.Dialog("Delete Leve Schematic", "Are you sure you would like to delete this level schematic? (This cannot be undone)", () => {
 
-            Presets.levelSchematics.Remove(schematic);
+            parentView.currentDirectory.schematics.Remove(schematic);
 
             parentView.RefreshView();
 
@@ -126,5 +126,60 @@ public class SchematicMeshItemView : MonoBehaviour {
         parentView.OnClickDone();
     }
 
+    public void ReceiveReorderLeft() {
+
+        if (Main.draggingElement.TryGetComponent<SchematicMeshItemView>(out var viewItem)) {
+
+            var indexOfItem = parentView.currentDirectory.schematics.IndexOf(viewItem.schematic);
+            var indexOfThis = parentView.currentDirectory.schematics.IndexOf(schematic);
+
+            parentView.currentDirectory.schematics.Remove(viewItem.schematic);
+
+            if (indexOfThis > indexOfItem) {
+
+                parentView.currentDirectory.schematics.Insert(indexOfThis - 1, viewItem.schematic);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+
+            }
+            else {
+
+                parentView.currentDirectory.schematics.Insert(indexOfThis, viewItem.schematic);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex());
+
+            }
+
+        }
+
+    }
+
+    public void ReceiveReorderRight() {
+
+        if (Main.draggingElement.TryGetComponent<SchematicMeshItemView>(out var viewItem)) {
+
+            var indexOfItem = parentView.currentDirectory.schematics.IndexOf(viewItem.schematic);
+            var indexOfThis = parentView.currentDirectory.schematics.IndexOf(schematic);
+
+            parentView.currentDirectory.schematics.Remove(viewItem.schematic);
+
+            if (indexOfThis > indexOfItem) {
+
+                parentView.currentDirectory.schematics.Insert(indexOfThis, viewItem.schematic);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex());
+
+            }
+            else {
+
+                parentView.currentDirectory.schematics.Insert(indexOfThis + 1, viewItem.schematic);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
+
+            }
+
+        }
+
+    }
 
 }

@@ -1,6 +1,4 @@
-﻿
-using UnityEngine;
-using TMPro;
+﻿using TMPro;
 using FCopParser;
 using System.Linq;
 using System.Collections.Generic;

@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class FolderActorSchematicItemView : MonoBehaviour {
+public class FolderSchematicItemView : MonoBehaviour {
 
     // - Unity Asset Refs -
     public Sprite backArrowSprite;
@@ -14,16 +14,16 @@ public class FolderActorSchematicItemView : MonoBehaviour {
     public TextFieldPopupHandler textFieldPopupHandler;
 
     // - Parameters -
-    public ActorEditMode controller;
-    public ActorSchematics actorSchematics;
+    public TileAddMode controller;
+    public Schematics schematics;
     [HideInInspector]
-    public ActorSchematicView view;
+    public SchematicMeshPresetsView view;
     [HideInInspector]
     public bool isBack = false;
 
     private void Start() {
 
-        infoBoxHandler.message = actorSchematics.directoryName;
+        infoBoxHandler.message = schematics.directoryName;
 
         contextMenu.items = new() {
             ("Rename", Rename), ("Delete", Delete)
@@ -31,9 +31,9 @@ public class FolderActorSchematicItemView : MonoBehaviour {
 
         textFieldPopupHandler.finishCallback = text => {
 
-            actorSchematics.directoryName = text;
+            schematics.directoryName = text;
 
-            infoBoxHandler.message = actorSchematics.directoryName;
+            infoBoxHandler.message = schematics.directoryName;
 
         };
 
@@ -45,7 +45,7 @@ public class FolderActorSchematicItemView : MonoBehaviour {
 
     void Rename() {
 
-        textFieldPopupHandler.OpenPopupTextField(actorSchematics.directoryName);
+        textFieldPopupHandler.OpenPopupTextField(schematics.directoryName);
 
     }
 
@@ -54,29 +54,29 @@ public class FolderActorSchematicItemView : MonoBehaviour {
         DialogWindowUtil.Dialog("Delete Actor Schematic Folder", "Are you sure you would like to delete this actor schematic? " +
             "This will delete all schematics inside this folder. This cannot be undone.", () => {
 
-            view.currentDirectory.subFolders.Remove(actorSchematics);
+                view.currentDirectory.subFolders.Remove(schematics);
 
-            view.RefreshView();
+                view.RefreshView();
 
-            return true;
-        });
+                return true;
+            });
 
     }
 
     // - Unity Callbacks -
     public void OnClick() {
 
-        view.SwitchDirectory(actorSchematics);
+        view.SwitchDirectory(schematics);
 
     }
 
     public void ReceiveDrag() {
 
-        if (Main.draggingElement.TryGetComponent<ActorSchematicItemView>(out var viewItem)) {
+        if (Main.draggingElement.TryGetComponent<SchematicMeshItemView>(out var viewItem)) {
 
-            view.currentDirectory.schematics.Remove(viewItem.actorSchematic);
+            view.currentDirectory.schematics.Remove(viewItem.schematic);
 
-            actorSchematics.schematics.Add(viewItem.actorSchematic);
+            schematics.schematics.Add(viewItem.schematic);
 
             Destroy(viewItem.gameObject);
 

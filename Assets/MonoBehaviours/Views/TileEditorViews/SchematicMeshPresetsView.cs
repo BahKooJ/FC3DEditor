@@ -8,6 +8,7 @@ public class SchematicMeshPresetsView : MonoBehaviour {
 
     // - View Prefab -
     public GameObject SchematicItem;
+    public GameObject FolderItem;
 
     // - View Refs -
     public Transform listContent;
@@ -16,13 +17,34 @@ public class SchematicMeshPresetsView : MonoBehaviour {
 
     // - Parameters -
     public TileAddMode controller;
+    [HideInInspector]
     public TileAddPanel view;
 
-    public List<SchematicMeshItemView> schematicListItems = new();
+    public Schematics currentDirectory;
+    List<GameObject> listGameObjects = new();
 
     void Start() {
 
+        currentDirectory = Presets.levelSchematics;
+
         RefreshView();
+
+    }
+
+    FolderSchematicItemView CreateFolderItem(Schematics folder) {
+
+        var obj = Instantiate(FolderItem);
+        obj.transform.SetParent(listContent, false);
+        obj.SetActive(true);
+
+        listGameObjects.Add(obj);
+
+        var view = obj.GetComponent<FolderSchematicItemView>();
+        view.controller = controller;
+        view.schematics = folder;
+        view.view = this;
+
+        return view;
 
     }
 
@@ -30,7 +52,18 @@ public class SchematicMeshPresetsView : MonoBehaviour {
 
         Clear();
 
-        foreach (var scem in Presets.levelSchematics) {
+        if (currentDirectory.parent != null) {
+            var folder = CreateFolderItem(currentDirectory.parent);
+            folder.isBack = true;
+        }
+
+        foreach (var folder in currentDirectory.subFolders) {
+
+            CreateFolderItem(folder);
+
+        }
+
+        foreach (var scem in currentDirectory.schematics) {
 
             var obj = Instantiate(SchematicItem);
             obj.transform.SetParent(listContent, false);
@@ -42,7 +75,7 @@ public class SchematicMeshPresetsView : MonoBehaviour {
             item.controller = controller;
             item.schematic = scem;
 
-            schematicListItems.Add(item);
+            listGameObjects.Add(obj);
 
         }
 
@@ -53,11 +86,18 @@ public class SchematicMeshPresetsView : MonoBehaviour {
 
     void Clear() {
 
-        foreach (var item in schematicListItems) {
+        foreach (var item in listGameObjects) {
             Destroy(item.gameObject);
         }
 
-        schematicListItems.Clear();
+        listGameObjects.Clear();
+
+    }
+
+    public void SwitchDirectory(Schematics folder) {
+
+        currentDirectory = folder;
+        RefreshView();
 
     }
 
@@ -79,6 +119,16 @@ public class SchematicMeshPresetsView : MonoBehaviour {
             controller.schematicBuildOverlay.RefreshMesh();
 
         }
+
+    }
+
+    public void OnClickAddFolder() {
+
+        var newFolder = new Schematics("Folder", currentDirectory);
+
+        currentDirectory.subFolders.Add(newFolder);
+
+        CreateFolderItem(newFolder);
 
     }
 
