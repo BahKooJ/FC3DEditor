@@ -157,7 +157,7 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
         }
 
         script.compiledBytes = total;
-        script.Refresh();
+        //script.Refresh();
         Init();
 
     }
