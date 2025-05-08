@@ -20,24 +20,12 @@ namespace FCopParser {
 
             bytes = rawFile.data;
 
-            var currentLine = new List<byte>();
-
-            var offset = 0;
             var i = 0;
-            foreach (var b in rawFile.data) {
+            while (i < bytes.Count) {
 
-                currentLine.Add(b);
-
-                i++;
-
-                if (b == 0) {
-
-                    code.Add(offset, new FCopScript(offset, new List<byte>(currentLine)));
-
-                    currentLine.Clear();
-
-                    offset = i;
-                }
+                var script = new FCopScript(i, bytes);
+                code[i] = script;
+                i = script.terminationOffset;
 
             }
 

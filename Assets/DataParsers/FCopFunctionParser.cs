@@ -46,31 +46,12 @@ namespace FCopParser {
             // Add 12 to move past the tEXT header
             offset += 12;
 
-            List<byte> GetLine(int offset) {
-
-                var itoffset = offset;
-                var total = new List<byte>();
-
-                while (true) {
-
-                    total.Add(rawFile.data[itoffset]);
-
-                    if (rawFile.data[itoffset] == 0) {
-                        break;
-                    }
-
-                    itoffset++;
-                }
-
-                return total;
-
-            }
-
+            var codeBytes = rawFile.data.GetRange(offset, rawFile.data.Count - offset);
 
             foreach (var item in functions) {
 
-                item.runCondition = new FCopScript(item.line1Offset, GetLine(offset + item.line1Offset));
-                item.code = new FCopScript(item.line2Offset, GetLine(offset + item.line2Offset));
+                item.runCondition = new FCopScript(item.line1Offset, codeBytes);
+                item.code = new FCopScript(item.line2Offset, codeBytes);
 
             }
 

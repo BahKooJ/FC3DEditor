@@ -22,7 +22,7 @@ public class ExpressionNodeView : MonoBehaviour {
     public Image backgroundImage;
 
     // - Parameters -
-    public FCopScript.ScriptNode scriptNode;
+    public ScriptNode scriptNode;
 
     public List<ExpressionNodeView> expressionNodes;
 
@@ -34,11 +34,10 @@ public class ExpressionNodeView : MonoBehaviour {
             padObj.SetActive(true);
         }
 
-        void CreateNode(FCopScript.ScriptNode nestedExpressions) {
+        void CreateNode(ScriptNode nestedExpressions) {
 
             var nodeObj = Instantiate(expressionNodePrefab);
             nodeObj.transform.SetParent(transform, false);
-
 
             var node = nodeObj.GetComponent<ExpressionNodeView>();
             node.scriptNode = nestedExpressions;
@@ -51,71 +50,29 @@ public class ExpressionNodeView : MonoBehaviour {
 
         }
 
-        if (scriptNode is FCopScript.ExpressionNode eNode) {
-
-            var metaData = FCopScript.operatorMetaData[eNode.operationType];
-
-            if (metaData.leftRightOperation) {
-
-                if (metaData.parameterCount != 2) {
-                    Debug.LogError(eNode.operationType.ToString() + " left right operator with a parameter count of " + metaData.parameterCount.ToString() + "?");
-                }
-
-                CreateNode(scriptNode.nestedExpressiveNodes[0]);
-
-                Pad();
-
-                expressionText.text = metaData.topLevelOperatorString;
-                expressionText.transform.SetSiblingIndex(transform.childCount - 1);
-
-                Pad();
-
-                CreateNode(scriptNode.nestedExpressiveNodes[1]);
-
-            }
-            else {
-
-                expressionText.text = metaData.topLevelName;
-
-                foreach (var nestedExpressions in scriptNode.nestedExpressiveNodes) {
-
-                    Pad();
-
-                    CreateNode(nestedExpressions);
-
-                }
-
-            }
-
-            backgroundImage.color = expressionColor;
-
-        }
-        else if (scriptNode is FCopScript.LiteralNode lNode) {
+        if (scriptNode is LiteralNode lNode) {
 
             expressionText.text = lNode.value.ToString();
 
             backgroundImage.color = literalColor;
 
         }
-        else if (scriptNode is FCopScript.VariableNode vNode) {
-
-            expressionText.text = "var" + vNode.varID.ToString();
-
-            backgroundImage.color = varColor;
-
-        }
-        else if (scriptNode is FCopScript.ActorRefNode aNode) {
-
-            expressionText.text = "Actor" + aNode.actorID.ToString();
-
-            backgroundImage.color = varColor;
-
-        }
         else {
 
-            Debug.LogError("Nested expression " + scriptNode.GetType().ToString() + " does not return value!");
+            expressionText.text = scriptNode.name;
+
+            foreach (var nestedExpressions in scriptNode.parameters) {
+
+                Pad();
+
+                CreateNode(nestedExpressions);
+
+            }
+
+            backgroundImage.color = expressionColor;
 
         }
+
 
         endBracket.transform.SetSiblingIndex(transform.childCount - 1);
 

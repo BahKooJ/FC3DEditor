@@ -2,6 +2,7 @@
 
 using FCopParser;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class VisualScriptingFuncWindowView : MonoBehaviour {
@@ -14,6 +15,9 @@ public class VisualScriptingFuncWindowView : MonoBehaviour {
     public GameObject thickSeparatorPrefab;
     public GameObject runConditionHeaderPrefab;
     public GameObject codeHeaderPrefab;
+
+    // - Unity Refs -
+    public TMP_InputField debugInput;
 
     // - Parameters -
     public FCopFunction func;
@@ -34,10 +38,17 @@ public class VisualScriptingFuncWindowView : MonoBehaviour {
         InitFuncData();
         InitUIGameObject(thickSeparatorPrefab);
         InitUIGameObject(runConditionHeaderPrefab);
-        InitCode(func.runCondition.scriptNodes, conditionalLines);
+        InitCode(func.runCondition.code, conditionalLines);
         InitUIGameObject(thickSeparatorPrefab);
         InitUIGameObject(codeHeaderPrefab);
-        InitCode(func.code.scriptNodes, codeLines);
+        InitCode(func.code.code, codeLines);
+
+        refuseCallback = true;
+        debugInput.text = "";
+        foreach (var b in func.code.compiledBytes) {
+            debugInput.text += b.ToString() + " ";
+        }
+        refuseCallback = false;
 
     }
 
@@ -69,7 +80,7 @@ public class VisualScriptingFuncWindowView : MonoBehaviour {
 
     }
 
-    void InitCode(List<FCopScript.ScriptNode> script, List<VisualScriptingLineView> lines) {
+    void InitCode(List<ScriptNode> script, List<VisualScriptingLineView> lines) {
 
         var i = 1;
 
@@ -100,7 +111,7 @@ public class VisualScriptingFuncWindowView : MonoBehaviour {
 
         }
 
-        void AddLines(List<FCopScript.ScriptNode> nodes) {
+        void AddLines(List<ScriptNode> nodes) {
 
             foreach (var node in nodes) {
 
@@ -112,35 +123,28 @@ public class VisualScriptingFuncWindowView : MonoBehaviour {
                 line.number = i;
                 i++;
 
-                if (node is FCopScript.StatementNode statementNode) {
+                var visualNodeObj = Instantiate(statementNodePrefab);
 
-                    var visualNodeObj = Instantiate(statementNodePrefab);
+                visualNodeObj.transform.SetParent(line.lineContent, false);
 
-                    visualNodeObj.transform.SetParent(line.lineContent, false);
+                var pos = ((RectTransform)visualNodeObj.transform).anchoredPosition;
 
-                    var pos = ((RectTransform)visualNodeObj.transform).anchoredPosition;
+                pos.x += nestCount * 24;
 
-                    pos.x += nestCount * 24;
+                ((RectTransform)visualNodeObj.transform).anchoredPosition = pos;
 
-                    ((RectTransform)visualNodeObj.transform).anchoredPosition = pos;
+                var visualNode = visualNodeObj.GetComponent<StatementNodeView>();
 
-                    var visualNode = visualNodeObj.GetComponent<StatementNodeView>();
+                visualNode.scriptNode = node;
+                line.scriptNodes.Add(visualNodeObj);
 
-                    visualNode.scriptNode = statementNode;
-                    line.scriptNodes.Add(visualNodeObj);
+                if (node.nestedNodes.Count > 0) {
 
-                    if (node.nestedNodes.Count > 0) {
+                    nestCount++;
+                    AddLines(node.nestedNodes);
+                    nestCount--;
+                    AddEndBracket();
 
-                        nestCount++;
-                        AddLines(node.nestedNodes);
-                        nestCount--;
-                        AddEndBracket();
-
-                    }
-
-                }
-                else {
-                    Debug.LogError("what?");
                 }
 
                 lines.Add(line);
@@ -167,6 +171,38 @@ public class VisualScriptingFuncWindowView : MonoBehaviour {
         var obj = Instantiate(prefab);
         obj.transform.SetParent(transform, false);
         uiFillerObjects.Add(obj);
+
+    }
+
+    bool refuseCallback = false;
+    public void OnFinishDebugType() {
+
+        if (refuseCallback) return;
+
+        var total = new List<byte>();
+
+        var value = "";
+
+        foreach (var c in debugInput.text) {
+
+            if (c == ' ') {
+
+                total.Add(byte.Parse(value));
+                value = "";
+                continue;
+            }
+
+            value += c;
+
+        }
+        if (value != "") {
+
+            total.Add(byte.Parse(value));
+
+        }
+
+        func.code.compiledBytes = total;
+        Init();
 
     }
 

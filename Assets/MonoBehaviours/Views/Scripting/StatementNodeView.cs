@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class StatementNodeView : MonoBehaviour {
 
-    static List<FCopScript.Instruction> keyWords = new() { FCopScript.Instruction.ConditionalJump, FCopScript.Instruction.Jump };
+    static List<ByteCode> keyWords = new() { ByteCode.CONDITIONAL_JUMP, ByteCode.JUMP };
     static Color keyWordColor = new Color(0x65 / 255f, 0x19 / 255f, 0x5E / 255f);
 
     // - Unity Prefabs -
@@ -20,13 +20,11 @@ public class StatementNodeView : MonoBehaviour {
     public Image backgroundImage;
 
     // - Parameters -
-    public FCopScript.StatementNode scriptNode;
+    public ScriptNode scriptNode;
 
     public List<ExpressionNodeView> expressionNodes;
 
     private void Start() {
-
-        var metadata = FCopScript.instructionMetaData[scriptNode.instruction];
 
         void Pad() {
             var padObj = Instantiate(paddingPrefab);
@@ -34,7 +32,7 @@ public class StatementNodeView : MonoBehaviour {
             padObj.SetActive(true);
         }
 
-        void CreateNode(FCopScript.ScriptNode nestedExpressions) {
+        void CreateNode(ScriptNode nestedExpressions) {
 
             var nodeObj = Instantiate(expressionNodePrefab);
             nodeObj.transform.SetParent(transform, false);
@@ -53,48 +51,14 @@ public class StatementNodeView : MonoBehaviour {
 
         }
 
-        if (metadata.leftRightOperation) {
 
-            var order = new List<int>() { 0, 1 };
+        statementText.text = scriptNode.name;
 
-            if (metadata.topLevelReverseleftRightOperation) {
-                order = new List<int>() { 1, 0 };
-            }
-
-            if (metadata.parameterCount != 2) {
-                Debug.LogError(scriptNode.instruction.ToString() + " left right operator with a parameter count of " + metadata.parameterCount.ToString() + "?");
-            }
-
-            CreateNode(scriptNode.nestedExpressiveNodes[order[0]]);
+        foreach (var parameter in scriptNode.parameters) {
 
             Pad();
 
-            statementText.text = metadata.topLevelOperatorString;
-            statementText.transform.SetSiblingIndex(transform.childCount - 1);
-
-            Pad();
-
-            CreateNode(scriptNode.nestedExpressiveNodes[order[1]]);
-
-        }
-        else if (metadata.topLevelOperatorString != "" && metadata.parameterCount == 1) {
-
-            CreateNode(scriptNode.nestedExpressiveNodes[0]);
-
-            statementText.text = metadata.topLevelOperatorString;
-            statementText.transform.SetSiblingIndex(transform.childCount - 1);
-        }
-        else {
-
-            statementText.text = metadata.topLevelName;
-
-            foreach (var nestedExpressions in scriptNode.nestedExpressiveNodes) {
-
-                Pad();
-
-                CreateNode(nestedExpressions);
-
-            }
+            CreateNode(parameter);
 
         }
 
@@ -106,7 +70,7 @@ public class StatementNodeView : MonoBehaviour {
             endBracket.transform.SetSiblingIndex(transform.childCount - 1);
         }
 
-        if (keyWords.Contains(scriptNode.instruction)) {
+        if (keyWords.Contains(scriptNode.byteCode)) {
             backgroundImage.color = keyWordColor;
         }
 

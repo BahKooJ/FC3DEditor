@@ -89,28 +89,7 @@ public class ScriptingPanelView : MonoBehaviour {
 
         var script = level.scripting.rpns.code[id];
 
-        try {
-            if (script.failed) {
-                //script.failed = false;
-                script.Disassemble(script.compiledBytes);
-                script.DeCompile();
-            }
-        }
-        catch (Exception e) {
-
-            var error = "";
-
-            foreach (var b in script.compiledBytes) {
-                error += b.ToString() + " ";
-            }
-            error += "\n";
-
-            Debug.Log(error);
-            throw e;
-
-        }
-
-        funcScriptingWindow.Clear();
+        //funcScriptingWindow.Clear();
 
         scriptingWindow.script = script;
         scriptingWindow.Init();
@@ -119,31 +98,10 @@ public class ScriptingPanelView : MonoBehaviour {
 
     public void SelectFunc(FCopFunction func) {
 
-        try {
-            if (func.code.failed) {
-                //script.failed = false;
-                func.code.Disassemble(func.code.compiledBytes);
-                func.code.DeCompile();
-            }
-        }
-        catch (Exception e) {
-
-            var error = "";
-
-            foreach (var b in func.code.compiledBytes) {
-                error += b.ToString() + " ";
-            }
-            error += "\n";
-
-            Debug.Log(error);
-            throw e;
-
-        }
-
         scriptingWindow.Clear();
 
-        funcScriptingWindow.func = func;
-        funcScriptingWindow.Init();
+        scriptingWindow.script = func.code;
+        scriptingWindow.Init();
 
     }
 

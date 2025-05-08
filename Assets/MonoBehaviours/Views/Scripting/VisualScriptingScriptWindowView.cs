@@ -15,6 +15,7 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
 
     // - Unity Refs -
     public TMP_InputField debugInput;
+    public Transform codeScrollView;
 
     // - Parameters -
     public FCopScript script;
@@ -37,7 +38,7 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
 
             var lineObj = Instantiate(linePrefab);
 
-            lineObj.transform.SetParent(transform, false);
+            lineObj.transform.SetParent(codeScrollView, false);
 
             var line = lineObj.GetComponent<VisualScriptingLineView>();
             line.number = i;
@@ -58,47 +59,40 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
 
         }
 
-        void AddLines(List<FCopScript.ScriptNode> nodes) {
+        void AddLines(List<ScriptNode> nodes) {
 
             foreach (var node in nodes) {
 
                 var lineObj = Instantiate(linePrefab);
 
-                lineObj.transform.SetParent(transform, false);
+                lineObj.transform.SetParent(codeScrollView, false);
 
                 var line = lineObj.GetComponent<VisualScriptingLineView>();
                 line.number = i;
                 i++;
 
-                if (node is FCopScript.StatementNode statementNode) {
+                var visualNodeObj = Instantiate(statementNodePrefab);
 
-                    var visualNodeObj = Instantiate(statementNodePrefab);
+                visualNodeObj.transform.SetParent(line.lineContent, false);
 
-                    visualNodeObj.transform.SetParent(line.lineContent, false);
+                var pos = ((RectTransform)visualNodeObj.transform).anchoredPosition;
 
-                    var pos = ((RectTransform)visualNodeObj.transform).anchoredPosition;
+                pos.x += nestCount * 24;
 
-                    pos.x += nestCount * 24;
+                ((RectTransform)visualNodeObj.transform).anchoredPosition = pos;
 
-                    ((RectTransform)visualNodeObj.transform).anchoredPosition = pos;
+                var visualNode = visualNodeObj.GetComponent<StatementNodeView>();
 
-                    var visualNode = visualNodeObj.GetComponent<StatementNodeView>();
+                visualNode.scriptNode = node;
+                line.scriptNodes.Add(visualNodeObj);
 
-                    visualNode.scriptNode = statementNode;
-                    line.scriptNodes.Add(visualNodeObj);
-                    
-                    if (node.nestedNodes.Count > 0) {
+                if (node.nestedNodes.Count > 0) {
 
-                        nestCount++;
-                        AddLines(node.nestedNodes);
-                        nestCount--;
-                        AddEndBracket();
+                    nestCount++;
+                    AddLines(node.nestedNodes);
+                    nestCount--;
+                    AddEndBracket();
 
-                    }
-
-                }
-                else {
-                    Debug.LogError("what?");
                 }
 
                 lines.Add(line);
@@ -108,7 +102,7 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
 
         }
 
-        AddLines(script.scriptNodes);
+        AddLines(script.code);
 
         refuseCallback = true;
         debugInput.text = "";
@@ -157,7 +151,7 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
         }
 
         script.compiledBytes = total;
-        //script.Refresh();
+        script.Refresh();
         Init();
 
     }
