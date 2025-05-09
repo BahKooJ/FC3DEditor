@@ -338,12 +338,7 @@ public class ActorEditMode : EditMode {
 
             var actors = main.level.sceneActors.actors.Where(a => {
 
-                //return a.behavior is FCopShooter e;
-
-                if (a.behavior is FCopShooter es) {
-                    return es.propertiesByName["Weapon ID"].GetCompiledValue() == 14;
-                }
-                return false;
+                return a.rawFile.rpnsReferences.Contains(1616);
 
             }).ToList();
 

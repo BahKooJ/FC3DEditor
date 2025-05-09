@@ -462,6 +462,8 @@ namespace FCopParser {
 
             UpdateRPNSOffsets();
 
+            scripting.ResetIDAndOffsets();
+
             newFileManager.files.Add(audio.CompileSoundHeader());
 
             foreach (var wav in audio.soundEffects) {
@@ -543,8 +545,6 @@ namespace FCopParser {
                 var rawFile = new IFFDataFile(2, bytes, "Ctil", group.Key, scripting.emptyOffset);
                 newFileManager.files.Add(rawFile);
             }
-
-            scripting.ResetIDAndOffsets();
 
             var floatingFiles = fileManager.files.Where(file => !dataAccountedFor.Contains(file.dataFourCC));
 

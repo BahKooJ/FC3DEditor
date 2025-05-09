@@ -79,9 +79,9 @@ namespace FCopParser {
 
         public static Dictionary<ByteCode, int> maxArgumentsByCode = new() {
 
-            { ByteCode.BYTE11, 1 },
-            { ByteCode.BYTE12, 1 },
-            { ByteCode.BYTE13, 1 },
+            { ByteCode.RANDOM, 1 },
+            { ByteCode.QUEUE_STREAM, 1 },
+            { ByteCode.PLAY_STREAM, 1 },
             { ByteCode.BYTE14, 1 },
             { ByteCode.BYTE15, 1 },
             { ByteCode.GET_16, 1 },
@@ -122,14 +122,14 @@ namespace FCopParser {
 
         public static Dictionary<ScriptDataKey, ScriptOperationData> scriptNodeData = new() {
 
-            { new ScriptDataKey(ByteCode.BYTE11, 1),
-                new ScriptOperationData("11", ScriptDataType.Int, false, new() { new ScriptParameter("Par0", ScriptDataType.Int) })
+            { new ScriptDataKey(ByteCode.RANDOM, 1),
+                new ScriptOperationData("Random", ScriptDataType.Int, false, new() { new ScriptParameter("Range", ScriptDataType.Int) })
             },
-            { new ScriptDataKey(ByteCode.BYTE12, 1),
-                new ScriptOperationData("12", ScriptDataType.Void, false, new() { new ScriptParameter("Par0", ScriptDataType.Int) })
+            { new ScriptDataKey(ByteCode.QUEUE_STREAM, 1),
+                new ScriptOperationData("Queue Stream", ScriptDataType.Void, false, new() { new ScriptParameter("Par0", ScriptDataType.Int) })
             },
-            { new ScriptDataKey(ByteCode.BYTE13, 1),
-                new ScriptOperationData("13", ScriptDataType.Void, false, new() { new ScriptParameter("Par0", ScriptDataType.Int) })
+            { new ScriptDataKey(ByteCode.PLAY_STREAM, 1),
+                new ScriptOperationData("Play Stream", ScriptDataType.Void, false, new() { new ScriptParameter("Par0", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.BYTE14, 1),
                 new ScriptOperationData("14", ScriptDataType.Void, false, new() { new ScriptParameter("Par0", ScriptDataType.Int) })
@@ -175,6 +175,9 @@ namespace FCopParser {
             },
             { new ScriptDataKey(ByteCode.BYTE31, 2),
                 new ScriptOperationData("31", ScriptDataType.Void, false, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int) })
+            },
+            { new ScriptDataKey(ByteCode.BYTE31, 1),
+                new ScriptOperationData("31 Temp Debug 1", ScriptDataType.Void, false, new() { new ScriptParameter("Par0", ScriptDataType.Int)})
             },
             { new ScriptDataKey(ByteCode.SET_19, 2),
                 new ScriptOperationData("=(19)", ScriptDataType.Void, false, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int) })
@@ -423,7 +426,7 @@ namespace FCopParser {
                         throw new Exception();
                     }
 
-                    AddScriptingNode(new LiteralNode(b), 1, true);
+                    AddScriptingNode(new LiteralNode(b - 128), 1, true);
 
                 }
 
@@ -463,9 +466,9 @@ namespace FCopParser {
         BIT_SHIFT_RIGHT = 2,
         LITERAL_16 = 3,
         JUMP = 8,
-        BYTE11 = 11,
-        BYTE12 = 12,
-        BYTE13 = 13,
+        RANDOM = 11,
+        QUEUE_STREAM = 12,
+        PLAY_STREAM = 13,
         BYTE14 = 14,
         BYTE15 = 15,
         GET_16 = 16,
