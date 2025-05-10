@@ -101,6 +101,7 @@ public class ScriptingPanelView : MonoBehaviour {
         scriptingWindow.Clear();
 
         scriptingWindow.script = func.code;
+        scriptingWindow.script.code.AddRange(func.runCondition.code);
         scriptingWindow.Init();
 
     }

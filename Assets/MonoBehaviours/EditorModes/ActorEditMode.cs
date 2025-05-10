@@ -338,7 +338,7 @@ public class ActorEditMode : EditMode {
 
             var actors = main.level.sceneActors.actors.Where(a => {
 
-                return a.rawFile.rpnsReferences.Contains(1616);
+                return a.rawFile.rpnsReferences.Contains(1861);
 
             }).ToList();
 
