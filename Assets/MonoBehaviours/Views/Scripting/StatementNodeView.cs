@@ -32,13 +32,13 @@ public class StatementNodeView : MonoBehaviour {
             padObj.SetActive(true);
         }
 
-        void CreateNode(ScriptNode nestedExpressions) {
+        void CreateNode(ParameterNode parameter) {
 
             var nodeObj = Instantiate(expressionNodePrefab);
             nodeObj.transform.SetParent(transform, false);
 
             var node = nodeObj.GetComponent<ExpressionNodeView>();
-            node.scriptNode = nestedExpressions;
+            node.parameterNode = parameter;
 
             expressionNodes.Add(node);
 
@@ -54,7 +54,7 @@ public class StatementNodeView : MonoBehaviour {
 
         statementText.text = scriptNode.name;
 
-        foreach (var parameter in scriptNode.parameters) {
+        foreach (var parameter in scriptNode.GetParameters()) {
 
             Pad();
 

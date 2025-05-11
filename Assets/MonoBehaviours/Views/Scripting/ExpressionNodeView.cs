@@ -22,7 +22,7 @@ public class ExpressionNodeView : MonoBehaviour {
     public Image backgroundImage;
 
     // - Parameters -
-    public ScriptNode scriptNode;
+    public ParameterNode parameterNode;
 
     public List<ExpressionNodeView> expressionNodes;
 
@@ -34,13 +34,13 @@ public class ExpressionNodeView : MonoBehaviour {
             padObj.SetActive(true);
         }
 
-        void CreateNode(ScriptNode nestedExpressions) {
+        void CreateNode(ParameterNode parameter) {
 
             var nodeObj = Instantiate(expressionNodePrefab);
             nodeObj.transform.SetParent(transform, false);
 
             var node = nodeObj.GetComponent<ExpressionNodeView>();
-            node.scriptNode = nestedExpressions;
+            node.parameterNode = parameter;
 
             expressionNodes.Add(node);
 
@@ -50,29 +50,52 @@ public class ExpressionNodeView : MonoBehaviour {
 
         }
 
-        if (scriptNode is LiteralNode lNode) {
+        if (parameterNode.parameterName != "") {
+            expressionText.text = parameterNode.parameterName + ": ";
+        }
+        else {
+            expressionText.text = "";
+        }
 
-            expressionText.text = lNode.value.ToString();
+        if (parameterNode.scriptNode is LiteralNode lNode) {
+
+            expressionText.text += lNode.value.ToString();
 
             backgroundImage.color = literalColor;
 
         }
+        else if (parameterNode.scriptNode is DoubleOperator doubleOperator) {
+
+            expressionText.text += parameterNode.scriptNode.name;
+
+            var parameters = parameterNode.scriptNode.GetParameters();
+
+            CreateNode(parameters[0]);
+
+            Pad();
+
+            expressionText.transform.SetSiblingIndex(transform.childCount - 1);
+
+            Pad();
+
+            CreateNode(parameters[1]);
+
+        }
         else {
 
-            expressionText.text = scriptNode.name;
+            expressionText.text += parameterNode.scriptNode.name;
 
-            foreach (var nestedExpressions in scriptNode.parameters) {
+            foreach (var parameters in parameterNode.scriptNode.GetParameters()) {
 
                 Pad();
 
-                CreateNode(nestedExpressions);
+                CreateNode(parameters);
 
             }
 
             backgroundImage.color = expressionColor;
 
         }
-
 
         endBracket.transform.SetSiblingIndex(transform.childCount - 1);
 

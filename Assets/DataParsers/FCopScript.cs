@@ -112,8 +112,9 @@ namespace FCopParser {
             { ByteCode.OR, 2 },
             { ByteCode.BYTE47, 2 },
             { ByteCode.ADD_16_SET, 2 },
-            { ByteCode.BYTE51, 2 },
+            { ByteCode.ADD_19_SET, 2 },
             { ByteCode.SUB_16_SET, 2 },
+            { ByteCode.SUB_19_SET, 2 },
             { ByteCode.Destroy, 3 },
             { ByteCode.BYTE57, 3 },
             { ByteCode.BYTE58, 3 },
@@ -130,10 +131,10 @@ namespace FCopParser {
                 new ScriptOperationData("Random", ScriptDataType.Int, new() { new ScriptParameter("Range", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.QUEUE_STREAM, 1),
-                new ScriptOperationData("Queue Stream", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int) })
+                new ScriptOperationData("Queue Stream", ScriptDataType.Void, new() { new ScriptParameter("Stream Index", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.PLAY_STREAM, 1),
-                new ScriptOperationData("Play Stream", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int) })
+                new ScriptOperationData("Play Stream", ScriptDataType.Void, new() { new ScriptParameter("Stream Index", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.BYTE14, 1),
                 new ScriptOperationData("14", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int) })
@@ -160,16 +161,16 @@ namespace FCopParser {
                 new ScriptOperationData("If (True)", ScriptDataType.Void, new())
             },
             { new ScriptDataKey(ByteCode.INCREMENT_16, 1),
-                new ScriptOperationData("++(16)", ScriptDataType.Void, new() { new ScriptParameter("Left", ScriptDataType.Int) })
+                new ScriptOperationData("++(16)", ScriptDataType.Void, new() { new ScriptParameter("Var ID", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.INCREMENT_19, 1),
-                new ScriptOperationData("++(19)", ScriptDataType.Void, new() { new ScriptParameter("Left", ScriptDataType.Int) })
+                new ScriptOperationData("++(19)", ScriptDataType.Void, new() { new ScriptParameter("Var ID", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.DECREMENT_16, 1),
-                new ScriptOperationData("--(16)", ScriptDataType.Void, new() { new ScriptParameter("Left", ScriptDataType.Int) })
+                new ScriptOperationData("--(16)", ScriptDataType.Void, new() { new ScriptParameter("Var ID", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.DECREMENT_19, 1),
-                new ScriptOperationData("--(19)", ScriptDataType.Void, new() { new ScriptParameter("Left", ScriptDataType.Int) })
+                new ScriptOperationData("--(19)", ScriptDataType.Void, new() { new ScriptParameter("Var ID", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.SET_16, 2),
                 new ScriptOperationData("=(16)", ScriptDataType.Void, new() { new ScriptParameter("Value", ScriptDataType.Int), new ScriptParameter("Var ID", ScriptDataType.Int) })
@@ -232,13 +233,16 @@ namespace FCopParser {
                 new ScriptOperationData("47", ScriptDataType.Int, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.ADD_16_SET, 2),
-                new ScriptOperationData("+=(16)", ScriptDataType.Void, new() { new ScriptParameter("Left", ScriptDataType.Int), new ScriptParameter("Right", ScriptDataType.Int) })
+                new ScriptOperationData("+=(16)", ScriptDataType.Void, new() { new ScriptParameter("Value", ScriptDataType.Int), new ScriptParameter("Var ID", ScriptDataType.Int) })
             },
-            { new ScriptDataKey(ByteCode.BYTE51, 2),
-                new ScriptOperationData("51", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int) })
+            { new ScriptDataKey(ByteCode.ADD_19_SET, 2),
+                new ScriptOperationData("+=(19)", ScriptDataType.Void, new() { new ScriptParameter("Value", ScriptDataType.Int), new ScriptParameter("Var ID", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.SUB_16_SET, 2),
-                new ScriptOperationData("-=(16)", ScriptDataType.Void, new() { new ScriptParameter("Left", ScriptDataType.Int), new ScriptParameter("Right", ScriptDataType.Int) })
+                new ScriptOperationData("-=(16)", ScriptDataType.Void, new() { new ScriptParameter("Value", ScriptDataType.Int), new ScriptParameter("Var ID", ScriptDataType.Int) })
+            },
+            { new ScriptDataKey(ByteCode.SUB_19_SET, 2),
+                new ScriptOperationData("-=(19)", ScriptDataType.Void, new() { new ScriptParameter("Value", ScriptDataType.Int), new ScriptParameter("Var ID", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.Destroy, 3),
                 new ScriptOperationData("56", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
@@ -265,6 +269,29 @@ namespace FCopParser {
                 new ScriptOperationData("62", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
             },
 
+        };
+
+        public static List<ByteCode> doubleOperators = new() {
+            ByteCode.SET_16,
+            ByteCode.SET_18,
+            ByteCode.SET_19,
+            ByteCode.EQUAL,
+            ByteCode.NOT_EQUAL,
+            ByteCode.GREATER_THAN,
+            ByteCode.GREATER_THAN_OR_EQUAL,
+            ByteCode.LESS_THAN,
+            ByteCode.LESS_THAN_OR_EQUAL,
+            ByteCode.ADD,
+            ByteCode.SUBTRACT,
+            ByteCode.MULTIPLY,
+            ByteCode.DIVIDE,
+            ByteCode.MOD,
+            ByteCode.AND,
+            ByteCode.OR,
+            ByteCode.ADD_16_SET,
+            ByteCode.ADD_19_SET,
+            ByteCode.SUB_16_SET,
+            ByteCode.SUB_19_SET
         };
 
         public List<ScriptNode> Decompile(int startingOffset, List<byte> code, out int terminationOffset) {
@@ -417,7 +444,14 @@ namespace FCopParser {
 
                     var scriptData = scriptNodeData[new ScriptDataKey(byteCode, paraCount)];
 
-                    var node = new ScriptNode(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData));
+                    ScriptNode node;
+
+                    if (doubleOperators.Contains(byteCode) && paraCount == 2) {
+                        node = new DoubleOperator(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData));
+                    }
+                    else {
+                        node = new ScriptNode(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData));
+                    }
 
                     node.parameters = floatingExpressions.GetRange(floatingExpressions.Count - paraCount, paraCount);
                     floatingExpressions.RemoveRange(floatingExpressions.Count - paraCount, paraCount);
@@ -514,8 +548,9 @@ namespace FCopParser {
         OR = 45,
         BYTE47 = 47,
         ADD_16_SET = 48,
-        BYTE51 = 51,
+        ADD_19_SET = 51,
         SUB_16_SET = 52,
+        SUB_19_SET = 55,
         Destroy = 56,
         BYTE57 = 57,
         BYTE58 = 58,
@@ -595,6 +630,58 @@ namespace FCopParser {
 
         public virtual ScriptDataType ReturnType() {
             return defaultReturnType;
+        }
+
+        public virtual List<ParameterNode> GetParameters() {
+
+            var parameters = new List<ParameterNode>();
+
+            foreach (var i in Enumerable.Range(0, this.parameters.Count)) {
+                var parData = parameterData[i];
+                var parNode = this.parameters[i];
+
+                parameters.Add(new ParameterNode(parNode, this, parData.name, i));
+            }
+
+            return parameters;
+        }
+
+    }
+
+    public class ParameterNode {
+
+        public ScriptNode parent;
+        public ScriptNode scriptNode;
+        public string parameterName;
+        public int parameterIndex;
+
+        public ParameterNode(ScriptNode scriptNode, ScriptNode parent, string parameterName, int parameterIndex) {
+            this.parent = parent;
+            this.scriptNode = scriptNode;
+            this.parameterName = parameterName;
+            this.parameterIndex = parameterIndex;
+        }
+
+    }
+
+    public class DoubleOperator : ScriptNode {
+
+        public DoubleOperator(ByteCode byteCode, string name, ScriptDataType defaultReturnType, List<ScriptParameter> parameterData) : base(byteCode, name, defaultReturnType, parameterData) {
+
+        }
+
+        public override List<ParameterNode> GetParameters() {
+            var parameters = new List<ParameterNode>();
+
+            var parData = parameterData[1];
+            var parNode = this.parameters[1];
+            parameters.Add(new ParameterNode(parNode, this, "", 1));
+
+            parData = parameterData[0];
+            parNode = this.parameters[0];
+            parameters.Add(new ParameterNode(parNode, this, "", 0));
+
+            return parameters;
         }
 
     }
