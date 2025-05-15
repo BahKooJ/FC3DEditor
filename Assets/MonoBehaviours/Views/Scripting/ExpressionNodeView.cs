@@ -14,19 +14,20 @@ public class ExpressionNodeView : MonoBehaviour {
 
     // - Unity Prefabs -
     public GameObject expressionNodePrefab;
+    public GameObject literalNodePrefab;
     public GameObject paddingPrefab;
 
     // - Unity Refs -
     public TMP_Text expressionText;
     public Transform endBracket;
     public Image backgroundImage;
-
+    
     // - Parameters -
     public ParameterNode parameterNode;
 
     public List<ExpressionNodeView> expressionNodes;
 
-    public void Init() {
+    public virtual void Init() {
 
         void Pad() {
             var padObj = Instantiate(paddingPrefab);
@@ -36,8 +37,10 @@ public class ExpressionNodeView : MonoBehaviour {
 
         void CreateNode(ParameterNode parameter) {
 
-            var nodeObj = Instantiate(expressionNodePrefab);
-            nodeObj.transform.SetParent(transform, false);
+            GameObject nodeObj = parameter.scriptNode switch {
+                LiteralNode => Instantiate(literalNodePrefab, transform, false),
+                _ => Instantiate(expressionNodePrefab, transform, false),
+            };
 
             var node = nodeObj.GetComponent<ExpressionNodeView>();
             node.parameterNode = parameter;
@@ -49,24 +52,10 @@ public class ExpressionNodeView : MonoBehaviour {
             node.Init();
 
         }
+        
+        if (parameterNode.scriptNode is DoubleOperator doubleOperator) {
 
-        if (parameterNode.parameterName != "") {
-            expressionText.text = parameterNode.parameterName + ": ";
-        }
-        else {
-            expressionText.text = "";
-        }
-
-        if (parameterNode.scriptNode is LiteralNode lNode) {
-
-            expressionText.text += lNode.value.ToString();
-
-            backgroundImage.color = literalColor;
-
-        }
-        else if (parameterNode.scriptNode is DoubleOperator doubleOperator) {
-
-            expressionText.text += parameterNode.scriptNode.name;
+            expressionText.text = parameterNode.scriptNode.name;
 
             var parameters = parameterNode.scriptNode.GetParameters();
 
@@ -83,7 +72,7 @@ public class ExpressionNodeView : MonoBehaviour {
         }
         else {
 
-            expressionText.text += parameterNode.scriptNode.name;
+            expressionText.text = parameterNode.scriptNode.name;
 
             foreach (var parameters in parameterNode.scriptNode.GetParameters()) {
 

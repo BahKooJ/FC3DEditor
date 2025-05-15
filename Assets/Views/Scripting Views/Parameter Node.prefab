@@ -66,7 +66,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 52faa677462bbf0459038ea703ae1f70, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d15c5b4cce4bba542ab7157d92f8da2a, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -125,9 +125,9 @@ GameObject:
   - component: {fileID: 2114225738920996258}
   - component: {fileID: 7882109401629979604}
   - component: {fileID: 2800429816985756880}
-  - component: {fileID: 3602698830820897697}
+  - component: {fileID: 4011227396271937177}
   m_Layer: 6
-  m_Name: Statement Node
+  m_Name: Parameter Node
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -178,15 +178,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.011764706, g: 0.15686275, b: 0.21568628, a: 1}
+  m_Color: {r: 0.011764708, g: 0.12491056, b: 0.21568628, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: bf35151233097594a9bbd2e09cf27183, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -235,7 +235,7 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &3602698830820897697
+--- !u!114 &4011227396271937177
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -244,16 +244,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 5572845360304710419}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e18310c0637f78448a3a52811b93f3fb, type: 3}
+  m_Script: {fileID: 11500000, guid: 082ca6b0ebd12ae4c99a5848b6697bd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  expressionNodePrefab: {fileID: 8547359735126737856, guid: 15505bd9954c8d946977fe3253675b51, type: 3}
-  literalNodePrefab: {fileID: 8547359735126737856, guid: 966ca1030d1a9d24a88ecf2da304bcf5, type: 3}
   paddingPrefab: {fileID: 2244709891178773203}
-  parameterNodeFab: {fileID: 5572845360304710419, guid: 29f8948e6c9b51e44b6bb4691222c5af, type: 3}
-  statementText: {fileID: 3308916068984118278}
+  parameterTextFab: {fileID: 5831553675030962827}
   endBracket: {fileID: 6530134690143696824}
-  backgroundImage: {fileID: 2114225738920996258}
   expressionNodes: []
 --- !u!1 &5831553675030962827
 GameObject:
@@ -273,7 +269,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &9213452217904637023
 RectTransform:
   m_ObjectHideFlags: 0
@@ -289,10 +285,10 @@ RectTransform:
   m_Father: {fileID: 6263620263533394224}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 20, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 20, y: -9.075}
+  m_SizeDelta: {x: 64.53, y: 18.15}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &1216106586093020552
 CanvasRenderer:
@@ -471,7 +467,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e738a0184204f2e4ab1619bd0ce17f9a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c49fda843ba60554da191a5a02fca1ec, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

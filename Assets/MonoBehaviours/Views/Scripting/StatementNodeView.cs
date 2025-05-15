@@ -12,7 +12,9 @@ public class StatementNodeView : MonoBehaviour {
 
     // - Unity Prefabs -
     public GameObject expressionNodePrefab;
+    public GameObject literalNodePrefab;
     public GameObject paddingPrefab;
+    public GameObject parameterNodeFab;
 
     // - Unity Refs -
     public TMP_Text statementText;
@@ -34,8 +36,10 @@ public class StatementNodeView : MonoBehaviour {
 
         void CreateNode(ParameterNode parameter) {
 
-            var nodeObj = Instantiate(expressionNodePrefab);
-            nodeObj.transform.SetParent(transform, false);
+            GameObject nodeObj = parameter.scriptNode switch {
+                LiteralNode => Instantiate(literalNodePrefab),
+                _ => Instantiate(expressionNodePrefab),
+            };
 
             var node = nodeObj.GetComponent<ExpressionNodeView>();
             node.parameterNode = parameter;
@@ -47,8 +51,6 @@ public class StatementNodeView : MonoBehaviour {
             // oh Unity you sweet child
             node.expressionNodePrefab = expressionNodePrefab;
 
-            node.Init();
-
         }
 
 
@@ -56,9 +58,34 @@ public class StatementNodeView : MonoBehaviour {
 
         foreach (var parameter in scriptNode.GetParameters()) {
 
-            Pad();
-
             CreateNode(parameter);
+
+        }
+
+        if (expressionNodes.Count != 0) {
+
+            if (scriptNode is DoubleOperator) {
+
+                expressionNodes[0].transform.SetParent(transform, false);
+                expressionNodes[0].Init();
+
+                Pad();
+
+                statementText.transform.SetSiblingIndex(transform.childCount - 1);
+
+                Pad();
+
+                expressionNodes[1].transform.SetParent(transform, false);
+                expressionNodes[1].Init();
+
+            }
+            else {
+
+                Pad();
+                var paraNode = Instantiate(parameterNodeFab, transform, false);
+                paraNode.GetComponent<ParameterNodeView>().expressionNodes = expressionNodes;
+
+            }
 
         }
 

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 
 namespace FCopParser {
 
@@ -272,9 +273,6 @@ namespace FCopParser {
         };
 
         public static List<ByteCode> doubleOperators = new() {
-            ByteCode.SET_16,
-            ByteCode.SET_18,
-            ByteCode.SET_19,
             ByteCode.EQUAL,
             ByteCode.NOT_EQUAL,
             ByteCode.GREATER_THAN,
@@ -287,7 +285,13 @@ namespace FCopParser {
             ByteCode.DIVIDE,
             ByteCode.MOD,
             ByteCode.AND,
-            ByteCode.OR,
+            ByteCode.OR
+        };
+
+        public static List<ByteCode> reverseDoubleOperators = new() {
+            ByteCode.SET_16,
+            ByteCode.SET_18,
+            ByteCode.SET_19,
             ByteCode.ADD_16_SET,
             ByteCode.ADD_19_SET,
             ByteCode.SUB_16_SET,
@@ -310,6 +314,7 @@ namespace FCopParser {
 
                     if (!isExpression) {
 
+                        node.parent = nestingNode.node;
                         nestingNode.node.nestedNodes.Add(node);
 
                     }
@@ -319,6 +324,7 @@ namespace FCopParser {
                         // Expression wasn't used and now outside the jump statement.
                         if (isExpression) {
 
+                            node.parent = nestingNode.node;
                             nestingNode.node.nestedNodes.Add(node);
 
                             // Todo: Ternary Check
@@ -447,7 +453,10 @@ namespace FCopParser {
                     ScriptNode node;
 
                     if (doubleOperators.Contains(byteCode) && paraCount == 2) {
-                        node = new DoubleOperator(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData));
+                        node = new DoubleOperator(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData), false);
+                    }
+                    else if (reverseDoubleOperators.Contains(byteCode) && paraCount == 2) {
+                        node = new DoubleOperator(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData), true);
                     }
                     else {
                         node = new ScriptNode(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData));
@@ -500,8 +509,83 @@ namespace FCopParser {
 
         public List<byte> Compile(int newOffset) {
 
+            var total = new List<byte>();
+
+            var nestedBytesStack = new List<List<byte>>();
+
+            void CompileNode(ScriptNode node) {
+
+                foreach (var parameter in node.parameters) {
+                    CompileNode(parameter);
+                }
+
+                if (nestedBytesStack.Count != 0) {
+                    nestedBytesStack.Last().AddRange(node.Compile());
+                }
+                else {
+                    total.AddRange(node.Compile());
+                }
+
+                if (node.byteCode == ByteCode.JUMP) {
+                    // The jump byte hasn't been added yet.
+                    PopByteStack(2);
+                }
+
+                if (node.nestedNodes.Count != 0) {
+
+                    nestedBytesStack.Add(new());
+
+                    bool alreadyPopped = false;
+
+                    foreach (var nestedNode in node.nestedNodes) {
+
+                        if (nestedNode.byteCode == ByteCode.JUMP) {
+                            alreadyPopped = true;
+                        }
+
+                        CompileNode(nestedNode);
+                    }
+
+                    if (!alreadyPopped) {
+                        PopByteStack();
+                    }
+
+                }
+
+
+            }
+
+            // It always counts the jump byte so 1 needs to be added
+            void PopByteStack(int futureByteCount = 1) {
+
+                if (nestedBytesStack.Count > 1) {
+                    nestedBytesStack[^2].Add((byte)(nestedBytesStack.Last().Count + futureByteCount));
+                    nestedBytesStack[^2].AddRange(nestedBytesStack.Last());
+                    nestedBytesStack.RemoveAt(nestedBytesStack.Count - 1);
+                }
+                else {
+                    total.Add((byte)(nestedBytesStack.Last().Count + futureByteCount));
+                    total.AddRange(nestedBytesStack.Last());
+                    nestedBytesStack.RemoveAt(nestedBytesStack.Count - 1);
+                }
+
+            }
+
+            foreach (var node in code) {
+
+                CompileNode(node);
+
+            }
+
+            total.Add(0);
+
             offset = newOffset;
 
+            if (!compiledBytes.SequenceEqual(total)) {
+                //throw new Exception("skill issue");
+            }
+
+            compiledBytes = total;
             return compiledBytes;
         }
 
@@ -608,6 +692,8 @@ namespace FCopParser {
 
     public class ScriptNode {
 
+        public ScriptNode parent = null;
+
         public ByteCode byteCode;
         public string name;
         public ScriptDataType defaultReturnType;
@@ -646,6 +732,15 @@ namespace FCopParser {
             return parameters;
         }
 
+        public virtual List<byte> Compile() {
+
+            if (byteCode == ByteCode.NONE) {
+                return new();
+            }
+
+            return new() { (byte)byteCode };
+        }
+
     }
 
     public class ParameterNode {
@@ -666,20 +761,24 @@ namespace FCopParser {
 
     public class DoubleOperator : ScriptNode {
 
-        public DoubleOperator(ByteCode byteCode, string name, ScriptDataType defaultReturnType, List<ScriptParameter> parameterData) : base(byteCode, name, defaultReturnType, parameterData) {
+        public bool reversed;
 
+        public DoubleOperator(ByteCode byteCode, string name, ScriptDataType defaultReturnType, List<ScriptParameter> parameterData, bool reversed) : base(byteCode, name, defaultReturnType, parameterData) {
+            this.reversed = reversed;
         }
 
         public override List<ParameterNode> GetParameters() {
             var parameters = new List<ParameterNode>();
 
-            var parData = parameterData[1];
-            var parNode = this.parameters[1];
-            parameters.Add(new ParameterNode(parNode, this, "", 1));
+            foreach (var i in Enumerable.Range(0, this.parameters.Count)) {
+                var parData = parameterData[i];
+                var parNode = this.parameters[i];
+                parameters.Add(new ParameterNode(parNode, this, "", i));
+            }
 
-            parData = parameterData[0];
-            parNode = this.parameters[0];
-            parameters.Add(new ParameterNode(parNode, this, "", 0));
+            if (reversed) {
+                parameters.Reverse();
+            }
 
             return parameters;
         }
@@ -692,6 +791,29 @@ namespace FCopParser {
 
         public LiteralNode(int value) : base(ByteCode.LITERAL, "", ScriptDataType.Int, new()) {
             this.value = value;
+        }
+
+        public override List<byte> Compile() {
+            
+            if (value < 0) {
+                var flippedValue = value ^= -1;
+                return new() { (byte)ByteCode.BIT_FLIP, (byte)flippedValue };
+            }
+
+            if (value > 127 && value < 384) {
+                return new() { (byte)ByteCode.BIT_SHIFT_RIGHT, (byte)(value - 128) };
+            }
+
+            if (value > 127) {
+                var compiled16bit = BitConverter.GetBytes((short)value);
+                var total = new List<byte>() { (byte)ByteCode.LITERAL_16 };
+                // Remember, it's big-endian
+                total.AddRange(compiled16bit.Reverse());
+                return total;
+            }
+
+            return new() { (byte)(value + 128) };
+
         }
 
     }
