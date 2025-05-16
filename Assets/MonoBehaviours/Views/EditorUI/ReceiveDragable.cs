@@ -31,7 +31,16 @@ public class ReceiveDragable : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
     public void ReceiveDrag(DragableUIElement dragable) {
 
-        if (dragable.transform.parent == expectedTransform) {
+        if (expectedTransform != null) {
+
+            if (dragable.transform.parent == expectedTransform) {
+
+                onReceive.Invoke();
+
+            }
+
+        }
+        else {
 
             onReceive.Invoke();
 

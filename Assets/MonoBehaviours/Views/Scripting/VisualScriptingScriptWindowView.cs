@@ -34,19 +34,29 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
 
         var nestCount = 0;
 
-        void AddEndBracket() {
-
+        VisualScriptingLineView CreateLineFab(StatementNodeView parentNode, StatementNodeView visualNode, int localIndex) {
             var lineObj = Instantiate(linePrefab);
 
             lineObj.transform.SetParent(codeScrollView, false);
-
             var line = lineObj.GetComponent<VisualScriptingLineView>();
             line.number = i;
             i++;
 
-            var endObj = Instantiate(endCodeBracket);
-            endObj.transform.SetParent(line.lineContent, false);
+            line.view = this;
+            line.parentNodeView = parentNode;
+            line.scriptNode = visualNode;
+            line.localIndex = localIndex;
 
+            lines.Add(line);
+
+            return line;
+        }
+
+        VisualScriptingLineView AddEndBracket(StatementNodeView parentNode) {
+
+            var line = CreateLineFab(parentNode, null, ((ScriptNestingNode)parentNode.scriptNode).nestedNodes.Count);
+
+            var endObj = Instantiate(endCodeBracket);
             endObj.transform.SetParent(line.lineContent, false);
 
             var pos = ((RectTransform)endObj.transform).anchoredPosition;
@@ -55,23 +65,23 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
 
             ((RectTransform)endObj.transform).anchoredPosition = pos;
 
-            lines.Add(line);
+            return line;
 
         }
 
-        void AddLines(List<ScriptNode> nodes) {
+        List<VisualScriptingLineView> AddLines(List<ScriptNode> nodes, StatementNodeView parentNode) {
 
+            var linesAdded = new List<VisualScriptingLineView>();
+
+            var localIndex = 0;
             foreach (var node in nodes) {
 
-                var lineObj = Instantiate(linePrefab);
-
-                lineObj.transform.SetParent(codeScrollView, false);
-
-                var line = lineObj.GetComponent<VisualScriptingLineView>();
-                line.number = i;
-                i++;
-
                 var visualNodeObj = Instantiate(statementNodePrefab);
+                var visualNode = visualNodeObj.GetComponent<StatementNodeView>();
+
+                var line = CreateLineFab(parentNode, visualNode, localIndex);
+
+                linesAdded.Add(line);
 
                 visualNodeObj.transform.SetParent(line.lineContent, false);
 
@@ -81,28 +91,29 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
 
                 ((RectTransform)visualNodeObj.transform).anchoredPosition = pos;
 
-                var visualNode = visualNodeObj.GetComponent<StatementNodeView>();
-
                 visualNode.scriptNode = node;
-                line.scriptNodes.Add(visualNodeObj);
 
-                if (node.nestedNodes.Count > 0) {
+                if (node is ScriptNestingNode nestingNode) {
 
                     nestCount++;
-                    AddLines(node.nestedNodes);
+                    var nestedLinesAdded = AddLines(nestingNode.nestedNodes, visualNode);
                     nestCount--;
-                    AddEndBracket();
+
+                    nestedLinesAdded.Add(AddEndBracket(visualNode));
+                    visualNode.associatedLines = nestedLinesAdded;
+                    linesAdded.AddRange(nestedLinesAdded);
 
                 }
 
-                lines.Add(line);
-
-
+                localIndex++;
             }
+
+            return linesAdded;
 
         }
 
-        AddLines(script.code);
+        AddLines(script.code, null);
+        CreateLineFab(null, null, script.code.Count);
 
         refuseCallback = true;
         debugInput.text = "";

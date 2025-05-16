@@ -302,7 +302,7 @@ namespace FCopParser {
 
             var statements = new List<ScriptNode>();
             var floatingExpressions = new List<ScriptNode>();
-            List<(ScriptNode node, int byteCount)> nodesToNest = new();
+            List<(ScriptNestingNode node, int byteCount)> nodesToNest = new();
 
             void AddScriptingNode(ScriptNode node, int bytesProcessed, bool isExpression) {
 
@@ -428,11 +428,15 @@ namespace FCopParser {
 
                         floatingExpressions.Clear();
 
-                        var jumpNode = new ScriptNode(ByteCode.JUMP, "Else", ScriptDataType.Void, new());
+                        var jumpNode = new ScriptNestingNode(ByteCode.JUMP, "Else", ScriptDataType.Void, new());
 
                         AddScriptingNode(jumpNode, 2, false);
 
-                        nodesToNest.Add((jumpNode, code[i + 1] - 1));
+                        // If one it's an empty jump statement.
+                        // This is only possible by the editor.
+                        if (code[i + 1] != 1) {
+                            nodesToNest.Add((jumpNode, code[i + 1] - 1));
+                        }
 
                         i += 2;
                         continue;
@@ -458,6 +462,9 @@ namespace FCopParser {
                     else if (reverseDoubleOperators.Contains(byteCode) && paraCount == 2) {
                         node = new DoubleOperator(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData), true);
                     }
+                    else if (byteCode == ByteCode.CONDITIONAL_JUMP) {
+                        node = new ScriptNestingNode(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData));
+                    }
                     else {
                         node = new ScriptNode(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData));
                     }
@@ -469,7 +476,11 @@ namespace FCopParser {
 
                         AddScriptingNode(node, 2, false);
 
-                        nodesToNest.Add((node, code[i + 1] - 1));
+                        // If one it's an empty jump statement.
+                        // This is only possible by the editor.
+                        if (code[i + 1] != 1) {
+                            nodesToNest.Add(((ScriptNestingNode)node, code[i + 1] - 1));
+                        }
 
                         i += 2;
                         continue;
@@ -531,13 +542,13 @@ namespace FCopParser {
                     PopByteStack(2);
                 }
 
-                if (node.nestedNodes.Count != 0) {
+                if (node is ScriptNestingNode nestingNode) {
 
                     nestedBytesStack.Add(new());
 
                     bool alreadyPopped = false;
 
-                    foreach (var nestedNode in node.nestedNodes) {
+                    foreach (var nestedNode in nestingNode.nestedNodes) {
 
                         if (nestedNode.byteCode == ByteCode.JUMP) {
                             alreadyPopped = true;
@@ -692,7 +703,7 @@ namespace FCopParser {
 
     public class ScriptNode {
 
-        public ScriptNode parent = null;
+        public ScriptNestingNode parent = null;
 
         public ByteCode byteCode;
         public string name;
@@ -700,7 +711,6 @@ namespace FCopParser {
         public List<ScriptParameter> parameterData;
 
         public List<ScriptNode> parameters = new();
-        public List<ScriptNode> nestedNodes = new();
 
         public ScriptNode(ByteCode byteCode, string name, ScriptDataType defaultReturnType, List<ScriptParameter> parameterData) {
             this.byteCode = byteCode;
@@ -709,9 +719,8 @@ namespace FCopParser {
             this.parameterData = parameterData;
         }
 
-        public ScriptNode(ByteCode byteCode, string name, ScriptDataType defaultReturnType, List<ScriptParameter> parameterData, List<ScriptNode> parameters, List<ScriptNode> nestedNodes) : this(byteCode, name, defaultReturnType, parameterData) {
+        public ScriptNode(ByteCode byteCode, string name, ScriptDataType defaultReturnType, List<ScriptParameter> parameterData, List<ScriptNode> parameters) : this(byteCode, name, defaultReturnType, parameterData) {
             this.parameters = parameters;
-            this.nestedNodes = nestedNodes;
         }
 
         public virtual ScriptDataType ReturnType() {
@@ -739,6 +748,15 @@ namespace FCopParser {
             }
 
             return new() { (byte)byteCode };
+        }
+
+    }
+
+    public class ScriptNestingNode : ScriptNode {
+
+        public List<ScriptNode> nestedNodes = new();
+
+        public ScriptNestingNode(ByteCode byteCode, string name, ScriptDataType defaultReturnType, List<ScriptParameter> parameterData) : base(byteCode, name, defaultReturnType, parameterData) {
         }
 
     }

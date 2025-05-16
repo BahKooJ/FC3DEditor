@@ -3,9 +3,10 @@ using FCopParser;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class StatementNodeView : MonoBehaviour {
+public class StatementNodeView : DragableUIElement {
 
     static List<ByteCode> keyWords = new() { ByteCode.CONDITIONAL_JUMP, ByteCode.JUMP };
     static Color keyWordColor = new Color(0x65 / 255f, 0x19 / 255f, 0x5E / 255f);
@@ -23,6 +24,8 @@ public class StatementNodeView : MonoBehaviour {
 
     // - Parameters -
     public ScriptNode scriptNode;
+    [HideInInspector]
+    public List<VisualScriptingLineView> associatedLines = new();
 
     public List<ExpressionNodeView> expressionNodes;
 
@@ -89,7 +92,7 @@ public class StatementNodeView : MonoBehaviour {
 
         }
 
-        if (scriptNode.nestedNodes.Count > 0) {
+        if (scriptNode is ScriptNestingNode) {
             endBracket.gameObject.SetActive(false);
             Pad();
         }
@@ -99,6 +102,28 @@ public class StatementNodeView : MonoBehaviour {
 
         if (keyWords.Contains(scriptNode.byteCode)) {
             backgroundImage.color = keyWordColor;
+        }
+
+        if (scriptNode.byteCode == ByteCode.JUMP) {
+            refuseDrag = true;
+        }
+
+    }
+
+    public override void OnBeginDrag(PointerEventData eventData) {
+        base.OnBeginDrag(eventData);
+
+        foreach (var line in associatedLines) {
+            line.gameObject.SetActive(false);
+        }
+
+    }
+
+    public override void OnEndDrag(PointerEventData eventData) {
+        base.OnEndDrag(eventData);
+
+        foreach (var line in associatedLines) {
+            line.gameObject.SetActive(true);
         }
 
     }

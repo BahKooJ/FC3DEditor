@@ -247,6 +247,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e18310c0637f78448a3a52811b93f3fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nestedRevieversInElement: []
+  originalParent: {fileID: 0}
   expressionNodePrefab: {fileID: 8547359735126737856, guid: 15505bd9954c8d946977fe3253675b51, type: 3}
   literalNodePrefab: {fileID: 8547359735126737856, guid: 966ca1030d1a9d24a88ecf2da304bcf5, type: 3}
   paddingPrefab: {fileID: 2244709891178773203}
@@ -291,7 +293,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 20, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &1216106586093020552

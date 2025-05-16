@@ -136,16 +136,16 @@ public class VisualScriptingFuncWindowView : MonoBehaviour {
                 var visualNode = visualNodeObj.GetComponent<StatementNodeView>();
 
                 visualNode.scriptNode = node;
-                line.scriptNodes.Add(visualNodeObj);
+                line.scriptNode = visualNode;
 
-                if (node.nestedNodes.Count > 0) {
+                //if (node.nestedNodes.Count > 0) {
 
-                    nestCount++;
-                    AddLines(node.nestedNodes);
-                    nestCount--;
-                    AddEndBracket();
+                //    nestCount++;
+                //    AddLines(node.nestedNodes);
+                //    nestCount--;
+                //    AddEndBracket();
 
-                }
+                //}
 
                 lines.Add(line);
 

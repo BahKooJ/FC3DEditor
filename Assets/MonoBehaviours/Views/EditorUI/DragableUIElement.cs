@@ -17,9 +17,14 @@ public class DragableUIElement : MonoBehaviour, IBeginDragHandler, IDragHandler,
     Vector2 originalAnchorMax;
     Vector2 originalAnchorMin;
     int originalSiblingIndex;
+    Vector3 originalPosition;
+
+    internal bool refuseDrag = false;
 
     bool started = false;
-    public void OnBeginDrag(PointerEventData eventData) {
+    public virtual void OnBeginDrag(PointerEventData eventData) {
+
+        if (refuseDrag) return;
 
         onDragCallback();
 
@@ -36,6 +41,7 @@ public class DragableUIElement : MonoBehaviour, IBeginDragHandler, IDragHandler,
         originalAnchorMin = rectTrans.anchorMin;
         originalSiblingIndex = transform.GetSiblingIndex();
         originalParent = transform.parent;
+        originalPosition = rectTrans.anchoredPosition;
 
         rectTrans.anchorMax = Vector2.zero;
         rectTrans.anchorMin = Vector2.zero;
@@ -53,7 +59,9 @@ public class DragableUIElement : MonoBehaviour, IBeginDragHandler, IDragHandler,
         started = true;
     }
 
-    public void OnDrag(PointerEventData eventData) {
+    public virtual void OnDrag(PointerEventData eventData) {
+
+        if (refuseDrag) return;
 
         if (!Input.GetMouseButton(0) || !started) return;
 
@@ -63,7 +71,9 @@ public class DragableUIElement : MonoBehaviour, IBeginDragHandler, IDragHandler,
 
     }
 
-    public void OnEndDrag(PointerEventData eventData) {
+    public virtual void OnEndDrag(PointerEventData eventData) {
+
+        if (refuseDrag) return;
 
         if (!started) return;
 
@@ -83,8 +93,10 @@ public class DragableUIElement : MonoBehaviour, IBeginDragHandler, IDragHandler,
         rectTrans.anchorMax = originalAnchorMax;
         rectTrans.anchorMin = originalAnchorMin;
 
-        transform.SetParent(originalParent);
+        transform.SetParent(originalParent, false);
         transform.SetSiblingIndex(originalSiblingIndex);
+
+        rectTrans.anchoredPosition = originalPosition;
 
         if (TryGetComponent<Button>(out var button)) {
             button.interactable = true;
