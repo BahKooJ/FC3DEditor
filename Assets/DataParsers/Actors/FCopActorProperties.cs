@@ -593,6 +593,41 @@ namespace FCopParser {
         CyanDiamondClone = 204,
     }
 
+    public enum MapIconColorObjective {
+        None = 0,
+        Red = 1,
+        Blue = 2,
+        Green = 3,
+        Cyan = 4,
+        Yellow = 5,
+        Magenta = 6,
+        White = 7,
+        Gold = 8,
+        DarkRed = 9,
+        DarkBlue = 10,
+        DarkGreen = 11,
+        DarkCyan = 12,
+        DarkYellow = 13,
+        DarkMagenta = 14,
+        Gray = 15,
+        Orange = 16,
+        RedPulse = 17,
+        BlueWhitePulse = 18,
+        GreenPulse = 19,
+        Pink = 20,
+        Silver = 21,
+        Sage = 22,
+        FlashingRed = 23,
+        FlashingBlue = 24,
+        FlashingGreen = 25,
+        FlashingCyan = 26,
+        FlashingYellow = 27,
+        FlashingMagenta = 28,
+        FlashingWhite = 29,
+        FlashingOrange = 30,
+        FlashingGray = 31
+    }
+
     public enum Team {
         Red = 1,
         Blue = 2

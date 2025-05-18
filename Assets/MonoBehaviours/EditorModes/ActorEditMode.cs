@@ -336,9 +336,62 @@ public class ActorEditMode : EditMode {
 
         if (Input.GetKeyDown(KeyCode.F10)) {
 
+            var offsets = new List<int>();
+
+            void SearchScript(ScriptNode script, int offset) {
+
+                if (script.byteCode == ByteCode.Destroy) {
+
+                    FCopActor actorReference;
+
+                    try {
+                        actorReference = main.level.sceneActors.actorsByID[((LiteralNode)script.parameters[0]).value];
+                    }
+                    catch {
+                        actorReference = null;
+                    }
+
+                    if (script.parameters[1] is LiteralNode lit) {
+
+                        if (lit.value == 124
+                            //&& (actorReference != null && actorReference.behaviorType == ActorBehavior.DynamicProp)
+                            ) {
+
+                            offsets.Add(offset);
+
+                        }
+
+                    }
+
+                }
+
+                foreach (var para in script.parameters) {
+                    SearchScript(para, offset);
+                }
+
+                if (script is ScriptNestingNode scriptNesting) {
+
+                    foreach (var nestedScript in scriptNesting.nestedNodes) {
+                        SearchScript(nestedScript, offset);
+                    }
+
+                }
+
+
+
+            }
+
+            foreach (var script in main.level.scripting.rpns.code) {
+
+                foreach (var line in script.Value.code) {
+                    SearchScript(line, script.Key);
+                }
+
+            }
+
             var actors = main.level.sceneActors.actors.Where(a => {
 
-                return a.rawFile.rpnsReferences.Contains(39);
+                return offsets.Contains(a.rawFile.rpnsReferences[0]) || offsets.Contains(a.rawFile.rpnsReferences[1]) || offsets.Contains(a.rawFile.rpnsReferences[2]);
 
             }).ToList();
 

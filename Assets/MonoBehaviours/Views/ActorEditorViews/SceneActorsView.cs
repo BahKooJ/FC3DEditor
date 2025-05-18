@@ -16,6 +16,7 @@ public class SceneActorsView : MonoBehaviour {
     public Transform listContent;
     public ScrollRect contentScrollview;
     public TMP_Dropdown sortDropdown;
+    public TMP_InputField searchBar;
     public ActorPropertiesView view;
 
     // - Parameters -
@@ -107,6 +108,8 @@ public class SceneActorsView : MonoBehaviour {
 
     public void Validate() {
 
+        ClearSearch();
+
         var openedNodes = new List<ActorNodeListItemView>();
 
         foreach (var node in actorNodes) {
@@ -177,6 +180,83 @@ public class SceneActorsView : MonoBehaviour {
 
             if (actorNodesByID != null && node.node.nestedActors.Count > 0) {
                 actorNodesByID.Remove(node.node.nestedActors[0].DataID);
+            }
+
+        }
+
+    }
+
+    public void StartType() {
+        Main.ignoreAllInputs = true;
+    }
+
+    public void StopType() {
+        Main.ignoreAllInputs = false;
+    }
+
+    public void Search() {
+
+        if (searchBar.text == "") {
+            ClearSearch();
+            return;
+        }
+
+        foreach (var node in actorNodes) {
+
+            if (node.node.nestedActors.Count > 1) {
+
+                var hasName = false;
+                foreach (var actor in node.node.nestedActors) {
+
+                    if (actor.name.Contains(searchBar.text) || searchBar.text == "") {
+                        hasName = true;
+                        break;
+                    }
+
+                }
+
+                if (hasName) {
+
+                    foreach (var nestNode in node.actorNodes) {
+
+                        if (nestNode.actor.name.Contains(searchBar.text) || searchBar.text == "") {
+                            nestNode.gameObject.SetActive(true);
+                        }
+                        else {
+                            nestNode.gameObject.SetActive(false);
+                        }
+
+                    }
+
+                }
+                else {
+                    node.gameObject.SetActive(false);
+                }
+
+            }
+            else {
+
+                if (node.node.name.Contains(searchBar.text) || searchBar.text == "") {
+                    node.gameObject.SetActive(true);
+                }
+                else {
+                    node.gameObject.SetActive(false);
+                }
+
+            }
+
+        }
+
+    }
+
+    public void ClearSearch() {
+
+        foreach (var node in actorNodes) {
+
+            node.gameObject.SetActive(true);
+
+            foreach (var nestNode in node.actorNodes) {
+                nestNode.gameObject.SetActive(true);
             }
 
         }
