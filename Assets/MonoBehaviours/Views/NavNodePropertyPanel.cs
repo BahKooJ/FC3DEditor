@@ -10,6 +10,7 @@ public class NavNodePropertyPanel : MonoBehaviour {
     // - Unity View Refs -
     public NavMeshEditPanel view;
 
+    public TMP_Text indexText;
     public TMP_Dropdown stateDropdown;
     public TMP_Dropdown groundcastDropdown;
     public Toggle readHeightToggle;
@@ -23,6 +24,7 @@ public class NavNodePropertyPanel : MonoBehaviour {
 
         refuseCallback = true;
 
+        indexText.text = "---";
         stateDropdown.interactable = false;
         groundcastDropdown.interactable = false;
         readHeightToggle.interactable = false;
@@ -47,6 +49,7 @@ public class NavNodePropertyPanel : MonoBehaviour {
             readHeightToggle.interactable = true;
             heightOffsetInput.interactable = true;
 
+            indexText.text = node.index.ToString();
             stateDropdown.value = (int)node.state;
             groundcastDropdown.value = (int)node.groundCast;
             readHeightToggle.isOn = node.readHeightOffset;
@@ -55,6 +58,7 @@ public class NavNodePropertyPanel : MonoBehaviour {
         }
         else {
 
+            indexText.text = "---";
             stateDropdown.interactable = false;
             groundcastDropdown.interactable = false;
             readHeightToggle.interactable= false;

@@ -431,23 +431,19 @@ namespace FCopParser {
 
         List<string> dataAccountedFor = new List<string>() { "RPNS", "Cshd", "Cwav", "Ctos", "Cptc", "Ctil", "Cfun", "Cnet", "Cbmp", "Cdcs", "Cobj", "Cact", "Csac", "Cctr" };
 
-        void UpdateRPNSOffsets() {
+        void UpdateRPNSOffsets(IFFDataFile rawFile) {
 
-            foreach (var rawFile in fileManager.files) {
+            var preCompileRefs = rawFile.rpnsReferences;
 
-                var preCompileRefs = rawFile.rpnsReferences;
+            rawFile.rpnsReferences = new();
 
-                rawFile.rpnsReferences = new();
-
-                // Remember that the actual compiled offset is stored on the script object
-                foreach (var rpnsRef in preCompileRefs) {
-                    if (rpnsRef == -1) {
-                        rawFile.rpnsReferences.Add(-1);
-                    }
-                    else {
-                        rawFile.rpnsReferences.Add(scripting.rpns.code[rpnsRef].offset);
-                    }
-
+            // Remember that the actual compiled offset is stored on the script object
+            foreach (var rpnsRef in preCompileRefs) {
+                if (rpnsRef == -1) {
+                    rawFile.rpnsReferences.Add(-1);
+                }
+                else {
+                    rawFile.rpnsReferences.Add(scripting.rpns.code[rpnsRef].offset);
                 }
 
             }
@@ -459,10 +455,6 @@ namespace FCopParser {
             IFFFileManager newFileManager = new();
 
             newFileManager.files.AddRange(scripting.Compile());
-
-            UpdateRPNSOffsets();
-
-            scripting.ResetIDAndOffsets();
 
             newFileManager.files.Add(audio.CompileSoundHeader());
 
@@ -559,12 +551,16 @@ namespace FCopParser {
 
             // SWVRs
             newFileManager.subFiles = audio.CompileStreams();
-
             newFileManager.music = audio.CompileMusic();
 
-            newFileManager.Sort();
+            foreach (var rawFile in newFileManager.files) {
+                UpdateRPNSOffsets(rawFile);
+            }
 
+            newFileManager.Sort();
             fileManager = newFileManager;
+
+            scripting.ResetIDAndOffsets();
 
             return newFileManager;
 
@@ -610,33 +606,37 @@ namespace FCopParser {
 
             // TODO: Function and script files
             var scriptingFiles = scripting.Compile();
-            foreach (var file in scriptingFiles) {
+            var compiledEmptyOffset = scripting.rpns.code[scripting.emptyOffset].offset;
 
+            foreach (var file in scriptingFiles) {
+                UpdateRPNSOffsets(file);
                 CreateHeaderWithFile(file, "FCop" + file.dataFourCC, "");
 
             }
 
-            UpdateRPNSOffsets();
-
-            CreateHeaderWithFile(audio.CompileSoundHeader(), "FCopCshd", "");
+            var soundHeader = audio.CompileSoundHeader();
+            UpdateRPNSOffsets(soundHeader);
+            CreateHeaderWithFile(soundHeader, "FCopCshd", "");
 
             foreach (var wav in audio.soundEffects) {
+                UpdateRPNSOffsets(wav.rawFile);
                 CreateHeaderWithFile(wav.rawFile, "FCopCwav", wav.name);
             }
 
-
-
             foreach (var navMesh in navMeshes) {
+                UpdateRPNSOffsets(navMesh.rawFile);
                 CreateHeaderWithFile(navMesh.Compile(), "FCopCnet", navMesh.name);
             }
 
             foreach (var texture in textures) {
+                UpdateRPNSOffsets(texture.rawFile);
                 CreateHeaderWithFile(texture.Compile(), "FCopCbmp", texture.name);
             }
 
-            CreateHeaderWithFile(TextureSnippet.Compile(textureSnippets, scripting.emptyOffset), "FCopCdcs", "");
+            CreateHeaderWithFile(TextureSnippet.Compile(textureSnippets, compiledEmptyOffset), "FCopCdcs", "");
 
             foreach (var obj in objects) {
+                UpdateRPNSOffsets(obj.rawFile);
                 CreateHeaderWithFile(obj.Compile(), "FCopCobj", obj.name);
             }
 
@@ -751,7 +751,7 @@ namespace FCopParser {
                 }
 
                 total.AddRange(
-                    CreateHeader(new IFFDataFile(2, new(), "Ctil", 0, scripting.emptyOffset),
+                    CreateHeader(new IFFDataFile(2, new(), "Ctil", 0, compiledEmptyOffset),
                     "SECTION ", "", sectionData.Count));
                 total.AddRange(sectionData);
 
@@ -760,7 +760,7 @@ namespace FCopParser {
             sceneActors.Compile();
 
             foreach (var actor in sceneActors.actors) {
-
+                UpdateRPNSOffsets(actor.rawFile);
                 CreateHeaderWithFile(actor.rawFile, "FCop" + actor.rawFile.dataFourCC, actor.name);
 
             }
@@ -835,6 +835,8 @@ namespace FCopParser {
                 if (dataAccountedFor.Contains(file.dataFourCC)) {
                     continue;
                 }
+
+                UpdateRPNSOffsets(file);
 
                 CreateHeaderWithFile(file, "FCop" + file.dataFourCC, "");
 

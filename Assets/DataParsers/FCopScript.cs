@@ -25,13 +25,12 @@ namespace FCopParser {
                 functionParser.Compile()
             };
 
-            emptyOffset = rpns.code.Last().Value.offset;
-
             return total;
         }
 
         public void ResetIDAndOffsets() {
             rpns.ResetKeys();
+            emptyOffset = rpns.code.Last().Value.offset;
         }
 
         // Added a debug code I forgot about and now mission files are messed up
@@ -116,10 +115,10 @@ namespace FCopParser {
             { ByteCode.ADD_19_SET, 2 },
             { ByteCode.SUB_16_SET, 2 },
             { ByteCode.SUB_19_SET, 2 },
-            { ByteCode.Destroy, 3 },
-            { ByteCode.BYTE57, 3 },
-            { ByteCode.BYTE58, 3 },
-            { ByteCode.BYTE59, 3 },
+            { ByteCode.ACTOR_FUNC, 3 },
+            { ByteCode.GROUP_ACTOR_FUNC, 3 },
+            { ByteCode.TEAM_ACTOR_FUNC, 3 },
+            { ByteCode.NAV_MESH_STATE_CHANGE, 3 },
             { ByteCode.Spawn, 3 },
             { ByteCode.SpawnAll, 3 },
             { ByteCode.BYTE62, 3 }
@@ -245,20 +244,20 @@ namespace FCopParser {
             { new ScriptDataKey(ByteCode.SUB_19_SET, 2),
                 new ScriptOperationData("-=(19)", ScriptDataType.Void, new() { new ScriptParameter("Value", ScriptDataType.Int), new ScriptParameter("Var ID", ScriptDataType.Int) })
             },
-            { new ScriptDataKey(ByteCode.Destroy, 3),
-                new ScriptOperationData("56", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
+            { new ScriptDataKey(ByteCode.ACTOR_FUNC, 3),
+                new ScriptOperationData("Actor Function", ScriptDataType.Void, new() { new ScriptParameter("Actor", ScriptDataType.Int), new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
             },
-            { new ScriptDataKey(ByteCode.Destroy, 2),
-                new ScriptOperationData("56(2)", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int) })
+            { new ScriptDataKey(ByteCode.ACTOR_FUNC, 2),
+                new ScriptOperationData("Actor Function(2)", ScriptDataType.Void, new() { new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
             },
-            { new ScriptDataKey(ByteCode.BYTE57, 3),
-                new ScriptOperationData("57", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
+            { new ScriptDataKey(ByteCode.GROUP_ACTOR_FUNC, 3),
+                new ScriptOperationData("Group Actor Function", ScriptDataType.Void, new() { new ScriptParameter("Actor Group", ScriptDataType.Int), new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
             },
-            { new ScriptDataKey(ByteCode.BYTE58, 3),
-                new ScriptOperationData("58", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
+            { new ScriptDataKey(ByteCode.TEAM_ACTOR_FUNC, 3),
+                new ScriptOperationData("Team Actor Function", ScriptDataType.Void, new() { new ScriptParameter("Team", ScriptDataType.Int), new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
             },
-            { new ScriptDataKey(ByteCode.BYTE59, 3),
-                new ScriptOperationData("59", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
+            { new ScriptDataKey(ByteCode.NAV_MESH_STATE_CHANGE, 3),
+                new ScriptOperationData("Nav Mesh State Change", ScriptDataType.Void, new() { new ScriptParameter("Nav Mesh Index", ScriptDataType.Int), new ScriptParameter("Disabled", ScriptDataType.Int), new ScriptParameter("Nav Mesh Node Index", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.Spawn, 3),
                 new ScriptOperationData("60", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
@@ -646,10 +645,10 @@ namespace FCopParser {
         ADD_19_SET = 51,
         SUB_16_SET = 52,
         SUB_19_SET = 55,
-        Destroy = 56,
-        BYTE57 = 57,
-        BYTE58 = 58,
-        BYTE59 = 59,
+        ACTOR_FUNC = 56,
+        GROUP_ACTOR_FUNC = 57,
+        TEAM_ACTOR_FUNC = 58,
+        NAV_MESH_STATE_CHANGE = 59,
         Spawn = 60,
         SpawnAll = 61,
         BYTE62 = 62,

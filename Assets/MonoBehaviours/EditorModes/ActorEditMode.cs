@@ -340,20 +340,20 @@ public class ActorEditMode : EditMode {
 
             void SearchScript(ScriptNode script, int offset) {
 
-                if (script.byteCode == ByteCode.Destroy) {
+                if (script.byteCode == ByteCode.Spawn) {
 
-                    FCopActor actorReference;
+                    //FCopActor actorReference;
 
-                    try {
-                        actorReference = main.level.sceneActors.actorsByID[((LiteralNode)script.parameters[0]).value];
-                    }
-                    catch {
-                        actorReference = null;
-                    }
+                    //try {
+                    //    actorReference = main.level.sceneActors.actorsByID[((LiteralNode)script.parameters[0]).value];
+                    //}
+                    //catch {
+                    //    actorReference = null;
+                    //}
 
-                    if (script.parameters[1] is LiteralNode lit) {
+                    if (script.parameters[1] is LiteralNode lit && script.parameters[2] is LiteralNode lit2) {
 
-                        if (lit.value == 124
+                        if (lit.value == 71 && lit2.value == 1
                             //&& (actorReference != null && actorReference.behaviorType == ActorBehavior.DynamicProp)
                             ) {
 
