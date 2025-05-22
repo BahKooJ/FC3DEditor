@@ -340,7 +340,7 @@ public class ActorEditMode : EditMode {
 
             void SearchScript(ScriptNode script, int offset) {
 
-                if (script.byteCode == ByteCode.Spawn) {
+                if (script.byteCode == ByteCode.SPAWNING_FUNC) {
 
                     //FCopActor actorReference;
 

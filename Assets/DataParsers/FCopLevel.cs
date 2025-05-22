@@ -2584,7 +2584,7 @@ namespace FCopParser {
 
     public class HeightPoints {
 
-        public const float multiplyer = 30f;
+        public const float multiplyer = 32f;
         public const float maxValue = SByte.MaxValue / multiplyer;
         public const float minValue = SByte.MinValue / multiplyer;
         public const int invalid = -128;

@@ -119,9 +119,9 @@ namespace FCopParser {
             { ByteCode.GROUP_ACTOR_FUNC, 3 },
             { ByteCode.TEAM_ACTOR_FUNC, 3 },
             { ByteCode.NAV_MESH_STATE_CHANGE, 3 },
-            { ByteCode.Spawn, 3 },
-            { ByteCode.SpawnAll, 3 },
-            { ByteCode.BYTE62, 3 }
+            { ByteCode.SPAWNING_FUNC, 3 },
+            { ByteCode.GROUP_SPAWNING_FUNC, 3 },
+            { ByteCode.STATIC_PROP_FUNC, 3 }
 
         };
 
@@ -245,27 +245,27 @@ namespace FCopParser {
                 new ScriptOperationData("-=(19)", ScriptDataType.Void, new() { new ScriptParameter("Value", ScriptDataType.Int), new ScriptParameter("Var ID", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.ACTOR_FUNC, 3),
-                new ScriptOperationData("Actor Function", ScriptDataType.Void, new() { new ScriptParameter("Actor", ScriptDataType.Int), new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
+                new ScriptOperationData("Actor Func", ScriptDataType.Void, new() { new ScriptParameter("Actor", ScriptDataType.Int), new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.ACTOR_FUNC, 2),
-                new ScriptOperationData("Actor Function(2)", ScriptDataType.Void, new() { new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
+                new ScriptOperationData("Actor Func(2)", ScriptDataType.Void, new() { new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.GROUP_ACTOR_FUNC, 3),
-                new ScriptOperationData("Group Actor Function", ScriptDataType.Void, new() { new ScriptParameter("Actor Group", ScriptDataType.Int), new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
+                new ScriptOperationData("Group Actor Func", ScriptDataType.Void, new() { new ScriptParameter("Actor Group", ScriptDataType.Int), new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.TEAM_ACTOR_FUNC, 3),
-                new ScriptOperationData("Team Actor Function", ScriptDataType.Void, new() { new ScriptParameter("Team", ScriptDataType.Int), new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
+                new ScriptOperationData("Team Actor Func", ScriptDataType.Void, new() { new ScriptParameter("Team", ScriptDataType.Int), new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.NAV_MESH_STATE_CHANGE, 3),
                 new ScriptOperationData("Nav Mesh State Change", ScriptDataType.Void, new() { new ScriptParameter("Nav Mesh Index", ScriptDataType.Int), new ScriptParameter("Disabled", ScriptDataType.Int), new ScriptParameter("Nav Mesh Node Index", ScriptDataType.Int) })
             },
-            { new ScriptDataKey(ByteCode.Spawn, 3),
-                new ScriptOperationData("60", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
+            { new ScriptDataKey(ByteCode.SPAWNING_FUNC, 3),
+                new ScriptOperationData("Spawning Func", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
             },
-            { new ScriptDataKey(ByteCode.SpawnAll, 3),
-                new ScriptOperationData("61", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
+            { new ScriptDataKey(ByteCode.GROUP_SPAWNING_FUNC, 3),
+                new ScriptOperationData("Group Spawning Func", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
             },
-            { new ScriptDataKey(ByteCode.BYTE62, 3),
+            { new ScriptDataKey(ByteCode.STATIC_PROP_FUNC, 3),
                 new ScriptOperationData("62", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
             },
 
@@ -649,9 +649,9 @@ namespace FCopParser {
         GROUP_ACTOR_FUNC = 57,
         TEAM_ACTOR_FUNC = 58,
         NAV_MESH_STATE_CHANGE = 59,
-        Spawn = 60,
-        SpawnAll = 61,
-        BYTE62 = 62,
+        SPAWNING_FUNC = 60,
+        GROUP_SPAWNING_FUNC = 61,
+        STATIC_PROP_FUNC = 62,
     }
 
     public enum ScriptDataType {
