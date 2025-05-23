@@ -8,13 +8,10 @@ using UnityEngine.UI;
 
 public class ExpressionNodeView : MonoBehaviour {
 
-    static Color expressionColor = new Color(0x00 / 255f, 0x30 / 255f, 0x24 / 255f);
-    static Color literalColor = new Color(0x01 / 255f, 0x71 / 255f, 0x71 / 255f);
-    static Color varColor = new Color(0x2C / 255f, 0x6C / 255f, 0x00 / 255f);
-
     // - Unity Prefabs -
     public GameObject expressionNodePrefab;
     public GameObject literalNodePrefab;
+    public GameObject varNodePrefab;
     public GameObject paddingPrefab;
 
     // - Unity Refs -
@@ -39,6 +36,7 @@ public class ExpressionNodeView : MonoBehaviour {
 
             GameObject nodeObj = parameter.scriptNode switch {
                 LiteralNode => Instantiate(literalNodePrefab, transform, false),
+                VariableNode => Instantiate(varNodePrefab, transform, false),
                 _ => Instantiate(expressionNodePrefab, transform, false),
             };
 
@@ -81,8 +79,6 @@ public class ExpressionNodeView : MonoBehaviour {
                 CreateNode(parameters);
 
             }
-
-            backgroundImage.color = expressionColor;
 
         }
 

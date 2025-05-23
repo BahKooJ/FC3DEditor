@@ -14,6 +14,7 @@ public class StatementNodeView : DragableUIElement {
     // - Unity Prefabs -
     public GameObject expressionNodePrefab;
     public GameObject literalNodePrefab;
+    public GameObject varNodePrefab;
     public GameObject paddingPrefab;
     public GameObject parameterNodeFab;
 
@@ -41,6 +42,7 @@ public class StatementNodeView : DragableUIElement {
 
             GameObject nodeObj = parameter.scriptNode switch {
                 LiteralNode => Instantiate(literalNodePrefab),
+                VariableNode => Instantiate(varNodePrefab, transform, false),
                 _ => Instantiate(expressionNodePrefab),
             };
 

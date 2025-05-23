@@ -58,9 +58,16 @@ public class AssetManagerView : MonoBehaviour {
 
         }
 
+        var streamsDir = new AssetDirectory(AssetType.SndsSound, false, "Streams", root);
+
+        foreach (var stream in level.audio.soundStreams) {
+            streamsDir.files.Add(new AssetFile(stream.sound, AssetType.SndsSound, streamsDir));
+        }
+
         root.directories.Add(soundDir);
         root.directories.Add(textureDir);
         root.directories.Add(objectDir);
+        root.directories.Add(streamsDir);
 
         root.files.Add(new AssetFile(level.audio.music, AssetType.Music, root));
 
@@ -174,6 +181,7 @@ public class AssetManagerView : MonoBehaviour {
                 InstanciateObjectProperties((FCopObject)file.asset);
                 break;
             case AssetType.SndsSound:
+                InstanciateSoundPlayer((FCopAudio)file.asset);
                 break;
             case AssetType.Music:
                 InstanciateSoundPlayer((FCopAudio)file.asset);

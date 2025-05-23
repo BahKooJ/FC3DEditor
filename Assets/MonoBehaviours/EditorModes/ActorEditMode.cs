@@ -336,58 +336,60 @@ public class ActorEditMode : EditMode {
 
         if (Input.GetKeyDown(KeyCode.F10)) {
 
-            var offsets = new List<int>();
+            var offsets = new List<int>() { 181 };
 
-            void SearchScript(ScriptNode script, int offset) {
+            //void SearchScript(ScriptNode script, int offset) {
 
-                if (script.byteCode == ByteCode.SPAWNING_FUNC) {
+            //    if (script.byteCode == ByteCode.SPAWNING_FUNC) {
 
-                    //FCopActor actorReference;
+            //        //FCopActor actorReference;
 
-                    //try {
-                    //    actorReference = main.level.sceneActors.actorsByID[((LiteralNode)script.parameters[0]).value];
-                    //}
-                    //catch {
-                    //    actorReference = null;
-                    //}
+            //        //try {
+            //        //    actorReference = main.level.sceneActors.actorsByID[((LiteralNode)script.parameters[0]).value];
+            //        //}
+            //        //catch {
+            //        //    actorReference = null;
+            //        //}
 
-                    if (script.parameters[1] is LiteralNode lit && script.parameters[2] is LiteralNode lit2) {
+            //        if (script.parameters[1] is LiteralNode lit && script.parameters[2] is LiteralNode lit2) {
 
-                        if (lit.value == 71 && lit2.value == 1
-                            //&& (actorReference != null && actorReference.behaviorType == ActorBehavior.DynamicProp)
-                            ) {
+            //            if (lit.value == 71 && lit2.value == 1
+            //                //&& (actorReference != null && actorReference.behaviorType == ActorBehavior.DynamicProp)
+            //                ) {
 
-                            offsets.Add(offset);
+            //                offsets.Add(offset);
 
-                        }
+            //            }
 
-                    }
+            //        }
 
-                }
+            //    }
 
-                foreach (var para in script.parameters) {
-                    SearchScript(para, offset);
-                }
+            //    foreach (var para in script.parameters) {
+            //        SearchScript(para, offset);
+            //    }
 
-                if (script is ScriptNestingNode scriptNesting) {
+            //    if (script is ScriptNestingNode scriptNesting) {
 
-                    foreach (var nestedScript in scriptNesting.nestedNodes) {
-                        SearchScript(nestedScript, offset);
-                    }
+            //        foreach (var nestedScript in scriptNesting.nestedNodes) {
+            //            SearchScript(nestedScript, offset);
+            //        }
 
-                }
+            //    }
 
 
 
-            }
+            //}
 
-            foreach (var script in main.level.scripting.rpns.code) {
+            //foreach (var script in main.level.scripting.rpns.code) {
 
-                foreach (var line in script.Value.code) {
-                    SearchScript(line, script.Key);
-                }
+            //    foreach (var line in script.Value.code) {
+            //        SearchScript(line, script.Key);
+            //    }
 
-            }
+            //}
+
+
 
             var actors = main.level.sceneActors.actors.Where(a => {
 

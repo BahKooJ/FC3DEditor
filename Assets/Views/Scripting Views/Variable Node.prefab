@@ -34,8 +34,8 @@ RectTransform:
   m_Father: {fileID: 5001642633774744197}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 20, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
@@ -351,9 +351,9 @@ GameObject:
   - component: {fileID: 6532242173359243619}
   - component: {fileID: 2094964203151101858}
   - component: {fileID: 9002557664747725861}
-  - component: {fileID: 5233705989860236943}
+  - component: {fileID: 7896730659796619371}
   m_Layer: 6
-  m_Name: Expression Node
+  m_Name: Variable Node
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -404,7 +404,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.1882353, b: 0.14117648, a: 1}
+  m_Color: {r: 0.17254902, g: 0.42352942, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -461,7 +461,7 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &5233705989860236943
+--- !u!114 &7896730659796619371
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -470,12 +470,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 8547359735126737856}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 929127a7f882d17428b56ba81f9a6584, type: 3}
+  m_Script: {fileID: 11500000, guid: c9a8962169095c94dbad9ddd95a84f0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   expressionNodePrefab: {fileID: 0}
-  literalNodePrefab: {fileID: 8547359735126737856, guid: 966ca1030d1a9d24a88ecf2da304bcf5, type: 3}
-  varNodePrefab: {fileID: 8547359735126737856, guid: 73de1ab72d7bc904d89edf7bb36085b9, type: 3}
+  literalNodePrefab: {fileID: 0}
+  varNodePrefab: {fileID: 0}
   paddingPrefab: {fileID: 7848249455887318779}
   expressionText: {fileID: 5486397937650842999}
   endBracket: {fileID: 7776246371061328223}
