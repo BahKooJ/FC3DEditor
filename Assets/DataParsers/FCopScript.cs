@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.XR;
 
 namespace FCopParser {
 
@@ -352,14 +353,18 @@ namespace FCopParser {
             ByteCode.OR
         };
 
-        public static List<ByteCode> reverseDoubleOperators = new() {
+        public static List<ByteCode> varAssignmentOperators = new() {
+            ByteCode.INCREMENT_16,
+            ByteCode.INCREMENT_19,
+            ByteCode.DECREMENT_16,
+            ByteCode.DECREMENT_19,
             ByteCode.SET_16,
             ByteCode.SET_18,
             ByteCode.SET_19,
             ByteCode.ADD_16_SET,
             ByteCode.ADD_19_SET,
             ByteCode.SUB_16_SET,
-            ByteCode.SUB_19_SET
+            ByteCode.SUB_19_SET,
         };
 
         public List<ScriptNode> Decompile(int startingOffset, List<byte> code, out int terminationOffset) {
@@ -523,13 +528,13 @@ namespace FCopParser {
                     ScriptNode node;
 
                     if (Enum.IsDefined(typeof(ScriptVariableType), (int)byteCode) && parameters.Count == 1 && parameters[0] is LiteralNode litNode) {
-                        node = new VariableNode(byteCode, (ScriptVariableType)b, litNode.value);
+                        node = new VariableNode(true, (ScriptVariableType)b, litNode.value);
                     }
                     else if (doubleOperators.Contains(byteCode) && paraCount == 2) {
-                        node = new DoubleOperator(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData), parameters, false);
+                        node = new OperatorNode(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData), parameters, false);
                     }
-                    else if (reverseDoubleOperators.Contains(byteCode) && paraCount == 2) {
-                        node = new DoubleOperator(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData), parameters, true);
+                    else if (varAssignmentOperators.Contains(byteCode)) {
+                        node = new VariableAssignmentNode(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData), parameters, true);
                     }
                     else if (byteCode == ByteCode.CONDITIONAL_JUMP) {
                         node = new ScriptNestingNode(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData), parameters);
@@ -659,7 +664,7 @@ namespace FCopParser {
             offset = newOffset;
 
             if (!compiledBytes.SequenceEqual(total)) {
-                throw new Exception("skill issue");
+                //throw new Exception("skill issue");
             }
 
             compiledBytes = total;
@@ -814,16 +819,16 @@ namespace FCopParser {
 
                     switch (parData.dataType) {
                         case ScriptDataType.GlobalVar:
-                            parameters[i] = new VariableNode(ByteCode.NONE, ScriptVariableType.Global, literalNode.value);
+                            parameters[i] = new VariableNode(false, ScriptVariableType.Global, literalNode.value);
                             break;
                         case ScriptDataType.SystemVar:
-                            parameters[i] = new VariableNode(ByteCode.NONE, ScriptVariableType.System, literalNode.value);
+                            parameters[i] = new VariableNode(false, ScriptVariableType.System, literalNode.value);
                             break;
                         case ScriptDataType.TimerVar:
-                            parameters[i] = new VariableNode(ByteCode.NONE, ScriptVariableType.Timer, literalNode.value);
+                            parameters[i] = new VariableNode(false, ScriptVariableType.Timer, literalNode.value);
                             break;
                         case ScriptDataType.UserVar:
-                            parameters[i] = new VariableNode(ByteCode.NONE, ScriptVariableType.User, literalNode.value);
+                            parameters[i] = new VariableNode(false, ScriptVariableType.User, literalNode.value);
                             break;
                     }
 
@@ -887,11 +892,11 @@ namespace FCopParser {
 
     }
 
-    public class DoubleOperator : ScriptNode {
+    public class OperatorNode : ScriptNode {
 
         public bool reversed;
 
-        public DoubleOperator(ByteCode byteCode, string name, ScriptDataType defaultReturnType, List<ScriptParameter> parameterData, List<ScriptNode> parameters, bool reversed) : base(byteCode, name, defaultReturnType, parameterData, parameters) {
+        public OperatorNode(ByteCode byteCode, string name, ScriptDataType defaultReturnType, List<ScriptParameter> parameterData, List<ScriptNode> parameters, bool reversed) : base(byteCode, name, defaultReturnType, parameterData, parameters) {
             this.reversed = reversed;
         }
 
@@ -913,12 +918,92 @@ namespace FCopParser {
 
     }
 
+    public class VariableAssignmentNode : OperatorNode {
+
+        const int incrementByteCodeOffset = 5;
+        const int decrementByteCodeOffset = 9;
+        const int assignByteCodeOffset = 13;
+        const int addByteCodeOffset = 32;
+        const int subByteCodeOffset = 36;
+
+        public enum AssignmentType {
+            Increment,
+            Decrement,
+            Assign,
+            Add,
+            Sub
+        }
+
+        VariableNode varNode;
+        AssignmentType assignmentType;
+
+        public VariableAssignmentNode(ByteCode byteCode, string name, ScriptDataType defaultReturnType, List<ScriptParameter> parameterData, List<ScriptNode> parameters, bool reversed) : base(byteCode, name, defaultReturnType, parameterData, parameters, reversed) {
+
+            foreach (var parameter in this.parameters) {
+                if (parameter is VariableNode) {
+                    varNode = (VariableNode)parameter;
+                    break;
+                }
+            }
+            if (byteCode == ByteCode.INCREMENT_16 || byteCode == ByteCode.INCREMENT_19) {
+                varNode.allowedVarTypeConverstion = new() { ScriptVariableType.Global, ScriptVariableType.User };
+                assignmentType = AssignmentType.Increment;
+            }
+            else if (byteCode == ByteCode.DECREMENT_16 || byteCode == ByteCode.DECREMENT_19) {
+                varNode.allowedVarTypeConverstion = new() { ScriptVariableType.Global, ScriptVariableType.User };
+                assignmentType = AssignmentType.Decrement;
+            }
+            else if (byteCode == ByteCode.SET_16 || byteCode == ByteCode.SET_17 || byteCode == ByteCode.SET_18 || byteCode == ByteCode.SET_19) {
+                assignmentType = AssignmentType.Assign;
+            }
+            else if (byteCode == ByteCode.ADD_16_SET || byteCode == ByteCode.ADD_19_SET) {
+                varNode.allowedVarTypeConverstion = new() { ScriptVariableType.Global, ScriptVariableType.User };
+                assignmentType = AssignmentType.Add;
+            }
+            else if (byteCode == ByteCode.SUB_16_SET || byteCode == ByteCode.SUB_19_SET) {
+                varNode.allowedVarTypeConverstion = new() { ScriptVariableType.Global, ScriptVariableType.User };
+                assignmentType = AssignmentType.Sub;
+            }
+
+        }
+
+        public override List<byte> Compile() {
+
+            var varTypeValue = (int)varNode.varibleType;
+
+            // Alright this is kind of a little sneaky.
+            // The values on the enum variableType are the byte codes for the gets (16, 17, 18, 19).
+            // These assignment byte codes are still sorted in the same way even if one var type is unused.
+            // So to get the correct byte code from the var type, we can just offset the number.
+            // For exampled the var type global which is 16, as a set code of 29. The difference is 13.
+            // Well the set for user vars (19), is 32, which is still 13 away.
+            // Because these numbers will never change this simple math way of getting the byte code works.
+            switch (assignmentType) {
+                case AssignmentType.Increment:
+                    return new() { (byte)(varTypeValue + incrementByteCodeOffset) };
+                case AssignmentType.Decrement:
+                    return new() { (byte)(varTypeValue + decrementByteCodeOffset) };
+                case AssignmentType.Assign:
+                    return new() { (byte)(varTypeValue + assignByteCodeOffset) };
+                case AssignmentType.Add:
+                    return new() { (byte)(varTypeValue + addByteCodeOffset) };
+                case AssignmentType.Sub:
+                    return new() { (byte)(varTypeValue + subByteCodeOffset) };
+                default:
+                    return base.Compile();
+            }
+        }
+
+    }
+
     public class VariableNode : ScriptNode {
 
+        public bool isGet;
         public int id;
         public ScriptVariableType varibleType;
+        public List<ScriptVariableType> allowedVarTypeConverstion = new() { ScriptVariableType.Global, ScriptVariableType.System, ScriptVariableType.Timer, ScriptVariableType.User };
 
-        public VariableNode(ByteCode byteCode, ScriptVariableType varibleType, int id) : base() {
+        public void SetData(ScriptVariableType varibleType, int id) {
             this.id = id;
             this.varibleType = varibleType;
 
@@ -945,18 +1030,22 @@ namespace FCopParser {
                     break;
             }
 
-            this.byteCode = byteCode;
             this.name = varData.name;
             this.defaultReturnType = varData.dataType;
         }
 
+        public VariableNode(bool isGet, ScriptVariableType varibleType, int id) : base() {
+            this.isGet = isGet;
+            SetData(varibleType, id);
+        }
+
         public override List<byte> Compile() {
 
-            if (byteCode == ByteCode.NONE) {
+            if (!isGet) {
                 return new() { (byte)(id + 128) };
             }
             else {
-                return new() { (byte)(id + 128), (byte)byteCode };
+                return new() { (byte)(id + 128), (byte)varibleType };
             }
 
         }

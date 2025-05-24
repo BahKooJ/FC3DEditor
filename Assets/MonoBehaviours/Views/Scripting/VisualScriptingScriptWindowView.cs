@@ -92,6 +92,7 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
                 ((RectTransform)visualNodeObj.transform).anchoredPosition = pos;
 
                 visualNode.scriptNode = node;
+                visualNode.currentLine = line;
 
                 if (node is ScriptNestingNode nestingNode) {
 

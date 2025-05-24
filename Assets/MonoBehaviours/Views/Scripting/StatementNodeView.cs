@@ -26,6 +26,8 @@ public class StatementNodeView : DragableUIElement {
     // - Parameters -
     public ScriptNode scriptNode;
     [HideInInspector]
+    public VisualScriptingLineView currentLine;
+    [HideInInspector]
     public List<VisualScriptingLineView> associatedLines = new();
 
     public List<ExpressionNodeView> expressionNodes;
@@ -48,6 +50,7 @@ public class StatementNodeView : DragableUIElement {
 
             var node = nodeObj.GetComponent<ExpressionNodeView>();
             node.parameterNode = parameter;
+            node.currentLine = currentLine;
 
             expressionNodes.Add(node);
 
@@ -69,19 +72,26 @@ public class StatementNodeView : DragableUIElement {
 
         if (expressionNodes.Count != 0) {
 
-            if (scriptNode is DoubleOperator) {
+            if (scriptNode is OperatorNode) {
 
                 expressionNodes[0].transform.SetParent(transform, false);
                 expressionNodes[0].Init();
 
-                Pad();
+                if (expressionNodes.Count > 1) {
 
-                statementText.transform.SetSiblingIndex(transform.childCount - 1);
+                    Pad();
 
-                Pad();
+                    statementText.transform.SetSiblingIndex(transform.childCount - 1);
 
-                expressionNodes[1].transform.SetParent(transform, false);
-                expressionNodes[1].Init();
+                    Pad();
+
+                    expressionNodes[1].transform.SetParent(transform, false);
+                    expressionNodes[1].Init();
+
+                }
+                else {
+                    statementText.transform.SetSiblingIndex(transform.childCount - 1);
+                }
 
             }
             else {

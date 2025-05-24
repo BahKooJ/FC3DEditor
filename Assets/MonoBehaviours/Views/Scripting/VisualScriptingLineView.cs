@@ -2,6 +2,8 @@
 using TMPro;
 using UnityEngine;
 using FCopParser;
+using UnityEngine.UI;
+using Unity.VisualScripting;
 
 public class VisualScriptingLineView : MonoBehaviour {
 
@@ -23,6 +25,33 @@ public class VisualScriptingLineView : MonoBehaviour {
 
     private void Start() {
         numberText.text = number.ToString();
+    }
+
+    // Love how I have to yell at unity 22 different times just to get the damn layouts to do their job.
+    public void RefreshLayout() {
+
+        void ReloadLayout(Transform transform) {
+
+            Canvas.ForceUpdateCanvases();
+
+            if (transform.gameObject.TryGetComponent<HorizontalLayoutGroup>(out var layouts)) {
+                layouts.enabled = false;
+                layouts.enabled = true;
+            }
+
+            foreach (Transform transform1 in transform) {
+                ReloadLayout(transform1);
+            }
+
+        }
+
+        Canvas.ForceUpdateCanvases();
+
+        foreach (Transform transform in lineContent) {
+            ReloadLayout(transform);
+        }
+
+
     }
 
     public void OnReceiverDrag() {

@@ -257,6 +257,7 @@ MonoBehaviour:
   statementText: {fileID: 3308916068984118278}
   endBracket: {fileID: 6530134690143696824}
   backgroundImage: {fileID: 2114225738920996258}
+  currentLine: {fileID: 0}
   associatedLines: []
   expressionNodes: []
 --- !u!1 &5831553675030962827

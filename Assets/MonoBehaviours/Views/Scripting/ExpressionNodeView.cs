@@ -18,8 +18,10 @@ public class ExpressionNodeView : MonoBehaviour {
     public TMP_Text expressionText;
     public Transform endBracket;
     public Image backgroundImage;
-    
+
     // - Parameters -
+    [HideInInspector]
+    public VisualScriptingLineView currentLine;
     public ParameterNode parameterNode;
 
     public List<ExpressionNodeView> expressionNodes;
@@ -42,6 +44,7 @@ public class ExpressionNodeView : MonoBehaviour {
 
             var node = nodeObj.GetComponent<ExpressionNodeView>();
             node.parameterNode = parameter;
+            node.currentLine = currentLine;
 
             expressionNodes.Add(node);
 
@@ -51,7 +54,7 @@ public class ExpressionNodeView : MonoBehaviour {
 
         }
         
-        if (parameterNode.scriptNode is DoubleOperator doubleOperator) {
+        if (parameterNode.scriptNode is OperatorNode doubleOperator) {
 
             expressionText.text = parameterNode.scriptNode.name;
 
@@ -63,9 +66,13 @@ public class ExpressionNodeView : MonoBehaviour {
 
             expressionText.transform.SetSiblingIndex(transform.childCount - 1);
 
-            Pad();
+            if (parameters.Count > 1) {
 
-            CreateNode(parameters[1]);
+                Pad();
+
+                CreateNode(parameters[1]);
+
+            }
 
         }
         else {
