@@ -11,6 +11,7 @@ public class ScriptingPanelView : MonoBehaviour {
     public Transform scriptListContent;
     public VisualScriptingScriptWindowView scriptingWindow;
     public VisualScriptingFuncWindowView funcScriptingWindow;
+    public VariableManagerView variableManagerView;
     //public AssetManagerView assetManager;
 
     // - Prefabs -
@@ -108,6 +109,9 @@ public class ScriptingPanelView : MonoBehaviour {
 
     public void OnClickScriptTab() {
 
+        scriptingWindow.gameObject.SetActive(true);
+        variableManagerView.gameObject.SetActive(false);
+
         isScriptTab = true;
         Refresh();
 
@@ -115,17 +119,23 @@ public class ScriptingPanelView : MonoBehaviour {
 
     public void OnClickFuncTab() {
 
+        scriptingWindow.gameObject.SetActive(true);
+        variableManagerView.gameObject.SetActive(false);
+
         isScriptTab = false;
         Refresh();
 
     }
 
-    public void OnDone() {
-        Destroy(gameObject);
+    public void OnClickVariableTab() {
+
+        scriptingWindow.gameObject.SetActive(false);
+        variableManagerView.gameObject.SetActive(true);
+
     }
 
-    public void OnApply() {
-
+    public void OnDone() {
+        Destroy(gameObject);
     }
 
 }

@@ -9,6 +9,16 @@ public class VariableNodeView : ExpressionNodeView {
     // - Prefabs -
     public GameObject variableSelectorView;
 
+    public override void Init() {
+
+        var varNode = parameterNode.scriptNode as VariableNode;
+
+        varNode.RefreshData();
+
+        base.Init();
+
+    }
+
     public void OnClick() {
 
         var existingVariableSelector = Object.FindAnyObjectByType<VariableSelectorView>();

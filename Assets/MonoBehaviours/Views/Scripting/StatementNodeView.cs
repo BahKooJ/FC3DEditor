@@ -16,6 +16,7 @@ public class StatementNodeView : DragableUIElement {
     public GameObject literalNodePrefab;
     public GameObject varNodePrefab;
     public GameObject paddingPrefab;
+    public GameObject boolNodePrefab;
     public GameObject parameterNodeFab;
 
     // - Unity Refs -
@@ -42,11 +43,25 @@ public class StatementNodeView : DragableUIElement {
 
         void CreateNode(ParameterNode parameter) {
 
-            GameObject nodeObj = parameter.scriptNode switch {
-                LiteralNode => Instantiate(literalNodePrefab),
-                VariableNode => Instantiate(varNodePrefab, transform, false),
-                _ => Instantiate(expressionNodePrefab),
-            };
+            GameObject nodeObj;
+
+            if (parameter.scriptNode is LiteralNode) {
+
+                nodeObj = parameter.dataType switch {
+                    ScriptDataType.GlobalVar => Instantiate(varNodePrefab),
+                    ScriptDataType.SystemVar => Instantiate(varNodePrefab),
+                    ScriptDataType.TimerVar => Instantiate(varNodePrefab),
+                    ScriptDataType.UserVar => Instantiate(varNodePrefab),
+                    ScriptDataType.Int => Instantiate(literalNodePrefab),
+                    ScriptDataType.Bool => Instantiate(boolNodePrefab),
+                    ScriptDataType.Any => Instantiate(literalNodePrefab),
+                    _ => Instantiate(expressionNodePrefab),
+                };
+
+            }
+            else {
+                nodeObj = Instantiate(expressionNodePrefab);
+            }
 
             var node = nodeObj.GetComponent<ExpressionNodeView>();
             node.parameterNode = parameter;

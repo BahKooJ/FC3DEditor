@@ -12,6 +12,7 @@ public class ExpressionNodeView : MonoBehaviour {
     public GameObject expressionNodePrefab;
     public GameObject literalNodePrefab;
     public GameObject varNodePrefab;
+    public GameObject boolNodePrefab;
     public GameObject paddingPrefab;
 
     // - Unity Refs -
@@ -36,11 +37,25 @@ public class ExpressionNodeView : MonoBehaviour {
 
         void CreateNode(ParameterNode parameter) {
 
-            GameObject nodeObj = parameter.scriptNode switch {
-                LiteralNode => Instantiate(literalNodePrefab, transform, false),
-                VariableNode => Instantiate(varNodePrefab, transform, false),
-                _ => Instantiate(expressionNodePrefab, transform, false),
-            };
+            GameObject nodeObj;
+
+            if (parameter.scriptNode is LiteralNode) {
+
+                nodeObj = parameter.dataType switch {
+                    ScriptDataType.GlobalVar => Instantiate(varNodePrefab, transform, false),
+                    ScriptDataType.SystemVar => Instantiate(varNodePrefab, transform, false),
+                    ScriptDataType.TimerVar => Instantiate(varNodePrefab, transform, false),
+                    ScriptDataType.UserVar => Instantiate(varNodePrefab, transform, false),
+                    ScriptDataType.Int => Instantiate(literalNodePrefab, transform, false),
+                    ScriptDataType.Bool => Instantiate(boolNodePrefab, transform, false),
+                    ScriptDataType.Any => Instantiate(literalNodePrefab, transform, false),
+                    _ => Instantiate(expressionNodePrefab, transform, false),
+                };
+
+            }
+            else {
+                nodeObj = Instantiate(expressionNodePrefab, transform, false);
+            }
 
             var node = nodeObj.GetComponent<ExpressionNodeView>();
             node.parameterNode = parameter;

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.XR;
 
 namespace FCopParser {
 
@@ -10,66 +9,66 @@ namespace FCopParser {
 
         public static Dictionary<int, ScriptVariable> globalVariables = new() {
 
-            { 2, new ScriptVariable("Unknown2", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 3, new ScriptVariable("Player Count", ScriptVariableType.Global, ScriptDataType.Int) },
-            { 16, new ScriptVariable("Mission Completed", ScriptVariableType.Global, ScriptDataType.Bool) },
-            { 17, new ScriptVariable("Unknown17", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 19, new ScriptVariable("Sky Captain Level", ScriptVariableType.Global, ScriptDataType.Int) },
-            { 25, new ScriptVariable("Red Points", ScriptVariableType.Global, ScriptDataType.Int) },
-            { 26, new ScriptVariable("Blue Points", ScriptVariableType.Global, ScriptDataType.Int) },
-            { 27, new ScriptVariable("Red Tank Count", ScriptVariableType.Global, ScriptDataType.Int) },
-            { 28, new ScriptVariable("Red Chopper Count", ScriptVariableType.Global, ScriptDataType.Int) },
-            { 29, new ScriptVariable("Blue Tank Count", ScriptVariableType.Global, ScriptDataType.Int) },
-            { 30, new ScriptVariable("Blue Chopper Count", ScriptVariableType.Global, ScriptDataType.Int) },
-            { 31, new ScriptVariable("Red Points Total", ScriptVariableType.Global, ScriptDataType.Int) },
-            { 32, new ScriptVariable("Blue Points Total", ScriptVariableType.Global, ScriptDataType.Int) },
-            { 33, new ScriptVariable("Red Outposts Claimed", ScriptVariableType.Global, ScriptDataType.Int) },
-            { 34, new ScriptVariable("Blue Outposts Claimed", ScriptVariableType.Global, ScriptDataType.Int) },
-            { 35, new ScriptVariable("Riot Shield Unlocked", ScriptVariableType.Global, ScriptDataType.Bool) },
-            { 36, new ScriptVariable("K-9 Drone Unlocked", ScriptVariableType.Global, ScriptDataType.Bool) },
-            { 37, new ScriptVariable("Grenade Unlocked", ScriptVariableType.Global, ScriptDataType.Bool) },
-            { 39, new ScriptVariable("skycaptainBehavior39", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 40, new ScriptVariable("skycaptainBehavior40", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 41, new ScriptVariable("skycaptainBehavior41", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 42, new ScriptVariable("skycaptainBehavior42", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 43, new ScriptVariable("skycaptainBehavior43", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 44, new ScriptVariable("skycaptainBehavior44", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 45, new ScriptVariable("skycaptainBehavior45", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 46, new ScriptVariable("skycaptainBehavior46", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 47, new ScriptVariable("skycaptainBehavior47", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 48, new ScriptVariable("skycaptainBehavior48", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 49, new ScriptVariable("skycaptainBehavior49", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 50, new ScriptVariable("skycaptainBehavior50", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 51, new ScriptVariable("skycaptainBehavior51", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 52, new ScriptVariable("skycaptainBehavior52", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 53, new ScriptVariable("skycaptainBehavior53", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 54, new ScriptVariable("skycaptainBehavior54", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 55, new ScriptVariable("skycaptainBehavior55", ScriptVariableType.Global, ScriptDataType.Any) },
-            { 56, new ScriptVariable("skycaptainBehavior56", ScriptVariableType.Global, ScriptDataType.Any) }
+            { 2, new ScriptVariable("Unknown2", 2, ScriptVariableType.Global, ScriptDataType.Any, "Unknown") },
+            { 3, new ScriptVariable("Player Count", 3, ScriptVariableType.Global, ScriptDataType.Int, "The selected player count") },
+            { 16, new ScriptVariable("Mission Completed", 16, ScriptVariableType.Global, ScriptDataType.Bool, "If the level was completed, opposite in Precinct Assault") },
+            { 17, new ScriptVariable("Unknown17", 17, ScriptVariableType.Global, ScriptDataType.Any, "Unknown") },
+            { 19, new ScriptVariable("Sky Captain Level", 19, ScriptVariableType.Global, ScriptDataType.Int, "Selected level of Sky Capatin starting from 0") },
+            { 25, new ScriptVariable("Red Points", 25, ScriptVariableType.Global, ScriptDataType.Int, "Red team points in Precinct Assault") },
+            { 26, new ScriptVariable("Blue Points", 26, ScriptVariableType.Global, ScriptDataType.Int, "Blue team points in Precinct Assault") },
+            { 27, new ScriptVariable("Red Tank Count", 27, ScriptVariableType.Global, ScriptDataType.Int, "Red tank count in Precinct Assault") },
+            { 28, new ScriptVariable("Red Chopper Count", 28, ScriptVariableType.Global, ScriptDataType.Int, "Red chopper count in Precinct Assault") },
+            { 29, new ScriptVariable("Blue Tank Count", 29, ScriptVariableType.Global, ScriptDataType.Int, "Blue tank count in Precinct Assault") },
+            { 30, new ScriptVariable("Blue Chopper Count", 30, ScriptVariableType.Global, ScriptDataType.Int, "Blue chopper count in Precinct Assault") },
+            { 31, new ScriptVariable("Red Points Total", 31, ScriptVariableType.Global, ScriptDataType.Int, "The total acquired red points in Precinct Assault") },
+            { 32, new ScriptVariable("Blue Points Total", 32, ScriptVariableType.Global, ScriptDataType.Int, "The total acquired blue points in Precinct Assault") },
+            { 33, new ScriptVariable("Red Outposts Claimed", 33, ScriptVariableType.Global, ScriptDataType.Int, "The total claimed outposts by red team in Precinct Assault") },
+            { 34, new ScriptVariable("Blue Outposts Claimed", 34, ScriptVariableType.Global, ScriptDataType.Int, "The total claimed outposts by blue team in Precinct Assault") },
+            { 35, new ScriptVariable("Riot Shield Unlocked", 35, ScriptVariableType.Global, ScriptDataType.Bool, "If the riot shield has been unlocked") },
+            { 36, new ScriptVariable("K-9 Drone Unlocked", 36, ScriptVariableType.Global, ScriptDataType.Bool, "If the K-9 Drone has been unlocked") },
+            { 37, new ScriptVariable("Grenade Unlocked", 37, ScriptVariableType.Global, ScriptDataType.Bool, "If the Grenade has been unlocked") },
+            { 39, new ScriptVariable("skycaptainBehavior39", 39, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 40, new ScriptVariable("skycaptainBehavior40", 40, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 41, new ScriptVariable("skycaptainBehavior41", 41, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 42, new ScriptVariable("skycaptainBehavior42", 42, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 43, new ScriptVariable("skycaptainBehavior43", 43, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 44, new ScriptVariable("skycaptainBehavior44", 44, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 45, new ScriptVariable("skycaptainBehavior45", 45, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 46, new ScriptVariable("skycaptainBehavior46", 46, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 47, new ScriptVariable("skycaptainBehavior47", 47, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 48, new ScriptVariable("skycaptainBehavior48", 48, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 49, new ScriptVariable("skycaptainBehavior49", 49, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 50, new ScriptVariable("skycaptainBehavior50", 50, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 51, new ScriptVariable("skycaptainBehavior51", 51, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 52, new ScriptVariable("skycaptainBehavior52", 52, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 53, new ScriptVariable("skycaptainBehavior53", 53, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 54, new ScriptVariable("skycaptainBehavior54", 54, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 55, new ScriptVariable("skycaptainBehavior55", 55, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") },
+            { 56, new ScriptVariable("skycaptainBehavior56", 56, ScriptVariableType.Global, ScriptDataType.Any, "Unknown Sky Captain behavior variable") }
 
         };
 
         public static Dictionary<int, ScriptVariable> systemVariables = new() {
-            { 0, new ScriptVariable("Frames Rendered", ScriptVariableType.System, ScriptDataType.Int) },
+            { 0, new ScriptVariable("Frames Rendered", 0, ScriptVariableType.System, ScriptDataType.Int, "The total amount of frames rendered from start.") },
         };
 
         public static Dictionary<int, ScriptVariable> timerVariables = new() {
-            { 0, new ScriptVariable("Timer Var 0", ScriptVariableType.Timer, ScriptDataType.Int) },
-            { 1, new ScriptVariable("Timer Var 1", ScriptVariableType.Timer, ScriptDataType.Int) },
-            { 2, new ScriptVariable("Timer Var 2", ScriptVariableType.Timer, ScriptDataType.Int) },
-            { 3, new ScriptVariable("Timer Var 3", ScriptVariableType.Timer, ScriptDataType.Int) },
-            { 4, new ScriptVariable("Timer Var 4", ScriptVariableType.Timer, ScriptDataType.Int) },
-            { 5, new ScriptVariable("Timer Var 5", ScriptVariableType.Timer, ScriptDataType.Int) },
-            { 6, new ScriptVariable("Timer Var 6", ScriptVariableType.Timer, ScriptDataType.Int) },
-            { 7, new ScriptVariable("Timer Var 7", ScriptVariableType.Timer, ScriptDataType.Int) },
-            { 8, new ScriptVariable("Timer Var 8", ScriptVariableType.Timer, ScriptDataType.Int) },
-            { 9, new ScriptVariable("Timer Var 9", ScriptVariableType.Timer, ScriptDataType.Int) },
-            { 10, new ScriptVariable("Timer Var 10", ScriptVariableType.Timer, ScriptDataType.Int) },
-            { 11, new ScriptVariable("Timer Var 11", ScriptVariableType.Timer, ScriptDataType.Int) },
-            { 12, new ScriptVariable("Timer Var 12", ScriptVariableType.Timer, ScriptDataType.Int) },
-            { 13, new ScriptVariable("Timer Var 13", ScriptVariableType.Timer, ScriptDataType.Int) },
-            { 14, new ScriptVariable("Timer Var 14", ScriptVariableType.Timer, ScriptDataType.Int) },
-            { 15, new ScriptVariable("Timer Var 15", ScriptVariableType.Timer, ScriptDataType.Int) },
+            { 0, new ScriptVariable("Timer Var 0", 0, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 0") },
+            { 1, new ScriptVariable("Timer Var 1", 1, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 1") },
+            { 2, new ScriptVariable("Timer Var 2", 2, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 2") },
+            { 3, new ScriptVariable("Timer Var 3", 3, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 3") },
+            { 4, new ScriptVariable("Timer Var 4", 4, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 4") },
+            { 5, new ScriptVariable("Timer Var 5", 5, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 5") },
+            { 6, new ScriptVariable("Timer Var 6", 6, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 6") },
+            { 7, new ScriptVariable("Timer Var 7", 7, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 7") },
+            { 8, new ScriptVariable("Timer Var 8", 8, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 8") },
+            { 9, new ScriptVariable("Timer Var 9", 9, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 9") },
+            { 10, new ScriptVariable("Timer Var 10", 10, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 10") },
+            { 11, new ScriptVariable("Timer Var 11", 11, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 11") },
+            { 12, new ScriptVariable("Timer Var 12", 12, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 12") },
+            { 13, new ScriptVariable("Timer Var 13", 13, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 13") },
+            { 14, new ScriptVariable("Timer Var 14", 14, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 14") },
+            { 15, new ScriptVariable("Timer Var 15", 15, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 15") },
         };
 
         public static Dictionary<int, ScriptVariable> userVariables = new();
@@ -82,6 +81,59 @@ namespace FCopParser {
             this.rpns = rpns;
             this.functionParser = functionParser;
             emptyOffset = rpns.code.Last().Key;
+            FindAllUserVars();
+        }
+
+        public void FindAllUserVars() {
+
+            void SearchScript(ScriptNode scriptNode) {
+
+                if (scriptNode is VariableNode varNode) {
+
+                    if (varNode.varibleType == ScriptVariableType.User) {
+
+                        if (!userVariables.ContainsKey(varNode.value)) {
+                            userVariables[varNode.value] = new ScriptVariable("Var" + varNode.value, varNode.value, ScriptVariableType.User, ScriptDataType.Any, "User Variable " + varNode.value);
+                        }
+
+                    }
+
+                }
+
+                foreach (var para in scriptNode.parameters) {
+                    SearchScript(para);
+                }
+
+                if (scriptNode is ScriptNestingNode scriptNesting) {
+
+                    foreach (var nestedScript in scriptNesting.nestedNodes) {
+                        SearchScript(nestedScript);
+                    }
+
+                }
+
+            }
+
+            foreach (var code in rpns.code) {
+                
+                foreach (var script in code.Value.code) {
+                    SearchScript(script);
+                }
+
+            }
+
+            foreach (var fun in functionParser.functions) {
+
+                foreach (var script in fun.runCondition.code) {
+                    SearchScript(script);
+                }
+
+                foreach (var script in fun.code.code) {
+                    SearchScript(script);
+                }
+
+            }
+
         }
 
         public List<IFFDataFile> Compile() {
@@ -367,6 +419,13 @@ namespace FCopParser {
             ByteCode.SUB_19_SET,
         };
 
+        public static List<ScriptDataType> varDataTypes = new() {
+            ScriptDataType.GlobalVar,
+            ScriptDataType.SystemVar,
+            ScriptDataType.TimerVar,
+            ScriptDataType.UserVar
+        };
+
         public List<ScriptNode> Decompile(int startingOffset, List<byte> code, out int terminationOffset) {
 
             var statements = new List<ScriptNode>();
@@ -527,7 +586,8 @@ namespace FCopParser {
 
                     ScriptNode node;
 
-                    if (Enum.IsDefined(typeof(ScriptVariableType), (int)byteCode) && parameters.Count == 1 && parameters[0] is LiteralNode litNode) {
+                    if (Enum.IsDefined(typeof(ScriptVariableType), (int)byteCode) && parameters.Count == 1 && parameters[0].GetType() == typeof(LiteralNode)) {
+                        var litNode = (LiteralNode)parameters[0];
                         node = new VariableNode(true, (ScriptVariableType)b, litNode.value);
                     }
                     else if (doubleOperators.Contains(byteCode) && paraCount == 2) {
@@ -806,35 +866,42 @@ namespace FCopParser {
 
         public ScriptNode(ByteCode byteCode, string name, ScriptDataType defaultReturnType, List<ScriptParameter> parameterData, List<ScriptNode> parameters) : this(byteCode, name, defaultReturnType, parameterData) {
             this.parameters = parameters;
-            CastLiteralsToTypes();
+            CastParametersToTypes();
         }
 
-        internal void CastLiteralsToTypes() {
+        // The idea of these casts were to take literal nodes and cast them to a specifc type of ease of use.
+        // The only issue is bitfields, because casting a literal node would apply it to the entire value.
+        // This idea is ultimately scrapped. The only reason this still applies is variables.
+        internal void CastParametersToTypes() {
 
             foreach (var i in Enumerable.Range(0, parameters.Count)) {
                 var parData = parameterData[i];
                 var parNode = parameters[i];
 
-                if (parNode is LiteralNode literalNode) {
+                if (parNode is LiteralNode literalNode && FCopScript.varDataTypes.Contains(parData.dataType)) {
 
-                    switch (parData.dataType) {
-                        case ScriptDataType.GlobalVar:
-                            parameters[i] = new VariableNode(false, ScriptVariableType.Global, literalNode.value);
-                            break;
-                        case ScriptDataType.SystemVar:
-                            parameters[i] = new VariableNode(false, ScriptVariableType.System, literalNode.value);
-                            break;
-                        case ScriptDataType.TimerVar:
-                            parameters[i] = new VariableNode(false, ScriptVariableType.Timer, literalNode.value);
-                            break;
-                        case ScriptDataType.UserVar:
-                            parameters[i] = new VariableNode(false, ScriptVariableType.User, literalNode.value);
-                            break;
-                    }
+                    parameters[i] = CastLiteralsToType(literalNode, parData.dataType);
 
                 }
 
             }
+
+        }
+
+        public LiteralNode CastLiteralsToType(LiteralNode literalNode, ScriptDataType dataType) {
+
+            switch (dataType) {
+                case ScriptDataType.GlobalVar:
+                    return new VariableNode(false, ScriptVariableType.Global, literalNode.value);
+                case ScriptDataType.SystemVar:
+                    return new VariableNode(false, ScriptVariableType.System, literalNode.value);
+                case ScriptDataType.TimerVar:
+                    return new VariableNode(false, ScriptVariableType.Timer, literalNode.value);
+                case ScriptDataType.UserVar:
+                    return new VariableNode(false, ScriptVariableType.User, literalNode.value);
+            }
+
+            return new LiteralNode(literalNode.value);
 
         }
 
@@ -850,7 +917,7 @@ namespace FCopParser {
                 var parData = parameterData[i];
                 var parNode = this.parameters[i];
 
-                parameters.Add(new ParameterNode(parNode, this, parData.name, i));
+                parameters.Add(new ParameterNode(parNode, this, parData.name, i, parData.dataType));
             }
 
             return parameters;
@@ -882,12 +949,14 @@ namespace FCopParser {
         public ScriptNode scriptNode;
         public string parameterName;
         public int parameterIndex;
+        public ScriptDataType dataType;
 
-        public ParameterNode(ScriptNode scriptNode, ScriptNode parent, string parameterName, int parameterIndex) {
+        public ParameterNode(ScriptNode scriptNode, ScriptNode parent, string parameterName, int parameterIndex, ScriptDataType dataType) {
             this.parent = parent;
             this.scriptNode = scriptNode;
             this.parameterName = parameterName;
             this.parameterIndex = parameterIndex;
+            this.dataType = dataType;
         }
 
     }
@@ -906,7 +975,7 @@ namespace FCopParser {
             foreach (var i in Enumerable.Range(0, this.parameters.Count)) {
                 var parData = parameterData[i];
                 var parNode = this.parameters[i];
-                parameters.Add(new ParameterNode(parNode, this, "", i));
+                parameters.Add(new ParameterNode(parNode, this, "", i, parData.dataType));
             }
 
             if (reversed) {
@@ -940,9 +1009,13 @@ namespace FCopParser {
         public VariableAssignmentNode(ByteCode byteCode, string name, ScriptDataType defaultReturnType, List<ScriptParameter> parameterData, List<ScriptNode> parameters, bool reversed) : base(byteCode, name, defaultReturnType, parameterData, parameters, reversed) {
 
             foreach (var parameter in this.parameters) {
-                if (parameter is VariableNode) {
-                    varNode = (VariableNode)parameter;
-                    break;
+                if (parameter is VariableNode varNode) {
+
+                    if (!varNode.isGet) {
+                        this.varNode = varNode;
+                        break;
+                    }
+
                 }
             }
             if (byteCode == ByteCode.INCREMENT_16 || byteCode == ByteCode.INCREMENT_19) {
@@ -994,58 +1067,30 @@ namespace FCopParser {
             }
         }
 
-    }
+        public override List<ParameterNode> GetParameters() {
 
-    public class VariableNode : ScriptNode {
+            varNode.RefreshData();
+            
+            if (parameters.Count == 2 && parameters[0] is LiteralNode litNode) {
 
-        public bool isGet;
-        public int id;
-        public ScriptVariableType varibleType;
-        public List<ScriptVariableType> allowedVarTypeConverstion = new() { ScriptVariableType.Global, ScriptVariableType.System, ScriptVariableType.Timer, ScriptVariableType.User };
+                var parameters = new List<ParameterNode>();
 
-        public void SetData(ScriptVariableType varibleType, int id) {
-            this.id = id;
-            this.varibleType = varibleType;
+                foreach (var i in Enumerable.Range(0, this.parameters.Count)) {
+                    var parData = parameterData[i];
+                    var parNode = this.parameters[i];
 
-            ScriptVariable varData = new ScriptVariable("Var" + id, varibleType, ScriptDataType.Int);
+                    parameters.Add(new ParameterNode(parNode, this, parData.name, i, parData.dataType));
+                }
 
-            switch (varibleType) {
-                case ScriptVariableType.Global:
-                    varData = FCopScriptingProject.globalVariables[id];
-                    break;
-                case ScriptVariableType.System:
-                    varData = FCopScriptingProject.systemVariables[id];
+                return new() {
+                    new ParameterNode(varNode, this, "", 1, VariableNode.VarTypeToDataType(varNode.varibleType)),
+                    new ParameterNode(litNode, this, "", 0, varNode.defaultReturnType),
 
-                    break;
-                case ScriptVariableType.Timer:
-                    varData = FCopScriptingProject.timerVariables[id];
+                };
 
-                    break;
-                case ScriptVariableType.User:
-
-                    if (!FCopScriptingProject.userVariables.TryGetValue(id, out varData)) {
-                        varData = new ScriptVariable("Var" + id, varibleType, ScriptDataType.Int);
-                    }
-
-                    break;
-            }
-
-            this.name = varData.name;
-            this.defaultReturnType = varData.dataType;
-        }
-
-        public VariableNode(bool isGet, ScriptVariableType varibleType, int id) : base() {
-            this.isGet = isGet;
-            SetData(varibleType, id);
-        }
-
-        public override List<byte> Compile() {
-
-            if (!isGet) {
-                return new() { (byte)(id + 128) };
             }
             else {
-                return new() { (byte)(id + 128), (byte)varibleType };
+                return base.GetParameters();
             }
 
         }
@@ -1055,6 +1100,10 @@ namespace FCopParser {
     public class LiteralNode : ScriptNode {
 
         public int value;
+
+        public LiteralNode() : base() {
+
+        }
 
         public LiteralNode(int value) : base(ByteCode.LITERAL, "", ScriptDataType.Int, new(), new()) {
             this.value = value;
@@ -1085,14 +1134,91 @@ namespace FCopParser {
 
     }
 
+    // Having this as a node is a little bit of a stretch. (as opposed to parameter types passed into the view)
+    // The "allowedVarTypeConverstion" is the only thing keeping this here.
+    public class VariableNode : LiteralNode {
+
+        public static ScriptDataType VarTypeToDataType(ScriptVariableType varType) {
+            return varType switch {
+                ScriptVariableType.Global => ScriptDataType.GlobalVar,
+                ScriptVariableType.System => ScriptDataType.SystemVar,
+                ScriptVariableType.Timer => ScriptDataType.TimerVar,
+                ScriptVariableType.User => ScriptDataType.UserVar,
+                _ => ScriptDataType.GlobalVar
+            };
+        }
+
+        public bool isGet;
+        public ScriptVariableType varibleType;
+        public List<ScriptVariableType> allowedVarTypeConverstion = new() { ScriptVariableType.Global, ScriptVariableType.System, ScriptVariableType.Timer, ScriptVariableType.User };
+
+        public void SetData(ScriptVariableType varibleType, int id) {
+            this.value = id;
+            this.varibleType = varibleType;
+
+            RefreshData();
+        }
+
+        public void RefreshData() {
+
+            ScriptVariable varData = new ScriptVariable("Var" + value, value, varibleType, ScriptDataType.Int, "Variable " + value);
+
+            switch (varibleType) {
+                case ScriptVariableType.Global:
+                    varData = FCopScriptingProject.globalVariables[value];
+                    break;
+                case ScriptVariableType.System:
+                    varData = FCopScriptingProject.systemVariables[value];
+
+                    break;
+                case ScriptVariableType.Timer:
+                    varData = FCopScriptingProject.timerVariables[value];
+
+                    break;
+                case ScriptVariableType.User:
+
+                    if (!FCopScriptingProject.userVariables.TryGetValue(value, out varData)) {
+                        varData = new ScriptVariable("Var" + value, value, varibleType, ScriptDataType.Int, "User Variable " + value);
+                    }
+
+                    break;
+            }
+
+            this.name = varData.name;
+            this.defaultReturnType = varData.dataType;
+
+        }
+
+        public VariableNode(bool isGet, ScriptVariableType varibleType, int id) : base() {
+            this.isGet = isGet;
+            SetData(varibleType, id);
+        }
+
+        public override List<byte> Compile() {
+
+            if (!isGet) {
+                return new() { (byte)(value + 128) };
+            }
+            else {
+                return new() { (byte)(value + 128), (byte)varibleType };
+            }
+
+        }
+
+    }
+
     public struct ScriptVariable {
 
+        public int id;
         public string name;
+        public string description;
         public ScriptVariableType varibleType;
         public ScriptDataType dataType;
 
-        public ScriptVariable(string name, ScriptVariableType varibleType, ScriptDataType dataType) {
+        public ScriptVariable(string name, int id, ScriptVariableType varibleType, ScriptDataType dataType, string descrition) {
             this.name = name;
+            this.id = id;
+            this.description = descrition;
             this.varibleType = varibleType;
             this.dataType = dataType;
         }
