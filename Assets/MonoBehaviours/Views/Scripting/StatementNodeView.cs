@@ -17,6 +17,8 @@ public class StatementNodeView : DragableUIElement {
     public GameObject varNodePrefab;
     public GameObject paddingPrefab;
     public GameObject boolNodePrefab;
+    public GameObject enumNodePrefab;
+    public GameObject assetNodePrefab;
     public GameObject parameterNodeFab;
 
     // - Unity Refs -
@@ -32,31 +34,54 @@ public class StatementNodeView : DragableUIElement {
     public List<VisualScriptingLineView> associatedLines = new();
 
     public List<ExpressionNodeView> expressionNodes;
+    ParameterNodeView parameterNodeView;
+    List<GameObject> activePads = new();
 
     private void Start() {
+
+        Init();
+
+    }
+
+    public void Init() {
 
         void Pad() {
             var padObj = Instantiate(paddingPrefab);
             padObj.transform.SetParent(transform, false);
             padObj.SetActive(true);
+            activePads.Add(padObj);
         }
 
         void CreateNode(ParameterNode parameter) {
 
-            GameObject nodeObj;
+            GameObject nodeObj = null;
 
             if (parameter.scriptNode is LiteralNode) {
 
-                nodeObj = parameter.dataType switch {
-                    ScriptDataType.GlobalVar => Instantiate(varNodePrefab),
-                    ScriptDataType.SystemVar => Instantiate(varNodePrefab),
-                    ScriptDataType.TimerVar => Instantiate(varNodePrefab),
-                    ScriptDataType.UserVar => Instantiate(varNodePrefab),
-                    ScriptDataType.Int => Instantiate(literalNodePrefab),
-                    ScriptDataType.Bool => Instantiate(boolNodePrefab),
-                    ScriptDataType.Any => Instantiate(literalNodePrefab),
-                    _ => Instantiate(expressionNodePrefab),
-                };
+                var set = false;
+                if (parameter.scriptNode is VariableNode varNode) {
+
+                    if (varNode.isGet) {
+                        nodeObj = Instantiate(varNodePrefab);
+                        set = true;
+                    }
+
+                }
+
+                if (!set) {
+                    nodeObj = parameter.dataType switch {
+                        ScriptDataType.GlobalVar => Instantiate(varNodePrefab),
+                        ScriptDataType.SystemVar => Instantiate(varNodePrefab),
+                        ScriptDataType.TimerVar => Instantiate(varNodePrefab),
+                        ScriptDataType.UserVar => Instantiate(varNodePrefab),
+                        ScriptDataType.Int => Instantiate(literalNodePrefab),
+                        ScriptDataType.Bool => Instantiate(boolNodePrefab),
+                        ScriptDataType.Enum => Instantiate(enumNodePrefab),
+                        ScriptDataType.Cwav => Instantiate(assetNodePrefab),
+                        ScriptDataType.Any => Instantiate(literalNodePrefab),
+                        _ => Instantiate(expressionNodePrefab),
+                    };
+                }
 
             }
             else {
@@ -113,7 +138,8 @@ public class StatementNodeView : DragableUIElement {
 
                 Pad();
                 var paraNode = Instantiate(parameterNodeFab, transform, false);
-                paraNode.GetComponent<ParameterNodeView>().expressionNodes = expressionNodes;
+                parameterNodeView = paraNode.GetComponent<ParameterNodeView>();
+                parameterNodeView.expressionNodes = expressionNodes;
 
             }
 
@@ -134,6 +160,30 @@ public class StatementNodeView : DragableUIElement {
         if (scriptNode.byteCode == ByteCode.JUMP) {
             refuseDrag = true;
         }
+
+    }
+
+    public void Rebuild() {
+
+        foreach (var expression in expressionNodes) {
+            Destroy(expression.gameObject);
+        }
+
+        expressionNodes.Clear();
+
+        if (parameterNodeView != null) {
+            Destroy(parameterNodeView.gameObject);
+        }
+
+        parameterNodeView = null;
+
+        foreach (var pad in activePads) {
+            Destroy(pad);
+        }
+
+        activePads.Clear();
+
+        Init();
 
     }
 

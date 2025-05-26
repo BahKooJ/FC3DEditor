@@ -115,7 +115,7 @@ namespace FCopParser {
                 case ActorBehavior.Teleporter:
                     behavior = new FCopBehavior29(this, propertyData);
                     break;
-                case ActorBehavior.Behavior30:
+                case ActorBehavior.InterchangingEntity:
                     behavior = new FCopBehavior30(this, propertyData);
                     break;
                 case ActorBehavior.Behavior31:
@@ -876,7 +876,7 @@ namespace FCopParser {
                 new ValueActorProperty("Health", Read16(0), 0, 30000, BitCount.Bit16, "Entity Properties"),
                 new ValueActorProperty("Collide Damage", Read16(0), 0, 30000, BitCount.Bit16, "Entity Properties"),
                 new AssetActorProperty("Team", Read8(0), AssetType.Team, BitCount.Bit8, "Entity Properties"),
-                new ValueActorProperty("Group?", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Entity Properties"),
+                new ValueActorProperty("Group", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Entity Properties"),
                 new EnumDataActorProperty("Map Icon Color", (MapIconColor)Read8(0), BitCount.Bit8, "Entity Properties"),
                 new ValueActorProperty("Target Priority", Read8(0), 0, 127, BitCount.Bit8, "Entity Properties"),
                 new ExplosionActorProperty("Explosion", Read8(0), BitCount.Bit8, "Entity Properties"),
@@ -3173,7 +3173,7 @@ namespace FCopParser {
         Behavior27 = 27,
         PathedMultiTurret = 28,
         Teleporter = 29,
-        Behavior30 = 30,
+        InterchangingEntity = 30,
         Behavior31 = 31,
         Reloader = 32,
         Behavior33 = 33,

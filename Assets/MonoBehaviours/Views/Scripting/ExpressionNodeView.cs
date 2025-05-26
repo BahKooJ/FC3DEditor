@@ -13,6 +13,8 @@ public class ExpressionNodeView : MonoBehaviour {
     public GameObject literalNodePrefab;
     public GameObject varNodePrefab;
     public GameObject boolNodePrefab;
+    public GameObject enumNodePrefab;
+    public GameObject assetNodePrefab;
     public GameObject paddingPrefab;
 
     // - Unity Refs -
@@ -37,20 +39,34 @@ public class ExpressionNodeView : MonoBehaviour {
 
         void CreateNode(ParameterNode parameter) {
 
-            GameObject nodeObj;
+            GameObject nodeObj = null;
 
             if (parameter.scriptNode is LiteralNode) {
 
-                nodeObj = parameter.dataType switch {
-                    ScriptDataType.GlobalVar => Instantiate(varNodePrefab, transform, false),
-                    ScriptDataType.SystemVar => Instantiate(varNodePrefab, transform, false),
-                    ScriptDataType.TimerVar => Instantiate(varNodePrefab, transform, false),
-                    ScriptDataType.UserVar => Instantiate(varNodePrefab, transform, false),
-                    ScriptDataType.Int => Instantiate(literalNodePrefab, transform, false),
-                    ScriptDataType.Bool => Instantiate(boolNodePrefab, transform, false),
-                    ScriptDataType.Any => Instantiate(literalNodePrefab, transform, false),
-                    _ => Instantiate(expressionNodePrefab, transform, false),
-                };
+                var set = false;
+                if (parameter.scriptNode is VariableNode varNode) {
+
+                    if (varNode.isGet) {
+                        nodeObj = Instantiate(varNodePrefab, transform, false);
+                        set = true;
+                    }
+
+                }
+
+                if (!set) {
+                    nodeObj = parameter.dataType switch {
+                        ScriptDataType.GlobalVar => Instantiate(varNodePrefab, transform, false),
+                        ScriptDataType.SystemVar => Instantiate(varNodePrefab, transform, false),
+                        ScriptDataType.TimerVar => Instantiate(varNodePrefab, transform, false),
+                        ScriptDataType.UserVar => Instantiate(varNodePrefab, transform, false),
+                        ScriptDataType.Int => Instantiate(literalNodePrefab, transform, false),
+                        ScriptDataType.Bool => Instantiate(boolNodePrefab, transform, false),
+                        ScriptDataType.Enum => Instantiate(enumNodePrefab, transform, false),
+                        ScriptDataType.Cwav => Instantiate(assetNodePrefab, transform, false),
+                        ScriptDataType.Any => Instantiate(literalNodePrefab, transform, false),
+                        _ => Instantiate(expressionNodePrefab, transform, false),
+                    };
+                }
 
             }
             else {

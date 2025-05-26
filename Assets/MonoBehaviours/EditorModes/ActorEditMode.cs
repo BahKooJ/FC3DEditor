@@ -13,7 +13,7 @@ public class ActorEditMode : EditMode {
         ActorBehavior.Aircraft,
         ActorBehavior.Behavior26,
         ActorBehavior.Behavior27,
-        ActorBehavior.Behavior30,
+        ActorBehavior.InterchangingEntity,
         ActorBehavior.Behavior31,
         ActorBehavior.Behavior33,
         ActorBehavior.Behavior34,

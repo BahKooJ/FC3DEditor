@@ -3,7 +3,6 @@ using TMPro;
 using UnityEngine;
 using FCopParser;
 using UnityEngine.UI;
-using Unity.VisualScripting;
 
 public class VisualScriptingLineView : MonoBehaviour {
 
@@ -25,6 +24,10 @@ public class VisualScriptingLineView : MonoBehaviour {
 
     private void Start() {
         numberText.text = number.ToString();
+    }
+
+    public void RebuildScriptNode() {
+        scriptNode.Rebuild();
     }
 
     // Love how I have to yell at unity 22 different times just to get the damn layouts to do their job.

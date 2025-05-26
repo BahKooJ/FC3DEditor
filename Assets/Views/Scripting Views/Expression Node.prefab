@@ -477,6 +477,8 @@ MonoBehaviour:
   literalNodePrefab: {fileID: 8547359735126737856, guid: 966ca1030d1a9d24a88ecf2da304bcf5, type: 3}
   varNodePrefab: {fileID: 8547359735126737856, guid: 73de1ab72d7bc904d89edf7bb36085b9, type: 3}
   boolNodePrefab: {fileID: 8547359735126737856, guid: 4bdab2741f53a23459d0bb140f0f0b4e, type: 3}
+  enumNodePrefab: {fileID: 8547359735126737856, guid: 660fa68644af26643be4a1da48b98445, type: 3}
+  assetNodePrefab: {fileID: 8547359735126737856, guid: 54931d49e9616cf4292f30e1625ba962, type: 3}
   paddingPrefab: {fileID: 7848249455887318779}
   expressionText: {fileID: 5486397937650842999}
   endBracket: {fileID: 7776246371061328223}

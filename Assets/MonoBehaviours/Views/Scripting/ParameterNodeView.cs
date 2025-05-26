@@ -33,9 +33,9 @@ public class ParameterNodeView : MonoBehaviour {
                 textObj.GetComponent<TMP_Text>().text = node.parameterNode.parameterName + ": ";
                 textObj.SetActive(true);
 
-            }
+                Pad();
 
-            Pad();
+            }
 
             node.transform.SetParent(transform, false);
             node.Init();

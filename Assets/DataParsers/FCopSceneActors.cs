@@ -11,7 +11,7 @@ namespace FCopParser {
 
         public List<ActorNode> positionalGroupedActors = new();
         public Dictionary<int, ActorNode> behaviorGroupedActors = new();
-        public List<ActorNode> scriptingGroupedActors;
+        public Dictionary<int, ActorNode> scriptingGroupedActors = new();
 
         public Dictionary<int, string> teams = new() {
             {0, "None"}
@@ -28,6 +28,7 @@ namespace FCopParser {
 
             SortActorsByPosition();
             SortActorsByBehavior();
+            SortActorsByScriptGroup();
 
             FindTeams();
         }
@@ -331,6 +332,26 @@ namespace FCopParser {
                 }
                 else {
                     behaviorGroupedActors[(int)actor.behaviorType] = new ActorNode(ActorGroupType.Behavior, "Group " + actor.behaviorType, actor);
+                }
+
+            }
+
+        }
+
+        public void SortActorsByScriptGroup() {
+
+            foreach (var actor in actors) {
+
+                if (actor.behavior is FCopEntity) {
+
+                    var groupID = actor.behavior.propertiesByName["Group"].GetCompiledValue();
+
+                    var node = new ActorNode(ActorGroupType.Script, "Group " + groupID, actor);
+
+                    if (!scriptingGroupedActors.TryAdd(groupID, node)) {
+                        scriptingGroupedActors[groupID].nestedActors.Add(actor);
+                    }
+
                 }
 
             }
