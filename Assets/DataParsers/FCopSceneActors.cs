@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace FCopParser {
@@ -355,6 +356,114 @@ namespace FCopParser {
                 }
 
             }
+
+        }
+
+        public List<Type> FindAllDerivedTypesFromActorBehavior(int dataID) {
+
+            if (!actorsByID.TryGetValue(dataID, out var actor)) {
+                return new();
+            }
+
+            var types = new List<Type>();
+
+            FindTypes(actor.behavior.GetType());
+
+            void FindTypes(Type type) {
+
+                types.Add(type);
+
+                if (type != typeof(FCopActorBehavior)) {
+                    FindTypes(type.BaseType);
+                }
+
+            }
+
+            return types;
+
+        }
+
+        public List<Type> FindAllDerviedTypesFromGroup(int groupID) {
+
+            if (!scriptingGroupedActors.TryGetValue(groupID, out var scriptGroup)) {
+                return new();
+            }
+
+            var actorTypes = new List<List<Type>>();
+
+            foreach (var actor in scriptGroup.nestedActors) {
+
+                actorTypes.Add(FindAllDerivedTypesFromActorBehavior(actor.DataID));
+
+            }
+
+            if (actorTypes.Count == 0) {
+                return new();
+            }
+
+            var commonTypes = actorTypes[0];
+
+            foreach (var types in actorTypes) {
+
+                foreach (var commonType in new List<Type>(commonTypes)) {
+
+                    if (!types.Contains(commonType)) {
+                        commonTypes.Remove(commonType);
+                    }
+
+                }
+
+            }
+
+            return commonTypes;
+
+        }
+
+        public List<Type> FindAllDerviedTypesFromTeam(int teamID) {
+
+            var actorsByTeam = new List<FCopActor>();
+
+            foreach (var actor in actors) {
+
+                if (actor.behavior is FCopEntity) {
+
+                    var teamIDToTest = actor.behavior.propertiesByName["Team"].GetCompiledValue();
+
+                    if (teamIDToTest == teamID) {
+                        actorsByTeam.Add(actor);
+                    }
+
+                }
+
+            }
+
+            var actorTypes = new List<List<Type>>();
+
+            foreach (var actor in actorsByTeam) {
+
+                actorTypes.Add(FindAllDerivedTypesFromActorBehavior(actor.DataID));
+
+            }
+
+            if (actorTypes.Count == 0) {
+                return new();
+            }
+
+            var commonTypes = actorTypes[0];
+
+            foreach (var types in actorTypes) {
+
+                foreach (var commonType in new List<Type>(commonTypes)) {
+
+                    if (!types.Contains(commonType)) {
+                        commonTypes.Remove(commonType);
+                    }
+
+                }
+
+            }
+
+            return commonTypes;
 
         }
 

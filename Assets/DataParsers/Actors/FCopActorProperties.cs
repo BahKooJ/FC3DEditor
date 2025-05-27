@@ -488,6 +488,7 @@ namespace FCopParser {
         NA = -1,
         Bit1 = 1,
         Bit3 = 3,
+        Bit5 = 5,
         Bit8 = 8,
         Bit16 = 16,
         Bit32 = 32,
@@ -640,6 +641,16 @@ namespace FCopParser {
         Unknown2 = 543
     }
 
+    public enum PlayerCameraType {
+        Standard = 0,
+        CloseUp = 1,
+        StandardSide = 2,
+        CloseUpSide = 3,
+        Sky = 4,
+        CrowdControl = 5,
+        CrowdControlSide = 6
+    }
+
     public enum ActorGroundCast {
         Highest = 0,
         Lowest = 1,
@@ -681,6 +692,14 @@ namespace FCopParser {
         Unknown2 = 2,
         Unknown3 = 3,
         Unknown4 = 4
+    }
+
+    public enum ElevatorMoveType {
+        NextStop = 0,
+        FirstStop = 1,
+        SecondStop = 2,
+        ThirdStop = 3,
+        FirstStopJump = 11
     }
 
     public enum MoveablePropMoveAxis {

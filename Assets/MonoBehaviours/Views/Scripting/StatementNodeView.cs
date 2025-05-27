@@ -19,6 +19,7 @@ public class StatementNodeView : DragableUIElement {
     public GameObject boolNodePrefab;
     public GameObject enumNodePrefab;
     public GameObject assetNodePrefab;
+    public GameObject specialActorNodePrefab;
     public GameObject parameterNodeFab;
 
     // - Unity Refs -
@@ -78,6 +79,9 @@ public class StatementNodeView : DragableUIElement {
                         ScriptDataType.Bool => Instantiate(boolNodePrefab),
                         ScriptDataType.Enum => Instantiate(enumNodePrefab),
                         ScriptDataType.Cwav => Instantiate(assetNodePrefab),
+                        ScriptDataType.Actor => Instantiate(specialActorNodePrefab),
+                        ScriptDataType.Group => Instantiate(specialActorNodePrefab),
+                        ScriptDataType.Team => Instantiate(specialActorNodePrefab),
                         ScriptDataType.Any => Instantiate(literalNodePrefab),
                         _ => Instantiate(expressionNodePrefab),
                     };

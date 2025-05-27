@@ -256,6 +256,7 @@ MonoBehaviour:
   boolNodePrefab: {fileID: 8547359735126737856, guid: 4bdab2741f53a23459d0bb140f0f0b4e, type: 3}
   enumNodePrefab: {fileID: 8547359735126737856, guid: 660fa68644af26643be4a1da48b98445, type: 3}
   assetNodePrefab: {fileID: 8547359735126737856, guid: 54931d49e9616cf4292f30e1625ba962, type: 3}
+  specialActorNodePrefab: {fileID: 8547359735126737856, guid: 32a4f1d44ecd1884c9483e46d3cb2f36, type: 3}
   parameterNodeFab: {fileID: 5572845360304710419, guid: 29f8948e6c9b51e44b6bb4691222c5af, type: 3}
   statementText: {fileID: 3308916068984118278}
   endBracket: {fileID: 6530134690143696824}

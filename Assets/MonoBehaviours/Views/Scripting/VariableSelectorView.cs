@@ -6,7 +6,6 @@ using FCopParser;
 using TMPro;
 using System.Collections.Generic;
 using UnityEngine.UI;
-using static UnityEditor.Progress;
 
 public class VariableSelectorView : MonoBehaviour {
 

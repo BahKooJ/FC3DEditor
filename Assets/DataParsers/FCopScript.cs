@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static FCopParser.SystemMethodNode;
+using static UnityEngine.UI.ContentSizeFitter;
 
 namespace FCopParser {
 
@@ -841,6 +843,30 @@ namespace FCopParser {
         public ScriptParameter(string name, ScriptDataType dataType) {
             this.name = name;
             this.dataType = dataType;
+            this.enumType = null;
+            this.bitCount = BitCount.NA;
+            this.bitPosition = 0;
+        }
+
+        public Type enumType;
+
+        public ScriptParameter(string name, ScriptDataType dataType, Type enumType) : this(name, dataType) {
+            this.enumType = enumType;
+            this.bitCount = BitCount.NA;
+            this.bitPosition = 0;
+        }
+
+        public BitCount bitCount;
+        public int bitPosition;
+
+        public ScriptParameter(string name, ScriptDataType dataType, BitCount bitCount, int bitPosition) : this(name, dataType) {
+            this.bitCount = bitCount;
+            this.bitPosition = bitPosition;
+        }
+
+        public ScriptParameter(string name, ScriptDataType dataType, Type enumType, BitCount bitCount, int bitPosition) : this(name, dataType, enumType) {
+            this.bitCount = bitCount;
+            this.bitPosition = bitPosition;
         }
 
     }
@@ -976,6 +1002,13 @@ namespace FCopParser {
             this.dataType = dataType;
         }
 
+        public BitCount bitCount = BitCount.NA;
+        public int bitPosition = 0;
+
+        public ParameterNode(ScriptNode parent, ScriptNode scriptNode, string parameterName, int parameterIndex, ScriptDataType dataType, BitCount bitCount, int bitPosition) : this(parent, scriptNode, parameterName, parameterIndex, dataType) {
+            this.bitCount = bitCount;
+            this.bitPosition = bitPosition;
+        }
     }
 
     public class EnumParameterNode : ParameterNode {
@@ -988,6 +1021,9 @@ namespace FCopParser {
             this.affectsParameters = affectsParameters;
         }
 
+        public EnumParameterNode(ScriptNode parent, ScriptNode scriptNode, string parameterName, int parameterIndex, BitCount bitCount, int bitPosition, Type enumType) : base(parent, scriptNode, parameterName, parameterIndex, ScriptDataType.Enum, bitCount, bitPosition) {
+            this.enumType = enumType;
+        }
     }
 
     public class OperatorNode : ScriptNode {
@@ -1159,8 +1195,8 @@ namespace FCopParser {
     public class ActorMethodNode : ScriptNode {
 
         public enum ActorMethod {
-
-            Enable = 30,
+            None = 0,
+            EnableShooter = 30,
             EnableSpinning = 45,
             ChangeObject = 46,
             PlayAnimation = 50,
@@ -1174,8 +1210,8 @@ namespace FCopParser {
             ChangeNodeVisibility = 75,
             ChangeNodeColor = 76,
             MoveProp = 80,
-            Move = 82,
-            SetMoving = 83,
+            MoveElevator = 82,
+            SetMovingElevator = 83,
             Unknown85 = 85,
             ChangeCamera = 97,
             PlayEffect = 100,
@@ -1187,6 +1223,7 @@ namespace FCopParser {
 
         public static Dictionary<Type, List<ActorMethod>> methods = new() {
             { typeof(FCopActorBehavior), new() { 
+                ActorMethod.None,
                 ActorMethod.Hurt,
                 ActorMethod.Despawn,
                 ActorMethod.Unknown101,
@@ -1201,17 +1238,17 @@ namespace FCopParser {
                 ActorMethod.PlayEffect
             } },
             { typeof(FCopShooter), new() {
-                ActorMethod.Enable
+                ActorMethod.EnableShooter
             } },
             { typeof(FCopTurret), new() {
                 ActorMethod.EnableSpinning
             } },
             { typeof(FCopBehavior1), new() {
-                ActorMethod.EnableSpinning
+                ActorMethod.ChangeCamera
             } },
             { typeof(FCopBehavior10), new() {
-                ActorMethod.Move,
-                ActorMethod.SetMoving
+                ActorMethod.MoveElevator,
+                ActorMethod.SetMovingElevator
             } },
             { typeof(FCopBehavior25), new() {
                 ActorMethod.MoveProp
@@ -1232,6 +1269,47 @@ namespace FCopParser {
             { typeof(FCopBehavior95), new() {
                 ActorMethod.EnableTrigger
             } },
+        };
+
+        static Dictionary<int, List<ScriptParameter>> methodParamters = new() {
+            { 0, new() { new ScriptParameter("Par", ScriptDataType.Any) } },
+            { 30, new() { new ScriptParameter("Enable", ScriptDataType.Bool) } },
+            { 45, new() { new ScriptParameter("Enable", ScriptDataType.Bool) } },
+            { 46, new() { new ScriptParameter("Change Object", ScriptDataType.Int) } },
+            { 50, new() { new ScriptParameter("Animation", ScriptDataType.Int) } },
+            { 57, new() { new ScriptParameter("Sound", ScriptDataType.Cwav) } },
+            { 58, new() { new ScriptParameter("Value", ScriptDataType.Int) } },
+            { 60, new() { new ScriptParameter("Hurt Value", ScriptDataType.Int) } },
+            { 61, new() { new ScriptParameter("Unknown", ScriptDataType.Bool) } },
+            { 62, new() { new ScriptParameter("Map Color", ScriptDataType.Enum, typeof(MapIconColor)) } },
+            { 63, new() { new ScriptParameter("Is Invincible", ScriptDataType.Bool) } },
+            { 64, new() { new ScriptParameter("Disable Targeting", ScriptDataType.Bool) } },
+            { 75, new() { 
+                new ScriptParameter("Show Arrow", ScriptDataType.Bool, BitCount.Bit1, 0),
+                new ScriptParameter("Show Satellite", ScriptDataType.Bool, BitCount.Bit1, 1),
+                new ScriptParameter("Show Mini Map", ScriptDataType.Bool, BitCount.Bit1, 2),
+                new ScriptParameter("Node", ScriptDataType.Int, BitCount.Bit5, 3),
+            } },
+            { 76, new() {
+                new ScriptParameter("Color", ScriptDataType.Enum, typeof(MapIconColorObjective), BitCount.Bit5, 0),
+                new ScriptParameter("Node", ScriptDataType.Int, BitCount.Bit3, 5),
+            } },
+            { 80, new() { new ScriptParameter("To Start", ScriptDataType.Bool) } },
+            { 82, new() { new ScriptParameter("Move Type", ScriptDataType.Enum, typeof(ElevatorMoveType)) } },
+            { 83, new() { new ScriptParameter("Move", ScriptDataType.Bool) } },
+            { 85, new() { new ScriptParameter("Unknown", ScriptDataType.Int) } },
+            { 97, new() { new ScriptParameter("Camera Type", ScriptDataType.Enum, typeof(PlayerCameraType)) } },
+            { 100, new() { new ScriptParameter("Unknown", ScriptDataType.Int) } },
+            { 101, new() { new ScriptParameter("Unknown", ScriptDataType.Int) } },
+            { 110, new() { new ScriptParameter("Unknown", ScriptDataType.Int) } },
+            { 124, new() { new ScriptParameter("Enable", ScriptDataType.Bool) } },
+
+        };
+
+        public static List<ScriptDataType> allowedActorRefs = new() {
+            ScriptDataType.Actor,
+            ScriptDataType.Group,
+            ScriptDataType.Team
         };
 
         public LiteralNode methodID;
@@ -1255,6 +1333,77 @@ namespace FCopParser {
                 return null;
             }
 
+        }
+
+        public void SetActorRef(ScriptDataType dataType, int id) {
+
+            if (parameters[0] is LiteralNode litNode) {
+
+                litNode.value = id;
+                parameterData[0] = new ScriptParameter(parameterData[0].name, dataType);
+
+            }
+
+        }
+
+        public override List<ParameterNode> GetParameters() {
+
+            if (methodID == null) {
+                return base.GetParameters();
+            }
+
+            if (parameters.Count != 3) {
+                return base.GetParameters();
+            }
+
+            List<ScriptParameter> methodParameters;
+
+            try {
+                methodParameters = methodParamters[methodID.value];
+            }
+            catch {
+                return base.GetParameters();
+            }
+
+            var totalParameters = new List<ParameterNode> {
+                new ParameterNode(parameters[0], this, "", 0, parameterData[0].dataType),
+                new EnumParameterNode(methodID, this, "", 1, typeof(ActorMethod), true),
+            };
+
+            foreach (var method in methodParameters) {
+
+                if (method.dataType == ScriptDataType.Enum) {
+                    totalParameters.Add(new EnumParameterNode(parameters[2], this, method.name, 2, method.bitCount, method.bitPosition, method.enumType));
+                }
+                else {
+                    totalParameters.Add(new ParameterNode(parameters[2], this, method.name, 2, method.dataType, method.bitCount, method.bitPosition));
+                }
+
+            }
+
+            return totalParameters;
+
+        }
+
+        public override List<byte> Compile() {
+
+            if (parameters.Count == 3 && parameters[0] is LiteralNode) {
+
+                if (parameterData[0].dataType == ScriptDataType.Actor) {
+                    return new() { (byte)ByteCode.ACTOR_FUNC };
+                }
+                if (parameterData[0].dataType == ScriptDataType.Group) {
+                    return new() { (byte)ByteCode.GROUP_ACTOR_FUNC };
+                }
+                if (parameterData[0].dataType == ScriptDataType.Team) {
+                    return new() { (byte)ByteCode.TEAM_ACTOR_FUNC };
+                }
+
+                return base.Compile();
+
+            }
+
+            return base.Compile();
         }
 
     }

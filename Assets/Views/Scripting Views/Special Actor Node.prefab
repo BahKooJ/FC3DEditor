@@ -351,10 +351,10 @@ GameObject:
   - component: {fileID: 6532242173359243619}
   - component: {fileID: 2094964203151101858}
   - component: {fileID: 9002557664747725861}
-  - component: {fileID: 7896730659796619371}
   - component: {fileID: 9159569633472101174}
+  - component: {fileID: 6632328287083640149}
   m_Layer: 6
-  m_Name: Variable Node
+  m_Name: Special Actor Node
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -405,7 +405,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.17254902, g: 0.42352942, b: 0, a: 1}
+  m_Color: {r: 0.003921569, g: 0.44313726, b: 0.44313726, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -462,31 +462,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &7896730659796619371
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8547359735126737856}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9a8962169095c94dbad9ddd95a84f0c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  expressionNodePrefab: {fileID: 0}
-  literalNodePrefab: {fileID: 0}
-  varNodePrefab: {fileID: 0}
-  boolNodePrefab: {fileID: 0}
-  enumNodePrefab: {fileID: 0}
-  assetNodePrefab: {fileID: 0}
-  paddingPrefab: {fileID: 7848249455887318779}
-  expressionText: {fileID: 5486397937650842999}
-  endBracket: {fileID: 7776246371061328223}
-  backgroundImage: {fileID: 6532242173359243619}
-  currentLine: {fileID: 0}
-  expressionNodes: []
-  variableSelectorView: {fileID: 6400905306875826594, guid: ef8a90c7c76f4cd41818d15d1be9488c, type: 3}
 --- !u!114 &9159569633472101174
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -531,8 +506,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7896730659796619371}
-        m_TargetAssemblyTypeName: VariableNodeView, Assembly-CSharp
+      - m_Target: {fileID: 6632328287083640149}
+        m_TargetAssemblyTypeName: SpecialActorNodeView, Assembly-CSharp
         m_MethodName: OnClick
         m_Mode: 1
         m_Arguments:
@@ -543,3 +518,29 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &6632328287083640149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8547359735126737856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f0a3986869ac934cb3b4b4ca30741e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  expressionNodePrefab: {fileID: 0}
+  literalNodePrefab: {fileID: 0}
+  varNodePrefab: {fileID: 0}
+  boolNodePrefab: {fileID: 0}
+  enumNodePrefab: {fileID: 0}
+  assetNodePrefab: {fileID: 0}
+  specialActorNodePrefab: {fileID: 0}
+  paddingPrefab: {fileID: 7848249455887318779}
+  expressionText: {fileID: 5486397937650842999}
+  endBracket: {fileID: 7776246371061328223}
+  backgroundImage: {fileID: 6532242173359243619}
+  currentLine: {fileID: 0}
+  expressionNodes: []
+  actorSelectorView: {fileID: 6400905306875826594, guid: 2a1a6389a079dbc459c114c21f8a43d5, type: 3}
