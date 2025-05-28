@@ -557,6 +557,8 @@ MonoBehaviour:
   varNodePrefab: {fileID: 0}
   boolNodePrefab: {fileID: 0}
   enumNodePrefab: {fileID: 0}
+  assetNodePrefab: {fileID: 0}
+  specialActorNodePrefab: {fileID: 0}
   paddingPrefab: {fileID: 7848249455887318779}
   expressionText: {fileID: 5486397937650842999}
   endBracket: {fileID: 7776246371061328223}
@@ -564,6 +566,7 @@ MonoBehaviour:
   currentLine: {fileID: 0}
   expressionNodes: []
   wavIconSprite: {fileID: 21300000, guid: 4dbfe6c0b744af640b052f2b922edd15, type: 3}
+  navMeshIcon: {fileID: 21300000, guid: d67470d0210ac554ca7c1657ec4a8b20, type: 3}
   assetIcon: {fileID: 4202435497603302315}
 --- !u!114 &4635588315519341860
 MonoBehaviour:

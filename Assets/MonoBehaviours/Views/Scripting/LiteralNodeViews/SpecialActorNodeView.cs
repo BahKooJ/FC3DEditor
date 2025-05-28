@@ -66,12 +66,22 @@ public class SpecialActorNodeView : ExpressionNodeView {
 
         var view = obj.GetComponent<SpecialActorSelectorView>();
 
-        //if (parameterNode.parent is ActorMethodNode) {
+        if (parameterNode.parent is ActorMethodNode) {
             view.allowedActorRefs = ActorMethodNode.allowedActorRefs;
-        //}
+        }
+        else if (parameterNode.parent is SpawningActorMethod) {
+            view.allowedActorRefs = SpawningActorMethod.allowedActorRefs;
+        }
 
         view.onDataSelected = (id, type) => {
-            (parameterNode.parent as ActorMethodNode).SetActorRef(type, id);
+
+            if (parameterNode.parent is ActorMethodNode actorMethod) {
+                actorMethod.SetActorRef(type, id);
+            }
+            else if (parameterNode.parent is SpawningActorMethod spawningActor) {
+                spawningActor.SetActorRef(type, id);
+            }
+
             Init();
 
             currentLine.RebuildScriptNode();

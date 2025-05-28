@@ -480,6 +480,7 @@ MonoBehaviour:
   boolNodePrefab: {fileID: 0}
   enumNodePrefab: {fileID: 0}
   assetNodePrefab: {fileID: 0}
+  specialActorNodePrefab: {fileID: 0}
   paddingPrefab: {fileID: 7848249455887318779}
   expressionText: {fileID: 5486397937650842999}
   endBracket: {fileID: 7776246371061328223}

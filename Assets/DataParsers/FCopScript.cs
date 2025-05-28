@@ -2,8 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static FCopParser.SystemMethodNode;
-using static UnityEngine.UI.ContentSizeFitter;
+using static FCopParser.ActorMethodNode;
 
 namespace FCopParser {
 
@@ -371,22 +370,22 @@ namespace FCopParser {
                 new ScriptOperationData("Actor Func(2)", ScriptDataType.Void, new() { new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.GROUP_ACTOR_FUNC, 3),
-                new ScriptOperationData("Group Actor Func", ScriptDataType.Void, new() { new ScriptParameter("Actor Group", ScriptDataType.Group), new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
+                new ScriptOperationData("Actor Func", ScriptDataType.Void, new() { new ScriptParameter("Actor Group", ScriptDataType.Group), new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.TEAM_ACTOR_FUNC, 3),
-                new ScriptOperationData("Team Actor Func", ScriptDataType.Void, new() { new ScriptParameter("Team", ScriptDataType.Team), new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
+                new ScriptOperationData("Actor Func", ScriptDataType.Void, new() { new ScriptParameter("Team", ScriptDataType.Team), new ScriptParameter("Method", ScriptDataType.Int), new ScriptParameter("Parameter", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.NAV_MESH_STATE_CHANGE, 3),
-                new ScriptOperationData("Nav Mesh State Change", ScriptDataType.Void, new() { new ScriptParameter("Nav Mesh Index", ScriptDataType.Int), new ScriptParameter("Disabled", ScriptDataType.Int), new ScriptParameter("Nav Mesh Node Index", ScriptDataType.Int) })
+                new ScriptOperationData("Nav Mesh State Change", ScriptDataType.Void, new() { new ScriptParameter("Nav Mesh", ScriptDataType.Cnet), new ScriptParameter("Disabled", ScriptDataType.Bool), new ScriptParameter("Nav Mesh Node Index", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.SPAWNING_FUNC, 3),
                 new ScriptOperationData("Spawning Func", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Actor), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.GROUP_SPAWNING_FUNC, 3),
-                new ScriptOperationData("Group Spawning Func", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Group), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
+                new ScriptOperationData("Spawning Func", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Group), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.STATIC_PROP_FUNC, 3),
-                new ScriptOperationData("62", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
+                new ScriptOperationData("Static Prop Func", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int), new ScriptParameter("Par1", ScriptDataType.Int), new ScriptParameter("Par2", ScriptDataType.Int) })
             },
 
         };
@@ -610,6 +609,9 @@ namespace FCopParser {
                     else if (actorMethods.Contains(byteCode)) {
                         node = new ActorMethodNode(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData), parameters);
                     }
+                    else if (byteCode == ByteCode.SPAWNING_FUNC || byteCode == ByteCode.GROUP_SPAWNING_FUNC) {
+                        node = new SpawningActorMethod(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData), parameters);
+                    }
                     else if (byteCode == ByteCode.CONDITIONAL_JUMP) {
                         node = new ScriptNestingNode(byteCode, scriptData.name, scriptData.defaultReturnType, new(scriptData.parameterData), parameters);
                     }
@@ -811,9 +813,11 @@ namespace FCopParser {
         UserVar,
         Enum,
         Cwav,
+        ActorDirect,
         Actor,
         Group,
-        Team
+        Team,
+        Cnet
     }
 
     public enum ScriptVariableType {
@@ -1397,6 +1401,108 @@ namespace FCopParser {
                 }
                 if (parameterData[0].dataType == ScriptDataType.Team) {
                     return new() { (byte)ByteCode.TEAM_ACTOR_FUNC };
+                }
+
+                return base.Compile();
+
+            }
+
+            return base.Compile();
+        }
+
+    }
+
+    public class SpawningActorMethod : ScriptNode {
+
+        public enum SpawningMethod {
+            Unknown = 60,
+            SetRespawning = 70,
+            Spawn = 71
+        }
+
+        static Dictionary<int, ScriptParameter> methodParameters = new() {
+            { 60, new ScriptParameter("Unknown", ScriptDataType.Bool) },
+            { 70, new ScriptParameter("Can Respawn", ScriptDataType.Bool) },
+            { 71, new ScriptParameter("Unknown", ScriptDataType.Bool) }
+        };
+
+        public static List<ScriptDataType> allowedActorRefs = new() {
+            ScriptDataType.Actor,
+            ScriptDataType.Group
+        };
+
+        public LiteralNode methodID;
+
+        public SpawningActorMethod(ByteCode byteCode, string name, ScriptDataType defaultReturnType, List<ScriptParameter> parameterData, List<ScriptNode> parameters) : base(byteCode, name, defaultReturnType, parameterData, parameters) {
+
+            if (parameters.Count > 1 && parameters[1].GetType() == typeof(LiteralNode)) {
+                methodID = (LiteralNode)parameters[1];
+            }
+
+        }
+
+        public ParameterNode GetActorRefProperty() {
+
+            if (parameters[0] is LiteralNode litNode) {
+
+                return new ParameterNode(litNode, this, "", 0, parameterData[0].dataType);
+
+            }
+            else {
+                return null;
+            }
+
+        }
+
+        public void SetActorRef(ScriptDataType dataType, int id) {
+
+            if (parameters[0] is LiteralNode litNode) {
+
+                litNode.value = id;
+                parameterData[0] = new ScriptParameter(parameterData[0].name, dataType);
+
+            }
+
+        }
+
+        public override List<ParameterNode> GetParameters() {
+
+            if (methodID == null) {
+                return base.GetParameters();
+            }
+
+            if (parameters.Count != 3) {
+                return base.GetParameters();
+            }
+
+            ScriptParameter methodParameter;
+
+            try {
+                methodParameter = methodParameters[methodID.value];
+            }
+            catch {
+                return base.GetParameters();
+            }
+
+            var totalParameters = new List<ParameterNode> {
+                new ParameterNode(parameters[0], this, "", 0, parameterData[0].dataType),
+                new EnumParameterNode(methodID, this, "", 1, typeof(SpawningMethod), true),
+                new ParameterNode(parameters[2], this, methodParameter.name, 2, methodParameter.dataType)
+            };
+
+            return totalParameters;
+
+        }
+
+        public override List<byte> Compile() {
+
+            if (parameters.Count == 3 && parameters[0] is LiteralNode) {
+
+                if (parameterData[0].dataType == ScriptDataType.Actor) {
+                    return new() { (byte)ByteCode.SPAWNING_FUNC };
+                }
+                if (parameterData[0].dataType == ScriptDataType.Group) {
+                    return new() { (byte)ByteCode.GROUP_SPAWNING_FUNC };
                 }
 
                 return base.Compile();

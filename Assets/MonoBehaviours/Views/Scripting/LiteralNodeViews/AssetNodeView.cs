@@ -9,6 +9,7 @@ public class AssetNodeView : ExpressionNodeView {
 
     // - Asset Refs -
     public Sprite wavIconSprite;
+    public Sprite navMeshIcon;
 
     // - Unity Refs -
     public Image assetIcon;
@@ -33,14 +34,11 @@ public class AssetNodeView : ExpressionNodeView {
         literalNode = (LiteralNode)parameterNode.scriptNode;
         main = FindAnyObjectByType<Main>();
 
-        switch (parameterNode.dataType) {
-            case ScriptDataType.Cwav:
-                assetType = AssetType.WavSound;
-                break;
-            default:
-                assetType = AssetType.None;
-                break;
-        }
+        assetType = parameterNode.dataType switch {
+            ScriptDataType.Cwav => AssetType.WavSound,
+            ScriptDataType.Cnet => AssetType.NavMesh,
+            _ => AssetType.None,
+        };
 
         switch (assetType) {
 
@@ -53,6 +51,17 @@ public class AssetNodeView : ExpressionNodeView {
                 }
 
                 assetIcon.sprite = wavIconSprite;
+                break;
+            case AssetType.NavMesh:
+
+                try {
+                    expressionText.text = main.level.navMeshes[literalNode.value].name;
+                }
+                catch {
+                    NameCheck();
+                }
+
+                assetIcon.sprite = navMeshIcon;
                 break;
 
         }
@@ -77,6 +86,10 @@ public class AssetNodeView : ExpressionNodeView {
 
                     }
 
+                }
+                else if (asset is FCopNavMesh navMesh) {
+
+                    literalNode.value = main.level.navMeshes.IndexOf(navMesh);
 
                 }
                 else {

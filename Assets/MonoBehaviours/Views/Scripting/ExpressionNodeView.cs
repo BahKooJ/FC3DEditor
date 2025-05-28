@@ -64,6 +64,7 @@ public class ExpressionNodeView : MonoBehaviour {
                         ScriptDataType.Bool => Instantiate(boolNodePrefab, transform, false),
                         ScriptDataType.Enum => Instantiate(enumNodePrefab, transform, false),
                         ScriptDataType.Cwav => Instantiate(assetNodePrefab, transform, false),
+                        ScriptDataType.Cnet => Instantiate(assetNodePrefab, transform, false),
                         ScriptDataType.Actor => Instantiate(specialActorNodePrefab, transform, false),
                         ScriptDataType.Group => Instantiate(specialActorNodePrefab, transform, false),
                         ScriptDataType.Team => Instantiate(specialActorNodePrefab, transform, false),
