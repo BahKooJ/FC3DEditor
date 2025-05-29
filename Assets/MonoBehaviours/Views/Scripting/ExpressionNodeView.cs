@@ -129,5 +129,31 @@ public class ExpressionNodeView : MonoBehaviour {
 
     }
 
+    public void OnReceiverDrag() {
+
+        ScriptNode scriptNode = null;
+
+        if (Main.draggingElement.TryGetComponent<StatementNodeView>(out var viewItem)) {
+
+            scriptNode = viewItem.scriptNode;
+
+        }
+        else if (Main.draggingElement.TryGetComponent<ScriptNodeCreatorItemView>(out var creatorItem)) {
+
+            scriptNode = creatorItem.Create(parameterNode.scriptNode);
+
+        }
+
+        if (scriptNode.ReturnType() == ScriptDataType.Void) return;
+        if (!parameterNode.acceptsExpression) return;
+
+        currentLine.view.script.RemoveNode(scriptNode);
+
+        parameterNode.parent.parameters[parameterNode.parameterIndex] = scriptNode;
+
+        currentLine.view.Init();
+
+    }
+
 
 }

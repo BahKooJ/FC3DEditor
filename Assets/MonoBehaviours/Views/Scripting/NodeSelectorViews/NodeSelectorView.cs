@@ -32,6 +32,18 @@ public class NodeSelectorView : MonoBehaviour {
             tabs.Add(tabView);
         }
 
+        Refresh();
+
+    }
+
+    public void Refresh() {
+
+        foreach (var item in items) {
+            Destroy(item.gameObject);
+        }
+
+        items.Clear();
+
         var nodeData = nodeCreatorData[selectorTab];
 
         foreach (var data in nodeData) {
@@ -45,6 +57,11 @@ public class NodeSelectorView : MonoBehaviour {
 
         }
 
+    }
+
+    public void SelectTab(NodeSelectorTab tab) {
+        selectorTab = tab;
+        Refresh();
     }
 
 }

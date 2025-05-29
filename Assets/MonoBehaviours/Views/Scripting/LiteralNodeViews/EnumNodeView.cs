@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using static FCopParser.ActorMethodNode;
 using System.Linq;
 using System.Collections;
-using UnityEngine.UIElements;
 
 public class EnumNodeView : ExpressionNodeView {
 

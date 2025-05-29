@@ -2,14 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static FCopParser.ActorMethodNode;
 
 namespace FCopParser {
 
     public class FCopScriptingProject {
 
         public static Dictionary<int, ScriptVariable> globalVariables = new() {
-
+            { 0, new ScriptVariable("None", 0, ScriptVariableType.Global, ScriptDataType.Any, "None") },
             { 2, new ScriptVariable("Unknown2", 2, ScriptVariableType.Global, ScriptDataType.Any, "Unknown") },
             { 3, new ScriptVariable("Player Count", 3, ScriptVariableType.Global, ScriptDataType.Int, "The selected player count") },
             { 16, new ScriptVariable("Mission Completed", 16, ScriptVariableType.Global, ScriptDataType.Bool, "If the level was completed, opposite in Precinct Assault") },
@@ -193,6 +192,21 @@ namespace FCopParser {
 
             code.Clear();
             code = Decompile(0, compiledBytes, out var _);
+
+        }
+
+        public int RemoveNode(ScriptNode scriptNode) {
+
+            int indexOfRemoved;
+            if (scriptNode.parent == null) {
+                indexOfRemoved = code.IndexOf(scriptNode);
+                code.Remove(scriptNode);
+            }
+            else {
+                indexOfRemoved = scriptNode.parent.nestedNodes.IndexOf(scriptNode);
+                scriptNode.parent.nestedNodes.Remove(scriptNode);
+            }
+            return indexOfRemoved;
 
         }
 
@@ -964,7 +978,7 @@ namespace FCopParser {
                 var parData = parameterData[i];
                 var parNode = this.parameters[i];
 
-                parameters.Add(new ParameterNode(parNode, this, parData.name, i, parData.dataType));
+                parameters.Add(new ParameterNode(parNode, this, parData.name, i, parData.dataType, true));
             }
 
             return parameters;
@@ -988,6 +1002,43 @@ namespace FCopParser {
         public ScriptNestingNode(ByteCode byteCode, string name, ScriptDataType defaultReturnType, List<ScriptParameter> parameterData, List<ScriptNode> parameters) : base(byteCode, name, defaultReturnType, parameterData, parameters) {
         }
 
+        public bool NestNode(ScriptNode node, int requestedIndex) {
+
+            var presentJumpNode = nestedNodes.FirstOrDefault(n => n.byteCode == ByteCode.JUMP);
+
+            if (node is ScriptNestingNode && node.byteCode == ByteCode.JUMP) {
+
+                // Cannot add two jumps
+                if (presentJumpNode != null) {
+                    return false;
+                }
+
+                // Cannot add a jump into a jump
+                if (byteCode == ByteCode.JUMP) {
+                    return false;
+                }
+
+                node.parent = this;
+                nestedNodes.Add(node);
+                return true;
+
+            }
+
+            node.parent = this;
+            nestedNodes.Insert(requestedIndex, node);
+            
+            // Ensures the jump is last
+            if (presentJumpNode != null) {
+                nestedNodes.Remove(presentJumpNode);
+                nestedNodes.Add(presentJumpNode);
+            }
+
+            return true;
+
+        }
+
+
+
     }
 
     public class ParameterNode {
@@ -997,19 +1048,21 @@ namespace FCopParser {
         public string parameterName;
         public int parameterIndex;
         public ScriptDataType dataType;
+        public bool acceptsExpression;
 
-        public ParameterNode(ScriptNode scriptNode, ScriptNode parent, string parameterName, int parameterIndex, ScriptDataType dataType) {
+        public ParameterNode(ScriptNode scriptNode, ScriptNode parent, string parameterName, int parameterIndex, ScriptDataType dataType, bool acceptsExpression) {
             this.parent = parent;
             this.scriptNode = scriptNode;
             this.parameterName = parameterName;
             this.parameterIndex = parameterIndex;
             this.dataType = dataType;
+            this.acceptsExpression = acceptsExpression;
         }
 
         public BitCount bitCount = BitCount.NA;
         public int bitPosition = 0;
 
-        public ParameterNode(ScriptNode parent, ScriptNode scriptNode, string parameterName, int parameterIndex, ScriptDataType dataType, BitCount bitCount, int bitPosition) : this(parent, scriptNode, parameterName, parameterIndex, dataType) {
+        public ParameterNode(ScriptNode parent, ScriptNode scriptNode, string parameterName, int parameterIndex, ScriptDataType dataType, BitCount bitCount, int bitPosition) : this(parent, scriptNode, parameterName, parameterIndex, dataType, false) {
             this.bitCount = bitCount;
             this.bitPosition = bitPosition;
         }
@@ -1020,7 +1073,7 @@ namespace FCopParser {
         public Type enumType;
         public bool affectsParameters;
 
-        public EnumParameterNode(ScriptNode scriptNode, ScriptNode parent, string parameterName, int parameterIndex, Type enumType, bool affectsParameters) : base(scriptNode, parent, parameterName, parameterIndex, ScriptDataType.Enum) {
+        public EnumParameterNode(ScriptNode scriptNode, ScriptNode parent, string parameterName, int parameterIndex, Type enumType, bool affectsParameters) : base(scriptNode, parent, parameterName, parameterIndex, ScriptDataType.Enum, false) {
             this.enumType = enumType;
             this.affectsParameters = affectsParameters;
         }
@@ -1044,7 +1097,7 @@ namespace FCopParser {
             foreach (var i in Enumerable.Range(0, this.parameters.Count)) {
                 var parData = parameterData[i];
                 var parNode = this.parameters[i];
-                parameters.Add(new ParameterNode(parNode, this, "", i, parData.dataType));
+                parameters.Add(new ParameterNode(parNode, this, "", i, parData.dataType, true));
             }
 
             if (reversed) {
@@ -1140,14 +1193,19 @@ namespace FCopParser {
 
             varNode.RefreshData();
             
-            if (parameters.Count == 2 && parameters[0] is LiteralNode litNode) {
+            if (parameters.Count == 2) {
 
                 return new() {
-                    new ParameterNode(varNode, this, "", 1, VariableNode.VarTypeToDataType(varNode.varibleType)),
-                    new ParameterNode(litNode, this, "", 0, varNode.defaultReturnType),
+                    new ParameterNode(varNode, this, "", 1, VariableNode.VarTypeToDataType(varNode.varibleType), false),
+                    new ParameterNode(parameters[0], this, "", 0, varNode.defaultReturnType, true),
 
                 };
 
+            }
+            else if (parameters.Count == 1) {
+                return new() {
+                    new ParameterNode(varNode, this, "", 0, VariableNode.VarTypeToDataType(varNode.varibleType), false),
+                };
             }
             else {
                 return base.GetParameters();
@@ -1160,11 +1218,13 @@ namespace FCopParser {
     public class SystemMethodNode : ScriptNode {
 
         public enum SystemMethod {
+            None = 0,
             EndGame = 2,
             PlaySound = 3
         }
 
         static Dictionary<int, ScriptParameter> methodParamters = new() {
+            { 0, new ScriptParameter("None", ScriptDataType.Any) },
             { 2, new ScriptParameter("Timer", ScriptDataType.Int) },
             { 3, new ScriptParameter("Sound", ScriptDataType.Cwav) },
         };
@@ -1189,7 +1249,7 @@ namespace FCopParser {
 
             return new() {
                 new EnumParameterNode(methodID, this, "", 1, typeof(SystemMethod), true),
-                new ParameterNode(parameters[0], this, methodParameter.name, 0, methodParameter.dataType),
+                new ParameterNode(parameters[0], this, methodParameter.name, 0, methodParameter.dataType, true),
             };
 
         }
@@ -1284,7 +1344,7 @@ namespace FCopParser {
             { 57, new() { new ScriptParameter("Sound", ScriptDataType.Cwav) } },
             { 58, new() { new ScriptParameter("Value", ScriptDataType.Int) } },
             { 60, new() { new ScriptParameter("Hurt Value", ScriptDataType.Int) } },
-            { 61, new() { new ScriptParameter("Unknown", ScriptDataType.Bool) } },
+            { 61, new() { new ScriptParameter("", ScriptDataType.Bool) } },
             { 62, new() { new ScriptParameter("Map Color", ScriptDataType.Enum, typeof(MapIconColor)) } },
             { 63, new() { new ScriptParameter("Is Invincible", ScriptDataType.Bool) } },
             { 64, new() { new ScriptParameter("Disable Targeting", ScriptDataType.Bool) } },
@@ -1330,7 +1390,7 @@ namespace FCopParser {
 
             if (parameters[0] is LiteralNode litNode) {
 
-                return new ParameterNode(litNode, this, "", 0, parameterData[0].dataType);
+                return new ParameterNode(litNode, this, "", 0, parameterData[0].dataType, false);
 
             }
             else {
@@ -1370,7 +1430,7 @@ namespace FCopParser {
             }
 
             var totalParameters = new List<ParameterNode> {
-                new ParameterNode(parameters[0], this, "", 0, parameterData[0].dataType),
+                new ParameterNode(parameters[0], this, "", 0, parameterData[0].dataType, false),
                 new EnumParameterNode(methodID, this, "", 1, typeof(ActorMethod), true),
             };
 
@@ -1415,15 +1475,17 @@ namespace FCopParser {
     public class SpawningActorMethod : ScriptNode {
 
         public enum SpawningMethod {
+            None = 0,
             Unknown = 60,
             SetRespawning = 70,
             Spawn = 71
         }
 
         static Dictionary<int, ScriptParameter> methodParameters = new() {
+            { 0, new ScriptParameter("None", ScriptDataType.Bool) },
             { 60, new ScriptParameter("Unknown", ScriptDataType.Bool) },
             { 70, new ScriptParameter("Can Respawn", ScriptDataType.Bool) },
-            { 71, new ScriptParameter("Unknown", ScriptDataType.Bool) }
+            { 71, new ScriptParameter("", ScriptDataType.Bool) }
         };
 
         public static List<ScriptDataType> allowedActorRefs = new() {
@@ -1445,7 +1507,7 @@ namespace FCopParser {
 
             if (parameters[0] is LiteralNode litNode) {
 
-                return new ParameterNode(litNode, this, "", 0, parameterData[0].dataType);
+                return new ParameterNode(litNode, this, "", 0, parameterData[0].dataType, false);
 
             }
             else {
@@ -1485,9 +1547,9 @@ namespace FCopParser {
             }
 
             var totalParameters = new List<ParameterNode> {
-                new ParameterNode(parameters[0], this, "", 0, parameterData[0].dataType),
+                new ParameterNode(parameters[0], this, "", 0, parameterData[0].dataType, false),
                 new EnumParameterNode(methodID, this, "", 1, typeof(SpawningMethod), true),
-                new ParameterNode(parameters[2], this, methodParameter.name, 2, methodParameter.dataType)
+                new ParameterNode(parameters[2], this, methodParameter.name, 2, methodParameter.dataType, true)
             };
 
             return totalParameters;

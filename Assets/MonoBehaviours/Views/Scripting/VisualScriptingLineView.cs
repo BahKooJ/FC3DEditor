@@ -59,72 +59,74 @@ public class VisualScriptingLineView : MonoBehaviour {
 
     public void OnReceiverDrag() {
 
+        ScriptNode scriptNode = null;
+
         if (Main.draggingElement.TryGetComponent<StatementNodeView>(out var viewItem)) {
 
-            var parentNodeOfDragged = viewItem.scriptNode.parent;
-
-            // Can't nest a node in itself.
-            if (parentNodeView != null && viewItem.scriptNode == parentNodeView.scriptNode) {
-                return;
-            }
-
-            int indexOfRemoved;
-
-            // Finds the scripting node and removes it so it can be added else where.
-            if (parentNodeOfDragged == null) {
-                indexOfRemoved = view.script.code.IndexOf(viewItem.scriptNode);
-                view.script.code.Remove(viewItem.scriptNode);
-            }
-            else {
-                indexOfRemoved = parentNodeOfDragged.nestedNodes.IndexOf(viewItem.scriptNode);
-                parentNodeOfDragged.nestedNodes.Remove(viewItem.scriptNode);
-            }
-
-            if (parentNodeView != null && parentNodeView.scriptNode is ScriptNestingNode parentNestingNode) {
-
-                if (parentNestingNode == parentNodeOfDragged) {
-
-                    var indexOfThis = localIndex;
-
-                    if (indexOfRemoved < indexOfThis) {
-                        indexOfThis--;
-                    }
-
-                    parentNestingNode.nestedNodes.Insert(indexOfThis, viewItem.scriptNode);
-
-                }
-                else {
-                    viewItem.scriptNode.parent = parentNestingNode;
-                    parentNestingNode.nestedNodes.Insert(localIndex, viewItem.scriptNode);
-                }
-
-
-            }
-            else {
-
-                if (parentNodeOfDragged == null) {
-
-                    var indexOfThis = localIndex;
-
-                    if (indexOfRemoved < indexOfThis) {
-                        indexOfThis--;
-                    }
-
-                    view.script.code.Insert(indexOfThis, viewItem.scriptNode);
-
-                }
-                else {
-
-                    viewItem.scriptNode.parent = null;
-                    view.script.code.Insert(localIndex, viewItem.scriptNode);
-
-                }
-
-            }
-
-            view.Init();
+            scriptNode = viewItem.scriptNode;
 
         }
+        else if (Main.draggingElement.TryGetComponent<ScriptNodeCreatorItemView>(out var creatorItem)) {
+
+            scriptNode = creatorItem.Create(null);
+
+        }
+
+        if (scriptNode == null) {
+            return;
+        }
+
+        var parentNodeOfDragged = scriptNode.parent;
+
+        // Can't nest a node in itself.
+        if (parentNodeView != null && scriptNode == parentNodeView.scriptNode) {
+            return;
+        }
+
+        // Finds the scripting node and removes it so it can be added else where.
+        int indexOfRemoved = view.script.RemoveNode(scriptNode);
+
+        if (parentNodeView != null && parentNodeView.scriptNode is ScriptNestingNode parentNestingNode) {
+
+            if (parentNestingNode == parentNodeOfDragged) {
+
+                var indexOfThis = localIndex;
+
+                if (indexOfRemoved != - 1 && indexOfRemoved < indexOfThis) {
+                    indexOfThis--;
+                }
+                parentNestingNode.NestNode(scriptNode, indexOfThis);
+
+            }
+            else {
+                parentNestingNode.NestNode(scriptNode, localIndex);
+            }
+
+
+        }
+        else if (scriptNode.byteCode != ByteCode.JUMP) {
+
+            if (parentNodeOfDragged == null) {
+
+                var indexOfThis = localIndex;
+
+                if (indexOfRemoved != -1 && indexOfRemoved < indexOfThis) {
+                    indexOfThis--;
+                }
+
+                view.script.code.Insert(indexOfThis, scriptNode);
+
+            }
+            else {
+
+                scriptNode.parent = null;
+                view.script.code.Insert(localIndex, scriptNode);
+
+            }
+
+        }
+
+        view.Init();
 
     }
 

@@ -19,6 +19,14 @@ public class NodeSelectorViewItem : MonoBehaviour {
     public Image openBracketImage;
     public Image fillImage;
     public Image closeBracketImage;
+    public Transform previewNodeTransform;
+    public ScriptNodeCreatorItemView scriptNodeView;
+
+    // - Unity Parameters -
+    public Color keyWordColor;
+    public Color expressionColor;
+    public Color variableColor;
+    public Color literalColor;
 
     // - Parameter -
     public NodeCreatorData creatorData;
@@ -36,6 +44,25 @@ public class NodeSelectorViewItem : MonoBehaviour {
             fillImage.sprite = expressionFillSprite;
             closeBracketImage.sprite = closeExpressionSprite;
         }
+
+        if (keyWordCodes.Contains(creatorData.byteCode)) {
+            fillImage.color = keyWordColor;
+        }
+        if (expressionCodes.Contains(creatorData.byteCode)) {
+            fillImage.color = expressionColor;
+        }
+        if (variableCodes.Contains(creatorData.byteCode)) {
+            fillImage.color = variableColor;
+        }
+        if (literalCodes.Contains(creatorData.byteCode)) {
+            fillImage.color = literalColor;
+        }
+
+        var previewNode = Instantiate(scriptNodeView.gameObject, previewNodeTransform, false);
+        previewNode.transform.SetSiblingIndex(0);
+        Destroy(previewNode.GetComponent<ScriptNodeCreatorItemView>());
+
+        scriptNodeView.creatorData = creatorData;
 
     }
 

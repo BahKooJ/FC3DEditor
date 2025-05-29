@@ -20,4 +20,10 @@ public class NodeSelectorTabView : MonoBehaviour {
 
     }
 
+    public void OnClick() {
+
+        view.SelectTab(tab);
+
+    }
+
 }

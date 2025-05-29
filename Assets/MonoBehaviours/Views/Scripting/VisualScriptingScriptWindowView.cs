@@ -168,4 +168,15 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
 
     }
 
+    public void OnReceiveTrash() {
+
+        if (Main.draggingElement.TryGetComponent<StatementNodeView>(out var viewItem)) {
+
+            script.RemoveNode(viewItem.scriptNode);
+            Init();
+
+        }
+
+    }
+
 }

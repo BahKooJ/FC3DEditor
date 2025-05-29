@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2450329162869203079}
   - component: {fileID: 5486397937650842999}
   - component: {fileID: 4941161694763243985}
+  - component: {fileID: 4455106383789771539}
   m_Layer: 6
   m_Name: Expression Text
   m_TagString: Untagged
@@ -34,8 +35,8 @@ RectTransform:
   m_Father: {fileID: 5001642633774744197}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 20, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
@@ -150,6 +151,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 2
   m_VerticalFit: 2
+--- !u!114 &4455106383789771539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4479808689462527050}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2840d62cab09ce44bc15847eae8d86d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  highlightImage: {fileID: 6532242173359243619}
+  changeColor: 1
+  highlightColor: {r: 0, g: 0.83137256, b: 0, a: 1}
+  expectedTransform: {fileID: 0}
+  onReceive:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7896730659796619371}
+        m_TargetAssemblyTypeName: ExpressionNodeView, Assembly-CSharp
+        m_MethodName: OnReceiverDrag
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &5800757731057328444
 GameObject:
   m_ObjectHideFlags: 0
@@ -353,6 +385,7 @@ GameObject:
   - component: {fileID: 9002557664747725861}
   - component: {fileID: 7896730659796619371}
   - component: {fileID: 9159569633472101174}
+  - component: {fileID: 6266568915058683499}
   m_Layer: 6
   m_Name: Variable Node
   m_TagString: Untagged
@@ -535,6 +568,37 @@ MonoBehaviour:
       - m_Target: {fileID: 7896730659796619371}
         m_TargetAssemblyTypeName: VariableNodeView, Assembly-CSharp
         m_MethodName: OnClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &6266568915058683499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8547359735126737856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2840d62cab09ce44bc15847eae8d86d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  highlightImage: {fileID: 6532242173359243619}
+  changeColor: 1
+  highlightColor: {r: 0, g: 0.83137256, b: 0, a: 1}
+  expectedTransform: {fileID: 0}
+  onReceive:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7896730659796619371}
+        m_TargetAssemblyTypeName: ExpressionNodeView, Assembly-CSharp
+        m_MethodName: OnReceiverDrag
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

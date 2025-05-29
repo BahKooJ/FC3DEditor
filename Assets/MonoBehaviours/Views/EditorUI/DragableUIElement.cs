@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -108,10 +109,10 @@ public class DragableUIElement : MonoBehaviour, IBeginDragHandler, IDragHandler,
 
         if (results.Count > 0) {
 
-            if (results[0].gameObject.TryGetComponent<ReceiveDragable>(out var receiver)) {
+            var resultWithReceiver = results.FirstOrDefault(result => result.gameObject.TryGetComponent<ReceiveDragable>(out var _));
 
-                receiver.ReceiveDrag(this);
-
+            if (resultWithReceiver.gameObject != null) {
+                resultWithReceiver.gameObject.GetComponent<ReceiveDragable>().ReceiveDrag(this);
             }
 
         }

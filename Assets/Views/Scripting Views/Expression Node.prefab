@@ -352,6 +352,7 @@ GameObject:
   - component: {fileID: 2094964203151101858}
   - component: {fileID: 9002557664747725861}
   - component: {fileID: 5233705989860236943}
+  - component: {fileID: 461428739875992179}
   m_Layer: 6
   m_Name: Expression Node
   m_TagString: Untagged
@@ -486,3 +487,34 @@ MonoBehaviour:
   backgroundImage: {fileID: 6532242173359243619}
   currentLine: {fileID: 0}
   expressionNodes: []
+--- !u!114 &461428739875992179
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8547359735126737856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2840d62cab09ce44bc15847eae8d86d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  highlightImage: {fileID: 6532242173359243619}
+  changeColor: 1
+  highlightColor: {r: 0, g: 0.8301887, b: 0, a: 1}
+  expectedTransform: {fileID: 0}
+  onReceive:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5233705989860236943}
+        m_TargetAssemblyTypeName: ExpressionNodeView, Assembly-CSharp
+        m_MethodName: OnReceiverDrag
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2

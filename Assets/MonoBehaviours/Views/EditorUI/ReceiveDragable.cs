@@ -8,15 +8,30 @@ public class ReceiveDragable : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
     // - Parameter -
     public Image highlightImage;
+    public bool changeColor;
+    public Color highlightColor;
     public Transform expectedTransform;
     public UnityEvent onReceive;
+
+    Color originalColor;
+
+    void Start() {
+        originalColor = highlightImage.color;
+    }
 
     public void OnPointerEnter(PointerEventData eventData) {
 
         if (highlightImage == null) return;
         
         if (Main.draggingElement != null) {
-            highlightImage.gameObject.SetActive(true);
+
+            if (changeColor) {
+                highlightImage.color = highlightColor;
+            }
+            else {
+                highlightImage.gameObject.SetActive(true);
+            }
+
         }
 
     }
@@ -25,7 +40,12 @@ public class ReceiveDragable : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
         if (highlightImage == null) return;
 
-        highlightImage.gameObject.SetActive(false);
+        if (changeColor) {
+            highlightImage.color = originalColor;
+        }
+        else {
+            highlightImage.gameObject.SetActive(false);
+        }
 
     }
 
@@ -48,7 +68,12 @@ public class ReceiveDragable : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
         if (highlightImage == null) return;
 
-        highlightImage.gameObject.SetActive(false);
+        if (changeColor) {
+            highlightImage.color = originalColor;
+        }
+        else {
+            highlightImage.gameObject.SetActive(false);
+        }
 
     }
 

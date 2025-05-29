@@ -163,7 +163,7 @@ public class StatementNodeView : DragableUIElement {
         }
 
         if (scriptNode.byteCode == ByteCode.JUMP) {
-            refuseDrag = true;
+            //refuseDrag = true;
         }
 
     }
