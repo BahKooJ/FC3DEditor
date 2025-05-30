@@ -73,6 +73,22 @@ namespace FCopParser {
 
         public static Dictionary<int, ScriptVariable> userVariables = new();
 
+        public static int AddUserVariable() {
+
+            var ids = userVariables.Keys.ToList();
+
+            var varID = Utils.FindNextInt(ids);
+
+            if (varID > 127) {
+                return -1;
+            }
+
+            userVariables.Add(varID, new ScriptVariable("Var" + varID, varID, ScriptVariableType.User, ScriptDataType.Any, "User Variable " + varID));
+
+            return varID;
+
+        }
+
         public FCopRPNS rpns;
         public FCopFunctionParser functionParser;
         public int emptyOffset;
@@ -80,7 +96,7 @@ namespace FCopParser {
         public FCopScriptingProject(FCopRPNS rpns, FCopFunctionParser functionParser) {
             this.rpns = rpns;
             this.functionParser = functionParser;
-            emptyOffset = rpns.code.Last().Key;
+            emptyOffset = rpns.code.Last().offset;
             FindAllUserVars();
         }
 
@@ -116,7 +132,7 @@ namespace FCopParser {
 
             foreach (var code in rpns.code) {
                 
-                foreach (var script in code.Value.code) {
+                foreach (var script in code.code) {
                     SearchScript(script);
                 }
 
@@ -148,18 +164,18 @@ namespace FCopParser {
 
         public void ResetIDAndOffsets() {
             rpns.ResetKeys();
-            emptyOffset = rpns.code.Last().Value.offset;
+            emptyOffset = rpns.code.Last().offset;
         }
 
         // Added a debug code I forgot about and now mission files are messed up
         public void DebugScriptDupeFix() {
 
-            var first = rpns.code.First().Value;
-            var copy = new Dictionary<int, FCopScript>(rpns.code.Skip(1));
+            var first = rpns.codeByOffset.First().Value;
+            var copy = new Dictionary<int, FCopScript>(rpns.codeByOffset.Skip(1));
             foreach (var code in copy) {
 
                 if (first.compiledBytes.SequenceEqual(code.Value.compiledBytes)) {
-                    rpns.code.Remove(code.Key);
+                    rpns.codeByOffset.Remove(code.Key);
                 }
 
             }
@@ -173,7 +189,6 @@ namespace FCopParser {
         public bool failed = false;
 
         public string name = "";
-        public int id;
 
         public int offset;
         public int terminationOffset;
@@ -181,11 +196,17 @@ namespace FCopParser {
         public List<ScriptNode> code = new();
 
         public FCopScript(int offset, List<byte> compiledBytes) {
-            this.id = offset;
             this.offset = offset;
-            code = Decompile(offset, compiledBytes, out terminationOffset);
+            this.code = Decompile(offset, compiledBytes, out terminationOffset);
             this.compiledBytes = compiledBytes.GetRange(offset, terminationOffset - offset);
+            this.name = "Script " + offset;
+        }
 
+        public FCopScript(int offset) {
+            this.offset = offset;
+            this.code = new();
+            this.compiledBytes = new() { 0 };
+            this.name = "Script " + offset;
         }
 
         public void Refresh() {

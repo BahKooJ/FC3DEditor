@@ -443,7 +443,14 @@ namespace FCopParser {
                     rawFile.rpnsReferences.Add(-1);
                 }
                 else {
-                    rawFile.rpnsReferences.Add(scripting.rpns.code[rpnsRef].offset);
+
+                    if (scripting.rpns.codeByOffset.TryGetValue(rpnsRef, out var script)) {
+                        rawFile.rpnsReferences.Add(script.offset);
+                    }
+                    else {
+                        rawFile.rpnsReferences.Add(scripting.rpns.codeByOffset[scripting.emptyOffset].offset);
+                    }
+
                 }
 
             }
@@ -606,7 +613,7 @@ namespace FCopParser {
 
             // TODO: Function and script files
             var scriptingFiles = scripting.Compile();
-            var compiledEmptyOffset = scripting.rpns.code[scripting.emptyOffset].offset;
+            var compiledEmptyOffset = scripting.rpns.codeByOffset[scripting.emptyOffset].offset;
 
             foreach (var file in scriptingFiles) {
                 UpdateRPNSOffsets(file);

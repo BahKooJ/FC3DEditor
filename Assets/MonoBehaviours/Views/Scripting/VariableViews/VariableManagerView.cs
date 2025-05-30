@@ -18,19 +18,19 @@ public class VariableManagerView : MonoBehaviour {
 
     List<VariableItemView> items = new();
 
+    VariableItemView InitVarItem(ScriptVariable scriptVariable) {
+
+        var obj = Instantiate(variableItem, listContent, false);
+        obj.SetActive(true);
+        var item = obj.GetComponent<VariableItemView>();
+        item.scriptVariable = scriptVariable;
+
+        items.Add(item);
+        return item;
+
+    }
+
     private void Start() {
-
-        VariableItemView InitVarItem(ScriptVariable scriptVariable) {
-
-            var obj = Instantiate(variableItem, listContent, false);
-            obj.SetActive(true);
-            var item = obj.GetComponent<VariableItemView>();
-            item.scriptVariable = scriptVariable;
-
-            items.Add(item);
-            return item;
-
-        }
 
         foreach (var userVar in FCopScriptingProject.userVariables) {
 
@@ -69,6 +69,23 @@ public class VariableManagerView : MonoBehaviour {
             varView.canChangeName = true;
             varView.canChangeDescription = true;
         }
+
+    }
+
+    public void AddUserVar() {
+
+        var varId = FCopScriptingProject.AddUserVariable();
+
+        if (varId == -1) {
+            QuickLogHandler.Log("Maximum user variables added", LogSeverity.Error); 
+            return;
+        }
+
+        var varView = InitVarItem(FCopScriptingProject.userVariables[varId]);
+        varView.transform.SetSiblingIndex(2);
+        varView.canChangeType = true;
+        varView.canChangeName = true;
+        varView.canChangeDescription = true;
 
     }
 

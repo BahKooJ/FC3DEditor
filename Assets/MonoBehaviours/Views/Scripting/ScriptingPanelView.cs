@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class ScriptingPanelView : MonoBehaviour {
 
-
     // - Unity Refs -
     public Transform scriptListContent;
     public VisualScriptingScriptWindowView scriptingWindow;
@@ -18,11 +17,9 @@ public class ScriptingPanelView : MonoBehaviour {
     public GameObject ScriptListItem;
 
     public bool isScriptTab = true;
-    public int actorRPNSRefIndex;
-    public FCopActor actor;
     public FCopLevel level;
 
-    List<ScriptingButtonItemView> scriptButtons = new();
+    List<ScriptingSelectorItemView> selectorItems = new();
 
     void Start() {
 
@@ -33,30 +30,39 @@ public class ScriptingPanelView : MonoBehaviour {
 
     }
 
-    void Refresh() {
+    ScriptingSelectorItemView AddScriptSelector(FCopScript script) {
 
-        foreach (var item in scriptButtons) {
+        var listItem = Instantiate(ScriptListItem, scriptListContent, false);
+        listItem.SetActive(true);
+
+        var listItemScript = listItem.GetComponent<ScriptingSelectorItemView>();
+
+        listItemScript.view = this;
+        listItemScript.id = script.offset;
+        listItemScript.script = script;
+
+        selectorItems.Add(listItemScript);
+        return listItemScript;
+
+    }
+
+    public void Refresh() {
+
+        foreach (var item in selectorItems) {
             Destroy(item.gameObject);
         }
 
-        scriptButtons.Clear();
+        selectorItems.Clear();
 
         if (isScriptTab) {
 
             foreach (var script in level.scripting.rpns.code) {
 
-                var listItem = Instantiate(ScriptListItem);
+                if (script.offset == level.scripting.emptyOffset) {
+                    continue;
+                }
 
-                listItem.gameObject.SetActive(true);
-
-                var listItemScript = listItem.GetComponent<ScriptingButtonItemView>();
-
-                listItemScript.view = this;
-                listItemScript.value = script.Key;
-
-                listItem.transform.SetParent(scriptListContent, false);
-
-                scriptButtons.Add(listItemScript);
+                AddScriptSelector(script);
 
             }
 
@@ -70,14 +76,14 @@ public class ScriptingPanelView : MonoBehaviour {
 
                 listItem.gameObject.SetActive(true);
 
-                var listItemScript = listItem.GetComponent<ScriptingButtonItemView>();
+                var listItemScript = listItem.GetComponent<ScriptingSelectorItemView>();
 
                 listItemScript.view = this;
-                listItemScript.value = i;
+                listItemScript.id = i;
 
                 listItem.transform.SetParent(scriptListContent, false);
 
-                scriptButtons.Add(listItemScript);
+                selectorItems.Add(listItemScript);
 
                 i++;
             }
@@ -86,9 +92,19 @@ public class ScriptingPanelView : MonoBehaviour {
 
     }
 
+    public void RefreshScriptSelection() {
+
+        foreach (var item in selectorItems) {
+            item.Unselect();
+        }
+
+    }
+
     public void SelectScript(int id) {
 
-        var script = level.scripting.rpns.code[id];
+        RefreshScriptSelection();
+
+        var script = level.scripting.rpns.codeByOffset[id];
 
         //funcScriptingWindow.Clear();
 
@@ -104,6 +120,21 @@ public class ScriptingPanelView : MonoBehaviour {
         scriptingWindow.script = func.code;
         scriptingWindow.script.code.AddRange(func.runCondition.code);
         scriptingWindow.Init();
+
+    }
+
+    public void ReOrderScript(int indexOfDragged, int indexOfReceiver) {
+
+        var draggedScript = level.scripting.rpns.code[indexOfDragged];
+
+        level.scripting.rpns.code.RemoveAt(indexOfDragged);
+
+        if (indexOfReceiver > indexOfDragged) {
+            level.scripting.rpns.code.Insert(indexOfReceiver - 1, draggedScript);
+        }
+        else {
+            level.scripting.rpns.code.Insert(indexOfReceiver, draggedScript);
+        }
 
     }
 
@@ -131,6 +162,20 @@ public class ScriptingPanelView : MonoBehaviour {
 
         scriptingWindow.gameObject.SetActive(false);
         variableManagerView.gameObject.SetActive(true);
+
+    }
+
+    public void OnClickAddScript() {
+
+        if (isScriptTab) {
+            level.scripting.rpns.AddScript();
+
+            var selector = AddScriptSelector(level.scripting.rpns.code[0]);
+
+            selector.transform.SetSiblingIndex(0);
+            selector.Rename();
+
+        }
 
     }
 

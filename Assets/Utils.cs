@@ -171,6 +171,27 @@ namespace FCopParser {
 
         }
 
+        public static int FindNextInt(List<int> ints) {
+
+            var intsByAscending = ints.OrderBy(i => i).ToList();
+
+            var previousID = intsByAscending[0];
+            foreach (var i in intsByAscending) {
+
+                if (i == previousID + 1 || i == previousID) {
+                    previousID = i;
+                    continue;
+                }
+                else {
+                    return previousID + 1;
+                }
+
+            }
+
+            return intsByAscending.Last() + 1;
+
+        }
+
     }
 
     public class WavefrontParser {

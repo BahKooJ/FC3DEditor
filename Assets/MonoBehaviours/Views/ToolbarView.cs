@@ -242,6 +242,21 @@ public class ToolbarView: MonoBehaviour {
 
     }
 
+    public void OpenScriptingPanel() {
+
+        var existingScriptingPanel = FindAnyObjectByType<ScriptingPanelView>();
+
+        if (existingScriptingPanel != null) {
+            Destroy(existingScriptingPanel.gameObject);
+        }
+
+        var obj = Instantiate(controller.scriptingPanelPrefab, controller.canvas.transform, false);
+
+        var scriptingPanel = obj.GetComponent<ScriptingPanelView>();
+        scriptingPanel.level = controller.level;
+
+    }
+
     public void OpenAssetManager() {
 
         var existingAssetManager = FindAnyObjectByType<AssetManagerView>();

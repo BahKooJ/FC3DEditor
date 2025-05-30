@@ -31,7 +31,6 @@ public class ActorScriptCallItemView : MonoBehaviour {
 
         var viewScript = view.GetComponent<ScriptingPanelView>();
 
-        viewScript.actor = actor;
         viewScript.level = FileManagerMain.level;
 
         view.transform.SetParent(DialogWindowUtil.canvas.transform, false);

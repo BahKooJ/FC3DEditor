@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace FCopParser {
 
@@ -8,7 +9,8 @@ namespace FCopParser {
         // The key is only updated on a new file load.
         // Even if the file is compiled the key stays the same.
         // The new offset is stored on FCopScript.
-        public Dictionary<int, FCopScript> code = new();
+        public Dictionary<int, FCopScript> codeByOffset = new();
+        public List<FCopScript> code = new();
 
         public List<byte> bytes = new();
 
@@ -24,11 +26,29 @@ namespace FCopParser {
             while (i < bytes.Count) {
 
                 var script = new FCopScript(i, bytes);
-                code[i] = script;
+                codeByOffset[i] = script;
+                code.Add(script);
                 i = script.terminationOffset;
 
             }
 
+        }
+
+        public void AddScript() {
+
+            var keys = codeByOffset.Keys.ToList();
+
+            var nextKey = Utils.FindNextInt(keys);
+
+            var script = new FCopScript(nextKey);
+            codeByOffset[nextKey] = script;
+            code.Insert(0, script);
+
+        }
+
+        public void RemoveScript(int offset) {
+            codeByOffset.Remove(offset);
+            code.RemoveAll(script => script.offset == offset);
         }
 
         public IFFDataFile Compile() {
@@ -38,7 +58,7 @@ namespace FCopParser {
             var offset = 0;
             foreach (var line in code) {
 
-                var compiledLine = line.Value.Compile(offset);
+                var compiledLine = line.Compile(offset);
 
                 total.AddRange(compiledLine);
 
@@ -55,19 +75,18 @@ namespace FCopParser {
         public void ResetKeys() {
 
             var newOrder = new List<FCopScript>();
-            foreach (var line in code) {
+            foreach (var line in codeByOffset) {
                 newOrder.Add(line.Value);
             }
 
-            code.Clear();
+            codeByOffset.Clear();
 
             foreach (var line in newOrder) {
-                code.Add(line.offset, line);
+                codeByOffset.Add(line.offset, line);
             }
 
         }
 
     }
-
 
 }

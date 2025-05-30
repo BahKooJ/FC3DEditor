@@ -119,7 +119,7 @@ public class Main : MonoBehaviour {
     public GameObject assetManagerPrefab;
     public GameObject miniAssetManagerPrefab;
     public GameObject universialDataManagerPrefab;
-
+    public GameObject scriptingPanelPrefab;
 
     // Temp
     public GameObject boundsPrefab;
