@@ -508,6 +508,11 @@ namespace FCopParser {
 
         public int expectedRawFileSize;
         public ActorAssetReference[] assetReferences;
+        public string[] callbackNames = new string[] {
+            "On Callback 1",
+            "On Callback 2",
+            "On Callback 3"
+        };
 
         FCopActor actor;
         public List<byte> propertyData;

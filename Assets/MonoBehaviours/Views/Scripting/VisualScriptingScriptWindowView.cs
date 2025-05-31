@@ -15,6 +15,8 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
 
     // - Unity Refs -
     public TMP_InputField debugInput;
+    public TMP_InputField commentInput;
+    public TMP_InputField commentWindow;
     public Transform codeScrollView;
 
     // - Parameters -
@@ -117,6 +119,9 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
         CreateLineFab(null, null, script.code.Count);
 
         refuseCallback = true;
+
+        commentInput.text = script.comment;
+
         debugInput.text = "";
         foreach (var b in script.compiledBytes) {
             debugInput.text += b.ToString() + " ";
@@ -132,6 +137,10 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
         }
 
         lines.Clear();
+
+        if (commentWindow.gameObject.activeSelf) {
+            commentWindow.gameObject.SetActive(false);
+        }
 
     }
 
@@ -165,6 +174,33 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
         script.compiledBytes = total;
         script.Refresh();
         Init();
+
+    }
+
+    public void OnStartType() {
+
+        Main.ignoreAllInputs = true;
+
+    }
+
+    public void OnEndType() {
+
+        Main.ignoreAllInputs = false;
+
+    }
+
+    public void OnClickComment() {
+
+        if (script == null) return; 
+
+        commentWindow.gameObject.SetActive(!commentWindow.gameObject.activeSelf);
+
+        if (!commentWindow.gameObject.activeSelf) {
+            script.comment = commentWindow.text;
+        }
+
+        commentWindow.text = script.comment;
+        commentInput.text = script.comment;
 
     }
 

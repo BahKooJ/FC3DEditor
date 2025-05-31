@@ -96,6 +96,7 @@ namespace FCopParser {
         public FCopScriptingProject(FCopRPNS rpns, FCopFunctionParser functionParser) {
             this.rpns = rpns;
             this.functionParser = functionParser;
+            rpns.code.Last().name = "None";
             emptyOffset = rpns.code.Last().offset;
             FindAllUserVars();
         }
@@ -189,6 +190,7 @@ namespace FCopParser {
         public bool failed = false;
 
         public string name = "";
+        public string comment = "";
 
         public int offset;
         public int terminationOffset;
