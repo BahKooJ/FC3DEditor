@@ -23,6 +23,7 @@ public class Main : MonoBehaviour {
 
     // Undos
     public static List<CounterAction> counterActions = new();
+    public static Type requiredCounterActionType = null;
     public static bool counterActionAddedOnCurrentSelectHold = false;
 
     public static List<DelayedAction> delayedActions = new();
@@ -297,6 +298,15 @@ public class Main : MonoBehaviour {
         }
 
         if (counterActions.Count > 0) {
+
+            if (requiredCounterActionType != null) {
+
+                if (counterActions.Last().GetType() != requiredCounterActionType) {
+                    return;
+                }
+
+            }
+
 
             QuickLogHandler.Log("Undo " + counterActions.Last().name , LogSeverity.Success);
 

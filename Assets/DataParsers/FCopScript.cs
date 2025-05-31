@@ -141,10 +141,6 @@ namespace FCopParser {
 
             foreach (var fun in functionParser.functions) {
 
-                foreach (var script in fun.runCondition.code) {
-                    SearchScript(script);
-                }
-
                 foreach (var script in fun.code.code) {
                     SearchScript(script);
                 }
@@ -207,6 +203,13 @@ namespace FCopParser {
         public FCopScript(int offset) {
             this.offset = offset;
             this.code = new();
+            this.compiledBytes = new() { 0 };
+            this.name = "Script " + offset;
+        }
+
+        public FCopScript(int offset, List<ScriptNode> code) {
+            this.offset = offset;
+            this.code = code;
             this.compiledBytes = new() { 0 };
             this.name = "Script " + offset;
         }
@@ -784,9 +787,22 @@ namespace FCopParser {
             return compiledBytes;
         }
 
+        public List<ScriptNode> CloneScripts() {
+
+            var clonedScripts = new List<ScriptNode>();
+
+            foreach (var node in code) {
+                clonedScripts.Add(node.Clone());
+            }
+
+            return clonedScripts;
+
+        }
+
     }
 
     public enum ByteCode {
+        RUN = -3,
         NONE = -2,
         LITERAL = -1,
         END = 0,
@@ -1009,11 +1025,23 @@ namespace FCopParser {
 
         public virtual List<byte> Compile() {
 
-            if (byteCode == ByteCode.NONE) {
+            if (byteCode == ByteCode.NONE || byteCode == ByteCode.RUN) {
                 return new();
             }
 
             return new() { (byte)byteCode };
+        }
+
+        public virtual ScriptNode Clone() {
+
+            var clonedParameters = new List<ScriptNode>();
+
+            for (int i = 0; i < parameters.Count; i++) {
+                clonedParameters.Add(parameters[i].Clone());
+            }
+
+            return new ScriptNode(byteCode, name, defaultReturnType, new(parameterData), clonedParameters);
+
         }
 
     }
@@ -1036,8 +1064,8 @@ namespace FCopParser {
                     return false;
                 }
 
-                // Cannot add a jump into a jump
-                if (byteCode == ByteCode.JUMP) {
+                // Cannot add a junp anywhere but a conditional jump
+                if (byteCode != ByteCode.CONDITIONAL_JUMP) {
                     return false;
                 }
 
@@ -1060,7 +1088,20 @@ namespace FCopParser {
 
         }
 
+        public override ScriptNode Clone() {
+            var baseClone = base.Clone();
 
+            var cloneNode = new ScriptNestingNode(byteCode, name, defaultReturnType, new(parameterData), baseClone.parameters);
+
+            foreach (var node in nestedNodes) {
+                var clonedNestNode = node.Clone();
+                cloneNode.nestedNodes.Add(clonedNestNode);
+                clonedNestNode.parent = cloneNode;
+            }
+
+            return cloneNode;
+
+        }
 
     }
 
@@ -1128,6 +1169,14 @@ namespace FCopParser {
             }
 
             return parameters;
+        }
+
+        public override ScriptNode Clone() {
+            var baseClone = base.Clone();
+
+            var cloneNode = new OperatorNode(byteCode, name, defaultReturnType, new(parameterData), baseClone.parameters, reversed);
+
+            return cloneNode;
         }
 
     }
@@ -1236,6 +1285,15 @@ namespace FCopParser {
 
         }
 
+        public override ScriptNode Clone() {
+            var baseClone = base.Clone();
+
+            var cloneNode = new VariableAssignmentNode(byteCode, name, defaultReturnType, new(parameterData), baseClone.parameters, reversed);
+            cloneNode.assignmentType = assignmentType;
+
+            return cloneNode;
+        }
+
     }
 
     public class SystemMethodNode : ScriptNode {
@@ -1275,6 +1333,14 @@ namespace FCopParser {
                 new ParameterNode(parameters[0], this, methodParameter.name, 0, methodParameter.dataType, true),
             };
 
+        }
+
+        public override ScriptNode Clone() {
+            var baseClone = base.Clone();
+
+            var cloneNode = new SystemMethodNode(byteCode, name, defaultReturnType, new(parameterData), baseClone.parameters);
+
+            return cloneNode;
         }
 
     }
@@ -1493,6 +1559,14 @@ namespace FCopParser {
             return base.Compile();
         }
 
+        public override ScriptNode Clone() {
+            var baseClone = base.Clone();
+
+            var cloneNode = new ActorMethodNode(byteCode, name, defaultReturnType, new(parameterData), baseClone.parameters);
+
+            return cloneNode;
+        }
+
     }
 
     public class SpawningActorMethod : ScriptNode {
@@ -1597,6 +1671,14 @@ namespace FCopParser {
             return base.Compile();
         }
 
+        public override ScriptNode Clone() {
+            var baseClone = base.Clone();
+
+            var cloneNode = new SpawningActorMethod(byteCode, name, defaultReturnType, new(parameterData), baseClone.parameters);
+
+            return cloneNode;
+        }
+
     }
 
     public class LiteralNode : ScriptNode {
@@ -1632,6 +1714,10 @@ namespace FCopParser {
 
             return new() { (byte)(value + 128) };
 
+        }
+
+        public override ScriptNode Clone() {
+            return new LiteralNode(value);
         }
 
     }
@@ -1705,6 +1791,12 @@ namespace FCopParser {
                 return new() { (byte)(value + 128), (byte)varibleType };
             }
 
+        }
+
+        public override ScriptNode Clone() {
+            var clone = new VariableNode(isGet, varibleType, value);
+            clone.allowedVarTypeConverstion = new(allowedVarTypeConverstion);
+            return clone;
         }
 
     }

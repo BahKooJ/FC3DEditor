@@ -3,15 +3,15 @@ using FCopParser;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class ScriptingPanelView : MonoBehaviour {
 
     // - Unity Refs -
     public Transform scriptListContent;
     public VisualScriptingScriptWindowView scriptingWindow;
-    public VisualScriptingFuncWindowView funcScriptingWindow;
     public VariableManagerView variableManagerView;
-    //public AssetManagerView assetManager;
+    public FuncDataView funcDataView;
 
     // - Prefabs -
     public GameObject ScriptListItem;
@@ -27,7 +27,13 @@ public class ScriptingPanelView : MonoBehaviour {
         //assetManager.main = FindAnyObjectByType<Main>();
 
         Refresh();
+        Main.requiredCounterActionType = typeof(ScriptSaveStateCounterAction);
 
+    }
+
+    private void OnDestroy() {
+        Main.GarbageCollectCounterActions(typeof(ScriptSaveStateCounterAction));
+        Main.requiredCounterActionType = null;
     }
 
     ScriptingSelectorItemView AddScriptSelector(FCopScript script) {
@@ -69,23 +75,10 @@ public class ScriptingPanelView : MonoBehaviour {
         }
         else {
 
-            var i = 0;
-            foreach (var script in level.scripting.functionParser.functions) {
+            foreach (var func in level.scripting.functionParser.functions) {
 
-                var listItem = Instantiate(ScriptListItem);
+                AddScriptSelector(func.code);
 
-                listItem.gameObject.SetActive(true);
-
-                var listItemScript = listItem.GetComponent<ScriptingSelectorItemView>();
-
-                listItemScript.view = this;
-                listItemScript.id = i;
-
-                listItem.transform.SetParent(scriptListContent, false);
-
-                selectorItems.Add(listItemScript);
-
-                i++;
             }
 
         }
@@ -106,20 +99,36 @@ public class ScriptingPanelView : MonoBehaviour {
 
         var script = level.scripting.rpns.codeByOffset[id];
 
-        //funcScriptingWindow.Clear();
+        scriptingWindow.script = script;
+        scriptingWindow.Init();
+
+        funcDataView.gameObject.SetActive(false);
+        var scriptWindowPos = ((RectTransform)scriptingWindow.transform).offsetMax;
+        scriptWindowPos.y = -31;
+        ((RectTransform)scriptingWindow.transform).offsetMax = scriptWindowPos;
+
+        Main.GarbageCollectCounterActions(typeof(ScriptSaveStateCounterAction));
+
+    }
+
+    public void SelectFunc(FCopScript script) {
+
+        RefreshScriptSelection();
+
+        scriptingWindow.Clear();
 
         scriptingWindow.script = script;
         scriptingWindow.Init();
 
-    }
+        funcDataView.gameObject.SetActive(true);
+        var scriptWindowPos = ((RectTransform)scriptingWindow.transform).offsetMax;
+        scriptWindowPos.y = -61;
+        ((RectTransform)scriptingWindow.transform).offsetMax = scriptWindowPos;
 
-    public void SelectFunc(FCopFunction func) {
+        funcDataView.function = level.scripting.functionParser.functions.First(fun => fun.code == script);
+        funcDataView.Refresh();
 
-        scriptingWindow.Clear();
-
-        scriptingWindow.script = func.code;
-        scriptingWindow.script.code.AddRange(func.runCondition.code);
-        scriptingWindow.Init();
+        Main.GarbageCollectCounterActions(typeof(ScriptSaveStateCounterAction));
 
     }
 
@@ -137,6 +146,23 @@ public class ScriptingPanelView : MonoBehaviour {
         }
 
     }
+
+    public void ReOrderFunc(int indexOfDragged, int indexOfReceiver) {
+
+        var draggedFunc = level.scripting.functionParser.functions[indexOfDragged];
+
+        level.scripting.functionParser.functions.RemoveAt(indexOfDragged);
+
+        if (indexOfReceiver > indexOfDragged) {
+            level.scripting.functionParser.functions.Insert(indexOfReceiver - 1, draggedFunc);
+        }
+        else {
+            level.scripting.functionParser.functions.Insert(indexOfReceiver, draggedFunc);
+        }
+
+    }
+
+    #region Unity Callbacks
 
     public void OnClickScriptTab() {
 
@@ -182,5 +208,36 @@ public class ScriptingPanelView : MonoBehaviour {
     public void OnDone() {
         Destroy(gameObject);
     }
+
+    #endregion
+    #region Counter-Actions
+
+    public class ScriptSaveStateCounterAction : CounterAction {
+
+        public string name { get; set; }
+
+        public FCopScript script;
+        public List<ScriptNode> saveState;
+        public VisualScriptingScriptWindowView view;
+
+        public ScriptSaveStateCounterAction(FCopScript script, VisualScriptingScriptWindowView view) {
+            this.script = script;
+            this.saveState = script.CloneScripts();
+            this.name = "Script Change";
+            this.view = view;
+        }
+
+        public void Action() {
+            script.code = saveState;
+            view.Init();
+        }
+
+    }
+
+    public void AddCounterAction() {
+        Main.AddCounterAction(new ScriptSaveStateCounterAction(scriptingWindow.script, scriptingWindow));
+    }
+
+    #endregion
 
 }

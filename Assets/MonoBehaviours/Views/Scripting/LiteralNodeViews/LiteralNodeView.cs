@@ -3,6 +3,7 @@ using TMPro;
 using FCopParser;
 using System.Collections;
 using System;
+using static ScriptingPanelView;
 
 public class LiteralNodeView : ExpressionNodeView {
 
@@ -68,6 +69,8 @@ public class LiteralNodeView : ExpressionNodeView {
     public void OnFinishType() {
 
         if (refuseCallback) return;
+
+        Main.AddCounterAction(new ScriptSaveStateCounterAction(currentLine.view.script, currentLine.view));
 
         try {
             var value = int.Parse(valueInput.text);

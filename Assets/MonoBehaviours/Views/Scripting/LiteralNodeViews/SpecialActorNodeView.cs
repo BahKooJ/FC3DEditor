@@ -2,6 +2,7 @@
 
 using FCopParser;
 using UnityEngine;
+using static ScriptingPanelView;
 
 public class SpecialActorNodeView : ExpressionNodeView {
 
@@ -74,6 +75,8 @@ public class SpecialActorNodeView : ExpressionNodeView {
         }
 
         view.onDataSelected = (id, type) => {
+
+            Main.AddCounterAction(new ScriptSaveStateCounterAction(currentLine.view.script, currentLine.view));
 
             if (parameterNode.parent is ActorMethodNode actorMethod) {
                 actorMethod.SetActorRef(type, id);

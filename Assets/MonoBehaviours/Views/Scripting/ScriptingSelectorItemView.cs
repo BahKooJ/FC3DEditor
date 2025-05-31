@@ -44,8 +44,12 @@ public class ScriptingSelectorItemView : MonoBehaviour {
         DialogWindowUtil.Dialog("Delete Script", "Are you sure you would like to delete this script?" +
             "Actors that depend on this script may no longer work properly", () => {
 
-                view.level.scripting.rpns.RemoveScript(id);
-
+                if (view.isScriptTab) {
+                    view.level.scripting.rpns.RemoveScript(id);
+                }
+                else {
+                    view.level.scripting.functionParser.functions.RemoveAll(func => func.code == script);
+                }
 
                 view.Refresh();
                 view.scriptingWindow.Clear();
@@ -79,15 +83,24 @@ public class ScriptingSelectorItemView : MonoBehaviour {
         }
         else {
 
-            var rpnsValues = view.level.scripting.rpns.codeByOffset.Values.ToList();
+            if (view.isScriptTab) {
 
-            var existingName = rpnsValues.FirstOrDefault(fcs => fcs.name == nameInput.text);
+                var rpnsValues = view.level.scripting.rpns.codeByOffset.Values.ToList();
 
-            if (existingName != null) {
-                //QuickLogHandler.Log("Name is already in use!", LogSeverity.Info);
+                var existingName = rpnsValues.FirstOrDefault(fcs => fcs.name == nameInput.text);
+
+                if (existingName != null) {
+                    //QuickLogHandler.Log("Name is already in use!", LogSeverity.Info);
+                }
+                else {
+                    script.name = nameInput.text;
+                }
+
             }
             else {
+
                 script.name = nameInput.text;
+
             }
 
         }
@@ -105,7 +118,7 @@ public class ScriptingSelectorItemView : MonoBehaviour {
             view.SelectScript(id);
         }
         else {
-            view.SelectFunc(view.level.scripting.functionParser.functions[id]);
+            view.SelectFunc(script);
         }
 
         background.color = Main.selectedColor;
@@ -116,10 +129,25 @@ public class ScriptingSelectorItemView : MonoBehaviour {
 
         if (Main.draggingElement.TryGetComponent<ScriptingSelectorItemView>(out var viewItem)) {
 
-            var indexOfDragged = view.level.scripting.rpns.code.IndexOf(viewItem.script);
-            var indexOfThis = view.level.scripting.rpns.code.IndexOf(script);
+            int indexOfDragged;
+            int indexOfThis;
 
-            view.ReOrderScript(indexOfDragged, indexOfThis);
+            if (view.isScriptTab) {
+
+                indexOfDragged = view.level.scripting.rpns.code.IndexOf(viewItem.script);
+                indexOfThis = view.level.scripting.rpns.code.IndexOf(script);
+
+                view.ReOrderScript(indexOfDragged, indexOfThis);
+
+            }
+            else {
+
+                indexOfDragged = view.level.scripting.functionParser.functions.FindIndex(func => func.code == viewItem.script);
+                indexOfThis = view.level.scripting.functionParser.functions.FindIndex(func => func.code == script);
+
+                view.ReOrderFunc(indexOfDragged, indexOfThis);
+
+            }
 
             if (indexOfThis > indexOfDragged) {
                 viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);

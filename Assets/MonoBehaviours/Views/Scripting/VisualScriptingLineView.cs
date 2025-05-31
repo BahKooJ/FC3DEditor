@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using FCopParser;
 using UnityEngine.UI;
+using static ScriptingPanelView;
 
 public class VisualScriptingLineView : MonoBehaviour {
 
@@ -82,6 +83,13 @@ public class VisualScriptingLineView : MonoBehaviour {
         if (parentNodeView != null && scriptNode == parentNodeView.scriptNode) {
             return;
         }
+
+        // This is to prevent the run condition code from not being the root in functions.
+        if (parentNodeView == null && view.script.code.Count > 0 && view.script.code[0].byteCode == ByteCode.RUN) {
+            return;
+        }
+
+        Main.AddCounterAction(new ScriptSaveStateCounterAction(view.script, view));
 
         // Finds the scripting node and removes it so it can be added else where.
         int indexOfRemoved = view.script.RemoveNode(scriptNode);

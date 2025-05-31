@@ -3,6 +3,7 @@
 using UnityEngine;
 using FCopParser;
 using UnityEngine.UI;
+using static ScriptingPanelView;
 
 public class VariableNodeView : ExpressionNodeView {
 
@@ -37,6 +38,9 @@ public class VariableNodeView : ExpressionNodeView {
 
         view.allowedVars = varNode.allowedVarTypeConverstion;
         view.onDataSelected = (id, type) => {
+
+            Main.AddCounterAction(new ScriptSaveStateCounterAction(currentLine.view.script, currentLine.view));
+
             varNode.SetData(type, id);
             expressionText.text = varNode.name;
 

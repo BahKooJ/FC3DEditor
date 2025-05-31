@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Unity.VisualScripting;
 
 namespace FCopParser {
 
@@ -29,15 +30,12 @@ namespace FCopParser {
 
             foreach (var i in Enumerable.Range(0, tFUNDataCount)) {
 
-                functions.Add(
-                    new FCopFunction(
+                functions.Add(new FCopFunction(
                             Utils.BytesToInt(data, offset),
                             Utils.BytesToInt(data, offset + 4),
                             Utils.BytesToInt(data, offset + 12),
                             Utils.BytesToInt(data, offset + 16)
-
-                        )
-                    );
+                        ));
 
                 offset += 20;
 
@@ -48,19 +46,29 @@ namespace FCopParser {
 
             var codeBytes = rawFile.data.GetRange(offset, rawFile.data.Count - offset);
 
+            var i2 = 0;
             foreach (var item in functions) {
 
-                item.runCondition = new FCopScript(item.line1Offset, codeBytes);
-                item.code = new FCopScript(item.line2Offset, codeBytes);
+                var runCondition = new FCopScript(item.line1Offset, codeBytes);
+                var code = new FCopScript(item.line2Offset, codeBytes);
 
+                if (runCondition.code.Count > 1) {
+                    throw new Exception("Run Condition has more than one line of code");
+                }
+
+                var runConditionNestingNode = new ScriptNestingNode(ByteCode.RUN, "Run", ScriptDataType.Void, new() { new ScriptParameter("", ScriptDataType.Bool) }, new() { runCondition.code[0] });
+
+                runConditionNestingNode.nestedNodes = code.code;
+                code.code = new() { runConditionNestingNode };
+                code.name = "Function " + i2;
+                item.code = code;
+
+                i2++;
             }
 
         }
 
         public IFFDataFile Compile() {
-
-            // TODO: Actually compile
-            return rawFile;
 
             var total = new List<byte>();
 
@@ -80,11 +88,14 @@ namespace FCopParser {
                 total.AddRange(BitConverter.GetBytes(0));
 
                 total.AddRange(BitConverter.GetBytes(tEXTTotal.Count));
-                tEXTTotal.AddRange(item.runCondition.compiledBytes);
+
+                var runCondition = new FCopScript(0, new List<ScriptNode> { item.code.code[0].parameters[0] });
+                tEXTTotal.AddRange(runCondition.Compile(0));
 
                 total.AddRange(BitConverter.GetBytes(tEXTTotal.Count));
-                tEXTTotal.AddRange(item.code.compiledBytes);
 
+                var unnestedCode = (item.code.code[0] as ScriptNestingNode).nestedNodes;
+                tEXTTotal.AddRange(new FCopScript(0, unnestedCode).Compile(0));
 
             }
 
@@ -95,8 +106,13 @@ namespace FCopParser {
 
             total.AddRange(tEXTTotal);
 
+            if (!rawFile.data.SequenceEqual(total)) {
+                //throw new Exception("skissue");
+            }
+
             rawFile.data = total;
-            rawFile.modified = true;
+
+            return rawFile;
 
         }
 
@@ -133,7 +149,6 @@ namespace FCopParser {
     public class FCopFunction {
 
         public int repeatCount, repeatTimer, line1Offset, line2Offset;
-        public FCopScript runCondition;
         public FCopScript code;
 
         public FCopFunction(int repeatCount, int repeatTimer, int line1Offset, int line2Offset) {

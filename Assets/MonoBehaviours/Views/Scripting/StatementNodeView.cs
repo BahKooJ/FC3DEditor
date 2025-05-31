@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 public class StatementNodeView : DragableUIElement {
 
-    static List<ByteCode> keyWords = new() { ByteCode.CONDITIONAL_JUMP, ByteCode.JUMP };
+    static List<ByteCode> keyWords = new() { ByteCode.CONDITIONAL_JUMP, ByteCode.JUMP, ByteCode.RUN };
     static Color keyWordColor = new Color(0x65 / 255f, 0x19 / 255f, 0x5E / 255f);
 
     // - Unity Prefabs -
@@ -162,8 +162,8 @@ public class StatementNodeView : DragableUIElement {
             backgroundImage.color = keyWordColor;
         }
 
-        if (scriptNode.byteCode == ByteCode.JUMP) {
-            //refuseDrag = true;
+        if (scriptNode.byteCode == ByteCode.RUN) {
+            refuseDrag = true;
         }
 
     }

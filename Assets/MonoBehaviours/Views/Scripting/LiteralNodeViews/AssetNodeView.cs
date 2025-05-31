@@ -4,6 +4,7 @@ using FCopParser;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using static ScriptingPanelView;
 
 public class AssetNodeView : ExpressionNodeView {
 
@@ -70,6 +71,8 @@ public class AssetNodeView : ExpressionNodeView {
     public void OnClick() {
 
         MiniAssetManagerUtil.RequestAsset(assetType, main, asset => {
+
+            Main.AddCounterAction(new ScriptSaveStateCounterAction(currentLine.view.script, currentLine.view));
 
             if (asset != null) {
 

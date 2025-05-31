@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using static FCopParser.ActorMethodNode;
 using System.Linq;
 using System.Collections;
+using static ScriptingPanelView;
 
 public class EnumNodeView : ExpressionNodeView {
 
@@ -159,6 +160,8 @@ public class EnumNodeView : ExpressionNodeView {
     public void OnChange() {
 
         if (refuseCallback) return;
+
+        Main.AddCounterAction(new ScriptSaveStateCounterAction(currentLine.view.script, currentLine.view));
 
         SetNodeValue((int)values.GetValue(caseDropDown.value));
 

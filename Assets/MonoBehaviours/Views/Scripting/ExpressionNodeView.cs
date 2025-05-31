@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static ScriptingPanelView;
 
 public class ExpressionNodeView : MonoBehaviour {
 
@@ -146,6 +147,8 @@ public class ExpressionNodeView : MonoBehaviour {
 
         if (scriptNode.ReturnType() == ScriptDataType.Void) return;
         if (!parameterNode.acceptsExpression) return;
+
+        Main.AddCounterAction(new ScriptSaveStateCounterAction(currentLine.view.script, currentLine.view));
 
         currentLine.view.script.RemoveNode(scriptNode);
 

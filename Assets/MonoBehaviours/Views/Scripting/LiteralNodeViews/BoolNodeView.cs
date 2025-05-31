@@ -4,6 +4,7 @@ using FCopParser;
 using UnityEngine.UI;
 using System.Collections;
 using System;
+using static ScriptingPanelView;
 
 public class BoolNodeView : ExpressionNodeView {
 
@@ -46,6 +47,8 @@ public class BoolNodeView : ExpressionNodeView {
     }
 
     public void OnClick() {
+
+        Main.AddCounterAction(new ScriptSaveStateCounterAction(currentLine.view.script, currentLine.view));
 
         SetNodeValue((GetNodeValue() == 1) ? 0 : 1);
 

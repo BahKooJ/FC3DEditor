@@ -4,7 +4,7 @@ using FCopParser;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-
+using static ScriptingPanelView;
 
 public class VisualScriptingScriptWindowView : MonoBehaviour {
 
@@ -207,6 +207,8 @@ public class VisualScriptingScriptWindowView : MonoBehaviour {
     public void OnReceiveTrash() {
 
         if (Main.draggingElement.TryGetComponent<StatementNodeView>(out var viewItem)) {
+
+            Main.AddCounterAction(new ScriptSaveStateCounterAction(script, this));
 
             script.RemoveNode(viewItem.scriptNode);
             Init();
