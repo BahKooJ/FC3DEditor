@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace FCopParser {
 
@@ -14,7 +16,7 @@ namespace FCopParser {
 
         public List<byte> bytes = new();
 
-        IFFDataFile rawFile;
+        public IFFDataFile rawFile;
 
         public FCopRPNS(IFFDataFile rawFile) {
 
@@ -31,6 +33,43 @@ namespace FCopParser {
                 i = script.terminationOffset;
 
             }
+
+        }
+
+        public FCopRPNS(List<byte> ncfcBytes) {
+
+            var arrayBytes = ncfcBytes.ToArray();
+
+            var i = 0;
+            while (i < ncfcBytes.Count) {
+
+                var offset = BitConverter.ToInt32(arrayBytes, i);
+                i += 4;
+                var nameSize = BitConverter.ToInt32(arrayBytes, i);
+                i += 4;
+                var name = Encoding.ASCII.GetString(ncfcBytes.GetRange(i, nameSize).ToArray());
+                i += nameSize;
+                var commentSize = BitConverter.ToInt32(arrayBytes, i);
+                i += 4;
+                var comment = Encoding.ASCII.GetString(ncfcBytes.GetRange(i, commentSize).ToArray());
+                i += commentSize;
+                var codeSize = BitConverter.ToInt32(arrayBytes, i);
+                i += 4;
+                var code = ncfcBytes.GetRange(i, codeSize);
+                i += codeSize;
+
+                var script = new FCopScript(0, code) {
+                    name = name,
+                    comment = comment,
+                    offset = offset
+                };
+
+                codeByOffset[offset] = script;
+                this.code.Add(script);
+
+            }
+
+            this.rawFile = new IFFDataFile(2, new(), "RPNS", 1, -1);
 
         }
 
@@ -58,7 +97,7 @@ namespace FCopParser {
             var offset = 0;
             foreach (var line in code) {
 
-                var compiledLine = line.Compile(offset);
+                var compiledLine = line.Compile(offset, false);
 
                 total.AddRange(compiledLine);
 
@@ -69,6 +108,39 @@ namespace FCopParser {
             rawFile.data = total;
 
             return rawFile;
+
+        }
+
+        public List<byte> CompileNCFC() {
+
+            var scriptData = new List<byte>();
+
+            var offset = 0;
+            foreach (var script in code) {
+
+                scriptData.AddRange(BitConverter.GetBytes(offset));
+                scriptData.AddRange(BitConverter.GetBytes(script.name.Length));
+                scriptData.AddRange(Encoding.ASCII.GetBytes(script.name));
+                scriptData.AddRange(BitConverter.GetBytes(script.comment.Length));
+                scriptData.AddRange(Encoding.ASCII.GetBytes(script.comment));
+
+                var compiledBytes = script.Compile(offset, true);
+
+                scriptData.AddRange(BitConverter.GetBytes(compiledBytes.Count));
+                scriptData.AddRange(compiledBytes);
+
+                offset += compiledBytes.Count;
+
+            }
+
+            var total = new List<byte>();
+
+            total.AddRange(Encoding.ASCII.GetBytes("SCPTRPNS"));
+            total.AddRange(BitConverter.GetBytes(scriptData.Count + 16));
+            total.AddRange(BitConverter.GetBytes(code.Count));
+            total.AddRange(scriptData);
+
+            return total;
 
         }
 

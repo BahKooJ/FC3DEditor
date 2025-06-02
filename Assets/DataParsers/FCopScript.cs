@@ -159,6 +159,17 @@ namespace FCopParser {
             return total;
         }
 
+        public List<byte> CompileNCFC() {
+
+            var total = new List<byte>();
+
+            total.AddRange(rpns.CompileNCFC());
+            total.AddRange(functionParser.CompileNCFC());
+
+            return total;
+
+        }
+
         public void ResetIDAndOffsets() {
             rpns.ResetKeys();
             emptyOffset = rpns.code.Last().offset;
@@ -705,7 +716,7 @@ namespace FCopParser {
 
         }
 
-        public List<byte> Compile(int newOffset) {
+        public List<byte> Compile(int newOffset, bool isNCFC) {
 
             var total = new List<byte>();
 
@@ -718,10 +729,10 @@ namespace FCopParser {
                 }
 
                 if (nestedBytesStack.Count != 0) {
-                    nestedBytesStack.Last().AddRange(node.Compile());
+                    nestedBytesStack.Last().AddRange(node.Compile(isNCFC));
                 }
                 else {
-                    total.AddRange(node.Compile());
+                    total.AddRange(node.Compile(isNCFC));
                 }
 
                 if (node.byteCode == ByteCode.JUMP) {
@@ -853,6 +864,7 @@ namespace FCopParser {
         SPAWNING_FUNC = 60,
         GROUP_SPAWNING_FUNC = 61,
         STATIC_PROP_FUNC = 62,
+        // Add pseudo byte codes for NCFC file here:
     }
 
     public enum ScriptDataType {
@@ -1023,7 +1035,7 @@ namespace FCopParser {
             return parameters;
         }
 
-        public virtual List<byte> Compile() {
+        public virtual List<byte> Compile(bool isNCFC) {
 
             if (byteCode == ByteCode.NONE || byteCode == ByteCode.RUN) {
                 return new();
@@ -1234,7 +1246,7 @@ namespace FCopParser {
 
         }
 
-        public override List<byte> Compile() {
+        public override List<byte> Compile(bool isNCFC) {
 
             var varTypeValue = (int)varNode.varibleType;
 
@@ -1257,7 +1269,7 @@ namespace FCopParser {
                 case AssignmentType.Sub:
                     return new() { (byte)(varTypeValue + subByteCodeOffset) };
                 default:
-                    return base.Compile();
+                    return base.Compile(isNCFC);
             }
         }
 
@@ -1538,7 +1550,7 @@ namespace FCopParser {
 
         }
 
-        public override List<byte> Compile() {
+        public override List<byte> Compile(bool isNCFC) {
 
             if (parameters.Count == 3 && parameters[0] is LiteralNode) {
 
@@ -1552,11 +1564,11 @@ namespace FCopParser {
                     return new() { (byte)ByteCode.TEAM_ACTOR_FUNC };
                 }
 
-                return base.Compile();
+                return base.Compile(isNCFC);
 
             }
 
-            return base.Compile();
+            return base.Compile(isNCFC);
         }
 
         public override ScriptNode Clone() {
@@ -1653,7 +1665,7 @@ namespace FCopParser {
 
         }
 
-        public override List<byte> Compile() {
+        public override List<byte> Compile(bool isNCFC) {
 
             if (parameters.Count == 3 && parameters[0] is LiteralNode) {
 
@@ -1664,11 +1676,11 @@ namespace FCopParser {
                     return new() { (byte)ByteCode.GROUP_SPAWNING_FUNC };
                 }
 
-                return base.Compile();
+                return base.Compile(isNCFC);
 
             }
 
-            return base.Compile();
+            return base.Compile(isNCFC);
         }
 
         public override ScriptNode Clone() {
@@ -1693,7 +1705,7 @@ namespace FCopParser {
             this.value = value;
         }
 
-        public override List<byte> Compile() {
+        public override List<byte> Compile(bool isNCFC) {
             
             if (value < 0) {
                 var flippedValue = value ^= -1;
@@ -1782,7 +1794,7 @@ namespace FCopParser {
             SetData(varibleType, id);
         }
 
-        public override List<byte> Compile() {
+        public override List<byte> Compile(bool isNCFC) {
 
             if (!isGet) {
                 return new() { (byte)(value + 128) };

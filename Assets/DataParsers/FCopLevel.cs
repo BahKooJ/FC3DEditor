@@ -611,15 +611,12 @@ namespace FCopParser {
 
             }
 
-            // TODO: Function and script files
-            var scriptingFiles = scripting.Compile();
+            total.AddRange(scripting.CompileNCFC());
+            UpdateRPNSOffsets(scripting.rpns.rawFile);
+            UpdateRPNSOffsets(scripting.functionParser.rawFile);
+
             var compiledEmptyOffset = scripting.rpns.codeByOffset[scripting.emptyOffset].offset;
 
-            foreach (var file in scriptingFiles) {
-                UpdateRPNSOffsets(file);
-                CreateHeaderWithFile(file, "FCop" + file.dataFourCC, "");
-
-            }
 
             var soundHeader = audio.CompileSoundHeader();
             UpdateRPNSOffsets(soundHeader);
@@ -1171,6 +1168,32 @@ namespace FCopParser {
                         texturesSnippets.Add(new TextureSnippet(name, id, x, y, width, height, textureID));
 
                     }
+
+                }
+                else if (eightCC == "SCPTRPNS") {
+
+                    i += 8;
+                    var totalSize = BitConverter.ToInt32(dataArray, i);
+                    i += 4;
+                    var scriptCount = BitConverter.ToInt32(dataArray, i);
+                    i += 4;
+
+                    rpns = new FCopRPNS(data.GetRange(i, totalSize - 16));
+
+                    i += totalSize - 16;
+
+                }
+                else if (eightCC == "FUNCTION") {
+
+                    i += 8;
+                    var totalSize = BitConverter.ToInt32(dataArray, i);
+                    i += 4;
+                    var funcCount = BitConverter.ToInt32(dataArray, i);
+                    i += 4;
+
+                    funParser = new FCopFunctionParser(data.GetRange(i, totalSize - 16), rpns.code.Last().offset);
+
+                    i += totalSize - 16;
 
                 }
                 else {

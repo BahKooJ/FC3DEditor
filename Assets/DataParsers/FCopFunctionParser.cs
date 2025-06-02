@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Unity.VisualScripting;
 
 namespace FCopParser {
 
@@ -68,6 +67,59 @@ namespace FCopParser {
 
         }
 
+        public FCopFunctionParser(List<byte> ncfcBytes, int emptyOffset) {
+
+            var arrayBytes = ncfcBytes.ToArray();
+
+            var i = 0;
+            while (i < ncfcBytes.Count) {
+
+                var repeatCount = BitConverter.ToInt32(arrayBytes, i);
+                i += 4;
+                var repeatTimer = BitConverter.ToInt32(arrayBytes, i);
+                i += 4;
+                var nameSize = BitConverter.ToInt32(arrayBytes, i);
+                i += 4;
+                var name = Encoding.ASCII.GetString(ncfcBytes.GetRange(i, nameSize).ToArray());
+                i += nameSize;
+                var commentSize = BitConverter.ToInt32(arrayBytes, i);
+                i += 4;
+                var comment = Encoding.ASCII.GetString(ncfcBytes.GetRange(i, commentSize).ToArray());
+                i += commentSize;
+
+                var runCodeSize = BitConverter.ToInt32(arrayBytes, i);
+                i += 4;
+                var runCode = ncfcBytes.GetRange(i, runCodeSize);
+                i += runCodeSize;
+
+                var codeSize = BitConverter.ToInt32(arrayBytes, i);
+                i += 4;
+                var code = ncfcBytes.GetRange(i, codeSize);
+                i += codeSize;
+
+                var runScript = new FCopScript(0, runCode);
+                var script = new FCopScript(0, code);
+
+                if (runScript.code.Count > 1) {
+                    throw new Exception("Run Condition has more than one line of code");
+                }
+
+                var runConditionNestingNode = new ScriptNestingNode(ByteCode.RUN, "Run", ScriptDataType.Void, new() { new ScriptParameter("", ScriptDataType.Bool) }, new() { runScript.code[0] });
+
+                runConditionNestingNode.nestedNodes = script.code;
+                script.code = new() { runConditionNestingNode };
+                script.name = name;
+                script.comment = comment;
+
+                functions.Add(new FCopFunction(repeatCount, repeatTimer, script));
+
+            }
+
+            this.rawFile = new IFFDataFile(2, new(), "Cfun", 1, emptyOffset);
+
+
+        }
+
         public IFFDataFile Compile() {
 
             var total = new List<byte>();
@@ -90,12 +142,12 @@ namespace FCopParser {
                 total.AddRange(BitConverter.GetBytes(tEXTTotal.Count));
 
                 var runCondition = new FCopScript(0, new List<ScriptNode> { item.code.code[0].parameters[0] });
-                tEXTTotal.AddRange(runCondition.Compile(0));
+                tEXTTotal.AddRange(runCondition.Compile(0, false));
 
                 total.AddRange(BitConverter.GetBytes(tEXTTotal.Count));
 
                 var unnestedCode = (item.code.code[0] as ScriptNestingNode).nestedNodes;
-                tEXTTotal.AddRange(new FCopScript(0, unnestedCode).Compile(0));
+                tEXTTotal.AddRange(new FCopScript(0, unnestedCode).Compile(0, false));
 
             }
 
@@ -113,6 +165,41 @@ namespace FCopParser {
             rawFile.data = total;
 
             return rawFile;
+
+        }
+
+        public List<byte> CompileNCFC() {
+
+            var funcData = new List<byte>();
+
+            foreach (var func in functions) {
+
+                funcData.AddRange(BitConverter.GetBytes(func.repeatCount));
+                funcData.AddRange(BitConverter.GetBytes(func.repeatTimer));
+                funcData.AddRange(BitConverter.GetBytes(func.code.name.Length));
+                funcData.AddRange(Encoding.ASCII.GetBytes(func.code.name));
+                funcData.AddRange(BitConverter.GetBytes(func.code.comment.Length));
+                funcData.AddRange(Encoding.ASCII.GetBytes(func.code.comment));
+
+                var runCondition = new FCopScript(0, new List<ScriptNode> { func.code.code[0].parameters[0] }).Compile(0, true);
+                funcData.AddRange(BitConverter.GetBytes(runCondition.Count));
+                funcData.AddRange(runCondition);
+
+                var unnestedCode = (func.code.code[0] as ScriptNestingNode).nestedNodes;
+                var compiledCode = new FCopScript(0, unnestedCode).Compile(0, false);
+                funcData.AddRange(BitConverter.GetBytes(compiledCode.Count));
+                funcData.AddRange(compiledCode);
+
+            }
+
+            var total = new List<byte>();
+
+            total.AddRange(Encoding.ASCII.GetBytes("FUNCTION"));
+            total.AddRange(BitConverter.GetBytes(funcData.Count + 16));
+            total.AddRange(BitConverter.GetBytes(functions.Count));
+            total.AddRange(funcData);
+
+            return total;
 
         }
 
@@ -157,6 +244,15 @@ namespace FCopParser {
             this.line1Offset = line1Offset;
             this.line2Offset = line2Offset;
         }
+
+        public FCopFunction(int repeatCount, int repeatTimer, FCopScript code) {
+            this.repeatCount = repeatCount;
+            this.repeatTimer = repeatTimer;
+            this.line1Offset = 0;
+            this.line2Offset = 0;
+            this.code = code;
+        }
+
     }
 
 }
