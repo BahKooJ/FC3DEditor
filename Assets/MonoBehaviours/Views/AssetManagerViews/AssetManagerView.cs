@@ -13,6 +13,7 @@ public class AssetManagerView : MonoBehaviour {
     public GameObject soundPlayer;
     public GameObject soundPropertiesPrefab;
     public GameObject objectPropertiesPrefab;
+    public GameObject texturePropertiesPrefab;
 
     // - Unity Refs -
     public Transform fileContent;
@@ -58,10 +59,10 @@ public class AssetManagerView : MonoBehaviour {
 
         }
 
-        var streamsDir = new AssetDirectory(AssetType.SndsSound, false, "Streams", root);
+        var streamsDir = new AssetDirectory(AssetType.Stream, false, "Streams", root);
 
         foreach (var stream in level.audio.soundStreams) {
-            streamsDir.files.Add(new AssetFile(stream.sound, AssetType.SndsSound, streamsDir));
+            streamsDir.files.Add(new AssetFile(stream, AssetType.Stream, streamsDir));
         }
 
         root.directories.Add(soundDir);
@@ -153,6 +154,14 @@ public class AssetManagerView : MonoBehaviour {
 
     }
 
+    public void ClearHighlight() {
+
+        foreach (var file in files) {
+            file.ClearHighlight();
+        }
+
+    }
+
     public void ClearInspectorContent() {
 
         foreach (Transform tran in inspectorContent) {
@@ -176,12 +185,13 @@ public class AssetManagerView : MonoBehaviour {
                 InstanciateSoundProperties((FCopAudio)file.asset);
                 break;
             case AssetType.Texture:
+                InstanciateTextureProperties((FCopTexture)file.asset);
                 break;
             case AssetType.Object:
                 InstanciateObjectProperties((FCopObject)file.asset);
                 break;
-            case AssetType.SndsSound:
-                InstanciateSoundPlayer((FCopAudio)file.asset);
+            case AssetType.Stream:
+                InstanciateSoundPlayer(((FCopStream)file.asset).sound);
                 break;
             case AssetType.Music:
                 InstanciateSoundPlayer((FCopAudio)file.asset);
@@ -192,6 +202,64 @@ public class AssetManagerView : MonoBehaviour {
                 break;
         }
 
+
+    }
+
+    // Screw it, object return type.
+    public object ParsedDataToRaw(AssetType assetType, string path) {
+
+        try {
+
+            switch (assetType) {
+                case AssetType.WavSound:
+
+                    var waveParser = new WaveParser(File.ReadAllBytes(path).ToList());
+
+                    if (!(waveParser.sampleRate == 22050 && waveParser.channels == 1 && waveParser.bitsPerSample == 16)) {
+                        DialogWindowUtil.Dialog("Incorrect Wave Format", "Wave file is incorrect format, ensure that wave file meets required format:\n" +
+                            "Required Sample Rate: 22050, File Sample Rate: " + waveParser.sampleRate + "\n" +
+                            "Required Channels: 1, File Channels: " + waveParser.channels + "\n" +
+                            "Required Bits Per Sample: 16, File Bits Per Sample: " + waveParser.bitsPerSample);
+                        return null;
+                    }
+
+                    return waveParser.data.ToArray();
+                case AssetType.Object:
+
+                    var wavefrontParser = new WavefrontParser(File.ReadAllText(path).ToList());
+
+                    var emptyRawFile = level.CreateEmptyAssetFile(AssetType.Object);
+
+                    try {
+                        var obj = new FCopObject(wavefrontParser, emptyRawFile);
+
+                        return obj;
+
+                    }
+                    catch (FCopObject.VertexLimitExceededException) {
+
+                        DialogWindowUtil.Dialog("Cobj Vertex Limit Exceeded", "Future Cop models has a maximum of 256 vertices, this limit was exceeded. " +
+                            "Keep the vertex count in mind when making models, this limit can be easily exceeded if not careful.");
+
+                    }
+                    catch (FCopObject.InvalidPrimitiveException) {
+
+                        DialogWindowUtil.Dialog("Invalid Face", "Future Cop models only support triangle and quad faces. " +
+                            "Any face with more than 4 vertices is invalid.");
+
+                    }
+                    return null;
+                default:
+                    return null;
+            }
+
+        }
+        catch (InvalidFileException) {
+
+            DialogWindowUtil.Dialog("Invalid File", "Please select a valid wave file.");
+
+            return null;
+        }
 
     }
 
@@ -213,32 +281,15 @@ public class AssetManagerView : MonoBehaviour {
 
                 OpenFileWindowUtil.OpenFile("FCEAssets", "", path => {
 
-                    try {
+                    var waveData = ParsedDataToRaw(AssetType.WavSound, path);
 
-                        var waveParser = new WaveParser(File.ReadAllBytes(path).ToList());
+                    if (waveData == null) return;
 
-                        if (!(waveParser.sampleRate == 22050 && waveParser.channels == 1 && waveParser.bitsPerSample == 16)) {
-                            DialogWindowUtil.Dialog("Incorrect Wave Format", "Wave file is incorrect format, ensure that wave file meets required format:\n" +
-                                "Required Sample Rate: 22050, File Sample Rate: " + waveParser.sampleRate + "\n" +
-                                "Required Channels: 1, File Channels: " + waveParser.channels + "\n" +
-                                "Required Bits Per Sample: 16, File Bits Per Sample: " + waveParser.bitsPerSample);
-                            return;
-                        }
+                    var newFile = level.AddAsset(AssetType.WavSound, (byte[])waveData);
 
-                        var newFile = level.AddAsset(AssetType.WavSound, waveParser.data.ToArray());
+                    currentDirectory.files.Add(new AssetFile(newFile, currentDirectory.storedAssets, currentDirectory));
 
-                        currentDirectory.files.Add(new AssetFile(newFile, currentDirectory.storedAssets, currentDirectory));
-
-                        Refresh();
-
-                    }
-                    catch (InvalidFileException) {
-
-                        DialogWindowUtil.Dialog("Invalid File", "Please select a valid wave file.");
-
-                    }
-
-
+                    Refresh();
 
                 });
 
@@ -248,31 +299,12 @@ public class AssetManagerView : MonoBehaviour {
 
                 OpenFileWindowUtil.OpenFile("FCEAssets", "", path => {
 
-                    var wavefrontParser = new WavefrontParser(File.ReadAllText(path).ToList());
+                    var obj = (FCopObject)ParsedDataToRaw(AssetType.Object, path);
 
-                    var emptyRawFile = level.CreateEmptyAssetFile(AssetType.Object);
+                    level.AddAsset(AssetType.Object, obj);
 
-                    try {
-                        var obj = new FCopObject(wavefrontParser, emptyRawFile);
-
-                        level.AddAsset(AssetType.Object, obj);
-
-                        currentDirectory.files.Add(new AssetFile(obj, AssetType.Object, currentDirectory));
-                        Refresh();
-                    }
-                    catch (FCopObject.VertexLimitExceededException) {
-
-                        DialogWindowUtil.Dialog("Cobj Vertex Limit Exceeded", "Future Cop models has a maximum of 256 vertices, this limit was exceeded. " +
-                            "Keep the vertex count in mind when making models, this limit can be easily exceeded if not careful.");
-
-                    }
-                    catch (FCopObject.InvalidPrimitiveException) {
-
-                        DialogWindowUtil.Dialog("Invalid Face", "Future Cop models only support triangle and quad faces. " +
-                            "Any face with more than 4 vertices is invalid.");
-
-                    }
-
+                    currentDirectory.files.Add(new AssetFile(obj, AssetType.Object, currentDirectory));
+                    Refresh();
 
                 });
 
@@ -310,6 +342,16 @@ public class AssetManagerView : MonoBehaviour {
         var script = obj.GetComponent<ObjectPropertiesView>();
         script.main = main;
         script.fCopObject = fCopObject;
+
+    }
+
+    void InstanciateTextureProperties(FCopTexture fCopTexture) {
+
+        var obj = Instantiate(texturePropertiesPrefab, inspectorContent.transform, false);
+
+        var script = obj.GetComponent<TexturePropertiesView>();
+        script.main = main;
+        script.texture = fCopTexture;
 
     }
 

@@ -693,8 +693,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b931d7cdb61100f4ea7c77ae82c05e6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  wavIcon: {fileID: 21300000, guid: 4dbfe6c0b744af640b052f2b922edd15, type: 3}
+  modelIcon: {fileID: 21300000, guid: 8376756dbc07cdf40934f12b6c33939a, type: 3}
+  textureIcon: {fileID: 21300000, guid: 16940df44a72efe47a744601414176c7, type: 3}
+  streamIcon: {fileID: 21300000, guid: 4dbfe6c0b744af640b052f2b922edd15, type: 3}
+  musicIcon: {fileID: 21300000, guid: 4dbfe6c0b744af640b052f2b922edd15, type: 3}
   title: {fileID: 1480588940240802624}
   icon: {fileID: 554537547584123924}
+  background: {fileID: 1185354969315274563}
   contextMenu: {fileID: 5737688483641261420}
   nameInput: {fileID: 2988381378925692041}
   view: {fileID: 0}

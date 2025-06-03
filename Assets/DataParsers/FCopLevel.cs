@@ -209,7 +209,7 @@ namespace FCopParser {
 
             switch (assetType) {
                 case AssetType.WavSound:
-                    // TODO
+                    audio.RemoveWave(id);
                     break;
 
                 case AssetType.Object:
@@ -853,7 +853,7 @@ namespace FCopParser {
                 var fileData = new List<byte>();
 
                 foreach (var file in subFile.files) {
-                    fileData.AddRange(CreateHeader(file, "FCop" + file.dataFourCC, "", file.data.Count));
+                    fileData.AddRange(CreateHeader(file, "FCop" + file.dataFourCC, file.name, file.data.Count));
                     fileData.AddRange(file.data);
                 }
 
@@ -955,6 +955,8 @@ namespace FCopParser {
                             headerCode
                             );
 
+                    file.name = name;
+
                     i += totalSize - headeSize;
 
                     if (eightCC.Substring(4,4) == "Cact" || eightCC.Substring(4, 4) == "Csac") {
@@ -1002,7 +1004,7 @@ namespace FCopParser {
 
                     }
                     else if (eightCC.Substring(4, 4) == "Cwav") {
-                        // TODO: Give name
+                        file.name = name;
                         rawCwavs.Add(file);
                     }
                     else if (eightCC.Substring(4, 4) == "Cshd") {

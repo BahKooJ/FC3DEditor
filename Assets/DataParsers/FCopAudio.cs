@@ -14,7 +14,6 @@ namespace FCopParser {
 
         IFFDataFile cshd;
 
-        // TODO: This whole storing sound effects by group id is wierd and I don't like it.
         public FCopAudioParser(List<IFFDataFile> cwavs, IFFDataFile cshd, List<SubFile> subFiles, MusicFile musicFile) {
 
             this.cshd = cshd;
@@ -231,6 +230,12 @@ namespace FCopParser {
 
         }
 
+        public void RemoveWave(int id) {
+
+            soundEffects.RemoveAll(sound => sound.DataID == id);
+
+        }
+
         public void ImportWave(int id, byte[] newData) {
 
             var wave = soundEffects.First(wav => wav.DataID == id);
@@ -252,6 +257,8 @@ namespace FCopParser {
                     subFile.files.Add(stream.miniAnimation.rawFile);
 
                 }
+
+                stream.sound.rawFile.name = stream.name;
 
                 subFile.files.Add(stream.sound.rawFile);
 
@@ -316,7 +323,7 @@ namespace FCopParser {
             this.unknown1 = soundMetaData.unknown1;
             this.soundLimit = soundMetaData.soundLimit;
             this.unknown2 = soundMetaData.unknown2;
-            this.name = "Sound Effect " + rawFile.dataID.ToString();
+            this.name = rawFile.name == "" ? "Sound Effect " + rawFile.dataID.ToString() : rawFile.name;
             this.rawDataHasHeader = true;
             this.bitrate = 16;
             this.sampleRate = 22050;
@@ -369,14 +376,12 @@ namespace FCopParser {
     }
 
     // SWVR
-    public class FCopStream {
-
-        public string name;
+    public class FCopStream : FCopAsset {
 
         public FCopAudio sound;
         public FCopMiniAnimation miniAnimation = null;
 
-        public FCopStream(SubFile subFile) {
+        public FCopStream(SubFile subFile) : base(null, subFile.name) {
 
             name = subFile.name;
 
@@ -386,6 +391,12 @@ namespace FCopParser {
 
             if (rawSound != null) {
                 sound = new FCopAudio(rawSound, subFile.name);
+
+                if (rawSound.name != "") {
+                    name = rawSound.name;
+                    sound.name = rawSound.name;
+                }
+
             }
 
             if (rawAnm != null) {

@@ -1,14 +1,24 @@
 ﻿
 using System.IO;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using FCopParser;
 
 public class AssetFileView : MonoBehaviour {
+
+    // - Unity Assets -
+    public Sprite wavIcon;
+    public Sprite modelIcon;
+    public Sprite textureIcon;
+    public Sprite streamIcon;
+    public Sprite musicIcon;
 
     // - Unity Refs -
     public TMP_Text title;
     public Image icon;
+    public Image background;
     public ContextMenuHandler contextMenu;
     public TMP_InputField nameInput;
 
@@ -18,6 +28,24 @@ public class AssetFileView : MonoBehaviour {
 
     void Start () {
 
+        switch (file.assetType) {
+            case AssetType.WavSound:
+                icon.sprite = wavIcon;
+                break;
+            case AssetType.Texture:
+                icon.sprite = textureIcon;
+                break;
+            case AssetType.Object:
+                icon.sprite = modelIcon;
+                break;
+            case AssetType.Music:
+                icon.sprite = musicIcon;
+                break;
+            case AssetType.SndsSound:
+                icon.sprite = streamIcon;
+                break;
+        }
+
         title.text = file.asset.name;
 
         if (file.directory.canAddFiles) {
@@ -26,6 +54,7 @@ public class AssetFileView : MonoBehaviour {
             ("Delete", Delete),
             ("Export", Export),
             ("Import", Import),
+            ("Import Parsed", ImportParsed),
             };
         }
         else {
@@ -34,11 +63,10 @@ public class AssetFileView : MonoBehaviour {
             ("Rename", StartRename),
             ("Export", Export),
             ("Import", Import),
+            ("Import Parsed", ImportParsed),
             };
 
         }
-
-
 
     }
 
@@ -84,9 +112,51 @@ public class AssetFileView : MonoBehaviour {
 
     }
 
+    void ImportParsed() {
+
+        OpenFileWindowUtil.OpenFile("FCEAssets", "", path => {
+            var data = view.ParsedDataToRaw(file.assetType, path);
+
+            if (data != null) {
+
+                if (file.assetType == AssetType.Object) {
+                    view.level.ImportAsset(file.assetType, file.asset.DataID, ((FCopObject)data).Compile().data.ToArray());
+                }
+                else {
+                    view.level.ImportAsset(file.assetType, file.asset.DataID, (byte[])data);
+                }
+
+                view.Refresh();
+
+            }
+            else {
+
+                if (file.assetType == AssetType.Texture) {
+                    ((FCopTexture)file.asset).ImportBMP(File.ReadAllBytes(path));
+
+                    view.main.RefreshTextures();
+
+                    foreach (var section in view.main.sectionMeshes) {
+                        section.RefreshTexture();
+                        section.RefreshMesh();
+                    }
+                }
+
+            }
+
+        });
+
+    }
+
+    public void ClearHighlight() {
+        background.color = Main.mainColor;
+    }
+
     public void OnClick() {
 
         view.OnSelectAsset(file);
+        view.ClearHighlight();
+        background.color = Main.selectedColor;
 
     }
 

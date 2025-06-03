@@ -497,10 +497,17 @@ public class HeightMapEditMode : EditMode {
 
     public void DiscardUnusedChannels() {
 
+        if (selectedSection == null) {
+            QuickLogHandler.Log("No sections are selected", LogSeverity.Info);
+            return;
+        }
+
         AddAllHeightMapSaveStateCounterAction();
         selectedSection.section.DiscardUnusedHeights();
         RefreshHeights();
         selectedSection.RefreshMesh();
+
+        QuickLogHandler.Log("Unused channels (vertices) sent to -128", LogSeverity.Success);
 
     }
 

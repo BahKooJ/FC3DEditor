@@ -813,10 +813,9 @@ public class TextureUVMapper : MonoBehaviour {
 
     public void OnClickGenerateColorPalette() {
 
-        DialogWindowUtil.Dialog("Color Palette Warning", 
-            "It is recommended to use already existing Future Cop color palettes. " +
-            "Future Cop's color palettes are not fully understood yet and the method for creating them is still work in progress. " +
-            "Textures might display low quality or incorrectly.", () => {
+        DialogWindowUtil.Dialog("Color Palette Warning",
+            "Are you sure you would like to generate a color palette? This will overwrite the existing color palette. " +
+            "For existing Future Cop textures, it is recommended to use already existing Future Cop color palettes. ", () => {
 
                 var bmpID = texturePaletteDropdown.GetComponent<TMP_Dropdown>().value;
 

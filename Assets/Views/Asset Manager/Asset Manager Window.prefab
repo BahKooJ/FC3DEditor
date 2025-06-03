@@ -524,6 +524,7 @@ MonoBehaviour:
   soundPlayer: {fileID: 8230121128105516005, guid: 3c6bc8c20bc4b304caa3287b5b186ef8, type: 3}
   soundPropertiesPrefab: {fileID: 7976195417839416632, guid: cef48c51cc16c6c40b5d35863662fda1, type: 3}
   objectPropertiesPrefab: {fileID: 2265680022078623320, guid: a8c03c5c71bcb5b4780b6215c12335ab, type: 3}
+  texturePropertiesPrefab: {fileID: 1780254457357413928, guid: 74d437cd3cd295b4997ef3a1bf2e0f24, type: 3}
   fileContent: {fileID: 8135658677681505636}
   inspectorContent: {fileID: 5034767195390374454}
   contextMenu: {fileID: 2540693481667825595}

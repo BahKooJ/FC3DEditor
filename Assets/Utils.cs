@@ -464,6 +464,7 @@ namespace FCopParser {
         MiniAnimation,
         Mixed,
         Actor,
+        Stream,
         // Non-IFFDataFile Assets
         Team,
         TextureSnippet,

@@ -170,6 +170,8 @@ namespace FCopParser {
         public List<int> headerCodeData = new();
         public List<byte> headerCode = new();
 
+        public string name = "";
+
         public IFFDataFile(int startNumber, List<byte> data, string dataFourCC, int dataID, List<int> rpnsReferences, List<int> headerCodeData, List<byte> headerCode) {
             this.startNumber = startNumber;
             this.data = data;
