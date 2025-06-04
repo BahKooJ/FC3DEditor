@@ -244,6 +244,12 @@ namespace FCopParser {
 
         }
 
+        public void RemoveStream(int index) {
+
+            soundStreams.RemoveAt(index);
+
+        }
+
         public List<SubFile> CompileStreams() {
 
             var total = new List<SubFile>();

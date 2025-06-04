@@ -14,6 +14,8 @@ public class AssetManagerView : MonoBehaviour {
     public GameObject soundPropertiesPrefab;
     public GameObject objectPropertiesPrefab;
     public GameObject texturePropertiesPrefab;
+    public GameObject streamPropertiesPrefab;
+
 
     // - Unity Refs -
     public Transform fileContent;
@@ -192,6 +194,7 @@ public class AssetManagerView : MonoBehaviour {
                 break;
             case AssetType.Stream:
                 InstanciateSoundPlayer(((FCopStream)file.asset).sound);
+                InstanciateStreamProperties((FCopStream)file.asset);
                 break;
             case AssetType.Music:
                 InstanciateSoundPlayer((FCopAudio)file.asset);
@@ -352,6 +355,16 @@ public class AssetManagerView : MonoBehaviour {
         var script = obj.GetComponent<TexturePropertiesView>();
         script.main = main;
         script.texture = fCopTexture;
+
+    }
+
+    void InstanciateStreamProperties(FCopStream fCopStream) {
+
+        var obj = Instantiate(streamPropertiesPrefab, inspectorContent.transform, false);
+
+        var script = obj.GetComponent<StreamPropertiesView>();
+        script.level = main.level;
+        script.stream = fCopStream;
 
     }
 

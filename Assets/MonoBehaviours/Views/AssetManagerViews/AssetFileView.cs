@@ -50,20 +50,26 @@ public class AssetFileView : MonoBehaviour {
 
         if (file.directory.canAddFiles) {
             contextMenu.items = new() {
-            ("Rename", StartRename),
-            ("Delete", Delete),
-            ("Export", Export),
-            ("Import", Import),
-            ("Import Parsed", ImportParsed),
+                ("Rename", StartRename),
+                ("Delete", Delete),
+                ("Export", Export),
+                ("Import", Import),
+                ("Import Parsed", ImportParsed),
+            };
+        }
+        else if (file.assetType == AssetType.Stream) {
+            contextMenu.items = new() {
+                ("Rename", StartRename),
+                ("Delete", StreamDelete),
             };
         }
         else {
 
             contextMenu.items = new() {
-            ("Rename", StartRename),
-            ("Export", Export),
-            ("Import", Import),
-            ("Import Parsed", ImportParsed),
+                ("Rename", StartRename),
+                ("Export", Export),
+                ("Import", Import),
+                ("Import Parsed", ImportParsed),
             };
 
         }
@@ -85,6 +91,22 @@ public class AssetFileView : MonoBehaviour {
             " and the game itself. Deleting an asset file may cause the level to no longer work.", () => {
 
             view.level.DeleteAsset(file.assetType, file.asset.DataID);
+            view.DeleteFile(file);
+
+            view.Refresh();
+
+            return true;
+
+        });
+
+    }
+
+    void StreamDelete() {
+
+        DialogWindowUtil.Dialog("Delete Stream", "It is strongly recommended to not remove streams as they are index based (Forced by scripting). " +
+            "Only remove streams if it is the last item, or if there is no scripting.", () => {
+
+            view.level.DeleteAsset(file.assetType, view.level.audio.soundStreams.IndexOf((FCopStream)file.asset));
             view.DeleteFile(file);
 
             view.Refresh();

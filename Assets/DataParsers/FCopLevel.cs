@@ -234,8 +234,8 @@ namespace FCopParser {
 
                     break;
 
-                case AssetType.SndsSound:
-                    // TODO
+                case AssetType.Stream:
+                    audio.RemoveStream(id);
                     break;
 
             }

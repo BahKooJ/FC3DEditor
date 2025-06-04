@@ -525,6 +525,7 @@ MonoBehaviour:
   soundPropertiesPrefab: {fileID: 7976195417839416632, guid: cef48c51cc16c6c40b5d35863662fda1, type: 3}
   objectPropertiesPrefab: {fileID: 2265680022078623320, guid: a8c03c5c71bcb5b4780b6215c12335ab, type: 3}
   texturePropertiesPrefab: {fileID: 1780254457357413928, guid: 74d437cd3cd295b4997ef3a1bf2e0f24, type: 3}
+  streamPropertiesPrefab: {fileID: 5276504939068045563, guid: c7fe179f2c4a8644bb8f901ffa5379f4, type: 3}
   fileContent: {fileID: 8135658677681505636}
   inspectorContent: {fileID: 5034767195390374454}
   contextMenu: {fileID: 2540693481667825595}
@@ -1342,7 +1343,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 300, y: 30}
+  m_SizeDelta: {x: 298, y: 30}
   m_Pivot: {x: 1, y: 1}
 --- !u!222 &4088518979017704610
 CanvasRenderer:
