@@ -7,6 +7,7 @@ using System.IO;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 public class StreamPropertiesView : MonoBehaviour {
 
@@ -17,11 +18,17 @@ public class StreamPropertiesView : MonoBehaviour {
     // - Parameters -
     public FCopStream stream;
     public FCopLevel level;
+    public AssetFile assetFile;
+    public AssetManagerView view;
 
     List<Sprite> frames = new();
 
+    Sprite defaultImage;
+
     private void Start() {
-        
+
+        defaultImage = animationPreview.sprite;
+
         indexText.text = level.audio.soundStreams.IndexOf(stream).ToString();
 
         Refresh();
@@ -30,9 +37,11 @@ public class StreamPropertiesView : MonoBehaviour {
 
     void Refresh() {
 
-        if (stream.miniAnimation != null) {
+        animationPreview.sprite = defaultImage;
 
-            frames.Clear();
+        frames.Clear();
+
+        if (stream.miniAnimation != null) {
 
             foreach (var frame in stream.miniAnimation.framesBitmapped) {
 
@@ -78,6 +87,50 @@ public class StreamPropertiesView : MonoBehaviour {
 
     }
 
+    public void OnClickExportSound() {
+
+        OpenFileWindowUtil.SaveFile("FCEAssets", stream.name, path => {
+            File.WriteAllBytes(path + ".wav", stream.sound.GetFormattedAudio());
+        });
+
+    }
+
+    public void OnClickImportSound() {
+
+        OpenFileWindowUtil.OpenFile("FCEAssets", "", path => {
+
+            try {
+
+                var waveParser = new WaveParser(File.ReadAllBytes(path).ToList());
+
+                if (!(waveParser.sampleRate == stream.sound.sampleRate && waveParser.channels == stream.sound.channelCount && waveParser.bitsPerSample == stream.sound.bitrate)) {
+                    DialogWindowUtil.Dialog("Incorrect Wave Format", "Wave file is incorrect format, ensure that wave file meets required format:\n" +
+                        "Required Sample Rate: " + stream.sound.sampleRate + ", File Sample Rate: " + waveParser.sampleRate + "\n" +
+                        "Required Channels: " + stream.sound.channelCount + ", File Channels: " + waveParser.channels + "\n" +
+                        "Required Bits Per Sample: " + stream.sound.bitrate + ", File Bits Per Sample: " + waveParser.bitsPerSample);
+                    return;
+                }
+
+                var data = new List<byte>();
+
+                data.AddRange(BitConverter.GetBytes(waveParser.sampleData.Count));
+                data.AddRange(waveParser.sampleData);
+
+                stream.sound.rawFile.data = data;
+
+                view.OnSelectAsset(assetFile);
+
+            }
+            catch {
+
+                DialogWindowUtil.Dialog("Invalid File", "Please select a valid file.");
+
+            }
+
+        });
+
+    }
+
     public void OnClickExportMiniAnimation() {
 
         if (stream.miniAnimation == null) {
@@ -94,7 +147,7 @@ public class StreamPropertiesView : MonoBehaviour {
 
         OpenFileWindowUtil.OpenFile("FCEAssets", "", path => {
 
-            //try {
+            try {
 
                 var data = File.ReadAllBytes(path);
 
@@ -102,14 +155,22 @@ public class StreamPropertiesView : MonoBehaviour {
 
                 Refresh();
 
-            //}
-            //catch {
+            }
+            catch {
 
-            //    DialogWindowUtil.Dialog("Invalid File", "Please select a valid file.");
+                DialogWindowUtil.Dialog("Invalid File", "Please select a valid file.");
 
-            //}
+            }
 
         });
+
+    }
+
+    public void OnClickRemoveMiniAnimation() {
+
+        stream.miniAnimation = null;
+
+        Refresh();
 
     }
 

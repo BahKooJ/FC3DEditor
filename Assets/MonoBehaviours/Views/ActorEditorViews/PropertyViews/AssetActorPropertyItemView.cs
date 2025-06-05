@@ -55,7 +55,15 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
                     assetNameText.text = controller.main.level.audio.soundEffects.First(t => t.scriptingID == assetProperty.assetID).name;
                 }
                 catch {
-                    NameCheck();
+
+                    try {
+                        assetNameText.text = controller.main.level.audio.globalSoundEffects.First(t => t.scriptingID == assetProperty.assetID).name;
+
+                    }
+                    catch {
+                        NameCheck();
+                    }
+
                 }
 
                 assetIcon.sprite = wavIconSprite;

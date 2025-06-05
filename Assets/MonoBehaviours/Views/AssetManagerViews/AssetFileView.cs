@@ -41,26 +41,31 @@ public class AssetFileView : MonoBehaviour {
             case AssetType.Music:
                 icon.sprite = musicIcon;
                 break;
-            case AssetType.SndsSound:
+            case AssetType.Stream:
                 icon.sprite = streamIcon;
                 break;
         }
 
         title.text = file.asset.name;
 
-        if (file.directory.canAddFiles) {
+        if (file.asset.isGlobalData) {
             contextMenu.items = new() {
-                ("Rename", StartRename),
-                ("Delete", Delete),
-                ("Export", Export),
-                ("Import", Import),
-                ("Import Parsed", ImportParsed),
+                ("Export", Export)
             };
         }
         else if (file.assetType == AssetType.Stream) {
             contextMenu.items = new() {
                 ("Rename", StartRename),
                 ("Delete", StreamDelete),
+            };
+        }
+        else if (file.directory.canAddFiles) {
+            contextMenu.items = new() {
+                ("Rename", StartRename),
+                ("Delete", Delete),
+                ("Export", Export),
+                ("Import", Import),
+                ("Import Parsed", ImportParsed),
             };
         }
         else {
@@ -72,6 +77,10 @@ public class AssetFileView : MonoBehaviour {
                 ("Import Parsed", ImportParsed),
             };
 
+        }
+
+        if (file.asset.isGlobalData) {
+            background.color = Main.globalColor;
         }
 
     }
@@ -171,7 +180,7 @@ public class AssetFileView : MonoBehaviour {
     }
 
     public void ClearHighlight() {
-        background.color = Main.mainColor;
+        background.color = file.asset.isGlobalData ? Main.globalColor : Main.mainColor;
     }
 
     public void OnClick() {

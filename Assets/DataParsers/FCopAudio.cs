@@ -8,6 +8,45 @@ namespace FCopParser {
 
     public class FCopAudioParser {
 
+        public static List<FCopAudio> ParseGlblDataSounds(List<IFFDataFile> cwavs, IFFDataFile cshd) {
+
+            List<FCopAudio> soundEffects = new();
+
+            IFFDataFile GetCwav(int id) {
+                return cwavs.First(file => { return file.dataID == id; });
+            }
+
+            var soundMetaDataStructCount = BitConverter.ToInt16(cshd.data.ToArray(), 6);
+
+            // offset of sound meta data array
+            var offset = BitConverter.ToInt16(cshd.data.ToArray(), 8);
+
+            foreach (var i in Enumerable.Range(0, soundMetaDataStructCount)) {
+
+                var metaDataStruct = new SoundMetaData(
+                    BitConverter.ToInt16(cshd.data.ToArray(), offset),
+                    BitConverter.ToInt16(cshd.data.ToArray(), offset + 2),
+                    cshd.data[offset + 4],
+                    cshd.data[offset + 5],
+                    cshd.data[offset + 6],
+                    cshd.data[offset + 7],
+                    BitConverter.ToInt16(cshd.data.ToArray(), offset + 8)
+                    );
+
+                var soundEffect = new FCopAudio(GetCwav(metaDataStruct.dataID), metaDataStruct);
+                soundEffect.isGlobalData = true;
+
+                soundEffects.Add(soundEffect);
+
+                offset += 12;
+
+            }
+
+            return soundEffects;
+
+        }
+
+        public List<FCopAudio> globalSoundEffects = new();
         public List<FCopAudio> soundEffects = new();
         public List<FCopStream> soundStreams = new();
         public FCopAudio music;
@@ -244,6 +283,18 @@ namespace FCopParser {
 
         }
 
+        public FCopStream AddStream(byte[] newData) {
+
+            var rawFile = new IFFDataFile(5, newData.ToList(), "snds", 0, -1);
+
+            var stream = new FCopStream(rawFile, "New Stream");
+
+            soundStreams.Add(stream);
+
+            return stream;
+
+        }
+
         public void RemoveStream(int index) {
 
             soundStreams.RemoveAt(index);
@@ -309,6 +360,7 @@ namespace FCopParser {
     public class FCopAudio : FCopAsset {
 
         public bool rawDataHasHeader;
+        public bool rawDataHasSize;
         public int bitrate;
         public int sampleRate;
         public int channelCount;
@@ -331,6 +383,7 @@ namespace FCopParser {
             this.unknown2 = soundMetaData.unknown2;
             this.name = rawFile.name == "" ? "Sound Effect " + rawFile.dataID.ToString() : rawFile.name;
             this.rawDataHasHeader = true;
+            this.rawDataHasSize = false;
             this.bitrate = 16;
             this.sampleRate = 22050;
             this.channelCount = 1;
@@ -340,6 +393,7 @@ namespace FCopParser {
         public FCopAudio(IFFDataFile rawFile, string streamName) : base(rawFile) {
             this.name = streamName;
             this.rawDataHasHeader = false;
+            this.rawDataHasSize = true;
             this.bitrate = 8;
             this.sampleRate = 22050;
             this.channelCount = 1;
@@ -351,6 +405,7 @@ namespace FCopParser {
             rawFile = new IFFDataFile(0, musicFile.data, "MSIC", 1, -1);
             this.name = musicFile.name;
             this.rawDataHasHeader = false;
+            this.rawDataHasSize = false;
             this.bitrate = 8;
             this.sampleRate = 14212;
             this.channelCount = 2;
@@ -363,7 +418,16 @@ namespace FCopParser {
                 return rawFile.data.ToArray();
             }
             else {
-                return null;
+                var bytesPerBlock = channelCount * bitrate / 8;
+                var BytePerSec = bytesPerBlock * sampleRate;
+
+                if (rawDataHasSize) {
+                    return new WaveParser(1, channelCount, sampleRate, BytePerSec, bytesPerBlock, bitrate, rawFile.data.GetRange(4, rawFile.data.Count - 4)).Compile();
+                }
+                else {
+                    return new WaveParser(1, channelCount, sampleRate, BytePerSec, bytesPerBlock, bitrate, rawFile.data).Compile();
+                }
+
             }
 
         } 
@@ -408,6 +472,13 @@ namespace FCopParser {
             if (rawAnm != null) {
                 miniAnimation = new FCopMiniAnimation(rawAnm);
             }
+
+        }
+
+        public FCopStream(IFFDataFile rawFile, string name) : base(null, name) {
+
+            this.name = name;
+            sound = new FCopAudio(rawFile, name);
 
         }
 

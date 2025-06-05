@@ -45,6 +45,11 @@ public class MiniAssetManagerView : MonoBehaviour {
         switch (requestAssetType) {
 
             case AssetType.WavSound:
+                foreach (var sound in level.audio.globalSoundEffects) {
+
+                    InitFile(sound);
+
+                }
                 foreach (var sound in level.audio.soundEffects) {
 
                     InitFile(sound);

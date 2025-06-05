@@ -48,8 +48,17 @@ public class AssetNodeView : ExpressionNodeView {
                     expressionText.text = main.level.audio.soundEffects.First(t => t.scriptingID == literalNode.value).name;
                 }
                 catch {
-                    NameCheck();
+
+                    try {
+                        expressionText.text = main.level.audio.globalSoundEffects.First(t => t.scriptingID == literalNode.value).name;
+
+                    }
+                    catch {
+                        NameCheck();
+                    }
+
                 }
+
 
                 assetIcon.sprite = wavIconSprite;
                 break;

@@ -397,6 +397,12 @@ namespace FCopParser {
 
     public class WaveParser {
 
+        static List<byte> riffFourCC = new List<byte>() { 0x52, 0x49, 0x46, 0x46 };
+        static List<byte> waveFourCC = new List<byte>() { 0x57, 0x41, 0x56, 0x45 };
+        static List<byte> fmtFourCC = new List<byte>()  { 0x66, 0x6D, 0x74, 0x20 };
+        static List<byte> dataFourCC = new List<byte>() { 0x64, 0x61, 0x74, 0x61 };
+
+
         public int fileSize;
         public int audioFormat;
         public int channels;
@@ -414,7 +420,7 @@ namespace FCopParser {
 
             var arrayData = data.ToArray();
 
-            if (!data.GetRange(0, 4).SequenceEqual(new List<byte>() { 0x52, 0x49, 0x46, 0x46 })) {
+            if (!data.GetRange(0, 4).SequenceEqual(riffFourCC)) {
                 throw new InvalidFileException();
             }
 
@@ -449,6 +455,42 @@ namespace FCopParser {
             // Move Past data fourCC
             offset += 4;
             sampleData = data.GetRange(offset + 4, BitConverter.ToInt32(arrayData, offset));
+
+        }
+
+        public WaveParser(int audioFormat, int channels, int sampleRate, int bytesPerSec, int bytesPerBlock, int bitsPerSample, List<byte> sampleData) {
+            this.audioFormat = audioFormat;
+            this.channels = channels;
+            this.sampleRate = sampleRate;
+            this.bytesPerSec = bytesPerSec;
+            this.bytesPerBlock = bytesPerBlock;
+            this.bitsPerSample = bitsPerSample;
+            this.sampleData = sampleData;
+        }
+
+        public byte[] Compile() {
+
+            var total = new List<byte>();
+
+            total.AddRange(riffFourCC);
+            total.AddRange(BitConverter.GetBytes(sampleData.Count + 36));
+            total.AddRange(waveFourCC);
+
+            total.AddRange(fmtFourCC);
+            total.AddRange(BitConverter.GetBytes(16));
+            total.AddRange(BitConverter.GetBytes((short)audioFormat));
+            total.AddRange(BitConverter.GetBytes((short)channels));
+            total.AddRange(BitConverter.GetBytes(sampleRate));
+            total.AddRange(BitConverter.GetBytes(bytesPerSec));
+            total.AddRange(BitConverter.GetBytes((short)bytesPerBlock));
+            total.AddRange(BitConverter.GetBytes((short)bitsPerSample));
+
+            total.AddRange(dataFourCC);
+            total.AddRange(BitConverter.GetBytes(sampleData.Count));
+
+            total.AddRange(sampleData);
+
+            return total.ToArray();
 
         }
 

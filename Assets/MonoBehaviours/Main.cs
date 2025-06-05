@@ -13,6 +13,7 @@ public class Main : MonoBehaviour {
     public const int interfaceObjectsMask = 512;
     public const int uiLayerMask = 480;
     public static Color mainColor = new Color(0x22 / 255f, 0x22 / 255f, 0x22 / 255f);
+    public static Color globalColor = new Color(0x1B / 255f, 0x24 / 255f, 0x32 / 255f);
     public static Color selectedColor = new Color(0f, 0x33 / 255f, 0f);
 
     public static bool ignoreAllInputs = false;
@@ -176,6 +177,7 @@ public class Main : MonoBehaviour {
             level = FileManagerMain.level;
         }
 
+       
 
         Application.targetFrameRate = 60;
 

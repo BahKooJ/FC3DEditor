@@ -42,6 +42,13 @@ public class FileManagerMain : MonoBehaviour {
         LoadingScreenUtil.prefab = LoadingScreen;
         LoadingScreenUtil.canvas = canvas.gameObject;
 
+        try {
+            FCopLevel.globalData = new FCopGlobalData(File.ReadAllBytes("GlblData"));
+        }
+        catch {
+            DialogWindowUtil.Dialog("No Global Data Found", "The file \"GlblData\" was not found. Please drag the GlblData file into the same directory as the editor.");
+        }
+
     }
 
     public FCopLevel GetFile(string path) {

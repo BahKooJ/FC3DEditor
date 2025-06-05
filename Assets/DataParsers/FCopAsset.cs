@@ -3,6 +3,7 @@
 
         public IFFDataFile rawFile;
         public string name;
+        public bool isGlobalData = false;
 
         public int DataID {
             get { return rawFile.dataID; }

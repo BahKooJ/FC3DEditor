@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -10,6 +11,8 @@ namespace FCopParser {
     // Takes everything in IFFFileMananger and converts it to higher parsed data.
     // Object also manages sections and level layout
     public class FCopLevel {
+
+        public static FCopGlobalData globalData = null;
 
         public int width;
         public int height;
@@ -146,6 +149,9 @@ namespace FCopParser {
 
             audio = new FCopAudioParser(rawCwavs, rawCshd, fileManager.subFiles, fileManager.music);
 
+            if (globalData != null) {
+                audio.globalSoundEffects.AddRange(globalData.soundEffects);
+            }
 
         }
 
@@ -272,12 +278,6 @@ namespace FCopParser {
                     audio.music.rawFile.data = newData.ToList();
 
                     break;
-                case AssetType.MiniAnimation:
-                    // ...TODO..?
-                    break;
-                case AssetType.Mixed:
-                    // ...TODO..?
-                    break;
             }
 
         }
@@ -301,8 +301,8 @@ namespace FCopParser {
 
                     return obj;
 
-                case AssetType.SndsSound:
-                    return null;
+                case AssetType.Stream:
+                    return audio.AddStream(newData);
 
 
             }
@@ -1229,7 +1229,9 @@ namespace FCopParser {
             scripting = new FCopScriptingProject(rpns, funParser);
 
             audio = new FCopAudioParser(rawCwavs, rawCshd, fileManager.subFiles, newFileManager.music);
-
+            if (globalData != null) {
+                audio.globalSoundEffects.AddRange(globalData.soundEffects);
+            }
         }
 
     }

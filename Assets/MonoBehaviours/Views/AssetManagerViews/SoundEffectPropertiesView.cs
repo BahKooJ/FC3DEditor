@@ -31,6 +31,12 @@ public class SoundEffectPropertiesView : MonoBehaviour {
         scriptingIDInput.text = audioAsset.scriptingID.ToString();
         doesLoopToggle.isOn = audioAsset.isLoop;
 
+        if (audioAsset.isGlobalData) {
+            groupIDInput.interactable = false;
+            scriptingIDInput.interactable = false;
+            doesLoopToggle.interactable = false;
+        }
+
         refuseCallback = false;
 
     }

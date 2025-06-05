@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Linq;
+using System;
 
 public class AssetManagerView : MonoBehaviour {
 
@@ -39,6 +40,12 @@ public class AssetManagerView : MonoBehaviour {
 
         var soundDir = new AssetDirectory(AssetType.WavSound, true, "Sound Effects", root);
 
+        foreach (var sound in level.audio.globalSoundEffects) {
+
+            soundDir.files.Add(new AssetFile(sound, AssetType.WavSound, soundDir));
+
+        }
+
         foreach (var sound in level.audio.soundEffects) {
             
             soundDir.files.Add(new AssetFile(sound, AssetType.WavSound, soundDir));
@@ -61,7 +68,7 @@ public class AssetManagerView : MonoBehaviour {
 
         }
 
-        var streamsDir = new AssetDirectory(AssetType.Stream, false, "Streams", root);
+        var streamsDir = new AssetDirectory(AssetType.Stream, true, "Streams", root);
 
         foreach (var stream in level.audio.soundStreams) {
             streamsDir.files.Add(new AssetFile(stream, AssetType.Stream, streamsDir));
@@ -194,7 +201,7 @@ public class AssetManagerView : MonoBehaviour {
                 break;
             case AssetType.Stream:
                 InstanciateSoundPlayer(((FCopStream)file.asset).sound);
-                InstanciateStreamProperties((FCopStream)file.asset);
+                InstanciateStreamProperties((FCopStream)file.asset, file);
                 break;
             case AssetType.Music:
                 InstanciateSoundPlayer((FCopAudio)file.asset);
@@ -252,6 +259,38 @@ public class AssetManagerView : MonoBehaviour {
 
                     }
                     return null;
+                case AssetType.Stream:
+
+                    var waveParserSnds = new WaveParser(File.ReadAllBytes(path).ToList());
+
+                    if (!(waveParserSnds.sampleRate == 22050 && waveParserSnds.channels == 1 && waveParserSnds.bitsPerSample == 8)) {
+                        DialogWindowUtil.Dialog("Incorrect Wave Format", "Wave file is incorrect format, ensure that wave file meets required format:\n" +
+                            "Required Sample Rate: 22050, File Sample Rate: " + waveParserSnds.sampleRate + "\n" +
+                            "Required Channels: 1, File Channels: " + waveParserSnds.channels + "\n" +
+                            "Required Bits Per Sample: 8, File Bits Per Sample: " + waveParserSnds.bitsPerSample);
+                        return null;
+                    }
+
+                    var data = new List<byte>();
+
+                    data.AddRange(BitConverter.GetBytes(waveParserSnds.sampleData.Count));
+                    data.AddRange(waveParserSnds.sampleData);
+
+                    return data.ToArray();
+                case AssetType.Music:
+
+                    var waveParserMusic = new WaveParser(File.ReadAllBytes(path).ToList());
+
+                    if (!(waveParserMusic.sampleRate == 14212 && waveParserMusic.channels == 2 && waveParserMusic.bitsPerSample == 8)) {
+                        DialogWindowUtil.Dialog("Incorrect Wave Format", "Wave file is incorrect format, ensure that wave file meets required format:\n" +
+                            "Required Sample Rate: 14212, File Sample Rate: " + waveParserMusic.sampleRate + "\n" +
+                            "Required Channels: 2, File Channels: " + waveParserMusic.channels + "\n" +
+                            "Required Bits Per Sample: 8, File Bits Per Sample: " + waveParserMusic.bitsPerSample);
+                        return null;
+                    }
+
+                    return waveParserMusic.data.ToArray();
+
                 default:
                     return null;
             }
@@ -313,6 +352,24 @@ public class AssetManagerView : MonoBehaviour {
 
                 break;
 
+            case AssetType.Stream:
+
+                OpenFileWindowUtil.OpenFile("FCEAssets", "", path => {
+
+                    var waveData = ParsedDataToRaw(AssetType.Stream, path);
+
+                    if (waveData == null) return;
+
+                    var newFile = level.AddAsset(AssetType.Stream, (byte[])waveData);
+
+                    currentDirectory.files.Add(new AssetFile(newFile, currentDirectory.storedAssets, currentDirectory));
+
+                    Refresh();
+
+                });
+
+                break;
+
         }
 
     }
@@ -358,13 +415,15 @@ public class AssetManagerView : MonoBehaviour {
 
     }
 
-    void InstanciateStreamProperties(FCopStream fCopStream) {
+    void InstanciateStreamProperties(FCopStream fCopStream, AssetFile file) {
 
         var obj = Instantiate(streamPropertiesPrefab, inspectorContent.transform, false);
 
         var script = obj.GetComponent<StreamPropertiesView>();
         script.level = main.level;
         script.stream = fCopStream;
+        script.assetFile = file;
+        script.view = this;
 
     }
 
