@@ -7,9 +7,11 @@ public class SupportingActorDataView : MonoBehaviour {
 
     // - Unity Refs -
     public TeamDataView teamDataView;
+    public GroupDataView groupDataView;
     public TextureSnippetsView textureSnippetsView;
-    public Button teamTab;
-    public Button textureTab;
+    public Image teamTab;
+    public Image groupTab;
+    public Image textureTab;
 
     // - Parameters -
     [HideInInspector]
@@ -19,9 +21,11 @@ public class SupportingActorDataView : MonoBehaviour {
     void Start() {
         
         teamDataView.level = level;
+        groupDataView.level = level;
         textureSnippetsView.level = level;
         textureSnippetsView.main = main;
 
+        teamTab.color = Main.selectedColor;
 
     }
 
@@ -33,30 +37,36 @@ public class SupportingActorDataView : MonoBehaviour {
 
     public void OnClickTeams() {
 
-        var teamColors = teamTab.colors;
-        teamColors.normalColor = new Color(0.5f, 1f, 0.5f);
-        teamTab.colors = teamColors;
-
-        var textureColors = textureTab.colors;
-        textureColors.normalColor = new Color(1f, 1f, 1f);
-        textureTab.colors = textureColors;
+        teamTab.color = Main.selectedColor;
+        groupTab.color = Main.mainColor;
+        textureTab.color = Main.mainColor;
 
         teamDataView.gameObject.SetActive(true);
+        groupDataView.gameObject.SetActive(false);
+        textureSnippetsView.gameObject.SetActive(false);
+
+    }
+
+    public void OnClickGroup() {
+
+        teamTab.color = Main.mainColor;
+        groupTab.color = Main.selectedColor;
+        textureTab.color = Main.mainColor;
+
+        teamDataView.gameObject.SetActive(false);
+        groupDataView.gameObject.SetActive(true);
         textureSnippetsView.gameObject.SetActive(false);
 
     }
 
     public void OnClickTexture() {
 
-        var teamColors = teamTab.colors;
-        teamColors.normalColor = new Color(1f, 1f, 1f);
-        teamTab.colors = teamColors;
-
-        var textureColors = textureTab.colors;
-        textureColors.normalColor = new Color(0.5f, 1f, 0.5f);
-        textureTab.colors = textureColors;
+        teamTab.color = Main.mainColor;
+        groupTab.color = Main.mainColor;
+        textureTab.color = Main.selectedColor;
 
         teamDataView.gameObject.SetActive(false);
+        groupDataView.gameObject.SetActive(false);
         textureSnippetsView.gameObject.SetActive(true);
 
     }

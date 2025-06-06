@@ -1,12 +1,10 @@
 ﻿
 using UnityEngine;
 using FCopParser;
-using UnityEngine.UI;
 using TMPro;
 using System;
 using System.Collections.Generic;
 using static FCopParser.ActorMethodNode;
-using System.Linq;
 using System.Collections;
 using static ScriptingPanelView;
 

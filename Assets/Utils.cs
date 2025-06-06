@@ -509,6 +509,7 @@ namespace FCopParser {
         Stream,
         // Non-IFFDataFile Assets
         Team,
+        ScriptGroup,
         TextureSnippet,
         None
     }

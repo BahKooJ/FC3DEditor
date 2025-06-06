@@ -69,8 +69,8 @@ public class SpecialActorSelectorView : MonoBehaviour {
                 break;
             case ScriptDataType.Group:
                 groupTab.color = Main.selectedColor;
-                foreach (var group in main.level.sceneActors.scriptingGroupedActors) {
-                    InitListItem(tabSelected, group.Key, group.Value.name);
+                foreach (var group in main.level.sceneActors.scriptGroup) {
+                    InitListItem(tabSelected, group.Key, group.Value);
                 }
                 break;
             case ScriptDataType.Team:

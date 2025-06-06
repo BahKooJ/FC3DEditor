@@ -1,7 +1,4 @@
-﻿
-using UnityEngine;
-using FCopParser;
-using UnityEngine.UI;
+﻿using FCopParser;
 using System.Collections;
 using System;
 using static ScriptingPanelView;

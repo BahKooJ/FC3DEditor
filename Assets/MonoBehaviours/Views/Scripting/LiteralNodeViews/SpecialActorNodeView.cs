@@ -36,7 +36,7 @@ public class SpecialActorNodeView : ExpressionNodeView {
         }
         else if (parameterNode.dataType == ScriptDataType.Group) {
             try {
-                expressionText.text = main.level.sceneActors.scriptingGroupedActors[litNode.value].name;
+                expressionText.text = main.level.sceneActors.scriptGroup[litNode.value];
             }
             catch {
                 NameCheck();

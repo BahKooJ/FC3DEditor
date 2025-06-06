@@ -12,11 +12,15 @@ namespace FCopParser {
 
         public List<ActorNode> positionalGroupedActors = new();
         public Dictionary<int, ActorNode> behaviorGroupedActors = new();
-        public Dictionary<int, ActorNode> scriptingGroupedActors = new();
 
         public Dictionary<int, string> teams = new() {
             {0, "None"}
         };
+
+        public Dictionary<int, string> scriptGroup = new() {
+            {0, "None"}
+        };
+
 
         public FCopSceneActors(List<FCopActor> actors, FCopLevel level) {
 
@@ -29,7 +33,7 @@ namespace FCopParser {
 
             SortActorsByPosition();
             SortActorsByBehavior();
-            SortActorsByScriptGroup();
+            FindGroups();
 
             FindTeams();
         }
@@ -339,7 +343,7 @@ namespace FCopParser {
 
         }
 
-        public void SortActorsByScriptGroup() {
+        public void FindGroups() {
 
             foreach (var actor in actors) {
 
@@ -347,10 +351,8 @@ namespace FCopParser {
 
                     var groupID = actor.behavior.propertiesByName["Group"].GetCompiledValue();
 
-                    var node = new ActorNode(ActorGroupType.Script, "Group " + groupID, actor);
-
-                    if (!scriptingGroupedActors.TryAdd(groupID, node)) {
-                        scriptingGroupedActors[groupID].nestedActors.Add(actor);
+                    if (!scriptGroup.ContainsKey(groupID)) {
+                        scriptGroup[groupID] = "Group " + groupID;
                     }
 
                 }
@@ -385,13 +387,25 @@ namespace FCopParser {
 
         public List<Type> FindAllDerviedTypesFromGroup(int groupID) {
 
-            if (!scriptingGroupedActors.TryGetValue(groupID, out var scriptGroup)) {
-                return new();
+            var actorsByGroup = new List<FCopActor>();
+
+            foreach (var actor in actors) {
+
+                if (actor.behavior is FCopEntity) {
+
+                    var groupIDToTest = actor.behavior.propertiesByName["Group"].GetCompiledValue();
+
+                    if (groupIDToTest == groupID) {
+                        actorsByGroup.Add(actor);
+                    }
+
+                }
+
             }
 
             var actorTypes = new List<List<Type>>();
 
-            foreach (var actor in scriptGroup.nestedActors) {
+            foreach (var actor in actorsByGroup) {
 
                 actorTypes.Add(FindAllDerivedTypesFromActorBehavior(actor.DataID));
 
@@ -545,6 +559,16 @@ namespace FCopParser {
 
         }
 
+        public int AddGroup() {
+
+            var nextID = Utils.FindNextInt(scriptGroup.Keys.ToList());
+
+            scriptGroup[nextID] = "Group";
+
+            return nextID;
+
+        }
+
         public void DeleteTeam(int id) {
 
             teams.Remove(id);
@@ -575,6 +599,24 @@ namespace FCopParser {
 
                     }
 
+                }
+
+            }
+
+        }
+
+        public void DeleteGroup(int id) {
+
+            scriptGroup.Remove(id);
+
+            var groupedActors = actors.Where(a => a.behavior is FCopEntity);
+
+            foreach (var actor in groupedActors) {
+
+                var groupProperties = actor.behavior.propertiesByName["Group"];
+
+                if (groupProperties.GetCompiledValue() == id) {
+                    groupProperties.SetCompiledValue(0);
                 }
 
             }

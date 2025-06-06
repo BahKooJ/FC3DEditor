@@ -100,6 +100,9 @@ namespace FCopParser {
                 throw new VertexLimitExceededException();
             }
 
+            frameCount = 1;
+            metaDataBitfield = 8;
+
             var compiledData = new List<byte>();
 
             var convertedVerts = new List<Vertex>();

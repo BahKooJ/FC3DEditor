@@ -506,6 +506,48 @@ namespace FCopParser {
 
     public class FCopActorBehavior {
 
+        public static Dictionary<Type, ActorBehavior> behaviorsByType = new() {
+            { typeof(FCopBehavior1), ActorBehavior.Player },
+            { typeof(FCopBehavior5), ActorBehavior.PathedEntity },
+            { typeof(FCopBehavior6), ActorBehavior.StationaryEntity },
+            { typeof(FCopBehavior8), ActorBehavior.StationaryTurret },
+            { typeof(FCopBehavior9), ActorBehavior.Aircraft },
+            { typeof(FCopBehavior10), ActorBehavior.Elevator },
+            { typeof(FCopBehavior11), ActorBehavior.DynamicProp },
+            { typeof(FCopBehavior12), ActorBehavior.WalkableProp },
+            { typeof(FCopBehavior14), ActorBehavior.UniversalTrigger },
+            { typeof(FCopBehavior16), ActorBehavior.FloatingItem },
+            { typeof(FCopBehavior20), ActorBehavior.PathedTurret },
+            { typeof(FCopBehavior25), ActorBehavior.MovableProp },
+            { typeof(FCopBehavior26), ActorBehavior.Behavior26 },
+            { typeof(FCopBehavior27), ActorBehavior.Behavior27 },
+            { typeof(FCopBehavior28), ActorBehavior.PathedMultiTurret },
+            { typeof(FCopBehavior29), ActorBehavior.Teleporter },
+            { typeof(FCopBehavior30), ActorBehavior.InterchangingEntity },
+            { typeof(FCopBehavior31), ActorBehavior.Behavior31 },
+            { typeof(FCopBehavior32), ActorBehavior.Reloader },
+            { typeof(FCopBehavior33), ActorBehavior.Behavior33 },
+            { typeof(FCopBehavior34), ActorBehavior.Behavior34 },
+            { typeof(FCopBehavior35), ActorBehavior.MapObjectiveNodes },
+            { typeof(FCopBehavior36), ActorBehavior.ClaimableTurret },
+            { typeof(FCopBehavior37), ActorBehavior.Behavior37 },
+            { typeof(FCopBehavior38), ActorBehavior.Behavior38 },
+            { typeof(FCopBehavior87), ActorBehavior.VisualEffects87 },
+            { typeof(FCopBehavior88), ActorBehavior.VisualEffects88 },
+            { typeof(FCopBehavior89), ActorBehavior.VisualEffects89 },
+            { typeof(FCopBehavior90), ActorBehavior.VisualEffects90 },
+            { typeof(FCopBehavior91), ActorBehavior.ActorExplosion },
+            { typeof(FCopBehavior92), ActorBehavior.VisualEffects92 },
+            { typeof(FCopBehavior93), ActorBehavior.ParticleEmitter },
+            { typeof(FCopBehavior94), ActorBehavior.VisualEffects94 },
+            { typeof(FCopBehavior95), ActorBehavior.Trigger },
+            { typeof(FCopBehavior96), ActorBehavior.StaticProp },
+            { typeof(FCopBehavior97), ActorBehavior.Texture },
+            { typeof(FCopBehavior98), ActorBehavior.Weapon },
+            { typeof(FCopBehavior99), ActorBehavior.PlayerWeapon },
+
+        };
+
         public int expectedRawFileSize;
         public ActorAssetReference[] assetReferences;
         public string[] callbackNames = new string[] {
@@ -881,7 +923,7 @@ namespace FCopParser {
                 new ValueActorProperty("Health", Read16(0), 0, 30000, BitCount.Bit16, "Entity Properties"),
                 new ValueActorProperty("Collide Damage", Read16(0), 0, 30000, BitCount.Bit16, "Entity Properties"),
                 new AssetActorProperty("Team", Read8(0), AssetType.Team, BitCount.Bit8, "Entity Properties"),
-                new ValueActorProperty("Group", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Entity Properties"),
+                new AssetActorProperty("Group", Read8(0), AssetType.ScriptGroup, BitCount.Bit8, "Entity Properties"),
                 new EnumDataActorProperty("Map Icon Color", (MapIconColor)Read8(0), BitCount.Bit8, "Entity Properties"),
                 new ValueActorProperty("Target Priority", Read8(0), 0, 127, BitCount.Bit8, "Entity Properties"),
                 new ExplosionActorProperty("Explosion", Read8(0), BitCount.Bit8, "Entity Properties"),

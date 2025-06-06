@@ -2,7 +2,6 @@
 
 using UnityEngine;
 using FCopParser;
-using UnityEngine.UI;
 using static ScriptingPanelView;
 
 public class VariableNodeView : ExpressionNodeView {

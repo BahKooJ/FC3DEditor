@@ -13,6 +13,8 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
     public Sprite actorIconSprite;
     public Sprite textureSnippetIconSprite;
     public Sprite teamIconSprite;
+    public Sprite groupIconSprite;
+
 
     // - Unity Refs -
     public TMP_Text nameText;
@@ -111,6 +113,18 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
                 assetIcon.sprite = teamIconSprite;
 
                 break;
+            case AssetType.ScriptGroup:
+
+                try {
+                    assetNameText.text = controller.main.level.sceneActors.scriptGroup[assetProperty.assetID];
+                }
+                catch {
+                    NameCheck();
+                }
+
+                assetIcon.sprite = groupIconSprite;
+
+                break;
             case AssetType.TextureSnippet:
 
                 try {
@@ -139,6 +153,21 @@ public class AssetActorPropertyItemView : ActorPropertyItemView {
         if (assetProperty.assetType == AssetType.Team) {
 
             MiniAssetManagerUtil.RequestUniversalData(controller.main.level.sceneActors.teams, controller.main, id => {
+                ActorEditMode.AddPropertyChangeCounterAction(property, actor);
+                assetProperty.assetID = id;
+                Refresh();
+
+                if (ActorPropertyChangeEvent.changeEventsByPropertyName.ContainsKey(property.name)) {
+
+                    ActorPropertyChangeEvent.changeEventsByPropertyName[property.name](controller, property);
+
+                }
+            });
+
+        }
+        else if (assetProperty.assetType == AssetType.ScriptGroup) {
+
+            MiniAssetManagerUtil.RequestUniversalData(controller.main.level.sceneActors.scriptGroup, controller.main, id => {
                 ActorEditMode.AddPropertyChangeCounterAction(property, actor);
                 assetProperty.assetID = id;
                 Refresh();
