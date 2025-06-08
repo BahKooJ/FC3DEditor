@@ -909,7 +909,7 @@ public abstract class Presets {
 
         var value = "";
 
-        var properties = new List<string> { "NAME", "TYPE", "BYTES" };
+        var properties = new List<string> { "NAME", "TYPE", "SCRIPT NAME 1", "SCRIPT NAME 2", "SCRIPT NAME 3", "BYTES" };
         var lookingForValue = -1;
         var isReadingValue = false;
         var openArray = false;
@@ -953,6 +953,33 @@ public abstract class Presets {
 
                         if (value != "") {
                             schematic.name = value;
+                            value = "";
+                            lookingForValue++;
+                        }
+
+                        break;
+                    case "SCRIPT NAME 1":
+
+                        if (value != "") {
+                            schematic.scriptRefs.Add(value);
+                            value = "";
+                            lookingForValue++;
+                        }
+
+                        break;
+                    case "SCRIPT NAME 2":
+
+                        if (value != "") {
+                            schematic.scriptRefs.Add(value);
+                            value = "";
+                            lookingForValue++;
+                        }
+
+                        break;
+                    case "SCRIPT NAME 3":
+
+                        if (value != "") {
+                            schematic.scriptRefs.Add(value);
                             value = "";
                             lookingForValue++;
                         }

@@ -68,7 +68,7 @@ public class UniversialMiniDataManagerView : MonoBehaviour {
 
             if (file.id != -1) {
 
-                if (file.dataName.Contains(searchBar.text) || searchBar.text == "") {
+                if (file.dataName.ToUpper().Contains(searchBar.text.ToUpper()) || searchBar.text == "") {
                     file.gameObject.SetActive(true);
                 }
                 else {

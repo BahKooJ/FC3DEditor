@@ -18,6 +18,7 @@ public class SceneActorsView : MonoBehaviour {
     public TMP_Dropdown sortDropdown;
     public TMP_InputField searchBar;
     public ActorPropertiesView view;
+    public ActorExcludeView excludeView;
 
     // - Parameters -
     public FCopLevel level;
@@ -84,7 +85,19 @@ public class SceneActorsView : MonoBehaviour {
                 actorNodesByID = new();
                 foreach (var node in level.sceneActors.positionalGroupedActors) {
 
-                    InitListNode(node, false);
+                    bool isAllowed = false;
+                    foreach (var actor in node.nestedActors) {
+
+                        if (SettingsManager.allowedActorsInSceneView[actor.behaviorType]) {
+                            isAllowed = true;
+                            break;
+                        }
+
+                    }
+
+                    if (isAllowed) {
+                        InitListNode(node, false);
+                    }
 
                 }
                 break;
@@ -141,15 +154,36 @@ public class SceneActorsView : MonoBehaviour {
         var pi = 0;
         foreach (var node in nodes) {
 
+            bool isAllowed = false;
+            foreach (var actor in node.nestedActors) {
+
+                if (SettingsManager.allowedActorsInSceneView[actor.behaviorType]) {
+                    isAllowed = true;
+                    break;
+                }
+
+            }
+
             var nodeView = unvalidateNodes.FirstOrDefault(n => n.node == node);
 
             if (nodeView != null) {
-                nodeView.transform.SetSiblingIndex(pi);
-                unvalidateNodes.Remove(nodeView);
-                nodeView.RefreshDisplay();
+
+                if (isAllowed) {
+
+                    // Node view is existing and validated.
+                    nodeView.transform.SetSiblingIndex(pi);
+                    unvalidateNodes.Remove(nodeView);
+                    nodeView.RefreshDisplay();
+
+                }
+
             }
             else {
-                InitListNode(node, forceGrouping);
+
+                if (isAllowed) {
+                    InitListNode(node, forceGrouping, pi);
+                }
+
             }
 
             pi++;
@@ -208,7 +242,7 @@ public class SceneActorsView : MonoBehaviour {
                 var hasName = false;
                 foreach (var actor in node.node.nestedActors) {
 
-                    if (actor.name.Contains(searchBar.text) || searchBar.text == "") {
+                    if (actor.name.ToUpper().Contains(searchBar.text.ToUpper()) || searchBar.text == "") {
                         hasName = true;
                         break;
                     }
@@ -217,9 +251,11 @@ public class SceneActorsView : MonoBehaviour {
 
                 if (hasName) {
 
+                    node.gameObject.SetActive(true);
+
                     foreach (var nestNode in node.actorNodes) {
 
-                        if (nestNode.actor.name.Contains(searchBar.text) || searchBar.text == "") {
+                        if (nestNode.actor.name.ToUpper().Contains(searchBar.text.ToUpper()) || searchBar.text == "") {
                             nestNode.gameObject.SetActive(true);
                         }
                         else {
@@ -231,12 +267,19 @@ public class SceneActorsView : MonoBehaviour {
                 }
                 else {
                     node.gameObject.SetActive(false);
+
+                    foreach (var nestNode in node.actorNodes) {
+                        
+                        nestNode.gameObject.SetActive(false);
+
+                    }
+
                 }
 
             }
             else {
 
-                if (node.node.name.Contains(searchBar.text) || searchBar.text == "") {
+                if (node.node.name.ToUpper().Contains(searchBar.text.ToUpper()) || searchBar.text == "") {
                     node.gameObject.SetActive(true);
                 }
                 else {
@@ -414,10 +457,14 @@ public class SceneActorsView : MonoBehaviour {
 
     }
 
-    void InitListNode(ActorNode node, bool forceGroup) {
+    void InitListNode(ActorNode node, bool forceGroup, int siblingIndex = -1) {
 
         var obj = Instantiate(actorNodeListItemFab);
         obj.transform.SetParent(listContent, false);
+
+        if (siblingIndex != -1) {
+            obj.transform.SetSiblingIndex(siblingIndex);
+        }
 
         var nodeListItem = obj.GetComponent<ActorNodeListItemView>();
         nodeListItem.node = node;
@@ -439,6 +486,12 @@ public class SceneActorsView : MonoBehaviour {
     public void OnGroupDrowdownChange() {
 
         Refresh();
+
+    }
+
+    public void OnClickExcludeContext() {
+
+        excludeView.gameObject.SetActive(!excludeView.gameObject.activeSelf);
 
     }
 

@@ -239,12 +239,14 @@ public class Main : MonoBehaviour {
 
             Save();
             counterActions.Clear();
+            SettingsManager.SaveToFile();
             System.GC.Collect();
         }
 
         if (Controls.OnDown("Compile")) {
             Compile();
             counterActions.Clear();
+            SettingsManager.SaveToFile();
             System.GC.Collect();
         }
 

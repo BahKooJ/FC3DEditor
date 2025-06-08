@@ -130,7 +130,7 @@ public class VariableSelectorView : MonoBehaviour {
 
         foreach (var item in items) {
 
-            if (item.varName.Contains(searchBar.text) || searchBar.text == "") {
+            if (item.varName.ToUpper().Contains(searchBar.text.ToUpper()) || searchBar.text == "") {
                 item.gameObject.SetActive(true);
             }
             else {

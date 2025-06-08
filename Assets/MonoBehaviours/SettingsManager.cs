@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using FCopParser;
+using System.Reflection;
 
 public abstract class SettingsManager {
 
@@ -19,6 +21,7 @@ public abstract class SettingsManager {
     public static bool renderDirectionalLight = false;
     public static float lightDirectionX = 135f;
     public static float lightDirectionY = 325f;
+    public static Dictionary<ActorBehavior, bool> allowedActorsInSceneView = new();
 
     static public void ParseSettings() {
 
@@ -48,6 +51,24 @@ public abstract class SettingsManager {
                         offset += bindCount + 2;
 
                     }
+
+                }
+
+                if (property == "ViewAllowActors") {
+
+                    var offset = 0;
+
+                    while (offset < values.Count) {
+
+                        var type = (ActorBehavior)Enum.Parse(typeof(ActorBehavior), values[offset]);
+                        var value = bool.Parse(values[offset + 1]);
+
+                        allowedActorsInSceneView[type] = value;
+
+                        offset += 2;
+
+                    }
+
 
                 }
 
@@ -137,6 +158,18 @@ public abstract class SettingsManager {
 
         }
 
+        if (allowedActorsInSceneView.Count != Enum.GetNames(typeof(ActorBehavior)).Length) {
+
+            allowedActorsInSceneView.Clear();
+
+            foreach (var type in Enum.GetValues(typeof(ActorBehavior))) {
+
+                allowedActorsInSceneView[(ActorBehavior)type] = true;
+
+            }
+
+        }
+
 
     }
 
@@ -155,6 +188,16 @@ public abstract class SettingsManager {
 
             total += "\n";
 
+        }
+
+        total += "}\n";
+
+        total += "ViewAllowActors = { \n";
+
+        foreach (var exclude in allowedActorsInSceneView) {
+            total += "\"" + exclude.Key + "\":\"" + exclude.Value.ToString() + "\"";
+
+            total += "\n";
         }
 
         total += "}\n";

@@ -95,11 +95,16 @@ public class ActorSchematic {
     // Because of the shear number of properties an actor can have.
     // To save development time it just creates a new actor by parsing the original format.
     public List<byte> actorData = new List<byte>();
+    public List<string> scriptRefs = new();
 
-    public ActorSchematic(FCopActor actor) {
+    public ActorSchematic(FCopActor actor, FCopLevel level) {
         this.name = "Actor Schematic";
         this.behavior = actor.behaviorType;
         this.actorData = actor.Compile().data;
+
+        foreach (var rpnsId in actor.rawFile.rpnsReferences) {
+            scriptRefs.Add(level.scripting.rpns.codeByOffset[rpnsId].name);
+        }
     }
 
     public ActorSchematic() {
@@ -108,7 +113,7 @@ public class ActorSchematic {
 
     public string Compile() {
 
-        // (NAME, TYPE, [Bytes])
+        // (NAME, TYPE, SCRIPT NAME 1, SCRIPT NAME 2, SCRIPT NAME 3, [Bytes])
 
         var total = new StringBuilder();
 
@@ -116,6 +121,10 @@ public class ActorSchematic {
 
         total.Append("\"" + name + "\",");
         total.Append(((int)behavior).ToString() + ",");
+
+        foreach (var script in scriptRefs) {
+            total.Append("\"" + script + "\",");
+        }
 
         total.Append("[");
         foreach (var b in actorData) {

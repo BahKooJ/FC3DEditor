@@ -337,7 +337,18 @@ public class NavMeshEditMode : EditMode {
         script.controlledObject = node.gameObject;
         script.moveCallback = (newPos, axis) => {
 
-            node.ChangePosition(newPos, axis);
+            if (Controls.IsDown("SnapActorPosition")) {
+
+                var lockPos = new Vector3(MathF.Round(newPos.x * 2) / 2, MathF.Round(newPos.y * 2) / 2, MathF.Round(newPos.z * 2) / 2);
+                node.ChangePosition(lockPos, axis);
+
+            }
+            else {
+
+                node.ChangePosition(newPos, axis);
+
+            }
+
 
             return true;
         };

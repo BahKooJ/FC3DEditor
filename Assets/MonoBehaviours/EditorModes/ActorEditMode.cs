@@ -231,7 +231,21 @@ public class ActorEditMode : EditMode {
 
                 if (hitPos != null) {
 
-                    AddActor(new FCopActor(new IFFDataFile(3, new(schematicToAdd.actorData), "Cact", main.level.sceneActors.FindNextID(), main.level.scripting.emptyOffset)), hitPos.Value);
+                    var newActor = new FCopActor(new IFFDataFile(3, new(schematicToAdd.actorData), "Cact", main.level.sceneActors.FindNextID(), main.level.scripting.emptyOffset));
+
+                    var i = 0;
+                    foreach (var name in schematicToAdd.scriptRefs) {
+                        
+                        var rpnsCode = main.level.scripting.rpns.code.FirstOrDefault(x => x.name == name);
+
+                        if (rpnsCode != null) {
+                            newActor.rawFile.rpnsReferences[i] = rpnsCode.offset;
+                        }
+
+                        i++;
+                    }
+
+                    AddActor(newActor, hitPos.Value);
 
                     if (!Input.GetKey(KeyCode.LeftShift)) {
 
@@ -336,7 +350,7 @@ public class ActorEditMode : EditMode {
 
         if (Input.GetKeyDown(KeyCode.F10)) {
 
-            var offsets = new List<int>() { 181 };
+            //var offsets = new List<int>() { 181 };
 
             //void SearchScript(ScriptNode script, int offset) {
 
@@ -388,14 +402,23 @@ public class ActorEditMode : EditMode {
             //    }
 
             //}
-
-
-
             var actors = main.level.sceneActors.actors.Where(a => {
 
-                return offsets.Contains(a.rawFile.rpnsReferences[0]) || offsets.Contains(a.rawFile.rpnsReferences[1]) || offsets.Contains(a.rawFile.rpnsReferences[2]);
+                if (a.behavior is FCopPathedEntity e) {
+                    return e.propertiesByName["PTag unknown3"].GetCompiledValue() == 1;
+                }
+                else {
+                    return false;
+                }
 
             }).ToList();
+
+
+            //var actors = main.level.sceneActors.actors.Where(a => {
+
+            //    return offsets.Contains(a.rawFile.rpnsReferences[0]) || offsets.Contains(a.rawFile.rpnsReferences[1]) || offsets.Contains(a.rawFile.rpnsReferences[2]);
+
+            //}).ToList();
 
             //foreach (var actor in actors) {
             //    ((ToggleActorProperty)actor.behavior.propertiesByName["STag unknown4"]).value = true;

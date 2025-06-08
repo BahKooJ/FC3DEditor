@@ -72,7 +72,7 @@ public class ActorEditPanelView : MonoBehaviour {
     public void SaveActorSchematic() {
 
         if (controller.selectedActor != null) {
-            Presets.actorSchematics.schematics.Add(new ActorSchematic(controller.selectedActor));
+            Presets.actorSchematics.schematics.Add(new ActorSchematic(controller.selectedActor, controller.main.level));
             QuickLogHandler.Log("Actor Schematic Added", LogSeverity.Success);
         }
         else {

@@ -1077,10 +1077,10 @@ namespace FCopParser {
             properties.AddRange(new List<ActorProperty>() {
 
                 new ToggleActorProperty("Enable Backtrack", Read1(0x01, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("PTag unknown1", Read1(0x02, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("PTag unknown2", Read1(0x04, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag ignore1", Read1(0x02, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("PTag ignore2", Read1(0x04, false), BitCount.Bit1, "Pathing Tags"),
                 new ToggleActorProperty("Disable Path Obstruction", Read1(0x08, false), BitCount.Bit1, "Pathing Tags"),
-                new ToggleActorProperty("PTag unknown3", Read1(0x10, false), BitCount.Bit1, "Pathing Tags"),
+                new ToggleActorProperty("Start As Landed", Read1(0x10, false), BitCount.Bit1, "Pathing Tags"),
                 new ToggleActorProperty("PTag unknown4", Read1(0x20, false), BitCount.Bit1, "Pathing Tags"),
                 new ToggleActorProperty("PTag unknown5", Read1(0x40, false), BitCount.Bit1, "Pathing Tags"),
                 new ToggleActorProperty("PTag unknown6", Read1(0x80, false), BitCount.Bit1, "Pathing Tags"),
@@ -1107,11 +1107,11 @@ namespace FCopParser {
                 new NormalizedValueProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16, "Pathing Properties"),
                 new RangeActorProperty("Minimum Speed Multiplier", Read16(4096), 0, 8192, 4096f, BitCount.Bit16, "Pathing Properties"),
                 new NormalizedValueProperty("Acceleration", Read16(0), 0, 8192, 4096f, BitCount.Bit16, "Pathing Properties"),
-                new NormalizedValueProperty("Path_Unknown3 70:", Read16(0), 0, short.MaxValue, 4096f, BitCount.Bit16, "Pathing Properties"),
-                new NormalizedValueProperty("Path_Unknown4 72:", Read16(0), 0, short.MaxValue, 4096f, BitCount.Bit16, "Pathing Properties"),
-                new NormalizedValueProperty ("Path_Unknown5 74:", Read16(0), 0, short.MaxValue, 4096f, BitCount.Bit16, "Pathing Properties"),
-                new ValueActorProperty("Path_Unknown6 76:", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
-                new ValueActorProperty("Path_Unknown7 78:", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Pathing Properties"),
+                new NormalizedValueProperty("Unknown Multiplier 70", Read16(0), 0, short.MaxValue, 4096f, BitCount.Bit16, "Pathing Properties"),
+                new NormalizedValueProperty("Unknown Multiplier 72", Read16(0), 0, short.MaxValue, 4096f, BitCount.Bit16, "Pathing Properties"),
+                new NormalizedValueProperty ("Unknown Multiplier 74", Read16(0), 0, short.MaxValue, 4096f, BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Unknown 76", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Pathing Properties"),
+                new ValueActorProperty("Unknown 78", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8, "Pathing Properties"),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
 
             });

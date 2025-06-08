@@ -122,7 +122,7 @@ public class MiniAssetManagerView : MonoBehaviour {
 
             if (file.asset != null) {
 
-                if (file.asset.name.Contains(searchBar.text) || searchBar.text == "") {
+                if (file.asset.name.ToUpper().Contains(searchBar.text.ToUpper()) || searchBar.text == "") {
                     file.gameObject.SetActive(true);
                 }
                 else {
