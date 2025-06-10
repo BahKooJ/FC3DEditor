@@ -405,7 +405,7 @@ public class ActorEditMode : EditMode {
             var actors = main.level.sceneActors.actors.Where(a => {
 
                 if (a.behavior is FCopPathedEntity e) {
-                    return e.propertiesByName["PTag unknown3"].GetCompiledValue() == 1;
+                    return e.propertiesByName["PTag unknown13"].GetCompiledValue() == 1;
                 }
                 else {
                     return false;
