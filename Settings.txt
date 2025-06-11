@@ -63,7 +63,7 @@ ViewAllowActors = {
 "Elevator":"False"
 "DynamicProp":"False"
 "WalkableProp":"False"
-"UniversalTrigger":"False"
+"UniversalTrigger":"True"
 "FloatingItem":"False"
 "PathedTurret":"False"
 "MovableProp":"False"

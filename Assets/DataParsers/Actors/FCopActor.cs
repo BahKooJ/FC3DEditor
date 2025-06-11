@@ -1480,10 +1480,34 @@ namespace FCopParser {
         public FCopBehavior14(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("28", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("29", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("30", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("31", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Unknown 1", Read1(0x02, false), BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Unknown 2", Read1(0x08, false), BitCount.Bit1),
+                new FillerActorProperty(1, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Unknown 3", Read1(0x80, false), BitCount.Bit1),
+            });
+            offset++;
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new ToggleActorProperty("Unknown 4", Read1(0x01, false), BitCount.Bit1),
+                new ToggleActorProperty("Unknown 5", Read1(0x02, false), BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+            });
+            offset++;
+
+            properties.AddRange(new List<ActorProperty>() {
+                new FillerActorProperty(Read8(2), BitCount.Bit8),
+                new FillerActorProperty(Read8(0), BitCount.Bit8),
                 new ValueActorProperty("32", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
@@ -1492,10 +1516,28 @@ namespace FCopParser {
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new ValueActorProperty("Interact Radius", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
                 new ValueActorProperty("46", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("48", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("49", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("50", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16)
 
+            });
+
+            properties.AddRange(new List<ActorProperty>() {
+
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Enabled", Read1(0x02, false), BitCount.Bit1),
+                new ToggleActorProperty("Trigger By Action", Read1(0x04, false), BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new ToggleActorProperty("Unknown 8", Read1(0x10, false), BitCount.Bit1),
+                new ToggleActorProperty("Unknown 9", Read1(0x20, false), BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+                new FillerActorProperty(0, BitCount.Bit1),
+            });
+            offset++;
+
+            properties.AddRange(new List<ActorProperty>() {
+                new EnumDataActorProperty("Trigger Type", (TriggerType)Read8(1), BitCount.Bit8, "", new() { "OverloadTrigger" }),
+                new OverloadedProperty("OverloadTrigger", new() {
+                    (new EnumDataActorProperty("Triggering Behavior", (ActorBehavior)Read16NoIt(0), BitCount.Bit16), () => (TriggerType)propertiesByName["Trigger Type"].GetCompiledValue() == TriggerType.BehaviorType),
+                    (new AssetActorProperty("Triggering Actor", Read16(0), AssetType.Actor, BitCount.Bit16), () => (TriggerType)propertiesByName["Trigger Type"].GetCompiledValue() == TriggerType.Actor),
+                }, BitCount.Bit16),
             });
 
             InitPropertiesByName();

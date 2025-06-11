@@ -58,6 +58,22 @@ public class ActorScriptCallItemView : MonoBehaviour {
 
     }
 
+    void EditScript(int index) {
+
+        var existingScriptingPanel = FindAnyObjectByType<ScriptingPanelView>();
+
+        if (existingScriptingPanel != null) {
+            Destroy(existingScriptingPanel.gameObject);
+        }
+
+        var obj = Instantiate(controller.main.scriptingPanelPrefab, controller.main.canvas.transform, false);
+
+        var scriptingPanel = obj.GetComponent<ScriptingPanelView>();
+        scriptingPanel.level = controller.main.level;
+        scriptingPanel.SelectScript(actor.rawFile.rpnsReferences[index]);
+
+    }
+
     public void OnClickRPNSRef1() {
         SelectScript(0);
     }
@@ -69,7 +85,18 @@ public class ActorScriptCallItemView : MonoBehaviour {
 
     public void OnClickRPNSRef3() {
         SelectScript(2);
+    }
 
+    public void OnClickEditRPNSRef1() {
+        EditScript(0);
+    }
+
+    public void OnClickEditRPNSRef2() {
+        EditScript(1);
+    }
+
+    public void OnClickEditRPNSRef3() {
+        EditScript(2);
     }
 
 }

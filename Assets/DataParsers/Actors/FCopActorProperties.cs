@@ -750,4 +750,9 @@ namespace FCopParser {
 
     }
 
+    public enum TriggerType {
+        BehaviorType = 1,
+        Actor = 2
+    }
+
 }
