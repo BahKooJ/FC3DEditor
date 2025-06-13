@@ -1382,6 +1382,7 @@ namespace FCopParser {
             PlayEffect = 100,
             Unknown101 = 101,
             Unknown110 = 110,
+            ScriptEnable = 122,
             EnableTrigger = 124,
 
         }
@@ -1414,6 +1415,9 @@ namespace FCopParser {
             { typeof(FCopBehavior10), new() {
                 ActorMethod.MoveElevator,
                 ActorMethod.SetMovingElevator
+            } },
+            { typeof(FCopBehavior14), new() {
+                ActorMethod.ScriptEnable
             } },
             { typeof(FCopBehavior25), new() {
                 ActorMethod.MoveProp
@@ -1467,6 +1471,7 @@ namespace FCopParser {
             { 100, new() { new ScriptParameter("Unknown", ScriptDataType.Int) } },
             { 101, new() { new ScriptParameter("Unknown", ScriptDataType.Int) } },
             { 110, new() { new ScriptParameter("Unknown", ScriptDataType.Int) } },
+            { 122, new() { new ScriptParameter("Enable Script", ScriptDataType.Bool) } },
             { 124, new() { new ScriptParameter("Enable", ScriptDataType.Bool) } },
 
         };

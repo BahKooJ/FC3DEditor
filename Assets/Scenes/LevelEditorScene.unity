@@ -2823,6 +2823,7 @@ MonoBehaviour:
   MapObjectiveNodesActor: {fileID: 1430015761629357658, guid: 5a362030122d65a4e9b68366d3028c3c, type: 3}
   TeleporterActor: {fileID: 1430015761629357658, guid: e83e15fd2a70b2d48aaeb655b554bb8a, type: 3}
   TriggerActorFab: {fileID: 1430015761629357658, guid: bf296f914accf914a981b6bf86564e44, type: 3}
+  UniversalTriggerFab: {fileID: 1430015761629357658, guid: 6e0a10c324806794e81b18e61c1ea1a2, type: 3}
   TextureActorFab: {fileID: 1640186847095666650, guid: 9aaae90836eadfe47b4457d232743dbb, type: 3}
   VisualEffectsActorFab: {fileID: 1430015761629357658, guid: fae92abb416d4d74f8044b5dee1d4db9, type: 3}
   ActorExplosionActorFab: {fileID: 1430015761629357658, guid: ceda3bd10930bac4ab5444f5aed1534e, type: 3}
@@ -2837,6 +2838,7 @@ MonoBehaviour:
   MovablePropStopFab: {fileID: 8359183669870585945, guid: d9dcd93bdc9ebc540bcf49b19958c080, type: 3}
   TeleporterLocationNodeFab: {fileID: 1430015761629357658, guid: 70e67ecf7d1f6f042b2de38a7c9005cb, type: 3}
   TriggerActorNodeFab: {fileID: 8179569107662061304, guid: 64551d37e0e33ee40828125dad5688e9, type: 3}
+  UniversalTriggerActorNodeFab: {fileID: 8179569107662061304, guid: 64d5192ad69b76a44acf3e29164d6ba1, type: 3}
   playerCamera: {fileID: 3980026059195325994, guid: fd18efa683a2f574cb71981049afecfd, type: 3}
   playModePlayer: {fileID: 7944998007720351482, guid: 810a6bf8ff8a94f42b989355eae1738a, type: 3}
   line3d: {fileID: 2980094452611837016, guid: 8dd5e36aa455bea41b061af29dbf9f7d, type: 3}

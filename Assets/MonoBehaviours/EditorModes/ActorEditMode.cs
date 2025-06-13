@@ -82,6 +82,9 @@ public class ActorEditMode : EditMode {
         GameObject nodeObject;
 
         switch (actor.behavior) {
+            case FCopBehavior14:
+                nodeObject = Object.Instantiate(main.UniversalTriggerFab);
+                break;
             case FCopBehavior29:
                 nodeObject = Object.Instantiate(main.TeleporterActor);
                 break;
@@ -675,6 +678,19 @@ public class ActorEditMode : EditMode {
 
         }
 
+        void InitUniversalTriggerNode() {
+
+            var obj = Object.Instantiate(main.UniversalTriggerActorNodeFab);
+
+            var editingNode = obj.GetComponent<UniversalTriggerActorNode>();
+            editingNode.controller = this;
+            editingNode.actor = selectedActor;
+            editingNode.actorObject = actorObjectsByID[selectedActor.DataID];
+
+            actorEditingNodes.Add(editingNode);
+
+        }
+
         switch (selectedActor.behavior) {
 
             case FCopBehavior10:
@@ -682,6 +698,9 @@ public class ActorEditMode : EditMode {
                 InitElevatorStopNode(2, (NormalizedValueProperty)selectedActor.behavior.propertiesByName["2nt Height Offset"]);
                 InitElevatorStopNode(3, (NormalizedValueProperty)selectedActor.behavior.propertiesByName["3rd Height Offset"]);
 
+                break;
+            case FCopBehavior14:
+                InitUniversalTriggerNode();
                 break;
             case FCopBehavior25:
                 InitMoveablePropStop();
@@ -703,7 +722,6 @@ public class ActorEditMode : EditMode {
                 break;
             case FCopBehavior95:
                 InitTriggerNode();
-
                 break;
 
         }

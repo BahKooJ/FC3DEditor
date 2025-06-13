@@ -95,6 +95,7 @@ public class Main : MonoBehaviour {
     public GameObject MapObjectiveNodesActor;
     public GameObject TeleporterActor;
     public GameObject TriggerActorFab;
+    public GameObject UniversalTriggerFab;
     public GameObject TextureActorFab;
     public GameObject VisualEffectsActorFab;
     public GameObject ActorExplosionActorFab;
@@ -110,6 +111,8 @@ public class Main : MonoBehaviour {
     public GameObject MovablePropStopFab;
     public GameObject TeleporterLocationNodeFab;
     public GameObject TriggerActorNodeFab;
+    public GameObject UniversalTriggerActorNodeFab;
+
 
     public GameObject playerCamera;
     public GameObject playModePlayer;

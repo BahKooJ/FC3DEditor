@@ -1508,14 +1508,14 @@ namespace FCopParser {
             properties.AddRange(new List<ActorProperty>() {
                 new FillerActorProperty(Read8(2), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
-                new ValueActorProperty("32", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new ValueActorProperty("Unknown 6", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
                 new FillerActorProperty(Read16(0), BitCount.Bit16),
-                new ValueActorProperty("Interact Radius", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("46", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new NormalizedValueProperty("Interact Radius", Read16(0), 0, short.MaxValue, 256f, BitCount.Bit16),
+                new ValueActorProperty("Unknown 7", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
 
             });
 
@@ -1525,8 +1525,8 @@ namespace FCopParser {
                 new ToggleActorProperty("Enabled", Read1(0x02, false), BitCount.Bit1),
                 new ToggleActorProperty("Trigger By Action", Read1(0x04, false), BitCount.Bit1),
                 new FillerActorProperty(0, BitCount.Bit1),
-                new ToggleActorProperty("Unknown 8", Read1(0x10, false), BitCount.Bit1),
-                new ToggleActorProperty("Unknown 9", Read1(0x20, false), BitCount.Bit1),
+                new ToggleActorProperty("Script Disable", Read1(0x10, false), BitCount.Bit1),
+                new ToggleActorProperty("Run Script Callback", Read1(0x20, false), BitCount.Bit1),
                 new FillerActorProperty(0, BitCount.Bit1),
                 new FillerActorProperty(0, BitCount.Bit1),
             });
