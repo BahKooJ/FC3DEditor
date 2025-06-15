@@ -551,7 +551,7 @@ public class Main : MonoBehaviour {
 
         FreeMove.StopLooking();
 
-        OpenFileWindowUtil.SaveFile("Output", "Mission File", path => {
+        OpenFileWindowUtil.SaveFile("C:/Program Files (x86)/Electronic Arts/Future Cop/missions", "Mission File", path => {
 
             File.WriteAllBytes(path, iffFile.bytes);
 

@@ -3,7 +3,7 @@
 using FCopParser;
 using UnityEngine;
 
-public class TeleporterLocationEditingNode : ActorEditingNode {
+public class LocationEditingNode : ActorEditingNode {
 
     // - Prefab -
     public GameObject editingNodeLine;

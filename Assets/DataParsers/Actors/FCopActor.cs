@@ -902,7 +902,7 @@ namespace FCopParser {
                 new ToggleActorProperty("Disable Player Targeting", Read1(0x02, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Disable Explosion", Read1(0x04, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Has Shadow", Read1(0x08, false), BitCount.Bit1, "Entity Tags"),
-                new ToggleActorProperty("Unknown (Scripting 3)", Read1(0x10, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Enable Thrid Callback", Read1(0x10, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Unknown (Scripting)", Read1(0x20, false), BitCount.Bit1, "Entity Tags"),
                 new FillerActorProperty(0, BitCount.Bit1),
                 new FillerActorProperty(0, BitCount.Bit1),
@@ -990,9 +990,10 @@ namespace FCopParser {
 
                 new OverloadedProperty("OverloadAttack", new() {
                     (new AssetActorProperty("Attack Team", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type"].GetCompiledValue() == TargetType.Team),
+                    (new AssetActorProperty("Attack Group", Read16NoIt(0), AssetType.ScriptGroup, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type"].GetCompiledValue() == TargetType.Group),
                     (new AssetActorProperty("Attack Actor", Read16NoIt(0), AssetType.Actor, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type"].GetCompiledValue() == TargetType.Actor),
-                    (new ValueActorProperty("S_Unknown Attack", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
-
+                    (new EnumDataActorProperty("Attack Behavior", (ActorBehavior)Read16NoIt(0), BitCount.Bit16), () => (TargetType)propertiesByName["Target Type"].GetCompiledValue() == TargetType.BehaviorType),
+                    (new ValueActorProperty("Attack", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
                 }, BitCount.Bit16, "Shooter Properties"),
 
                 new NormalizedValueProperty("Detection FOV?", Read16(4096), 0, 4096, 4096f / 360f, BitCount.Bit16, "Shooter Properties"),
@@ -1143,6 +1144,12 @@ namespace FCopParser {
 
         public FCopBehavior1(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Death",
+                "On New Second"
+            };
+
             properties.Add(new RangeActorProperty("Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16));
 
             // Implies ground cast but Future Cop won't react except with 0x01 which will crash. Leaving at default 0xFF
@@ -1177,6 +1184,12 @@ namespace FCopParser {
 
         public FCopBehavior5(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Death",
+                "On New Second"
+            };
+
             assetReferences = new ActorAssetReference[] {
                 new ActorAssetReference("Object", AssetType.Object),
                 new ActorAssetReference("Destroyed Object", AssetType.Object),
@@ -1209,6 +1222,12 @@ namespace FCopParser {
 
         public FCopBehavior6(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Death",
+                "On New Second"
+            };
+
             assetReferences = new ActorAssetReference[] {
                 new ActorAssetReference("Object", AssetType.Object),
                 new ActorAssetReference("Destroyed Object", AssetType.Object)
@@ -1230,6 +1249,12 @@ namespace FCopParser {
         public const int assetRefCount = 4;
 
         public FCopBehavior8(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Death",
+                "On New Second"
+            };
 
             assetReferences = new ActorAssetReference[] { 
                 new ActorAssetReference("Head Object", AssetType.Object, 2, 0),
@@ -1263,11 +1288,17 @@ namespace FCopParser {
     }
 
     // Observed
-    public class FCopBehavior9 : FCopShooter {
+    public class FCopBehavior9 : FCopShooter, FCopHeightOffsetting {
 
         public const int assetRefCount = 2;
 
         public FCopBehavior9(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Death",
+                "On New Second"
+            };
 
             assetReferences = new ActorAssetReference[] {
                 new ActorAssetReference("Object", AssetType.Object),
@@ -1275,29 +1306,53 @@ namespace FCopParser {
             };
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("60", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("61", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("62", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("64", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("Unknown 1", Read8(3), 1, 3, BitCount.Bit8),
+                new EnumDataActorProperty("Aircraft Target Type", (TargetType)Read8(1), BitCount.Bit8, "", new() { "OverloadAircraftAttack" }),
+
+                new OverloadedProperty("OverloadAircraftAttack", new() {
+                    (new AssetActorProperty("Aircraft Attack Team", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Aircraft Target Type"].GetCompiledValue() == TargetType.Team),
+                    (new AssetActorProperty("Aircraft Attack Group", Read16NoIt(0), AssetType.ScriptGroup, BitCount.Bit16), () => (TargetType)propertiesByName["Aircraft Target Type"].GetCompiledValue() == TargetType.Group),
+                    (new AssetActorProperty("Aircraft Attack Actor", Read16NoIt(0), AssetType.Actor, BitCount.Bit16), () => (TargetType)propertiesByName["Aircraft Target Type"].GetCompiledValue() == TargetType.Actor),
+                    (new EnumDataActorProperty("Aircraft Attack Behavior", (ActorBehavior)Read16NoIt(0), BitCount.Bit16), () => (TargetType)propertiesByName["Aircraft Target Type"].GetCompiledValue() == TargetType.BehaviorType),
+                    (new ValueActorProperty("Aircraft Attack", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
+                }, BitCount.Bit16),
+
+                new EnumDataActorProperty("Target Acquisition", (AircraftTargetAcquire)Read8(1), BitCount.Bit8),
                 new EnumDataActorProperty("Spawn Type", (AircraftSpawnType)Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Target Detection Range", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("68", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("70", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Time To Descend", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Turn Rate", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Move Speed", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Orbit Area X", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Orbit Area Y", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("84", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("86", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Spawn Pos X", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
-                new ValueActorProperty("Spawn Pos Y", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16),
+                new NormalizedValueProperty("Target Detection Range", Read16(28672), 0, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("Min Distance From Target", Read16(512), 0, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("Unknown 2", Read16(1024), 0, short.MaxValue, 1024f, BitCount.Bit16),
+                new NormalizedValueProperty("Height Offset", Read16(512), short.MinValue, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("Time To Descend", Read16(1024), 0, short.MaxValue, 1024f, BitCount.Bit16),
+                new NormalizedValueProperty("Turn Rate", Read16(4096), 0, short.MaxValue, 4096f, BitCount.Bit16),
+                new NormalizedValueProperty("Move Speed", Read16(1024), 0, short.MaxValue, 1024f, BitCount.Bit16),
+                new NormalizedValueProperty("Orbit Area Width", Read16(22528), 0, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("Orbit Area Height", Read16(22528), 0, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("Engage Time", Read16(5120), 0, short.MaxValue, 256f, BitCount.Bit16),
+                new NormalizedValueProperty("Engage Cooldown", Read16(1280), 0, short.MaxValue, 256f, BitCount.Bit16),
+                new NormalizedValueProperty("Spawn Pos X", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16),
+                new NormalizedValueProperty("Spawn Pos Y", Read16(0), 0, short.MaxValue, 16f, BitCount.Bit16),
 
             });
             
             InitPropertiesByName();
 
+        }
+
+        public void SetHeight(float height) {
+            ((NormalizedValueProperty)propertiesByName["Height Offset"]).Set(height);
+        }
+
+        public float GetHeight() {
+            return ((NormalizedValueProperty)propertiesByName["Height Offset"]).value;
+        }
+
+        public ActorProperty GetHeightProperty() {
+            return propertiesByName["Height Offset"];
+        }
+
+        public ActorGroundCast GetGroundCast() {
+            return ActorGroundCast.Highest;
         }
 
     }
@@ -1309,6 +1364,12 @@ namespace FCopParser {
         public const int blocks = 20;
 
         public FCopBehavior10(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Death",
+                "On New Second"
+            };
 
             assetReferences = new ActorAssetReference[] {
                 new ActorAssetReference("Object", AssetType.Object),
@@ -1373,6 +1434,12 @@ namespace FCopParser {
 
         public FCopBehavior11(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Death",
+                "On New Second"
+            };
+
             assetReferences = new ActorAssetReference[] {
                 new ActorAssetReference("Object", AssetType.Object),
                 new ActorAssetReference("Destroyed Object", AssetType.Object)
@@ -1428,6 +1495,12 @@ namespace FCopParser {
         public const int blocks = 12;
 
         public FCopBehavior12(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Death",
+                "On New Second"
+            };
 
             assetReferences = new ActorAssetReference[] {
                 new ActorAssetReference("Object", AssetType.Object),
@@ -1553,6 +1626,12 @@ namespace FCopParser {
 
         public FCopBehavior16(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Claim",
+                "On New Second"
+            };
+
             assetReferences = new ActorAssetReference[] {
                 new ActorAssetReference("Object", AssetType.Object),
                 new ActorAssetReference("None", AssetType.None)
@@ -1626,6 +1705,12 @@ namespace FCopParser {
 
         public FCopBehavior20(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Death",
+                "On New Second"
+            };
+
             assetReferences = new ActorAssetReference[] {
                 new ActorAssetReference("Base Object", AssetType.Object),
                 new ActorAssetReference("Destroyed Object", AssetType.Object),
@@ -1685,6 +1770,12 @@ namespace FCopParser {
         public const int blocks = 16;
 
         public FCopBehavior25(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Death",
+                "On New Second"
+            };
 
             assetReferences = new ActorAssetReference[] {
                 new ActorAssetReference("Object", AssetType.Object),
@@ -1759,6 +1850,12 @@ namespace FCopParser {
 
         public FCopBehavior26(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Death",
+                "On New Second"
+            };
+
             properties.AddRange(new List<ActorProperty>() {
 
                 new ValueActorProperty("80", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
@@ -1782,6 +1879,12 @@ namespace FCopParser {
     public class FCopBehavior27 : FCopShooter {
 
         public FCopBehavior27(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Death",
+                "On New Second"
+            };
 
             properties.AddRange(new List<ActorProperty>() {
 
@@ -1820,6 +1923,12 @@ namespace FCopParser {
         public const int assetRefCount = 7;
 
         public FCopBehavior28(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Death",
+                "On New Second"
+            };
 
             assetReferences = new ActorAssetReference[] {
                 new ActorAssetReference("Base Object", AssetType.Object),
@@ -2087,6 +2196,12 @@ namespace FCopParser {
 
         public FCopBehavior29(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
+            callbackNames = new string[] {
+                "On Teleport",
+                "None",
+                "On New Second"
+            };
+
             assetReferences = new ActorAssetReference[] {
                 new ActorAssetReference("None", AssetType.None),
                 new ActorAssetReference("None", AssetType.None)
@@ -2120,6 +2235,12 @@ namespace FCopParser {
     public class FCopBehavior30 : FCopTurret {
 
         public FCopBehavior30(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Death",
+                "On New Second"
+            };
 
             assetReferences = new ActorAssetReference[] {
                 new ActorAssetReference("Object 1", AssetType.Object),
@@ -2173,6 +2294,12 @@ namespace FCopParser {
         public const int assetRefCount = 3;
 
         public FCopBehavior32(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Death",
+                "On Interact"
+            };
 
             assetReferences = new ActorAssetReference[] {
                 new ActorAssetReference("Base Object", AssetType.Object),
@@ -2408,6 +2535,12 @@ namespace FCopParser {
     public class FCopBehavior36 : FCopBehavior8 {
 
         public FCopBehavior36(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            callbackNames = new string[] {
+                "On Hurt",
+                "On Death",
+                "On Interact"
+            };
 
             properties.AddRange(new List<ActorProperty>() {
                 new AssetActorProperty("1st Interact Team", Read8(0), AssetType.Team, BitCount.Bit8),
@@ -2935,6 +3068,12 @@ namespace FCopParser {
         public const int assetRefCount = 1;
 
         public FCopBehavior95(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
+
+            callbackNames = new string[] {
+                "On Trigger",
+                "None",
+                "None"
+            };
 
             assetReferences = new ActorAssetReference[] {
                 new ActorAssetReference("None", AssetType.None)

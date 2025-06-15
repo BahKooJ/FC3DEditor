@@ -228,7 +228,7 @@ public class ActorPropertiesView : MonoBehaviour {
 
     }
 
-    public void JumpToPropety(ActorProperty property) {
+    public void JumpToPropety(ActorProperty property, bool hasSpawningProperties) {
 
         foreach (var group in initedGroups) {
 
@@ -260,7 +260,9 @@ public class ActorPropertiesView : MonoBehaviour {
 
         if (propertyView == null) { return; }
 
-        var normalizedPos = ((decimal)propertyView.transform.GetSiblingIndex()) / ((decimal)propertyView.transform.parent.childCount - 0);
+        var buffer = hasSpawningProperties ? 4 : 0;
+
+        var normalizedPos = ((decimal)propertyView.transform.GetSiblingIndex()) / ((decimal)propertyView.transform.parent.childCount + buffer);
 
         contentScrollview.verticalNormalizedPosition = (float)(1 - normalizedPos);
 

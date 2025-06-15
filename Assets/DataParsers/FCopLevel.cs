@@ -1231,6 +1231,10 @@ namespace FCopParser {
             if (globalData != null) {
                 audio.globalSoundEffects.AddRange(globalData.soundEffects);
             }
+
+            if (sceneActors.teams.Count == 0) {
+                sceneActors.FindTeams();
+            }
         }
 
     }

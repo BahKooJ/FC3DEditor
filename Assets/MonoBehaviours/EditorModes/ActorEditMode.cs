@@ -407,8 +407,8 @@ public class ActorEditMode : EditMode {
             //}
             var actors = main.level.sceneActors.actors.Where(a => {
 
-                if (a.behavior is FCopPathedEntity e) {
-                    return e.propertiesByName["PTag unknown13"].GetCompiledValue() == 1;
+                if (a.behavior is FCopEntity e) {
+                    return e.propertiesByName["Unknown (Scripting)"].GetCompiledValue() == 1;
                 }
                 else {
                     return false;
@@ -646,11 +646,11 @@ public class ActorEditMode : EditMode {
 
         }
 
-        void InitTeleporterNode(NormalizedValueProperty propX, NormalizedValueProperty propY) {
+        void InitLocationNode(NormalizedValueProperty propX, NormalizedValueProperty propY) {
 
             var obj = Object.Instantiate(main.TeleporterLocationNodeFab);
 
-            var editingNode = obj.GetComponent<TeleporterLocationEditingNode>();
+            var editingNode = obj.GetComponent<LocationEditingNode>();
             editingNode.controller = this;
             editingNode.actor = selectedActor;
             editingNode.controlledProperties = new() {
@@ -693,6 +693,9 @@ public class ActorEditMode : EditMode {
 
         switch (selectedActor.behavior) {
 
+            case FCopBehavior9:
+                InitLocationNode((NormalizedValueProperty)selectedActor.behavior.propertiesByName["Spawn Pos X"], (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Spawn Pos Y"]);
+                break;
             case FCopBehavior10:
 
                 InitElevatorStopNode(2, (NormalizedValueProperty)selectedActor.behavior.propertiesByName["2nt Height Offset"]);
@@ -706,7 +709,7 @@ public class ActorEditMode : EditMode {
                 InitMoveablePropStop();
                 break;
             case FCopBehavior29:
-                InitTeleporterNode((NormalizedValueProperty)selectedActor.behavior.propertiesByName["X"], (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Y"]);
+                InitLocationNode((NormalizedValueProperty)selectedActor.behavior.propertiesByName["X"], (NormalizedValueProperty)selectedActor.behavior.propertiesByName["Y"]);
                 break;
             case FCopBehavior35:
 
@@ -771,7 +774,7 @@ public class ActorEditMode : EditMode {
         };
 
         selectedActorEditingNode = script;
-        view.activeActorPropertiesView.JumpToPropety(node.controlledProperties[0]);
+        view.activeActorPropertiesView.JumpToPropety(node.controlledProperties[0], selectedActor.spawningProperties != null);
         foreach (var prop in node.controlledProperties) {
             view.activeActorPropertiesView.HighlightProperty(prop);
         }

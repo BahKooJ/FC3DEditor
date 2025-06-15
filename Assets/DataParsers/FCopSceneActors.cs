@@ -529,27 +529,33 @@ namespace FCopParser {
 
         public int AddTeam() {
 
-            int newID = -1;
+            int newID = 1;
+            int previousID = 1;
 
-            var teamsByAscending = teams.OrderBy(t => t.Key).ToList();
+            if (teams.Count > 0) {
 
-            var previousID = teamsByAscending[0].Key;
-            foreach (var team in teamsByAscending) {
+                var teamsByAscending = teams.OrderBy(t => t.Key).ToList();
 
-                if (team.Key == previousID + 1 || team.Key == previousID) {
-                    previousID = team.Key;
-                    continue;
+                previousID = teamsByAscending[0].Key;
+
+                foreach (var team in teamsByAscending) {
+
+                    if (team.Key == previousID + 1 || team.Key == previousID) {
+                        previousID = team.Key;
+                        continue;
+                    }
+                    else {
+                        newID = previousID + 1;
+                        break;
+                    }
+
                 }
-                else {
-                    newID = previousID + 1;
-                    break;
+
+                if (newID == 1) {
+
+                    newID = teamsByAscending.Last().Key + 1;
+
                 }
-
-            }
-
-            if (newID == -1) {
-
-                newID = teamsByAscending.Last().Key + 1;
 
             }
 

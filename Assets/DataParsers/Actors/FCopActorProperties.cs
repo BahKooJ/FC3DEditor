@@ -660,10 +660,10 @@ namespace FCopParser {
     }
 
     public enum TargetType {
-        ShootNoTarget = 0,
-        PlayerOnly = 1,
+        NoTarget = 0,
+        BehaviorType = 1,
         Actor = 2,
-        NoTarget = 3,
+        Group = 3,
         Team = 4
     }
 
@@ -753,6 +753,12 @@ namespace FCopParser {
     public enum TriggerType {
         BehaviorType = 1,
         Actor = 2
+    }
+
+    public enum AircraftTargetAcquire {
+        First = 0,
+        Priority = 1,
+        Closest = 2
     }
 
 }
