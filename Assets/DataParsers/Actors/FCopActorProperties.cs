@@ -330,6 +330,36 @@ namespace FCopParser {
 
     }
 
+    public class ImpactActorProperty : ActorProperty {
+        public string name { get; set; }
+        public BitCount bitCount { get; set; }
+        public string commonName { get; set; }
+        public List<string> dictatesOverload { get; set; }
+
+        public int GetCompiledValue() {
+            return id;
+        }
+
+        public void SetCompiledValue(int value) {
+            this.id = value;
+        }
+
+        public int id;
+
+        public ImpactActorProperty(string name, int id, BitCount bitCount) {
+            this.name = name;
+            this.id = id;
+            this.bitCount = bitCount;
+            this.commonName = "";
+
+        }
+
+        public ImpactActorProperty(string name, int id, BitCount bitCount, string commonName) : this(name, id, bitCount) {
+            this.commonName = commonName;
+        }
+
+    }
+
     public class SpecializedActorRefActorProperty : ActorProperty {
 
         public string name { get; set; }
@@ -482,7 +512,57 @@ namespace FCopParser {
             {110, "Dynamic Infantry Death"},
         };
 
+        public static Dictionary<int, string> globalWeaponImpacts = new() {
+            {2, "Tiny Diamond"},
+            {4, "Small Red-White Circle"},
+            {5, "Sparks"},
+            {6, "Persisting Small Red Circle"},
+            {9, "Medium Orange Circle"},
+            {11, "Large Spread Sparks"},
+            {12, "Green Diamond Shockwave"},
+            {13, "Medium Green Circle"},
+            {15, "Complex Green Impact With Sparks"},
+            {17, "Medium Blue Circle"},
+            {19, "Sparks With Orange Circle"},
+            {29, "Persisting Steam"},
+            {30, "Steam"},
+            {33, "Persisting Small Sparks"},
+            {34, "Complex Green Impact"},
+            {35, "Persisting Solid Circle"},
+            {37, "Small Sparks"},
+            {39, "Tiny Blue Diamond"},
+            {40, "Blue Flash Medium Circle"},
+            {41, "Medium Red Circle"},
+            {42, "Blue-Red Flash Medium Circle"},
+            {43, "Large Yellow Circle With Sparks"},
+            {44, "Persisting Large Sparks"},
+            {45, "Red Flash With Sparks"},
+            {46, "Red Flash"},
+            {62, "Persisting Very Large Red Circle"},
+            {63, "Large Shockwaves"},
+            {64, "Large Shockwaves With Large Red Circle"},
+            {65, "Persisting Very Large Red Circle With Sparks"},
+            {66, "Persisting Large White Circle"},
+            {68, "Flash Large Shockwaves"},
+            {77, "Slow Shockwaves"},
+            {79, "Large Volume Shockwaves With Pink Star"},
+            {80, "Large Volume Shockwaves With Blue Star"},
+            {81, "Large Blue Star With Sparks"},
+            {83, "Drop Flames"},
+            {85, "Small Red Flash"},
+            {87, "Large Sparking Star"},
+            {88, "Persisting Large Red Circle With Sparks"},
+            {89, "Persisting Large Sparks"},
+            {90, "Single Shockwave"},
+            {92, "Drop"},
+            {97, "Blood"},
+            {155, "Persisting Flame Explosion"},
+            {156, "Persisting Smoke Explosion"},
+            {160, "Large White Explosion"},
+        };
+
     }
+
 
     public enum BitCount {
         NA = -1,

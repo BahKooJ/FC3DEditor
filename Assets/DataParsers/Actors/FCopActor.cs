@@ -3347,12 +3347,11 @@ namespace FCopParser {
                     (new ValueActorProperty("Unknown 52", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
                 }, BitCount.Bit16),
 
-                new ValueActorProperty("Impact Effect", Read8(0), 0, 255, BitCount.Bit8),
+                new ImpactActorProperty("Impact Effect", Read8(0), BitCount.Bit8),
                 new ValueActorProperty("Weapon Effects", Read8(0), 0, 255, BitCount.Bit8),
-                //new AssetActorProperty("Shoot Sound", Read8(0), AssetType.WavSound, BitCount.Bit8),
-                new ValueActorProperty("Shoot Sound", Read8(0), 0, 255, BitCount.Bit8),
+                new AssetActorProperty("Shoot Sound", Read8(0), AssetType.WavSound, BitCount.Bit8),
                 new ValueActorProperty("Unknown 57", Read8(0), 0, 255, BitCount.Bit8),
-                new ValueActorProperty("Echo Sound", Read8(0), 0, 255, BitCount.Bit8),
+                new AssetActorProperty("Echo Sound", Read8(0), AssetType.WavSound, BitCount.Bit8),
                 new ValueActorProperty("Unknown 59", Read8(0), 0, 255, BitCount.Bit8),
             });
 
