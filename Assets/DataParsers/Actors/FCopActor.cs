@@ -3348,7 +3348,7 @@ namespace FCopParser {
                 }, BitCount.Bit16),
 
                 new ImpactActorProperty("Impact Effect", Read8(0), BitCount.Bit8),
-                new ValueActorProperty("Weapon Effects", Read8(0), 0, 255, BitCount.Bit8),
+                new ImpactActorProperty("Weapon Effects", Read8(0), BitCount.Bit8),
                 new AssetActorProperty("Shoot Sound", Read8(0), AssetType.WavSound, BitCount.Bit8),
                 new ValueActorProperty("Unknown 57", Read8(0), 0, 255, BitCount.Bit8),
                 new AssetActorProperty("Echo Sound", Read8(0), AssetType.WavSound, BitCount.Bit8),

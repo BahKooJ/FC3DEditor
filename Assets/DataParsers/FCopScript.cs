@@ -1298,6 +1298,17 @@ namespace FCopParser {
         }
 
         public override ScriptNode Clone() {
+
+            for (var i = 0; i < parameterData.Count; i++) {
+
+                if (FCopScript.varDataTypes.Contains(parameterData[i].dataType)) {
+                    var data = parameterData[i];
+                    data.dataType = VariableNode.VarTypeToDataType(varNode.varibleType);
+                    parameterData[i] = data;
+                }
+
+            }
+            
             var baseClone = base.Clone();
 
             var cloneNode = new VariableAssignmentNode(byteCode, name, defaultReturnType, new(parameterData), baseClone.parameters, reversed);

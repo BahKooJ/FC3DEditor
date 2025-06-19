@@ -63,7 +63,7 @@ ViewAllowActors = {
 "Elevator":"False"
 "DynamicProp":"False"
 "WalkableProp":"False"
-"UniversalTrigger":"True"
+"UniversalTrigger":"False"
 "FloatingItem":"False"
 "PathedTurret":"False"
 "MovableProp":"False"
@@ -91,7 +91,7 @@ ViewAllowActors = {
 "Trigger":"False"
 "StaticProp":"False"
 "Texture":"False"
-"Weapon":"False"
+"Weapon":"True"
 "PlayerWeapon":"False"
 }
 RenderMode = "Pixelated";

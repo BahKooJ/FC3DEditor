@@ -58,6 +58,11 @@ namespace FCopParser {
                 var runConditionNestingNode = new ScriptNestingNode(ByteCode.RUN, "Run", ScriptDataType.Void, new() { new ScriptParameter("", ScriptDataType.Bool) }, new() { runCondition.code[0] });
 
                 runConditionNestingNode.nestedNodes = code.code;
+
+                foreach (var line in code.code) {
+                    line.parent = runConditionNestingNode;
+                }
+
                 code.code = new() { runConditionNestingNode };
                 code.name = "Function " + i2;
                 item.code = code;
@@ -107,6 +112,11 @@ namespace FCopParser {
                 var runConditionNestingNode = new ScriptNestingNode(ByteCode.RUN, "Run", ScriptDataType.Void, new() { new ScriptParameter("", ScriptDataType.Bool) }, new() { runScript.code[0] });
 
                 runConditionNestingNode.nestedNodes = script.code;
+
+                foreach (var line in script.code) {
+                    line.parent = runConditionNestingNode;
+                }
+
                 script.code = new() { runConditionNestingNode };
                 script.name = name;
                 script.comment = comment;

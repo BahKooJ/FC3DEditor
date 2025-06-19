@@ -257,6 +257,7 @@ MonoBehaviour:
   view: {fileID: 0}
   defaultColor: {r: 0.13333334, g: 0.13333334, b: 0.13333334, a: 1}
   impactPicker: {fileID: 7133951728893125215, guid: bd484f64d0a173b4ea79664309a010dd, type: 3}
+  weaponEffectsPicker: {fileID: 7133951728893125215, guid: 0b82259f9fdbfea41b5a72edd8fb618f, type: 3}
   nameText: {fileID: 9036803018902790301}
   impactNameText: {fileID: 7776379842707760629}
 --- !u!1 &4829722383575995985
