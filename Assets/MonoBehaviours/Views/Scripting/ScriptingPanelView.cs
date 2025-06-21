@@ -185,8 +185,8 @@ public class ScriptingPanelView : MonoBehaviour {
 
     public void OnClickVariableTab() {
 
-        scriptingWindow.gameObject.SetActive(false);
-        variableManagerView.gameObject.SetActive(true);
+        scriptingWindow.gameObject.SetActive(variableManagerView.gameObject.activeSelf);
+        variableManagerView.gameObject.SetActive(!variableManagerView.gameObject.activeSelf);
 
     }
 
@@ -196,6 +196,16 @@ public class ScriptingPanelView : MonoBehaviour {
             level.scripting.rpns.AddScript();
 
             var selector = AddScriptSelector(level.scripting.rpns.code[0]);
+
+            selector.transform.SetSiblingIndex(0);
+            selector.Rename();
+
+        }
+        else {
+
+            level.scripting.functionParser.AddFunc();
+
+            var selector = AddScriptSelector(level.scripting.functionParser.functions[0].code);
 
             selector.transform.SetSiblingIndex(0);
             selector.Rename();

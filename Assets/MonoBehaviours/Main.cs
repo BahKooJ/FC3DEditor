@@ -393,6 +393,7 @@ public class Main : MonoBehaviour {
 
         TextureEditMode.openUVMapperByDefault = true;
 
+        FCopScriptingProject.ClearVars();
 
     }
 

@@ -130,7 +130,8 @@ public class MovablePropStop : ActorEditingNode {
                 if (objectMesh != null) {
                     var objRot = objectMesh.transform.localRotation.eulerAngles;
 
-                    objRot.x = rotationOffset.value + rotation.value;
+                    objRot.y = rotation.value;
+                    objRot.x = -rotationOffset.value;
 
                     objectMesh.transform.localRotation = Quaternion.Euler(objRot);
                 }
@@ -139,7 +140,8 @@ public class MovablePropStop : ActorEditingNode {
                 if (objectMesh != null) {
                     var objRot = objectMesh.transform.localRotation.eulerAngles;
 
-                    objRot.z = rotationOffset.value + rotation.value;
+                    objRot.y = rotation.value;
+                    objRot.z = -rotationOffset.value;
 
                     objectMesh.transform.localRotation = Quaternion.Euler(objRot);
                 }

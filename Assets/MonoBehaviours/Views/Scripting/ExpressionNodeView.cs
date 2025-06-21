@@ -146,6 +146,8 @@ public class ExpressionNodeView : MonoBehaviour {
 
         }
 
+        if (scriptNode == null) return;
+
         if (scriptNode.ReturnType() == ScriptDataType.Void) return;
         if (!parameterNode.acceptsExpression) return;
 

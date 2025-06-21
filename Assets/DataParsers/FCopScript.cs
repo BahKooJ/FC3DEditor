@@ -89,6 +89,31 @@ namespace FCopParser {
 
         }
 
+        public static void ClearVars() {
+
+            userVariables = new();
+
+            timerVariables = new() {
+            { 0, new ScriptVariable("Timer Var 0", 0, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 0") },
+            { 1, new ScriptVariable("Timer Var 1", 1, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 1") },
+            { 2, new ScriptVariable("Timer Var 2", 2, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 2") },
+            { 3, new ScriptVariable("Timer Var 3", 3, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 3") },
+            { 4, new ScriptVariable("Timer Var 4", 4, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 4") },
+            { 5, new ScriptVariable("Timer Var 5", 5, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 5") },
+            { 6, new ScriptVariable("Timer Var 6", 6, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 6") },
+            { 7, new ScriptVariable("Timer Var 7", 7, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 7") },
+            { 8, new ScriptVariable("Timer Var 8", 8, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 8") },
+            { 9, new ScriptVariable("Timer Var 9", 9, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 9") },
+            { 10, new ScriptVariable("Timer Var 10", 10, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 10") },
+            { 11, new ScriptVariable("Timer Var 11", 11, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 11") },
+            { 12, new ScriptVariable("Timer Var 12", 12, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 12") },
+            { 13, new ScriptVariable("Timer Var 13", 13, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 13") },
+            { 14, new ScriptVariable("Timer Var 14", 14, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 14") },
+            { 15, new ScriptVariable("Timer Var 15", 15, ScriptVariableType.Timer, ScriptDataType.Int, "Timer Variable 15") },
+            };
+
+        }
+
         public FCopRPNS rpns;
         public FCopFunctionParser functionParser;
         public int emptyOffset;

@@ -165,7 +165,7 @@ public class ActorSpawningPropertiesItemView : MonoBehaviour {
             }
             catch { }
 
-            respawnTimerField.text = actor.spawningProperties.maxActiveActors.ToString();
+            maxActiveActorsField.text = actor.spawningProperties.maxActiveActors.ToString();
 
         }
 

@@ -130,6 +130,17 @@ namespace FCopParser {
 
         }
 
+        public void AddFunc() {
+
+            var code = new FCopScript(0);
+            code.name = "Function";
+            code.code.Add(new ScriptNestingNode(ByteCode.RUN, "Run", ScriptDataType.Void, new() { new ScriptParameter("", ScriptDataType.Bool) }, new() { new LiteralNode(0) }));
+
+            var newFunc = new FCopFunction(-1, 55, code);
+            functions.Insert(0, newFunc);
+
+        }
+
         public IFFDataFile Compile() {
 
             var total = new List<byte>();

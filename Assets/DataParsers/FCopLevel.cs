@@ -808,6 +808,56 @@ namespace FCopParser {
 
             #endregion
 
+            #region Scripting Groups
+
+            var scriptGroupData = new List<byte>();
+
+            foreach (var group in sceneActors.scriptGroup) {
+
+                scriptGroupData.AddRange(BitConverter.GetBytes(group.Value.Count()));
+                scriptGroupData.AddRange(Encoding.ASCII.GetBytes(group.Value));
+                scriptGroupData.AddRange(BitConverter.GetBytes(group.Key));
+
+            }
+
+            total.AddRange(Encoding.ASCII.GetBytes("SCRGROUP"));
+            total.AddRange(BitConverter.GetBytes(scriptGroupData.Count + 16));
+            total.AddRange(BitConverter.GetBytes(sceneActors.scriptGroup.Count()));
+            total.AddRange(scriptGroupData);
+
+            #endregion
+
+            #region Variables
+
+            var varData = new List<byte>();
+
+            foreach (var var in FCopScriptingProject.userVariables) {
+                varData.AddRange(BitConverter.GetBytes(var.Value.id));
+                varData.AddRange(BitConverter.GetBytes(var.Value.name.Length));
+                varData.AddRange(Encoding.ASCII.GetBytes(var.Value.name));
+                varData.AddRange(BitConverter.GetBytes((int)var.Value.varibleType));
+                varData.AddRange(BitConverter.GetBytes((int)var.Value.dataType));
+                varData.AddRange(BitConverter.GetBytes(var.Value.description.Length));
+                varData.AddRange(Encoding.ASCII.GetBytes(var.Value.description));
+            }
+
+            foreach (var var in FCopScriptingProject.timerVariables) {
+                varData.AddRange(BitConverter.GetBytes(var.Value.id));
+                varData.AddRange(BitConverter.GetBytes(var.Value.name.Length));
+                varData.AddRange(Encoding.ASCII.GetBytes(var.Value.name));
+                varData.AddRange(BitConverter.GetBytes((int)var.Value.varibleType));
+                varData.AddRange(BitConverter.GetBytes((int)var.Value.dataType));
+                varData.AddRange(BitConverter.GetBytes(var.Value.description.Length));
+                varData.AddRange(Encoding.ASCII.GetBytes(var.Value.description));
+            }
+
+            total.AddRange(Encoding.ASCII.GetBytes("VARIABLE"));
+            total.AddRange(BitConverter.GetBytes(varData.Count + 16));
+            total.AddRange(BitConverter.GetBytes(FCopScriptingProject.userVariables.Count + FCopScriptingProject.timerVariables.Count));
+            total.AddRange(varData);
+
+            #endregion
+
             #region Texture Snippets
 
             var tSnippetData = new List<byte>();
@@ -901,7 +951,9 @@ namespace FCopParser {
             List<IFFDataFile> rawCwavs = new();
             IFFDataFile rawCshd = null;
             List<ActorGroup> actorGroups = new();
+            List<ScriptVariable> variables = new();
             Dictionary<int, string> teams = new();
+            Dictionary<int, string> scriptGroups = new();
             FCopRPNS rpns = null;
             FCopFunctionParser funParser = null;
 
@@ -1117,6 +1169,36 @@ namespace FCopParser {
                     }
 
                 }
+                else if (eightCC == "VARIABLE") {
+
+                    i += 8;
+                    var totalSize = BitConverter.ToInt32(dataArray, i);
+                    i += 4;
+                    var varCount = BitConverter.ToInt32(dataArray, i);
+                    i += 4;
+
+                    foreach (var v in Enumerable.Range(0, varCount)) {
+
+                        var id = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+                        var nameSize = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+                        var name = Encoding.ASCII.GetString(data.GetRange(i, nameSize).ToArray());
+                        i += nameSize;
+                        var varType = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+                        var dataType = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+                        var desSize = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+                        var description = Encoding.ASCII.GetString(data.GetRange(i, desSize).ToArray());
+                        i += desSize;
+
+                        variables.Add(new ScriptVariable(name, id, (ScriptVariableType)varType, (ScriptDataType)dataType, description));
+
+                    }
+
+                }
                 else if (eightCC == "ACTTEAMS") {
 
                     i += 8;
@@ -1171,6 +1253,28 @@ namespace FCopParser {
                     }
 
                 }
+                else if (eightCC == "SCRGROUP") {
+
+                    i += 8;
+                    var totalSize = BitConverter.ToInt32(dataArray, i);
+                    i += 4;
+                    var groupCount = BitConverter.ToInt32(dataArray, i);
+                    i += 4;
+
+                    foreach (var t in Enumerable.Range(0, groupCount)) {
+
+                        var nameSize = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+                        var name = Encoding.ASCII.GetString(data.GetRange(i, nameSize).ToArray());
+                        i += nameSize;
+                        var id = BitConverter.ToInt32(dataArray, i);
+                        i += 4;
+
+                        scriptGroups[id] = name;
+
+                    }
+
+                }
                 else if (eightCC == "SCPTRPNS") {
 
                     i += 8;
@@ -1214,18 +1318,33 @@ namespace FCopParser {
             if (actorGroups.Count != 0) {
                 sceneActors.SetPositionalGroup(actorGroups);
             }
+
             if (teams.Count != 0) {
-                sceneActors.FindTeams();
-            }
-            else {
                 sceneActors.teams = teams;
             }
+
+            if (scriptGroups.Count != 0) {
+                sceneActors.scriptGroup = scriptGroups;
+            }
+
             this.navMeshes = navMeshes;
             this.objects = objects;
             this.textures = textures;
             this.textureSnippets = texturesSnippets;
 
             scripting = new FCopScriptingProject(rpns, funParser);
+
+            foreach (var var in variables) {
+
+                if (var.varibleType == ScriptVariableType.User) {
+                    FCopScriptingProject.userVariables[var.id] = var;
+                }
+
+                if (var.varibleType == ScriptVariableType.Timer) {
+                    FCopScriptingProject.timerVariables[var.id] = var;
+                }
+
+            }
 
             audio = new FCopAudioParser(rawCwavs, rawCshd, fileManager.subFiles, newFileManager.music);
             if (globalData != null) {

@@ -1637,7 +1637,7 @@ RectTransform:
   - {fileID: 1205012585502856970}
   - {fileID: 840826150130612271}
   m_Father: {fileID: 4073439553773917587}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
@@ -1901,8 +1901,8 @@ RectTransform:
   - {fileID: 8478458916256850512}
   - {fileID: 4739892409603679304}
   - {fileID: 3582852733735318974}
-  - {fileID: 5349092144502964806}
   - {fileID: 1235723712356433324}
+  - {fileID: 5349092144502964806}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1963,7 +1963,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scriptListContent: {fileID: 8630534303278027532}
   scriptingWindow: {fileID: 7723221786156386216}
-  funcScriptingWindow: {fileID: 0}
   variableManagerView: {fileID: 9163219711800939258}
   funcDataView: {fileID: 3047320750605429480}
   ScriptListItem: {fileID: 7265295910534662172}
@@ -4036,7 +4035,7 @@ RectTransform:
   m_Children:
   - {fileID: 7038291332654929690}
   m_Father: {fileID: 4073439553773917587}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -4945,7 +4944,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -5330,7 +5329,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -9707,7 +9706,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 630897276203883294, guid: 4c36a30fa36db4f4b89a5b5fbf2ffb91, type: 3}
       propertyPath: m_Size
-      value: 0.50714636
+      value: 0.5047053
       objectReference: {fileID: 0}
     - target: {fileID: 1250400484849478509, guid: 4c36a30fa36db4f4b89a5b5fbf2ffb91, type: 3}
       propertyPath: m_AnchorMax.y
