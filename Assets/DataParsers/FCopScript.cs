@@ -252,7 +252,7 @@ namespace FCopParser {
             { ByteCode.RANDOM, 1 },
             { ByteCode.QUEUE_STREAM, 1 },
             { ByteCode.PLAY_STREAM, 1 },
-            { ByteCode.BYTE14, 1 },
+            { ByteCode.PLAY_STREAM_ON_ACT, 1 },
             { ByteCode.BYTE15, 1 },
             { ByteCode.GET_16, 1 },
             { ByteCode.GET_17, 1 },
@@ -301,13 +301,13 @@ namespace FCopParser {
                 new ScriptOperationData("Random", ScriptDataType.Int, new() { new ScriptParameter("Range", ScriptDataType.Int) })
             },
             { new ScriptDataKey(ByteCode.QUEUE_STREAM, 1),
-                new ScriptOperationData("Queue Stream", ScriptDataType.Void, new() { new ScriptParameter("Stream Index", ScriptDataType.Int) })
+                new ScriptOperationData("Queue Stream", ScriptDataType.Void, new() { new ScriptParameter("", ScriptDataType.Stream) })
             },
             { new ScriptDataKey(ByteCode.PLAY_STREAM, 1),
-                new ScriptOperationData("Play Stream", ScriptDataType.Void, new() { new ScriptParameter("Stream Index", ScriptDataType.Int) })
+                new ScriptOperationData("Play Stream", ScriptDataType.Void, new() { new ScriptParameter("", ScriptDataType.Stream) })
             },
-            { new ScriptDataKey(ByteCode.BYTE14, 1),
-                new ScriptOperationData("14", ScriptDataType.Void, new() { new ScriptParameter("Par0", ScriptDataType.Int) })
+            { new ScriptDataKey(ByteCode.PLAY_STREAM_ON_ACT, 1),
+                new ScriptOperationData("Play Stream Actor", ScriptDataType.Void, new() { new ScriptParameter("", ScriptDataType.Stream) })
             },
             { new ScriptDataKey(ByteCode.BYTE15, 1),
                 new ScriptOperationData("Get 15", ScriptDataType.Int, new() { new ScriptParameter("ID", ScriptDataType.Int) })
@@ -824,7 +824,7 @@ namespace FCopParser {
         RANDOM = 11,
         QUEUE_STREAM = 12,
         PLAY_STREAM = 13,
-        BYTE14 = 14,
+        PLAY_STREAM_ON_ACT = 14,
         BYTE15 = 15,
         GET_16 = 16,
         GET_17 = 17,
@@ -882,7 +882,8 @@ namespace FCopParser {
         Actor,
         Group,
         Team,
-        Cnet
+        Cnet,
+        Stream
     }
 
     public enum ScriptVariableType {
@@ -1372,26 +1373,42 @@ namespace FCopParser {
 
         public enum ActorMethod {
             None = 0,
+            Unknown2 = 2,
+            Unknown7 = 7,
+            CanPath = 19,
+            Unknown22 = 22,
             EnableShooter = 30,
+            Unknown32 = 32,
+            Unknown38 = 38,
             EnableSpinning = 45,
             ChangeObject = 46,
             PlayAnimation = 50,
+            Unknown51 = 51,
+            Unknown52 = 52,
             PlaySound = 57,
             SetCollideDamage = 58,
+            SetColliding = 59,
             Hurt = 60,
             Despawn = 61,
             SetMapColor = 62,
             SetInvincibility = 63,
             SetPlayerTargeting = 64,
+            SetHealthDoNotUse = 65,
+            SetTeam = 67,
+            SetUVOffsetY = 68,
+            SetRendering = 69,
             ChangeNodeVisibility = 75,
             ChangeNodeColor = 76,
             MoveProp = 80,
             MoveElevator = 82,
             SetMovingElevator = 83,
             Unknown85 = 85,
+            Unknown86 = 86,
+            Unknown91 = 91,
             ChangeCamera = 97,
             PlayEffect = 100,
             Unknown101 = 101,
+            Unknown103 = 103,
             Unknown110 = 110,
             ScriptEnable = 122,
             EnableTrigger = 124,
@@ -1409,13 +1426,21 @@ namespace FCopParser {
                 ActorMethod.PlayAnimation,
                 ActorMethod.PlaySound,
                 ActorMethod.SetCollideDamage,
+                ActorMethod.SetColliding,
                 ActorMethod.SetMapColor,
                 ActorMethod.SetInvincibility,
                 ActorMethod.SetPlayerTargeting,
+                ActorMethod.SetHealthDoNotUse,
+                ActorMethod.SetTeam,
+                ActorMethod.SetUVOffsetY,
+                ActorMethod.SetRendering,
                 ActorMethod.PlayEffect
             } },
             { typeof(FCopShooter), new() {
                 ActorMethod.EnableShooter
+            } },
+            { typeof(FCopPathedEntity), new() {
+                ActorMethod.CanPath
             } },
             { typeof(FCopTurret), new() {
                 ActorMethod.EnableSpinning
@@ -1453,17 +1478,30 @@ namespace FCopParser {
 
         static Dictionary<int, List<ScriptParameter>> methodParamters = new() {
             { 0, new() { new ScriptParameter("Par", ScriptDataType.Any) } },
+            { 2, new() { new ScriptParameter("Par", ScriptDataType.Any) } },
+            { 7, new() { new ScriptParameter("Par", ScriptDataType.Any) } },
+            { 19, new() { new ScriptParameter("", ScriptDataType.Bool) } },
+            { 22, new() { new ScriptParameter("Par", ScriptDataType.Any) } },
             { 30, new() { new ScriptParameter("Enable", ScriptDataType.Bool) } },
+            { 32, new() { new ScriptParameter("Par", ScriptDataType.Any) } },
+            { 38, new() { new ScriptParameter("Par", ScriptDataType.Any) } },
             { 45, new() { new ScriptParameter("Enable", ScriptDataType.Bool) } },
             { 46, new() { new ScriptParameter("Change Object", ScriptDataType.Int) } },
             { 50, new() { new ScriptParameter("Animation", ScriptDataType.Int) } },
+            { 51, new() { new ScriptParameter("Unknown", ScriptDataType.Any) } },
+            { 52, new() { new ScriptParameter("Unknown", ScriptDataType.Any) } },
             { 57, new() { new ScriptParameter("Sound", ScriptDataType.Cwav) } },
             { 58, new() { new ScriptParameter("Value", ScriptDataType.Int) } },
+            { 59, new() { new ScriptParameter("Can Collide", ScriptDataType.Bool) } },
             { 60, new() { new ScriptParameter("Hurt Value", ScriptDataType.Int) } },
             { 61, new() { new ScriptParameter("", ScriptDataType.Bool) } },
             { 62, new() { new ScriptParameter("Map Color", ScriptDataType.Enum, typeof(MapIconColor)) } },
             { 63, new() { new ScriptParameter("Is Invincible", ScriptDataType.Bool) } },
             { 64, new() { new ScriptParameter("Disable Targeting", ScriptDataType.Bool) } },
+            { 65, new() { new ScriptParameter("Value (0 - 255)", ScriptDataType.Int) } },
+            { 67, new() { new ScriptParameter("Team", ScriptDataType.Team) } },
+            { 68, new() { new ScriptParameter("Offset", ScriptDataType.Int) } },
+            { 69, new() { new ScriptParameter("Does Render", ScriptDataType.Bool) } },
             { 75, new() { 
                 new ScriptParameter("Show Arrow", ScriptDataType.Bool, BitCount.Bit1, 0),
                 new ScriptParameter("Show Satellite", ScriptDataType.Bool, BitCount.Bit1, 1),
@@ -1478,9 +1516,12 @@ namespace FCopParser {
             { 82, new() { new ScriptParameter("Move Type", ScriptDataType.Enum, typeof(ElevatorMoveType)) } },
             { 83, new() { new ScriptParameter("Move", ScriptDataType.Bool) } },
             { 85, new() { new ScriptParameter("Unknown", ScriptDataType.Int) } },
+            { 86, new() { new ScriptParameter("Unknown", ScriptDataType.Int) } },
+            { 91, new() { new ScriptParameter("Unknown", ScriptDataType.Any) } },
             { 97, new() { new ScriptParameter("Camera Type", ScriptDataType.Enum, typeof(PlayerCameraType)) } },
             { 100, new() { new ScriptParameter("Unknown", ScriptDataType.Int) } },
             { 101, new() { new ScriptParameter("Unknown", ScriptDataType.Int) } },
+            { 103, new() { new ScriptParameter("Unknown", ScriptDataType.Int) } },
             { 110, new() { new ScriptParameter("Unknown", ScriptDataType.Int) } },
             { 122, new() { new ScriptParameter("Enable Script", ScriptDataType.Bool) } },
             { 124, new() { new ScriptParameter("Enable", ScriptDataType.Bool) } },

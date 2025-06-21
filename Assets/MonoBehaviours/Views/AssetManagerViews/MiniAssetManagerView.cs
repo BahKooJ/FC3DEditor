@@ -88,14 +88,14 @@ public class MiniAssetManagerView : MonoBehaviour {
                 }
 
                 break;
-            case AssetType.SndsSound:
+            case AssetType.Stream:
+                foreach (var sound in level.audio.soundStreams) {
+
+                    InitFile(sound);
+
+                }
                 break;
-            case AssetType.Music:
-                break;
-            case AssetType.MiniAnimation:
-                break;
-            case AssetType.Mixed:
-                break;
+
 
         }
 

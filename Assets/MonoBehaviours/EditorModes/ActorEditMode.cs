@@ -353,7 +353,7 @@ public class ActorEditMode : EditMode {
 
         if (Input.GetKeyDown(KeyCode.F10)) {
 
-            //var offsets = new List<int>() { 181 };
+            var offsets = new List<int>() { 499 };
 
             //void SearchScript(ScriptNode script, int offset) {
 
@@ -405,23 +405,23 @@ public class ActorEditMode : EditMode {
             //    }
 
             //}
-            var actors = main.level.sceneActors.actors.Where(a => {
-
-                if (a.behavior is FCopEntity e) {
-                    return e.propertiesByName["Unknown (Scripting)"].GetCompiledValue() == 1;
-                }
-                else {
-                    return false;
-                }
-
-            }).ToList();
-
-
             //var actors = main.level.sceneActors.actors.Where(a => {
 
-            //    return offsets.Contains(a.rawFile.rpnsReferences[0]) || offsets.Contains(a.rawFile.rpnsReferences[1]) || offsets.Contains(a.rawFile.rpnsReferences[2]);
+            //    if (a.behavior is FCopEntity e) {
+            //        return e.propertiesByName["Unknown (Scripting)"].GetCompiledValue() == 1;
+            //    }
+            //    else {
+            //        return false;
+            //    }
 
             //}).ToList();
+
+
+            var actors = main.level.sceneActors.actors.Where(a => {
+
+                return offsets.Contains(a.rawFile.rpnsReferences[0]) || offsets.Contains(a.rawFile.rpnsReferences[1]) || offsets.Contains(a.rawFile.rpnsReferences[2]);
+
+            }).ToList();
 
             //foreach (var actor in actors) {
             //    ((ToggleActorProperty)actor.behavior.propertiesByName["STag unknown4"]).value = true;

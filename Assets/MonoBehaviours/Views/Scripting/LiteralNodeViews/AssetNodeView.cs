@@ -38,6 +38,7 @@ public class AssetNodeView : ExpressionNodeView {
         assetType = parameterNode.dataType switch {
             ScriptDataType.Cwav => AssetType.WavSound,
             ScriptDataType.Cnet => AssetType.NavMesh,
+            ScriptDataType.Stream => AssetType.Stream,
             _ => AssetType.None,
         };
 
@@ -73,6 +74,17 @@ public class AssetNodeView : ExpressionNodeView {
 
                 assetIcon.sprite = navMeshIcon;
                 break;
+            case AssetType.Stream:
+
+                try {
+                    expressionText.text = main.level.audio.soundStreams[literalNode.value].name;
+                }
+                catch {
+                    NameCheck();
+                }
+
+                assetIcon.sprite = wavIconSprite;
+                break;
 
         }
 
@@ -102,6 +114,11 @@ public class AssetNodeView : ExpressionNodeView {
                 else if (asset is FCopNavMesh navMesh) {
 
                     literalNode.value = main.level.navMeshes.IndexOf(navMesh);
+
+                }
+                else if (asset is FCopStream stream) {
+
+                    literalNode.value = main.level.audio.soundStreams.IndexOf(stream);
 
                 }
                 else {
