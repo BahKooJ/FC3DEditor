@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using FCopParser;
-using System.Reflection;
 
 public abstract class SettingsManager {
 

@@ -1,6 +1,5 @@
 ﻿
 using FCopParser;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 
