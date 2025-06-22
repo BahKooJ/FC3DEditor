@@ -37,7 +37,6 @@ public class MapOpenerView : MonoBehaviour {
 
     public void OnClickPAOption() {
 
-
         selectedLevel = new FCopLevel(File.ReadAllBytes("PA Template.ncfc"));
 
         DisableOtherColors();
@@ -48,9 +47,6 @@ public class MapOpenerView : MonoBehaviour {
 
     public void OnClickEmptyOption() {
 
-        // Not supported yet
-        return;
-
         selectedLevel = new FCopLevel(File.ReadAllBytes("Empty Template.ncfc"));
 
         DisableOtherColors();
@@ -60,8 +56,6 @@ public class MapOpenerView : MonoBehaviour {
     }
 
     public void OnClickExistingOption() {
-
-
 
         OpenFileWindowUtil.OpenFile("MissionFiles", "", file => {
 
