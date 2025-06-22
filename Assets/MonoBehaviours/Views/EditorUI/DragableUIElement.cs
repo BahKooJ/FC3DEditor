@@ -60,6 +60,7 @@ public class DragableUIElement : MonoBehaviour, IBeginDragHandler, IDragHandler,
         started = true;
     }
 
+    ReceiveDragable previousReceiver = null;
     public virtual void OnDrag(PointerEventData eventData) {
 
         if (refuseDrag) return;
@@ -69,6 +70,33 @@ public class DragableUIElement : MonoBehaviour, IBeginDragHandler, IDragHandler,
         var rectTrans = GetComponent<RectTransform>();
 
         rectTrans.anchoredPosition = (Input.mousePosition + new Vector3((rectTrans.sizeDelta.x / 2) + 4, 0, 0)) / Main.uiScaleFactor;
+
+        var pointerData = new PointerEventData(EventSystem.current);
+        pointerData.position = Input.mousePosition;
+
+        var results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(pointerData, results);
+
+        if (results.Count > 0) {
+
+            var resultWithReceiver = results.FirstOrDefault(result => result.gameObject.TryGetComponent<ReceiveDragable>(out var _));
+
+            if (resultWithReceiver.gameObject != null) {
+                var reciever = resultWithReceiver.gameObject.GetComponent<ReceiveDragable>();
+
+                if (previousReceiver != null && reciever != previousReceiver) {
+                    previousReceiver.StopHighlight();
+                    previousReceiver = reciever;
+                }
+                else if (previousReceiver == null) {
+                    previousReceiver = reciever;
+                }
+
+                reciever.StartHighlight();
+
+            }
+
+        }
 
     }
 
@@ -81,6 +109,11 @@ public class DragableUIElement : MonoBehaviour, IBeginDragHandler, IDragHandler,
         if (originalParent == null) {
             Destroy(gameObject); 
             return;
+        }
+
+        if (previousReceiver != null) {
+            previousReceiver.StopHighlight();
+            previousReceiver = null;
         }
 
         var pointerData = new PointerEventData(EventSystem.current);

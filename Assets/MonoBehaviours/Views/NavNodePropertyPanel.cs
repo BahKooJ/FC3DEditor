@@ -1,6 +1,7 @@
 ﻿
 using FCopParser;
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +16,7 @@ public class NavNodePropertyPanel : MonoBehaviour {
     public TMP_Dropdown groundcastDropdown;
     public Toggle readHeightToggle;
     public TMP_InputField heightOffsetInput;
+    public List<TMP_Text> nextNodeButtonTexts;
 
     NavNode node;
 
@@ -30,6 +32,10 @@ public class NavNodePropertyPanel : MonoBehaviour {
         readHeightToggle.interactable = false;
         heightOffsetInput.text = "---";
         heightOffsetInput.interactable = false;
+
+        foreach (var text in nextNodeButtonTexts) {
+            text.text = "None";
+        }
 
         refuseCallback = false;
 
@@ -55,6 +61,17 @@ public class NavNodePropertyPanel : MonoBehaviour {
             readHeightToggle.isOn = node.readHeightOffset;
             heightOffsetInput.text = node.heightOffset.ToString();
 
+            for (int i = 0; i < nextNodeButtonTexts.Count; i++) {
+
+                if (node.nextNodeIndexes[i] == NavNode.invalid) {
+                    nextNodeButtonTexts[i].text = "None";
+                }
+                else {
+                    nextNodeButtonTexts[i].text = node.nextNodeIndexes[i].ToString();
+                }
+
+            }
+
         }
         else {
 
@@ -64,6 +81,11 @@ public class NavNodePropertyPanel : MonoBehaviour {
             readHeightToggle.interactable= false;
             heightOffsetInput.text = "---";
             heightOffsetInput.interactable = false;
+
+            foreach (var text in nextNodeButtonTexts) {
+                text.text = "None";
+            }
+
         }
 
         refuseCallback = false;
@@ -117,6 +139,66 @@ public class NavNodePropertyPanel : MonoBehaviour {
 
         heightOffsetInput.text = node.heightOffset.ToString();
 
+    }
+
+    public void StartType() {
+        Main.ignoreAllInputs = true;
+    }
+
+    public void StopType() {
+        Main.ignoreAllInputs = false;
+    }
+
+    public void OnClickNextIndex1() {
+
+        if (this.node == null) return;
+
+        var node = view.controller.navNodes[this.node.nextNodeIndexes[0]];
+
+        if (this.node.nextNodeIndexes[0] == NavNode.invalid) return;
+
+        Camera.main.transform.position = node.transform.position;
+        Camera.main.transform.position = Camera.main.transform.position + (Camera.main.transform.forward * -4);
+        view.controller.SelectNavNode(node);
+    }
+
+    public void OnClickNextIndex2() {
+
+        if (this.node == null) return;
+
+        var node = view.controller.navNodes[this.node.nextNodeIndexes[1]];
+
+        if (this.node.nextNodeIndexes[1] == NavNode.invalid) return;
+
+        Camera.main.transform.position = node.transform.position;
+        Camera.main.transform.position = Camera.main.transform.position + (Camera.main.transform.forward * -4);
+        view.controller.SelectNavNode(node);
+    }
+
+    public void OnClickNextIndex3() {
+
+        if (this.node == null) return;
+
+        var node = view.controller.navNodes[this.node.nextNodeIndexes[2]];
+
+        if (this.node.nextNodeIndexes[2] == NavNode.invalid) return;
+
+        Camera.main.transform.position = node.transform.position;
+        Camera.main.transform.position = Camera.main.transform.position + (Camera.main.transform.forward * -4);
+        view.controller.SelectNavNode(node);
+    }
+
+    public void OnClickNextIndex4() {
+
+        if (this.node == null) return;
+
+        var node = view.controller.navNodes[this.node.nextNodeIndexes[3]];
+
+        if (this.node.nextNodeIndexes[3] == NavNode.invalid) return;
+
+        Camera.main.transform.position = node.transform.position;
+        Camera.main.transform.position = Camera.main.transform.position + (Camera.main.transform.forward * -4);
+        view.controller.SelectNavNode(node);
     }
 
 }

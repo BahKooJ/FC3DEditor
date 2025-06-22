@@ -327,7 +327,7 @@ public class NavMeshEditMode : EditMode {
 
     }
 
-    void SelectNavNode(NavNodePoint node) {
+    public void SelectNavNode(NavNodePoint node) {
 
         UnselectNode();
 

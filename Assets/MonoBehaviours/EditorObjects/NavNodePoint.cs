@@ -60,10 +60,7 @@ public class NavNodePoint : MonoBehaviour {
 
             }
 
-            controller.ChangeHeightOffset(
-                Mathf.RoundToInt(savedHeightOffsetPos * heightMultiplier) + 
-                (Mathf.RoundToInt(pos.y * heightMultiplier) - Mathf.RoundToInt(GroundCast() * heightMultiplier))
-                );
+            controller.ChangeHeightOffset(Mathf.RoundToInt(pos.y * 32f));
 
             controller.view.propertyPanel.Refresh();
 
@@ -81,48 +78,18 @@ public class NavNodePoint : MonoBehaviour {
 
     public float GroundCast() {
 
-        Vector3 castDirection = Vector3.down;
-        float startingHeight = 100f;
-
         switch (node.groundCast) {
             case NavNodeGroundCast.Highest:
-                break;
+                return ObjectUtil.GroundCast(ActorGroundCast.Highest, new Vector2(node.x / 32f, -(node.y / 32f)));
             case NavNodeGroundCast.Lowest:
-                castDirection = Vector3.up;
-                startingHeight = -100f;
-                break;
+                return ObjectUtil.GroundCast(ActorGroundCast.Lowest, new Vector2(node.x / 32f, -(node.y / 32f)));
             case NavNodeGroundCast.LowestDisableHeight:
-                castDirection = Vector3.up;
-                startingHeight = -100f;
-                break;
+                return ObjectUtil.GroundCast(ActorGroundCast.Lowest, new Vector2(node.x / 32f, -(node.y / 32f)));
             case NavNodeGroundCast.Middle:
-                break;
+                return ObjectUtil.GroundCast(ActorGroundCast.Middle, new Vector2(node.x / 32f, -(node.y / 32f)));
         }
 
-        var castPos = new Vector3(node.x / 32f, startingHeight, -(node.y / 32f));
-
-        if (Physics.Raycast(castPos, castDirection, out RaycastHit hit, Mathf.Infinity, 1)) {
-
-            if (node.groundCast == NavNodeGroundCast.Middle) {
-
-                var middleCastAttempt = hit.point;
-
-                middleCastAttempt.y -= 0.01f;
-
-                if (Physics.Raycast(middleCastAttempt, castDirection, out hit, Mathf.Infinity, 1)) {
-                    return hit.point.y;
-                }
-
-            }
-
-            return hit.point.y;
-
-        }
-        else {
-
-            return 6f;
-
-        }
+        return 6f;
 
     }
 
@@ -130,11 +97,11 @@ public class NavNodePoint : MonoBehaviour {
 
         var pos = new Vector3(node.x / 32f, GroundCast(), -(node.y / 32f));
 
-        RefreshHeightOffsetSphere();
-
         pos.y += yPadding;
 
         transform.position = pos;
+
+        RefreshHeightOffsetSphere();
 
         if (node.state == NavNodeState.Disabled) {
             GetComponent<MeshRenderer>().material.color = Color.red;
@@ -147,13 +114,13 @@ public class NavNodePoint : MonoBehaviour {
 
     public void RefreshHeightOffsetSphere() {
 
-        var heightSpherePos = heightOffsetSphere.transform.localPosition;
+        var heightSpherePos = heightOffsetSphere.transform.position;
 
-        heightSpherePos.y = node.heightOffset / heightMultiplier;
+        heightSpherePos.y = node.heightOffset / 32f;
 
-        heightOffsetSphere.transform.localPosition = heightSpherePos;
+        heightOffsetSphere.transform.position = heightSpherePos;
         
-        heightOffsetSphere.SetActive(node.heightOffset != 0 && node.readHeightOffset);
+        heightOffsetSphere.SetActive(node.readHeightOffset);
 
     }
 

@@ -1015,10 +1015,11 @@ namespace FCopParser {
                 new EnumDataActorProperty("Facing Target Type", (TargetType)Read8(1), BitCount.Bit8, "Turret Properties", new() { "FacingOverloadAttack" }),
 
                 new OverloadedProperty("FacingOverloadAttack", new() {
-                    (new AssetActorProperty("Face Team", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type"].GetCompiledValue() == TargetType.Team),
-                    (new AssetActorProperty("Face Actor", Read16NoIt(0), AssetType.Actor, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type"].GetCompiledValue() == TargetType.Actor),
-                    (new ValueActorProperty("S_Unknown Face", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
-
+                    (new AssetActorProperty("Face Team", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Facing Target Type"].GetCompiledValue() == TargetType.Team),
+                    (new AssetActorProperty("Face Group", Read16NoIt(0), AssetType.ScriptGroup, BitCount.Bit16), () => (TargetType)propertiesByName["Facing Target Type"].GetCompiledValue() == TargetType.Group),
+                    (new AssetActorProperty("Face Actor", Read16NoIt(0), AssetType.Actor, BitCount.Bit16), () => (TargetType)propertiesByName["Facing Target Type"].GetCompiledValue() == TargetType.Actor),
+                    (new EnumDataActorProperty("Face Behavior", (ActorBehavior)Read16NoIt(0), BitCount.Bit16), () => (TargetType)propertiesByName["Facing Target Type"].GetCompiledValue() == TargetType.BehaviorType),
+                    (new ValueActorProperty("Face", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
                 }, BitCount.Bit16, "Turret Properties"),
                 new RangeActorProperty("Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16, "Turret Properties"),
                 new NormalizedValueProperty("Height Offset", Read16(0), short.MinValue, short.MaxValue, 512f, BitCount.Bit16, "Turret Properties"),
@@ -2048,9 +2049,10 @@ namespace FCopParser {
 
                 new OverloadedProperty("OverloadAttack2", new() {
                     (new AssetActorProperty("Attack Team (H2)", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H2)"].GetCompiledValue() == TargetType.Team),
+                    (new AssetActorProperty("Attack Group (H2)", Read16NoIt(0), AssetType.ScriptGroup, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H2)"].GetCompiledValue() == TargetType.Group),
                     (new AssetActorProperty("Attack Actor (H2)", Read16NoIt(0), AssetType.Actor, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H2)"].GetCompiledValue() == TargetType.Actor),
-                    (new ValueActorProperty("S_Unknown Attack (H2)", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
-
+                    (new EnumDataActorProperty("Attack Behavior (H2)", (ActorBehavior)Read16NoIt(0), BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H2)"].GetCompiledValue() == TargetType.BehaviorType),
+                    (new ValueActorProperty("Attack (H2)", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
                 }, BitCount.Bit16, "Shooter Properties Head 2"),
 
                 new NormalizedValueProperty("Detection FOV? (H2)", Read16(4096), 0, 4096, 4096f / 360f, BitCount.Bit16, "Shooter Properties Head 2"),
@@ -2100,9 +2102,10 @@ namespace FCopParser {
 
                 new OverloadedProperty("OverloadAttack3", new() {
                     (new AssetActorProperty("Attack Team (H3)", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H3)"].GetCompiledValue() == TargetType.Team),
+                    (new AssetActorProperty("Attack Group (H3)", Read16NoIt(0), AssetType.ScriptGroup, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H3)"].GetCompiledValue() == TargetType.Group),
                     (new AssetActorProperty("Attack Actor (H3)", Read16NoIt(0), AssetType.Actor, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H3)"].GetCompiledValue() == TargetType.Actor),
-                    (new ValueActorProperty("S_Unknown Attack (H3)", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
-
+                    (new EnumDataActorProperty("Attack Behavior (H3)", (ActorBehavior)Read16NoIt(0), BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H3)"].GetCompiledValue() == TargetType.BehaviorType),
+                    (new ValueActorProperty("Attack (H3)", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
                 }, BitCount.Bit16, "Shooter Properties Head 3"),
 
                 new NormalizedValueProperty("Detection FOV? (H3)", Read16(4096), 0, 4096, 4096f / 360f, BitCount.Bit16, "Shooter Properties Head 3"),
@@ -2152,9 +2155,10 @@ namespace FCopParser {
 
                 new OverloadedProperty("OverloadAttack4", new() {
                     (new AssetActorProperty("Attack Team (H4)", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H4)"].GetCompiledValue() == TargetType.Team),
+                    (new AssetActorProperty("Attack Group (H4)", Read16NoIt(0), AssetType.ScriptGroup, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H4)"].GetCompiledValue() == TargetType.Group),
                     (new AssetActorProperty("Attack Actor (H4)", Read16NoIt(0), AssetType.Actor, BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H4)"].GetCompiledValue() == TargetType.Actor),
-                    (new ValueActorProperty("S_Unknown Attack (H4)", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
-
+                    (new EnumDataActorProperty("Attack Behavior (H4)", (ActorBehavior)Read16NoIt(0), BitCount.Bit16), () => (TargetType)propertiesByName["Target Type (H4)"].GetCompiledValue() == TargetType.BehaviorType),
+                    (new ValueActorProperty("Attack (H4)", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
                 }, BitCount.Bit16, "Shooter Properties Head 4"),
 
                 new NormalizedValueProperty("Detection FOV? (H4)", Read16(4096), 0, 4096, 4096f / 360f, BitCount.Bit16, "Shooter Properties Head 4"),

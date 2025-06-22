@@ -243,6 +243,11 @@ public class ActorPropertyChangeEvent {
             RefreshActor(controller);
 
         } },
+        {"Thruster Behavior Override", (controller, prop) => {
+
+            RefreshActor(controller);
+
+        } },
         #region MapNodes
         {"Node 1 X", (controller, prop) => {
 

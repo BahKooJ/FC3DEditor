@@ -167,7 +167,7 @@ public class ActorObject : MonoBehaviour {
 
         }
 
-        if (actor.behavior is FCopObjectMutating) {
+        if (actor.behavior is FCopShooter) {
 
             var hasObj = false;
             foreach (var obj in objects) {
@@ -245,6 +245,10 @@ public class ActorObject : MonoBehaviour {
 
                         try {
                             fCopVert = dependantObj.fCopObject.GetPosition(assetRef.positionIndex);
+
+                            if (actor.behaviorType == ActorBehavior.PathedTurret && actor.behavior.propertiesByName["Thruster Behavior Override"].GetCompiledValue() == 1) {
+                                fCopVert = dependantObj.fCopObject.GetPosition(2);
+                            }
                         }
                         catch {
                             ari++;

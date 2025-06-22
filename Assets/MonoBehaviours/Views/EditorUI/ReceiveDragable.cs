@@ -16,13 +16,25 @@ public class ReceiveDragable : MonoBehaviour, IPointerEnterHandler, IPointerExit
     Color originalColor;
 
     void Start() {
+        if (highlightImage == null) return;
+
         originalColor = highlightImage.color;
     }
 
     public void OnPointerEnter(PointerEventData eventData) {
 
+
+
+    }
+
+    bool startedHighlight = false;
+    public void StartHighlight() {
+
         if (highlightImage == null) return;
-        
+
+        if (startedHighlight) return;
+
+
         if (Main.draggingElement != null) {
 
             if (changeColor) {
@@ -34,9 +46,11 @@ public class ReceiveDragable : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
         }
 
+        startedHighlight = true;
+
     }
 
-    public void OnPointerExit(PointerEventData eventData) {
+    public void StopHighlight() {
 
         if (highlightImage == null) return;
 
@@ -46,6 +60,14 @@ public class ReceiveDragable : MonoBehaviour, IPointerEnterHandler, IPointerExit
         else {
             highlightImage.gameObject.SetActive(false);
         }
+
+        startedHighlight = false;
+
+    }
+
+    public void OnPointerExit(PointerEventData eventData) {
+
+        StopHighlight();
 
     }
 

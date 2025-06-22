@@ -47,6 +47,7 @@ public abstract class NodeSelectorViewUtil {
         } },
         { NodeSelectorTab.Variable, new() {
             new NodeCreatorData(ByteCode.GET_16, "Get Variable", ScriptDataType.Any, "Returns the value of the selected variable"),
+            //new NodeCreatorData(ByteCode.BYTE47, "47", ScriptDataType.Any, "47"),
             new NodeCreatorData(ByteCode.SET_16, "Set Variable", ScriptDataType.Void, "Sets the value of the selected variable"),
             new NodeCreatorData(ByteCode.INCREMENT_16, "Increment Variable", ScriptDataType.Void, "Adds 1 and sets the selected variable"),
             new NodeCreatorData(ByteCode.DECREMENT_16, "Decrement Variable", ScriptDataType.Void, "Subtracts 1 and sets the selected variable"),
