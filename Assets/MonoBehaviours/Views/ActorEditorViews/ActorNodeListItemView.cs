@@ -196,9 +196,12 @@ public class ActorNodeListItemView : MonoBehaviour {
 
     void JumpViewToListItem() {
 
-        var normalizedPos = ((decimal)transform.GetSiblingIndex()) / ((decimal)transform.parent.childCount - 10);
+        try {
+            var normalizedPos = ((decimal)transform.GetSiblingIndex()) / ((decimal)transform.parent.childCount - 10);
 
-        view.contentScrollview.verticalNormalizedPosition = (float)(1 - normalizedPos);
+            view.contentScrollview.verticalNormalizedPosition = (float)(1 - normalizedPos);
+        }
+        catch { }
 
     }
 

@@ -298,7 +298,7 @@ namespace FCopParser {
 
                     var maxID = Utils.FindNextInt(ids);
 
-                    var rawFile = new IFFDataFile(2, newData.ToList(), "Cobj", maxID + 1, scripting.emptyOffset);
+                    var rawFile = new IFFDataFile(2, newData.ToList(), "Cobj", maxID, scripting.emptyOffset);
 
                     var obj = new FCopObject(rawFile);
 
@@ -385,9 +385,15 @@ namespace FCopParser {
 
                 case AssetType.Object:
 
-                    maxID = objects.Max(o => o.DataID);
+                    var ids = new List<int>();
 
-                    rawFile = new IFFDataFile(2, new(), "Cobj", maxID + 1, scripting.emptyOffset);
+                    foreach (var obj2 in objects) {
+                        ids.Add(obj2.DataID);
+                    }
+
+                    maxID = Utils.FindNextInt(ids);
+
+                    rawFile = new IFFDataFile(2, new(), "Cobj", maxID, scripting.emptyOffset);
 
                     return rawFile;
 
