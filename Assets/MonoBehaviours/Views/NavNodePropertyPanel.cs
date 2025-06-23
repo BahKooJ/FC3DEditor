@@ -153,6 +153,10 @@ public class NavNodePropertyPanel : MonoBehaviour {
 
         if (this.node == null) return;
 
+        if (this.node.nextNodeIndexes[0] >= view.controller.navNodes.Count) {
+            return;
+        }
+
         var node = view.controller.navNodes[this.node.nextNodeIndexes[0]];
 
         if (this.node.nextNodeIndexes[0] == NavNode.invalid) return;
@@ -165,6 +169,10 @@ public class NavNodePropertyPanel : MonoBehaviour {
     public void OnClickNextIndex2() {
 
         if (this.node == null) return;
+
+        if (this.node.nextNodeIndexes[1] >= view.controller.navNodes.Count) {
+            return;
+        }
 
         var node = view.controller.navNodes[this.node.nextNodeIndexes[1]];
 
@@ -179,6 +187,10 @@ public class NavNodePropertyPanel : MonoBehaviour {
 
         if (this.node == null) return;
 
+        if (this.node.nextNodeIndexes[2] >= view.controller.navNodes.Count) {
+            return;
+        }
+
         var node = view.controller.navNodes[this.node.nextNodeIndexes[2]];
 
         if (this.node.nextNodeIndexes[2] == NavNode.invalid) return;
@@ -191,6 +203,10 @@ public class NavNodePropertyPanel : MonoBehaviour {
     public void OnClickNextIndex4() {
 
         if (this.node == null) return;
+
+        if (this.node.nextNodeIndexes[3] >= view.controller.navNodes.Count) {
+            return;
+        }
 
         var node = view.controller.navNodes[this.node.nextNodeIndexes[3]];
 

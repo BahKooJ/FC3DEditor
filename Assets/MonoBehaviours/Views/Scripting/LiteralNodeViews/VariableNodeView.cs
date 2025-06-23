@@ -43,7 +43,7 @@ public class VariableNodeView : ExpressionNodeView {
             varNode.SetData(type, id);
             expressionText.text = varNode.name;
 
-            currentLine.RefreshLayout();
+            currentLine.RebuildScriptNode();
 
         };
     }

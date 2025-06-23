@@ -2607,7 +2607,7 @@ namespace FCopParser {
                 var column = new TileColumn(x, y, newTiles, heights);
 
                 foreach (var newTile in oldTileColumns[i].tiles) {
-                    newTiles.Add(newTile);
+                    newTiles.Add(new Tile(newTile, column, section));
                 }
 
                 tileColumns.Add(column);

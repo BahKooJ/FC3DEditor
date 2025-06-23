@@ -248,6 +248,16 @@ public class ActorPropertyChangeEvent {
             RefreshActor(controller);
 
         } },
+        {"UV Offset X", (controller, prop) => {
+
+            RefreshActor(controller);
+
+        } },
+        {"UV Offset Y", (controller, prop) => {
+
+            RefreshActor(controller);
+
+        } },
         #region MapNodes
         {"Node 1 X", (controller, prop) => {
 

@@ -197,7 +197,7 @@ public class ActorEditMode : EditMode {
 
     public void Update() {
 
-        if (Input.GetKeyDown(KeyCode.Escape)) {
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1)) {
 
             HeadsUpTextUtil.End();
             actorToGroup = null;
@@ -353,6 +353,7 @@ public class ActorEditMode : EditMode {
 
         if (Input.GetKeyDown(KeyCode.F10)) {
 
+            return;
 
             foreach (var code in main.level.scripting.rpns.code) {
                 if (main.level.scripting.emptyOffset == code.offset) {
@@ -362,9 +363,6 @@ public class ActorEditMode : EditMode {
             }
 
             main.level.scripting.rpns.code.RemoveRange(0, main.level.scripting.rpns.code.Count - 1);
-
-
-            return;
 
             var offsets = new List<int>() { 499 };
 

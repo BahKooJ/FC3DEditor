@@ -9188,7 +9188,7 @@ MonoBehaviour:
       m_Calls: []
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
-  m_SelectionColor: {r: 0, g: 0.787, b: 0, a: 0.7529412}
+  m_SelectionColor: {r: 0, g: 0.5176471, b: 0.0627451, a: 0.7529412}
   m_Text: aaaaaaaaaaaaaaa
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
@@ -9706,7 +9706,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 630897276203883294, guid: 4c36a30fa36db4f4b89a5b5fbf2ffb91, type: 3}
       propertyPath: m_Size
-      value: 0.5047053
+      value: 0.5029821
       objectReference: {fileID: 0}
     - target: {fileID: 1250400484849478509, guid: 4c36a30fa36db4f4b89a5b5fbf2ffb91, type: 3}
       propertyPath: m_AnchorMax.y

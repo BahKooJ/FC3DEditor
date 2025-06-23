@@ -318,6 +318,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   text: {fileID: 1701839505916890667}
+  fitter: {fileID: 452001800906571354}
 --- !u!222 &4768310426004722443
 CanvasRenderer:
   m_ObjectHideFlags: 0

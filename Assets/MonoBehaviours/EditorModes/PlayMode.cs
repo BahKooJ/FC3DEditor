@@ -36,7 +36,7 @@ public class PlayMode : EditMode {
 
         if (Input.GetKeyDown(KeyCode.Escape)) {
 
-            main.Undo();
+            Object.FindAnyObjectByType<ToolbarView>().SelectHeightMapEditMode();
 
         }
 

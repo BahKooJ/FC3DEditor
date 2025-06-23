@@ -32,6 +32,18 @@ class SetHeightValueTextField: MonoBehaviour {
 
     }
 
+    public void OnDestroy() {
+        StopType();
+    }
+
+    public void StartType() {
+        Main.ignoreAllInputs = true;
+    }
+
+    public void StopType() {
+        Main.ignoreAllInputs = false;
+    }
+
     public void OnFinished() {
 
         if (!preSelect) {

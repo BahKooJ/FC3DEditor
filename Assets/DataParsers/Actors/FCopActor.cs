@@ -251,8 +251,8 @@ namespace FCopParser {
                     this.behavior = new FCopBehavior25(this, new());
                     break;
                 case ActorBehavior.PathedMultiTurret:
-                    InitResourceAndRawFile(FCopBehavior25.assetRefCount);
-                    this.behavior = new FCopBehavior25(this, new());
+                    InitResourceAndRawFile(FCopBehavior28.assetRefCount);
+                    this.behavior = new FCopBehavior28(this, new());
                     break;
                 case ActorBehavior.Teleporter:
                     InitResourceAndRawFile(FCopBehavior29.assetRefCount);
@@ -3085,9 +3085,9 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
 
-                new NormalizedValueProperty("Width Area", Read16(0), 0, short.MaxValue, 512f, BitCount.Bit16),
-                new NormalizedValueProperty("Length Area", Read16(0), 0, short.MaxValue, 512f, BitCount.Bit16),
-                new NormalizedValueProperty("Height Area", Read16(0), 0, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("Width Area", Read16(512), 0, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("Length Area", Read16(512), 0, short.MaxValue, 512f, BitCount.Bit16),
+                new NormalizedValueProperty("Height Area", Read16(512), 0, short.MaxValue, 512f, BitCount.Bit16),
                 new EnumDataActorProperty("Ground Cast", (ActorGroundCast)Read8(0), BitCount.Bit8),
 
 

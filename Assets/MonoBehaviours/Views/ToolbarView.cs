@@ -57,6 +57,22 @@ public class ToolbarView: MonoBehaviour {
 
     }
 
+    void SwitchEditMode() {
+
+        var existingAssetManager = FindAnyObjectByType<MiniAssetManagerView>();
+
+        if (existingAssetManager != null) {
+            Destroy(existingAssetManager.gameObject);
+        }
+
+        var existingDataManager = FindAnyObjectByType<UniversialMiniDataManagerView>();
+
+        if (existingDataManager != null) {
+            Destroy(existingDataManager.gameObject);
+        }
+
+    }
+
     public void SelectHeightMapEditMode() {
 
         if (Main.editMode == null) {
@@ -71,6 +87,8 @@ public class ToolbarView: MonoBehaviour {
         }
 
         Destroy(activePanel);
+
+        SwitchEditMode();
 
         var editMode = new HeightMapEditMode(controller);
 
@@ -93,7 +111,7 @@ public class ToolbarView: MonoBehaviour {
         Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new TileEditMode(controller);
-
+        SwitchEditMode();
         Destroy(activePanel);
 
         var obj = Instantiate(tileEditPanel);
@@ -114,7 +132,7 @@ public class ToolbarView: MonoBehaviour {
         Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new TileAddMode(controller);
-
+        SwitchEditMode();
         Destroy(activePanel);
 
         var obj = Instantiate(tileAddPanel);
@@ -135,7 +153,7 @@ public class ToolbarView: MonoBehaviour {
         Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new NavMeshEditMode(controller);
-
+        SwitchEditMode();
         Destroy(activePanel);
 
         var obj = Instantiate(navMeshEditPanel);
@@ -159,7 +177,7 @@ public class ToolbarView: MonoBehaviour {
         Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new ActorEditMode(controller);
-
+        SwitchEditMode();
         Destroy(activePanel);
 
         var obj = Instantiate(actorEditPanel);
@@ -181,7 +199,7 @@ public class ToolbarView: MonoBehaviour {
         Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new SectionEditMode(controller);
-
+        SwitchEditMode();
         Destroy(activePanel);
 
         var obj = Instantiate(sectionEditPanel);
@@ -203,7 +221,7 @@ public class ToolbarView: MonoBehaviour {
         Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new TextureEditMode(controller);
-
+        SwitchEditMode();
         Destroy(activePanel);
 
         var obj = Instantiate(textureEditPanel);
@@ -225,7 +243,7 @@ public class ToolbarView: MonoBehaviour {
         Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new ShaderEditMode(controller);
-
+        SwitchEditMode();
         Destroy(activePanel);
 
         var obj = Instantiate(shaderEditPanel);
@@ -243,7 +261,7 @@ public class ToolbarView: MonoBehaviour {
     }
 
     public void OpenScriptingPanel() {
-
+        SwitchEditMode();
         var existingScriptingPanel = FindAnyObjectByType<ScriptingPanelView>();
 
         if (existingScriptingPanel != null) {
@@ -258,7 +276,7 @@ public class ToolbarView: MonoBehaviour {
     }
 
     public void OpenAssetManager() {
-
+        SwitchEditMode();
         var existingAssetManager = FindAnyObjectByType<AssetManagerView>();
 
         if (existingAssetManager != null) {
@@ -280,7 +298,7 @@ public class ToolbarView: MonoBehaviour {
         Main.AddCounterAction(new ChangeEditModeCounterAction(this, Main.editMode.GetType()));
 
         var editMode = new PlayMode(controller);
-
+        SwitchEditMode();
         Destroy(activePanel);
 
         controller.ChangeEditMode(editMode);
