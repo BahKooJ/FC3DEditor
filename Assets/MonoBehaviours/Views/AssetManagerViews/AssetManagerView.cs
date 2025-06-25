@@ -258,6 +258,10 @@ public class AssetManagerView : MonoBehaviour {
                             "Any face with more than 4 vertices is invalid.");
 
                     }
+                    catch {
+                        DialogWindowUtil.Dialog("Invalid File", "Please select a valid obj file.");
+                    }
+
                     return null;
                 case AssetType.Stream:
 
@@ -298,7 +302,7 @@ public class AssetManagerView : MonoBehaviour {
         }
         catch (InvalidFileException) {
 
-            DialogWindowUtil.Dialog("Invalid File", "Please select a valid wave file.");
+            DialogWindowUtil.Dialog("Invalid File", "Please select a valid file.");
 
             return null;
         }
@@ -342,6 +346,8 @@ public class AssetManagerView : MonoBehaviour {
                 OpenFileWindowUtil.OpenFile("FCEAssets", "", path => {
 
                     var obj = (FCopObject)ParsedDataToRaw(AssetType.Object, path);
+
+                    if (obj == null) return;
 
                     level.AddAsset(AssetType.Object, obj);
 

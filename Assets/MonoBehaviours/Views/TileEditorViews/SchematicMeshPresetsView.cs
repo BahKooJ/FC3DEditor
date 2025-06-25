@@ -40,6 +40,7 @@ public class SchematicMeshPresetsView : MonoBehaviour {
         listGameObjects.Add(obj);
 
         var view = obj.GetComponent<FolderSchematicItemView>();
+        view.parentView = this;
         view.controller = controller;
         view.schematics = folder;
         view.view = this;

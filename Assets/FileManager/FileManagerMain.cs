@@ -23,6 +23,8 @@ public class FileManagerMain : MonoBehaviour {
 
     void Start() {
 
+        Application.targetFrameRate = 60;
+
         if (SettingsManager.keyBinds.Count == 0) {
             SettingsManager.ParseSettings();
         }

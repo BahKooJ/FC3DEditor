@@ -11,6 +11,7 @@ public class AssetNodeView : ExpressionNodeView {
     // - Asset Refs -
     public Sprite wavIconSprite;
     public Sprite navMeshIcon;
+    public Sprite teamIconSprite;
 
     // - Unity Refs -
     public Image assetIcon;
@@ -39,6 +40,7 @@ public class AssetNodeView : ExpressionNodeView {
             ScriptDataType.Cwav => AssetType.WavSound,
             ScriptDataType.Cnet => AssetType.NavMesh,
             ScriptDataType.Stream => AssetType.Stream,
+            ScriptDataType.TeamDirect => AssetType.Team,
             _ => AssetType.None,
         };
 
@@ -85,11 +87,37 @@ public class AssetNodeView : ExpressionNodeView {
 
                 assetIcon.sprite = wavIconSprite;
                 break;
+            case AssetType.Team:
+
+                try {
+                    expressionText.text = main.level.sceneActors.teams[literalNode.value];
+                }
+                catch {
+                    NameCheck();
+                }
+
+                assetIcon.sprite = teamIconSprite;
+
+                break;
 
         }
 
     }
     public void OnClick() {
+
+        if (assetType == AssetType.Team) {
+
+            MiniAssetManagerUtil.RequestUniversalData(main.level.sceneActors.teams, main, id => {
+                Main.AddCounterAction(new ScriptSaveStateCounterAction(currentLine.view.script, currentLine.view));
+
+                literalNode.value = id;
+                Init();
+                currentLine.RefreshLayout();
+
+            });
+
+            return;
+        }
 
         MiniAssetManagerUtil.RequestAsset(assetType, main, asset => {
 

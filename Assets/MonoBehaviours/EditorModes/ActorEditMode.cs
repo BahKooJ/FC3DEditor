@@ -10,10 +10,8 @@ public class ActorEditMode : EditMode {
 
     public static List<ActorBehavior> unsupportedBehaviors = new() {
         ActorBehavior.UniversalTrigger,
-        ActorBehavior.Aircraft,
         ActorBehavior.Behavior26,
         ActorBehavior.Behavior27,
-        ActorBehavior.InterchangingEntity,
         ActorBehavior.Behavior31,
         ActorBehavior.Behavior33,
         ActorBehavior.Behavior34,

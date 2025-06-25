@@ -81,6 +81,7 @@ public class StatementNodeView : DragableUIElement {
                         ScriptDataType.Cwav => Instantiate(assetNodePrefab),
                         ScriptDataType.Cnet => Instantiate(assetNodePrefab),
                         ScriptDataType.Stream => Instantiate(assetNodePrefab),
+                        ScriptDataType.TeamDirect => Instantiate(assetNodePrefab),
                         ScriptDataType.Actor => Instantiate(specialActorNodePrefab),
                         ScriptDataType.Group => Instantiate(specialActorNodePrefab),
                         ScriptDataType.Team => Instantiate(specialActorNodePrefab),

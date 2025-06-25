@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public class HomeScreenView : MonoBehaviour {
 
+    // - Prefabs -
+    public GameObject creditsMenu;
+
     // - Unity Refs -
     public List<Sprite> backgroundImages;
     public Image backgroundImage;
@@ -35,6 +38,10 @@ public class HomeScreenView : MonoBehaviour {
 
     }
 
+    public void OnClickCredits() {
+        Instantiate(creditsMenu, transform.parent);
+    }
+
     public void OnClickQuit() {
 
 
@@ -51,6 +58,10 @@ public class HomeScreenView : MonoBehaviour {
 
     public void OnClickPatreon() {
         Application.OpenURL("https://www.patreon.com/FCEditor");
+    }
+
+    public void OnClickGithub() {
+        Application.OpenURL("https://github.com/BahKooJ/FC3DEditor");
     }
 
 }

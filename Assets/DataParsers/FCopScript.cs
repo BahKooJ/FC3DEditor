@@ -908,7 +908,8 @@ namespace FCopParser {
         Group,
         Team,
         Cnet,
-        Stream
+        Stream,
+        TeamDirect
     }
 
     public enum ScriptVariableType {
@@ -1524,7 +1525,7 @@ namespace FCopParser {
             { 63, new() { new ScriptParameter("Is Invincible", ScriptDataType.Bool) } },
             { 64, new() { new ScriptParameter("Disable Targeting", ScriptDataType.Bool) } },
             { 65, new() { new ScriptParameter("Value (0 - 255)", ScriptDataType.Int) } },
-            { 67, new() { new ScriptParameter("Team", ScriptDataType.Team) } },
+            { 67, new() { new ScriptParameter("Team", ScriptDataType.TeamDirect) } },
             { 68, new() { new ScriptParameter("Offset", ScriptDataType.Int) } },
             { 69, new() { new ScriptParameter("Does Render", ScriptDataType.Bool) } },
             { 75, new() { 

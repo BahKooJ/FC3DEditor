@@ -954,7 +954,7 @@ namespace FCopParser {
         public FCopShooter(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
             properties.AddRange(new List<ActorProperty>() {
-                new SpecializedActorRefActorProperty("Weapon ID", Read16(0), ActorBehavior.Weapon, true, BitCount.Bit16, "Shooter Properties")
+                new SpecializedActorRefActorProperty("Weapon", Read16(0), ActorBehavior.Weapon, true, BitCount.Bit16, "Shooter Properties")
             });
 
             properties.AddRange(new List<ActorProperty>() {
@@ -1288,7 +1288,7 @@ namespace FCopParser {
 
     }
 
-    // Observed
+    // - Completed -
     public class FCopBehavior9 : FCopShooter, FCopHeightOffsetting {
 
         public const int assetRefCount = 2;
@@ -1314,7 +1314,7 @@ namespace FCopParser {
                     (new AssetActorProperty("Aircraft Attack Team", Read16NoIt(0), AssetType.Team, BitCount.Bit16), () => (TargetType)propertiesByName["Aircraft Target Type"].GetCompiledValue() == TargetType.Team),
                     (new AssetActorProperty("Aircraft Attack Group", Read16NoIt(0), AssetType.ScriptGroup, BitCount.Bit16), () => (TargetType)propertiesByName["Aircraft Target Type"].GetCompiledValue() == TargetType.Group),
                     (new AssetActorProperty("Aircraft Attack Actor", Read16NoIt(0), AssetType.Actor, BitCount.Bit16), () => (TargetType)propertiesByName["Aircraft Target Type"].GetCompiledValue() == TargetType.Actor),
-                    (new EnumDataActorProperty("Aircraft Attack Behavior", (ActorBehavior)Read16NoIt(0), BitCount.Bit16), () => (TargetType)propertiesByName["Aircraft Target Type"].GetCompiledValue() == TargetType.BehaviorType),
+                    (new EnumDataActorProperty("Aircraft Attack Behavior", (ActorBehavior)Read16NoIt(1), BitCount.Bit16), () => (TargetType)propertiesByName["Aircraft Target Type"].GetCompiledValue() == TargetType.BehaviorType),
                     (new ValueActorProperty("Aircraft Attack", Read16(1), short.MinValue, short.MaxValue, BitCount.Bit16), () => true),
                 }, BitCount.Bit16),
 
@@ -1742,7 +1742,7 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("Secondary Explosion", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ExplosionActorProperty("Secondary Explosion", Read8(0), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8)
 
@@ -1859,14 +1859,14 @@ namespace FCopParser {
 
             properties.AddRange(new List<ActorProperty>() {
 
-                new ValueActorProperty("80", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("Unknown 80", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
                 new ValueActorProperty("Sub Model (Unknown)", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("82", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("83", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("Unknown 82", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("Unknown 83", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
                 new ValueActorProperty("Move Animation (Unk)", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
                 new FillerActorProperty(Read8(0), BitCount.Bit8),
-                new ValueActorProperty("86", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
-                new ValueActorProperty("87", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8)
+                new ValueActorProperty("Unknown 86", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
+                new ValueActorProperty("Unknown 87", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8)
 
             });
 
@@ -2013,7 +2013,7 @@ namespace FCopParser {
             #region Head 2
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("Weapon ID (H2)", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Shooter Properties Head 2")
+               new SpecializedActorRefActorProperty("Weapon (H2)", Read16(0), ActorBehavior.Weapon, true, BitCount.Bit16, "Shooter Properties Head 2")
             });
 
             properties.AddRange(new List<ActorProperty>() {
@@ -2066,7 +2066,7 @@ namespace FCopParser {
             #region Head 3
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("Weapon ID (H3)", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Shooter Properties Head 3")
+                new SpecializedActorRefActorProperty("Weapon (H3)", Read16(0), ActorBehavior.Weapon, true, BitCount.Bit16, "Shooter Properties Head 3")
             });
 
             properties.AddRange(new List<ActorProperty>() {
@@ -2119,7 +2119,7 @@ namespace FCopParser {
             #region Head 4
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("Weapon ID (H4)", Read16(0), short.MinValue, short.MaxValue, BitCount.Bit16, "Shooter Properties Head 4")
+                new SpecializedActorRefActorProperty("Weapon (H4)", Read16(0), ActorBehavior.Weapon, true, BitCount.Bit16, "Shooter Properties Head 4")
             });
 
             properties.AddRange(new List<ActorProperty>() {

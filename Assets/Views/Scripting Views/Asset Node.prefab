@@ -567,6 +567,7 @@ MonoBehaviour:
   expressionNodes: []
   wavIconSprite: {fileID: 21300000, guid: 4dbfe6c0b744af640b052f2b922edd15, type: 3}
   navMeshIcon: {fileID: 21300000, guid: d67470d0210ac554ca7c1657ec4a8b20, type: 3}
+  teamIconSprite: {fileID: 21300000, guid: 6b9a673d89acab149ad884ec3cc77f9b, type: 3}
   assetIcon: {fileID: 4202435497603302315}
 --- !u!114 &4635588315519341860
 MonoBehaviour:
