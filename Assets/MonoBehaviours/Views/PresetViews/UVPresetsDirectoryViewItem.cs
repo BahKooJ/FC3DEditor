@@ -1,6 +1,7 @@
 ﻿
 
 using TMPro;
+using UnityEditor.Presets;
 using UnityEngine;
 
 public class UVPresetsDirectoryViewItem : MonoBehaviour {
@@ -95,6 +96,44 @@ public class UVPresetsDirectoryViewItem : MonoBehaviour {
             presets.presets.Add(viewItem.preset);
 
             Destroy(viewItem.gameObject);
+
+        }
+
+        if (Main.draggingElement.TryGetComponent<UVPresetsDirectoryViewItem>(out var viewItem2)) {
+
+            controller.currentUVPresets.subFolders.Remove(viewItem2.presets);
+            presets.subFolders.Add(viewItem2.presets);
+            viewItem2.presets.parent = presets;
+
+            Destroy(viewItem2.gameObject);
+
+        }
+
+    }
+
+    public void OnReceiverDragInsert() {
+
+        if (Main.draggingElement.TryGetComponent<UVPresetsDirectoryViewItem>(out var viewItem)) {
+
+            var indexOfItem = controller.currentUVPresets.subFolders.IndexOf(viewItem.presets);
+            var indexOfThis = controller.currentUVPresets.subFolders.IndexOf(presets);
+
+            controller.currentUVPresets.subFolders.Remove(viewItem.presets);
+
+            if (indexOfThis > indexOfItem) {
+
+                controller.currentUVPresets.subFolders.Insert(indexOfThis - 1, viewItem.presets);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+
+            }
+            else {
+
+                controller.currentUVPresets.subFolders.Insert(indexOfThis, viewItem.presets);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex());
+
+            }
 
         }
 

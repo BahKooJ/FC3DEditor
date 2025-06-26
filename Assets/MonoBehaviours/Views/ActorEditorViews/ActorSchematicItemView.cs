@@ -1,6 +1,7 @@
 ﻿
 
 using FCopParser;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
@@ -11,6 +12,12 @@ public class ActorSchematicItemView : MonoBehaviour {
     public Texture2D missingObjectIcon;
     public Texture2D teleporterIcon;
     public Texture2D triggerIcon;
+    public Texture2D universialTriggerIcon;
+    public Texture2D effectsIcon;
+    public Texture2D weaponIcon;
+    public Texture2D playerWeaponIcon;
+    public Texture2D mapNodesIcon;
+
 
     // - Prefabs -
     public GameObject objectPreviewCamera;
@@ -38,6 +45,31 @@ public class ActorSchematicItemView : MonoBehaviour {
         }
         else if (actorSchematic.behavior == ActorBehavior.Trigger) {
             meshPreview.texture = triggerIcon;
+        }
+        else if (actorSchematic.behavior == ActorBehavior.UniversalTrigger) {
+            meshPreview.texture = universialTriggerIcon;
+        }
+        else if (actorSchematic.behavior == ActorBehavior.Weapon) {
+            meshPreview.texture = weaponIcon;
+        }
+        else if (actorSchematic.behavior == ActorBehavior.PlayerWeapon) {
+            meshPreview.texture = playerWeaponIcon;
+        }
+        else if (actorSchematic.behavior == ActorBehavior.MapObjectiveNodes) {
+            meshPreview.texture = mapNodesIcon;
+        }
+        else if (new List<ActorBehavior>() { 
+            ActorBehavior.VisualEffects87, 
+            ActorBehavior.VisualEffects88, 
+            ActorBehavior.VisualEffects89,
+            ActorBehavior.VisualEffects90,
+            ActorBehavior.ActorExplosion,
+            ActorBehavior.VisualEffects92,
+            ActorBehavior.ParticleEmitter,
+            ActorBehavior.VisualEffects94,
+            }.Contains(actorSchematic.behavior)) {
+
+            meshPreview.texture = effectsIcon;
         }
         else {
 

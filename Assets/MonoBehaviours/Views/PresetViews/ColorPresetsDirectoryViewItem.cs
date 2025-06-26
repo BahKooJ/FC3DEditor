@@ -1,6 +1,7 @@
 ﻿
 
 using TMPro;
+using UnityEditor.Presets;
 using UnityEngine;
 
 public class ColorPresetsDirectoryViewItem : MonoBehaviour {
@@ -95,6 +96,44 @@ public class ColorPresetsDirectoryViewItem : MonoBehaviour {
             presets.presets.Add(viewItem.preset);
 
             Destroy(viewItem.gameObject);
+
+        }
+
+        if (Main.draggingElement.TryGetComponent<ColorPresetsDirectoryViewItem>(out var viewItem2)) {
+
+            controller.currentColorPresets.subFolders.Remove(viewItem2.presets);
+            presets.subFolders.Add(viewItem2.presets);
+            viewItem2.presets.parent = presets;
+
+            Destroy(viewItem2.gameObject);
+
+        }
+
+    }
+
+    public void OnReceiverDragInsert() {
+
+        if (Main.draggingElement.TryGetComponent<ColorPresetsDirectoryViewItem>(out var viewItem)) {
+
+            var indexOfItem = controller.currentColorPresets.subFolders.IndexOf(viewItem.presets);
+            var indexOfThis = controller.currentColorPresets.subFolders.IndexOf(presets);
+
+            controller.currentColorPresets.subFolders.Remove(viewItem.presets);
+
+            if (indexOfThis > indexOfItem) {
+
+                controller.currentColorPresets.subFolders.Insert(indexOfThis - 1, viewItem.presets);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+
+            }
+            else {
+
+                controller.currentColorPresets.subFolders.Insert(indexOfThis, viewItem.presets);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex());
+
+            }
 
         }
 

@@ -109,7 +109,7 @@ public class ActorSpawningPropertiesItemView : MonoBehaviour {
                     actor.spawningProperties.respawnTime = 100;
                 }
                 else if (value < 0) {
-                    actor.spawningProperties.respawnTime = 0;
+                    actor.spawningProperties.respawnTime = 0.02f;
                 }
                 else {
                     actor.spawningProperties.respawnTime = value;

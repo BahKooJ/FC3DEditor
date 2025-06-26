@@ -1,5 +1,6 @@
 ﻿
 using FCopParser;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
@@ -10,6 +11,11 @@ public class FolderActorSchematicItemView : MonoBehaviour {
     public Texture2D missingObjectIcon;
     public Texture2D teleporterIcon;
     public Texture2D triggerIcon;
+    public Texture2D universialTriggerIcon;
+    public Texture2D effectsIcon;
+    public Texture2D weaponIcon;
+    public Texture2D playerWeaponIcon;
+    public Texture2D mapNodesIcon;
 
     // - Prefabs -
     public GameObject objectPreviewCamera;
@@ -54,6 +60,7 @@ public class FolderActorSchematicItemView : MonoBehaviour {
 
         if (isBack) {
             icon.sprite = backArrowSprite;
+            GetComponent<DragableUIElement>().refuseDrag = true;
         }
 
         if (actorSchematics.schematics.Count == 0 || isBack) return;
@@ -65,6 +72,31 @@ public class FolderActorSchematicItemView : MonoBehaviour {
         }
         else if (actorSchematics.schematics[0].behavior == ActorBehavior.Trigger) {
             meshPreview.texture = triggerIcon;
+        }
+        else if (actorSchematics.schematics[0].behavior == ActorBehavior.UniversalTrigger) {
+            meshPreview.texture = universialTriggerIcon;
+        }
+        else if (actorSchematics.schematics[0].behavior == ActorBehavior.Weapon) {
+            meshPreview.texture = weaponIcon;
+        }
+        else if (actorSchematics.schematics[0].behavior == ActorBehavior.PlayerWeapon) {
+            meshPreview.texture = playerWeaponIcon;
+        }
+        else if (actorSchematics.schematics[0].behavior == ActorBehavior.MapObjectiveNodes) {
+            meshPreview.texture = mapNodesIcon;
+        }
+        else if (new List<ActorBehavior>() {
+            ActorBehavior.VisualEffects87,
+            ActorBehavior.VisualEffects88,
+            ActorBehavior.VisualEffects89,
+            ActorBehavior.VisualEffects90,
+            ActorBehavior.ActorExplosion,
+            ActorBehavior.VisualEffects92,
+            ActorBehavior.ParticleEmitter,
+            ActorBehavior.VisualEffects94,
+            }.Contains(actorSchematics.schematics[0].behavior)) {
+
+            meshPreview.texture = effectsIcon;
         }
         else {
 
@@ -197,6 +229,77 @@ public class FolderActorSchematicItemView : MonoBehaviour {
             actorSchematics.schematics.Add(viewItem.actorSchematic);
 
             Destroy(viewItem.gameObject);
+
+        }
+
+        if (Main.draggingElement.TryGetComponent<FolderActorSchematicItemView>(out var viewItem2)) {
+
+            view.currentDirectory.subFolders.Remove(viewItem2.actorSchematics);
+
+            actorSchematics.subFolders.Add(viewItem2.actorSchematics);
+            viewItem2.actorSchematics.parent = actorSchematics;
+
+            Destroy(viewItem2.gameObject);
+
+        }
+
+    }
+
+    public void ReceiveReorderLeft() {
+
+        if (isBack) return;
+
+        if (Main.draggingElement.TryGetComponent<FolderActorSchematicItemView>(out var viewItem)) {
+
+            var indexOfItem = view.currentDirectory.subFolders.IndexOf(viewItem.actorSchematics);
+            var indexOfThis = view.currentDirectory.subFolders.IndexOf(actorSchematics);
+
+            view.currentDirectory.subFolders.Remove(viewItem.actorSchematics);
+
+            if (indexOfThis > indexOfItem) {
+
+                view.currentDirectory.subFolders.Insert(indexOfThis - 1, viewItem.actorSchematics);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+
+            }
+            else {
+
+                view.currentDirectory.subFolders.Insert(indexOfThis, viewItem.actorSchematics);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex());
+
+            }
+
+        }
+
+    }
+
+    public void ReceiveReorderRight() {
+
+        if (isBack) return;
+
+        if (Main.draggingElement.TryGetComponent<FolderActorSchematicItemView>(out var viewItem)) {
+
+            var indexOfItem = view.currentDirectory.subFolders.IndexOf(viewItem.actorSchematics);
+            var indexOfThis = view.currentDirectory.subFolders.IndexOf(actorSchematics);
+
+            view.currentDirectory.subFolders.Remove(viewItem.actorSchematics);
+
+            if (indexOfThis > indexOfItem) {
+
+                view.currentDirectory.subFolders.Insert(indexOfThis, viewItem.actorSchematics);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex());
+
+            }
+            else {
+
+                view.currentDirectory.subFolders.Insert(indexOfThis + 1, viewItem.actorSchematics);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
+
+            }
 
         }
 

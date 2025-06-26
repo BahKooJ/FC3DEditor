@@ -47,8 +47,8 @@ public class ActorScriptCallItemView : MonoBehaviour {
 
         var requestingScripts = new Dictionary<int, string>();
 
-        foreach (var codeByOffset in controller.main.level.scripting.rpns.codeByOffset) {
-            requestingScripts[codeByOffset.Key] = codeByOffset.Value.name;
+        foreach (var code in controller.main.level.scripting.rpns.code) {
+            requestingScripts[code.offset] = code.name;
         }
 
         MiniAssetManagerUtil.RequestUniversalData(requestingScripts, controller.main, id => {
@@ -59,6 +59,10 @@ public class ActorScriptCallItemView : MonoBehaviour {
     }
 
     void EditScript(int index) {
+
+        if (actor.rawFile.rpnsReferences[index] == controller.main.level.scripting.emptyOffset) {
+            return;
+        }
 
         var existingScriptingPanel = FindAnyObjectByType<ScriptingPanelView>();
 

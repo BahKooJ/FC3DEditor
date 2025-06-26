@@ -351,18 +351,8 @@ public class ActorEditMode : EditMode {
 
         if (Input.GetKeyDown(KeyCode.F10)) {
 
-            return;
 
-            foreach (var code in main.level.scripting.rpns.code) {
-                if (main.level.scripting.emptyOffset == code.offset) {
-                    break;
-                }
-                main.level.scripting.rpns.codeByOffset.Remove(code.offset);
-            }
-
-            main.level.scripting.rpns.code.RemoveRange(0, main.level.scripting.rpns.code.Count - 1);
-
-            var offsets = new List<int>() { 499 };
+            var offsets = new List<int>() { 27 };
 
             //void SearchScript(ScriptNode script, int offset) {
 

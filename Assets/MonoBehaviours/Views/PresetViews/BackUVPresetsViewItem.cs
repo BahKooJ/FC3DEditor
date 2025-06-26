@@ -1,6 +1,7 @@
 ﻿
 
 using TMPro;
+using UnityEditor.Presets;
 using UnityEngine;
 
 public class BackUVPresetsViewItem : MonoBehaviour {
@@ -37,6 +38,16 @@ public class BackUVPresetsViewItem : MonoBehaviour {
             controller.currentUVPresets.parent.presets.Add(viewItem.preset);
 
             Destroy(viewItem.gameObject);
+
+        }
+
+        if (Main.draggingElement.TryGetComponent<UVPresetsDirectoryViewItem>(out var viewItem2)) {
+
+            controller.currentUVPresets.subFolders.Remove(viewItem2.presets);
+            controller.currentUVPresets.parent.subFolders.Add(viewItem2.presets);
+            viewItem2.presets.parent = controller.currentUVPresets.parent;
+
+            Destroy(viewItem2.gameObject);
 
         }
 

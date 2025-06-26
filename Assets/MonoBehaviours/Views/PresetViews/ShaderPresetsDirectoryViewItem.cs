@@ -100,6 +100,44 @@ public class ShaderPresetsDirectoryViewItem : MonoBehaviour {
 
         }
 
+        if (Main.draggingElement.TryGetComponent<ShaderPresetsDirectoryViewItem>(out var viewItem2)) {
+
+            controller.currentShaderPresets.subFolders.Remove(viewItem2.presets);
+            presets.subFolders.Add(viewItem2.presets);
+            viewItem2.presets.parent = presets;
+
+            Destroy(viewItem2.gameObject);
+
+        }
+
+    }
+
+    public void OnReceiverDragInsert() {
+
+        if (Main.draggingElement.TryGetComponent<ShaderPresetsDirectoryViewItem>(out var viewItem)) {
+
+            var indexOfItem = controller.currentShaderPresets.subFolders.IndexOf(viewItem.presets);
+            var indexOfThis = controller.currentShaderPresets.subFolders.IndexOf(presets);
+
+            controller.currentShaderPresets.subFolders.Remove(viewItem.presets);
+
+            if (indexOfThis > indexOfItem) {
+
+                controller.currentShaderPresets.subFolders.Insert(indexOfThis - 1, viewItem.presets);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+
+            }
+            else {
+
+                controller.currentShaderPresets.subFolders.Insert(indexOfThis, viewItem.presets);
+
+                viewItem.transform.SetSiblingIndex(transform.GetSiblingIndex());
+
+            }
+
+        }
+
     }
 
 }

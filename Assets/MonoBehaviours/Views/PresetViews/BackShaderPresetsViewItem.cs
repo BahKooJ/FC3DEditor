@@ -40,6 +40,16 @@ public class BackShaderPresetsViewItem : MonoBehaviour {
 
         }
 
+        if (Main.draggingElement.TryGetComponent<ShaderPresetsDirectoryViewItem>(out var viewItem2)) {
+
+            controller.currentShaderPresets.subFolders.Remove(viewItem2.presets);
+            controller.currentShaderPresets.parent.subFolders.Add(viewItem2.presets);
+            viewItem2.presets.parent = controller.currentShaderPresets.parent;
+
+            Destroy(viewItem2.gameObject);
+
+        }
+
     }
 
 }

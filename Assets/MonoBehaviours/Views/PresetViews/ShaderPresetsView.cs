@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 
 // Yup... This is an exact copy of texture presets view with different types. What of it?
+// Update: Well thanks past me, now I have to copy and past all the dragging code to all thre- five preset copies
 public class ShaderPresetsView : MonoBehaviour {
 
     // Prefabs

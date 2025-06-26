@@ -3320,7 +3320,7 @@ namespace FCopParser {
             };
 
             properties.AddRange(new List<ActorProperty>() {
-                new ValueActorProperty("ID", Read8(0), 0, 255, BitCount.Bit8),
+                new ValueActorProperty("Weapon ID", Read8(0), 0, 255, BitCount.Bit8),
                 new EnumDataActorProperty("Type", (WeaponType)Read8(1), BitCount.Bit8, "", new() { "OverloadMaxRange", "Overload52", "OverloadBlastRadius" }),
                 new ValueActorProperty("Ammo Count", Read16(-1), short.MinValue, short.MaxValue, BitCount.Bit16),
                 new ValueActorProperty("Reload Count", Read16(100), short.MinValue, short.MaxValue, BitCount.Bit16),

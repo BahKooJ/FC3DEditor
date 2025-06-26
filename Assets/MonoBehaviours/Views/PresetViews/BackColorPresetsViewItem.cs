@@ -39,6 +39,16 @@ public class BackColorPresetsViewItem : MonoBehaviour {
 
         }
 
+        if (Main.draggingElement.TryGetComponent<ColorPresetsDirectoryViewItem>(out var viewItem2)) {
+
+            controller.currentColorPresets.subFolders.Remove(viewItem2.presets);
+            controller.currentColorPresets.parent.subFolders.Add(viewItem2.presets);
+            viewItem2.presets.parent = controller.currentColorPresets.parent;
+
+            Destroy(viewItem2.gameObject);
+
+        }
+
     }
 
 }
