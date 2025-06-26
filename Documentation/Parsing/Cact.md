@@ -129,10 +129,10 @@ NoCast = 255
 
 ### Target Type
 ```
-ShootNoTarget = 0,
-PlayerOnly = 1,
+NoTarget = 0,
+BehaviorType = 1,
 Actor = 2,
-NoTarget = 3,
+Group = 3,
 Team = 4
 ```
 
@@ -211,7 +211,8 @@ The base inheritance for most actors. Handles meta data for collision and other 
 **Toggle, 1bit:** Disable Player Targeting  
 **Toggle, 1bit:** Disable Explosion  
 **Toggle, 1bit:** Has Shadow  
-**Toggle, 1bit:** Unknown  
+**Toggle, 1bit:** Enable Thrid Callback  
+	*Enables the third RPNS reference, which for entities is normaly ran every new second or 60 ticks*  
 **Toggle, 1bit:** Unknown  
 **Constant, 1bit:** False  
 **Constant, 1bit:** False  
@@ -238,7 +239,7 @@ Used by actors that shoot weapons
 
 **Constant, 1bit:** False  
 **Toggle, 1bit:** Prevent Back Shooting  
-	*Actor will not shoot at target if about 15 degrees behide facing.*
+	*Actor will not shoot at target if about 15 degrees behide facing.*  
 **Toggle, 1bit:** Shoot When Facing  
 **Toggle, 1bit:** Unknown  
 **Toggle, 1bit:** Unknown  
@@ -253,18 +254,21 @@ Used by actors that shoot weapons
 	*If the weapon shot can also collide with actors alongside the player*  
 **Toggle, 1bit:** Attackable Weapon  
 **Toggle, 1bit:** Unknown  
-	*Used once in the entire game, maybe ignored * 
+	*Used once in the entire game, maybe ignored *  
 **Toggle, 1bit:** Unknown  
 **Toggle, 1bit:** Unknown  
 **Toggle, 1bit:** Allow Switch Target  
 **Toggle, 1bit:** Unknown  
 
-**Enum, 8bit:** Acquiring Type 
+**Enum, 8bit:** Acquiring Type  
 **Enum, 8bit:** Target Type  
 **OVERLOADED, 16bit:**  
 **If Target Type is Team: Value:** Attack Team  
-**Otherwise: Value:** Attack Actor  
-**Normalized Value, 16bit:** Detection FOV? 
+**If Target Type is Group: Value:** Attack Group  
+**If Target Type is Actor: Value:** Attack Actor  
+**If Target Type is Behavior: Value:** Attack Actor  
+**Otherwise: Value:** Uknown  
+**Normalized Value, 16bit:** Detection FOV?  
 	*Developer Notes:*  
 	*It tests out to almost be an detection FOV
 	Range of 0-4096 makes sense, same range used for rotation
@@ -283,7 +287,10 @@ A shoot but with more data on how to control the model attached to the actor.
 **Enum, 8bit:** Facing Target Type  
 **OVERLOADED, 16bit:**  
 **If Facing Target Type is Team: Value:** Attack Team  
-**Otherwise: Value:** Attack Actor  
+**If Facing Target Type is Group: Value:** Attack Group  
+**If Facing Target Type is Actor: Value:** Attack Actor  
+**If Facing Target Type is Behavior: Value:** Attack Actor  
+**Otherwise: Value:** Unknown  
 **Normalized Value, 16bit:** Y Axis Rotation  
 **Unit Measurement Value, 512, 16bit:** Height Offset  
 **Unit Measurement Value, 16bit:** Turn Speed  
@@ -314,35 +321,37 @@ An actor that uses the Cnet navigation mesh.
 **Toggle, 1bit:** Unknown  
 **Toggle, 1bit:** Unknown  
 **Toggle, 1bit:** Disable Path Obstruction  
-**Toggle, 1bit:** Unknown  
-**Toggle, 1bit:** Unknown  
-**Toggle, 1bit:** Unknown  
+**Toggle, 1bit:** Start As Landed  
+	*If the actor has an height offset, Future Cop treats the actor as flying. If this is true, when the actor spawns or starts pathing, it will first start on the ground and move towards the height offset before pathing*  
+**Toggle, 1bit:** Roll On Turns  
+	*Will slightly rotate the actor's Z-axis to mimic an aircraft turning*  
+**Toggle, 1bit:** Disable Pathing  
+	*Will prevent the actor from pathing, if actor has an height offset, the actor will land. If disabled via script the actor will stop pathing immediately*  
 **Toggle, 1bit:** Unknown  
 
+**Toggle, 1bit:** Lock X Rotation  
 **Toggle, 1bit:** Unknown  
-**Toggle, 1bit:** Unknown  
+**Toggle, 1bit:** Disable Spin To Backtrack  
+	*Actors will do a complete 360 spin to move to the backtrack node, if disable it will face instantly to the backtrack node*  
 **Toggle, 1bit:** Disable Ease  
-	*Ease for turning between nodes*  
-**Toggle, 1bit:** Unknown  
-**Toggle, 1bit:** Unknown  
-**Toggle, 1bit:** Unknown  
-**Toggle, 1bit:** Unknown  
-**Toggle, 1bit:** Unknown  
+	*Actor will not slow down or turn on corners*  
+**Toggle, 1bit:** Lock All Rotations  
+	*Actor will lock the roataion to the facing of the first node*  
+**Toggle, 1bit:** Fall On Death  
+	*If actor has a height offset, the actor will fall to the ground if killed*  
+**Toggle, 1bit:** Walkable  
+	*If the player can walk on the actor*  
+**Toggle, 1bit:** Despawn On Path End  
+	*When reaching the end of the path, the actor will despawn*  
 
 **Unit Measurement Value, 16bit:** Move Speed  
 **Unit Measurement Value, 16bit:** Height Offset  
-**Normalized Value, 16bit:** Move Speed Multiplier?  
-	*Developer Notes:*  
-	*Linear Speed Normalized from Move Speed
-	actually I have no idea what this does.
-	Maybe like a global multiplier for speed?.
-	As like a reference for turning and such.
-	Sometimes this value is complete ignored,
-	Most noticeably on slight turns.*  
+**Normalized Value, 16bit:** Minimum Speed Multiplier  
+	*Pathing actors will slow down in various was when pathing, this includes things like turning. This is the minimum speed the actor can travel (Move Speed * Minimum Speed Multiplier). The unknown multipliers affect the actor's speed in unknown ways*  
 **Unit Measurement Value, 16bit:** Acceleration  
-**Unknown, 16bit:** Unknown  
-**Unknown, 16bit:** Unknown  
-**Unknown, 16bit:** Unknown  
+**Unknown, 16bit:** Unknown Multiplier  
+**Unknown, 16bit:** Unknown Multiplier  
+**Unknown, 16bit:** Unknown Multiplier  
 **Unknown, 16bit:** Unknown  
 **Unknown, 8bit:** Unknown  
 **Unknown, 8bit:** Unknown  
