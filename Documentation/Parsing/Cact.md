@@ -414,13 +414,21 @@ An object that hovers and orbits around it's actor position. It does not use a p
 
 #### Properties:
 **Unknown, 8bit:** Unknown  
-**Unknown, 8bit:** Unknown  
-**Unknown, 16bit:** Unknown  
-**Unknown, 8bit:** Unknown  
+**Enum, 8bit:** Aircraft Target Type  
+**OVERLOADED, 16bit:**  
+**If Aircraft Target Type is Team: Value:** Attack Team  
+**If Aircraft Target Type is Group: Value:** Attack Group  
+**If Aircraft Target Type is Actor: Value:** Attack Actor  
+**If Aircraft Target Type is Behavior: Value:** Attack Actor  
+**Otherwise: Value:** Unknown  
+**Enum, 8bit:** Target Acquisition  
+	*First = 0,  
+        Priority = 1,  
+        Closest = 2*  
 **Enum, 8bit:** Spawn Type  
 **Unit Measurement Value, 16bit:** Target Detection Range  
 	*This is different for engage range, as it will fly to a hostile to meet the engage range.*  
-**Unknown, 16bit:** Unknown  
+**Unit Measurement Value, 16bit:**  Min Distance From Target  
 **Unknown, 16bit:** Unknown  
 **Unit Measurement Value, 16bit:** Height Offset  
 **Unit Measurement Value, 16bit:** Time To Descend  
@@ -428,8 +436,8 @@ An object that hovers and orbits around it's actor position. It does not use a p
 **Unit Measurement Value, 16bit:** Move Speed  
 **Unit Measurement Value, 16bit:** Orbit Area X  
 **Unit Measurement Value, 16bit:** Orbit Area Y  
-**Unknown, 16bit:** Unknown  
-**Unknown, 16bit:** Unknown  
+**Unit Measurement Value, 16bit:** Engage Time  
+**Unit Measurement Value, 16bit:** Engage Cooldown  
 **Unit Measurement Value, 16bit:** Spawn Pos X  
 **Unit Measurement Value, 16bit:** Spawn Pos Y  
 
