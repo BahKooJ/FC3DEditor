@@ -5,40 +5,40 @@
 	- [Scripting Group](Actors%20Properties.md#Scripting-Group)
 	- [Explosions](Actors%20Properties.md#Explosions)
 	- [Ground Cast](Actors%20Properties.md#Ground-Cast)
-	- Height Offset
-	- Key Positions
-- Entity
-	- Properties
-		- Disable Actor Targeting
-		- Disable Collision
-		- Always Active
-		- Disable Map Icon
-		- Disable Rendering
-		- Player Physics
-		- Is Invincible
-		- Always Interactable
-		- Actor Collision
-		- Strong Pushback
-		- Disable Destroyed Collision
-		- Obstruct Actor Path
-		- Disable Player Targeting
-		- Disable Explosion
-		- Has Shadow
-		- Enable Third Callback
-		- Health
-		- Collide Damage
-		- Team
-		- Group
-		- Map Icon Color
-		- Target Priority
-		- Explosion
-		- Ambient Sound
-		- UV Offset X
-		- UV Offset Y
-	- Callbacks
-		- On Hurt
-		- On Destroy
-		- On New Second
+	- [Height Offset](Actors%20Properties.md#Height-Offset)
+	- [Key Positions](Actors%20Properties.md#Key-Positions)
+- [Entity](Actors%20Properties.md#Entity)
+	- [Properties](Actors%20Properties.md#Properties)
+		- [Disable Actor Targeting](Actors%20Properties.md#Disable-Actor-Targeting)
+		- [Disable Collision](Actors%20Properties.md#Disable-Collision)
+		- [Always Active](Actors%20Properties.md#Always-Active)
+		- [Disable Map Icon](Actors%20Properties.md#Disable-Map-Icon)
+		- [Disable Rendering](Actors%20Properties.md#Disable-Rendering)
+		- [Player Physics](Actors%20Properties.md#Player-Physics)
+		- [Is Invincible](Actors%20Properties.md#Is-Invincible)
+		- [Always Interactable](Actors%20Properties.md#Always-Interactable)
+		- [Actor Collision](Actors%20Properties.md#Actor-Collision)
+		- [Strong Pushback](Actors%20Properties.md#Strong-Pushback)
+		- [Disable Destroyed Collision](Actors%20Properties.md#Disable-Destroyed-Collision)
+		- [Obstruct Actor Path](Actors%20Properties.md#Obstruct-Actor-Path)
+		- [Disable Player Targeting](Actors%20Properties.md#Disable-Player-Targeting)
+		- [Disable Explosion](Actors%20Properties.md#Disable-Explosion)
+		- [Has Shadow](Actors%20Properties.md#Has-Shadow)
+		- [Enable Third Callback](Actors%20Properties.md#Enable-Third-Callback)
+		- [Health](Actors%20Properties.md#Health)
+		- [Collide Damage](Actors%20Properties.md#Collide-Damage)
+		- [Team](Actors%20Properties.md#Team)
+		- [Group](Actors%20Properties.md#Group)
+		- [Map Icon Color](Actors%20Properties.md#Map-Icon-Color)
+		- [Target Priority](Actors%20Properties.md#Target-Priority)
+		- [Explosion](Actors%20Properties.md#Explosion)
+		- [Ambient Sound](Actors%20Properties.md#Ambient-Sound)
+		- [UV Offset X](Actors%20Properties.md#UV-Offset-X)
+		- [UV Offset Y](Actors%20Properties.md#UV-Offset-Y)
+	- [Callbacks](Actors%20Properties.md#Callbacks)
+		- [On Hurt](Actors%20Properties.md#On-Hurt)
+		- [On Destroy](Actors%20Properties.md#On-Destroy)
+		- [On New Second](Actors%20Properties.md#On-New-Second)
 - Shooter
 	- Properties
 		- Weapon
