@@ -1,10 +1,10 @@
 # Table Of Contents
 **Unknown properties and unsupported actors will not be shown on this list.**
 - [Concepts](Actors%20Properties.md#concepts)
-	- Teams
-	- Scripting Group
-	- Explosions
-	- Ground Cast
+	- [Teams](Actors%20Properties.md#Teams)
+	- [Scripting Group](Actors%20Properties.md#Scripting-Group)
+	- [Explosions](Actors%20Properties.md#Explosions)
+	- [Ground Cast](Actors%20Properties.md#Ground-Cast)
 	- Height Offset
 	- Key Positions
 - Entity
