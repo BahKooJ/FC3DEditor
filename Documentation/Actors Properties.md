@@ -1,9 +1,338 @@
 # Table Of Contents
 **Unknown properties and unsupported actors will not be shown on this list.**
-- [Entity](Actors%20Properties.md#entity)
+- [Concepts](Actors%20Properties.md#concepts)
+	- Teams
+	- Scripting Group
+	- Explosions
+	- Ground Cast
+	- Height Offset
+	- Key Positions
+- Entity
 	- Properties
 		- Disable Actor Targeting
-
+		- Disable Collision
+		- Always Active
+		- Disable Map Icon
+		- Disable Rendering
+		- Player Physics
+		- Is Invincible
+		- Always Interactable
+		- Actor Collision
+		- Strong Pushback
+		- Disable Destroyed Collision
+		- Obstruct Actor Path
+		- Disable Player Targeting
+		- Disable Explosion
+		- Has Shadow
+		- Enable Third Callback
+		- Health
+		- Collide Damage
+		- Team
+		- Group
+		- Map Icon Color
+		- Target Priority
+		- Explosion
+		- Ambient Sound
+		- UV Offset X
+		- UV Offset Y
+	- Callbacks
+		- On Hurt
+		- On Destroy
+		- On New Second
+- Shooter
+	- Properties
+		- Weapon
+		- Prevent Back Shooting
+		- Shoot When Facing
+		- Fire Alternations
+		- Target Priority
+		- Disabled
+		- Weapon Actor Collision
+		- Attackable Weapon
+		- Allow Switch Target
+		- Acquiring Type
+		- Target Type
+		- Attack
+		- Detection FOV?
+		- Shooting FOV?
+		- Engage Range
+		- Targeting Delay
+- Turret
+	- Properties
+		- Ground Cast
+		- Facing Target Type, Facing Attack and Face Engage Range
+		- Rotation
+		- Height Offset
+		- Turn Speed
+		- Use Shooter Data for Facing
+		- Look at Target X-Axis
+		- Use Turret Data for Facing
+		- Spin Z Axis
+		- Walkable
+		- 135 Degrees Forward Facing
+	- References
+		- Head Object
+		- Destroyed Object
+- Pathed Entity
+	- Properties
+		- Enable Backtrack
+		- Disable Path Obstruction
+		- Start As Landed
+		- Roll On Turns
+		- Disable Pathing
+		- Lock X Rotation
+		- Disable Spin To Backtrack
+		- Disable Ease
+		- Lock All Rotations
+		- Fall On Death
+		- Walkable
+		- Despawn On Path End
+		- Move Speed
+		- Height Offset
+		- Minimum Speed Multiplier
+		- Acceleration
+		- Unknown Multiplier
+	- References
+		- Object
+		- Destroyed Object
+		- Nav Mesh
+- Player
+	- Properties
+		- Rotation
+- Stationary Turret
+	- Properties
+		- Base Rotation
+	- References
+		- Head Object
+		- Base Object
+		- Destroyed Object
+- Aircraft
+	- Properties
+		- Aircraft Target Type and Aircraft Attack
+		- Target Acquisition
+		- Spawn Type
+		- Target Detection Range
+		- Min Distance From Target
+		- Height Offset
+		- Time To Descend
+		- Turn Rate
+		- Move Speed
+		- Orbit Area Width and Orbit Area Height
+		- Engage Time
+		- Engage Cooldown
+		- Spawn Pos X and Spawn Pos Y
+	- References
+		- Object
+- Elevator
+	- Properties
+		- Number Of Stops
+		- Starting Position
+		- 1st Height Offset, 2nt Height Offset, and 3rd Height Offset
+		- 1st Stop Time, 2nt Stop Time, and 3rd Stop Time
+		- Up Speed
+		- Down Speed
+		- Rotation
+		- Trigger Type
+		- Tile Effect
+		- End Sound
+	- References
+		- Object
+- Dynamic Prop
+	- Properties
+		- Ground Cast
+		- Rotation
+		- Height Offset
+	- References
+		- Object
+		- Destroyed Object
+- Walkable Prop
+	- Properties
+		- Rotation Y
+		- Rotation X
+		- Height Offset
+		- Tile Effect
+	- References
+		- Object
+		- Destroyed Object
+- Floating Item
+	- Properties
+		- Ground Cast
+		- Reload Gun
+		- Reload Heavy
+		- Reload Special
+		- Power Up Gun
+		- Power Up Heavy
+		- Power Up Special
+		- Restore Health
+		- Invisibility
+		- Invincibility
+		- Rotation Speed
+	- References
+		- Object
+- Pathed Turret
+	- Properties
+		- Turn Speed
+		- Head Rotation
+		- Thruster Behavior Override
+		- Spin Head (No Engaging)
+		- Shoot With Base Object
+		- Look at Target X-Axis
+		- Lock Head
+		- Targetable Head Object
+		- Secondary Explosion
+	- References
+		- Base Object
+		- Destroyed Object
+		- Nav Mesh
+		- Head Object
+- Movable Prop
+	- Properties
+		- Move Axis
+		- Start in End Position
+		- Looping
+		- Walkable
+		- Enabled
+		- Ground Cast
+		- Start Sound
+		- Height Offset
+		- Rotation
+		- Ending Position Offset
+		- Ending Rotation
+		- Position Speed
+		- Rotation Speed
+	- References
+		- Object
+		- Destroyed Object
+- Pathed Multi Turret
+	- Properties
+		- Turn Speed
+		- Independent Object
+		- Thruster Behavior Override
+		- Spin Head (No Engaging)
+		- Shoot With Base Object
+		- Look at Target X-Axis
+		- Lock Head
+		- Targetable Head Object
+		- Duplicate Shooter Properties
+	- References
+		- Base Object
+		- Destroyed Object
+		- Nav Mesh
+		- Head Object 1
+		- Head Object 2
+		- Head Object 3
+		- Head Object 4
+- Teleporter
+	- Properties
+		- X
+		- Y
+		- Trigger Radius
+	- Callbacks
+		- On Teleport
+		- On New Second
+- Interchanging Entity
+	- References
+		- Object 1
+		- Object 2
+		- Object 3
+		- Object 4
+		- Object 5
+- Reloader
+	- Properties
+		- Ground Cast
+		- Open Radius
+		- Reload Gun
+		- Reload Heavy
+		- Reload Special
+		- Power Up Gun
+		- Power Up Heavy
+		- Power Up Special
+		- Restore Health
+		- Invisibility
+		- Invincibility
+		- Rotation
+	- References
+		- Base Object
+		- Item Object
+	- Callbacks
+		- On Hurt
+		- On Destroy
+		- On Interact
+- Map Objective Nodes
+	- Properties
+		- Show Arrow
+		- Show Satellite
+		- Show Minimap
+		- Map Icon Color
+		- Node X
+		- Node Y
+- Claimable Turret
+	- Properties
+		- 1st Interact Team
+		- 2nt Interact Team
+		- First Map Icon Color
+		- Second Map Icon Color
+		- Interact UV Offset X and Interact UV Offset Y
+		- Trigger Radius
+	- Callbacks
+		- On Hurt
+		- On Destroy
+		- On Interact
+- Trigger
+	- Properties
+		- Width Area, Length Area, Height Area
+		- Ground Cast
+		- Can Retrigger
+		- Trigger By Action
+		- Disable Trigger
+		- Unknown (Crowd Control)
+		- Actor Triggering Type
+		- Triggering Actor
+	- Callbacks
+		- On Trigger
+- Static Prop
+	- Properties
+		- Rotation Y, Rotation Z, and Rotation X
+		- Height Offset
+		- Ground Cast
+		- Disable Rendering
+		- Disable Animation
+		- Reverse Animation
+		- Animation Speed
+		- Scale X, Scale Y, Scale Z
+		- Spin Speed
+		- Spin Angle
+	- References
+		- Object
+- Texture
+	- Properties
+		- Transparent
+		- Additive
+		- Texture Snippet
+		- Height Offset
+		- Width and Height
+		- Rotation Y, Rotation X, and Rotation Z
+		- Ground Cast
+		- Red, Green and Blue
+- Weapon
+	- Properties
+		- Weapon ID
+		- Type
+		- Ammo Count
+		- Reload Count
+		- Burst Shot Count
+		- Fire Delay
+		- Burst Fire Delay
+		- Damage
+		- Blast Radius
+		- Velocity
+		- Max Range
+		- Impact Effect
+		- Weapon Effects
+		- Shoot Sound
+		- Echo Sound
+	- References
+		- Object
 # Concepts
 
 #### Teams
@@ -48,13 +377,13 @@ A behavior that Entities have is actors being able to target and shoot at Entiti
 #### Disable Collision (Toggle)
 If allowed, Entity actors can collide with other Entities, most notably the player. When two Entity actors collide, it will damage each other based on their collide damage. Enabling this will cause the Entity actor to not give collide damage to other actors and/or prevent the player from being pushed back if applicable.
 
-*Also see "Player Physics".*
-*Also see "Actor Collision".*
-*Also see "Collide Damage".*
+*Also see "Player Physics".*  
+*Also see "Actor Collision".*  
+*Also see "Collide Damage".*  
 #### Always Active (Toggle)
 Entities will only update within a certain radius around the player. If the player moves outside this radius, the actor will no longer update. Enabling this will ensure that the actor will always update regardless of where the player is. This is extremely important for Precinct Assault levels.
 
-*Also see "Always Interactable".*
+*Also see "Always Interactable".*  
 
 #### Disable Map Icon (Toggle)
 Entities get the option to show on the map. Enabling this toggle will prevent the actor from showing a map icon.
@@ -71,7 +400,7 @@ Entities have health and can be destroyed by other actors if taken enough damage
 #### Always Interactable (Toggle)
 Entities will only update within a certain radius around the player. "Always Active" can allow the actor to update outside the radius. However, actors will not detect or interact with other actors outside of the radius unless this is enabled. Most notably actors will not shoot at each other if this is not enabled. This is extremely important for Precinct Assault levels.
 
-*Also see "Always Active".*
+*Also see "Always Active".*  
 
 #### Actor Collision (Toggle)
 By default, an entity actor will only collide with the player. If this is enabled, the Entity actor can collide with other Entity actors. This will NOT cause any pushback and will only damage the other actor with the collide damage.
@@ -79,7 +408,7 @@ By default, an entity actor will only collide with the player. If this is enable
 #### Strong Pushback (Toggle)
 The property "Player Physics" allows the actor to push the player back when colliding. This property allows the pushback to be much stronger.
 
-*Also see "Player Physics".*
+*Also see "Player Physics".*  
 
 #### Disable Destroyed Collision (Toggle)
 Some Entities have an object for when the actor is destroyed. This destroyed object can still have collision. Enabling this ensures that the destroyed object will not collide with any actors.
@@ -93,7 +422,7 @@ This property allows for disabling the player's ability to target the Entity, wh
 #### Disable Explosion (Toggle)
 When destroyed, Entity actors have the option to play an explosion effect. This property, if enabled, will prevent the effect from playing if destroyed.
 
-*Also see "Explosion".*
+*Also see "Explosion" in concepts.*  
 
 #### Has Shadow (Toggle)
 Entities get the option to render a shadow on the ground. This shadow is dynamic and will adjust to the size and shape of the object. Enabling this property will render the shadow.
@@ -112,10 +441,10 @@ Entity actors have the option of colliding with each other. If allowed, the coll
 *Also see "Actor Collision".*
 
 #### Team (Team)
-The team of the Entity actor. Please see "Teams".
+The team of the Entity actor. Please see "Teams" in concepts.
 
 #### Group (Group)
-The scripting group of the Entity actor. Please see "Scripting Group".
+The scripting group of the Entity actor. Please see "Scripting Group" in concepts.
 
 #### Map Icon Color (Dropdown)
 Entity actors can show on the mini map and satellite map. This property allows you to select what kind of color and shape the Entity will show on the map.
@@ -123,8 +452,8 @@ Entity actors can show on the mini map and satellite map. This property allows y
 #### Target Priority (Value)
 This value can tell Shooter actors if this actor should be a target priority. The higher the value, the higher the priority to target. This is only relevant if the Shooter actor is set to target the highest priority actor.
 
-*Also see "Shooter".*
-*Also see "Target Priority".*
+*Also see "Shooter".*  
+*Also see "Target Priority".*  
 
 #### Explosion (Explosion)
 The explosion effect that will play on death. Please see "Explosions".
@@ -173,7 +502,7 @@ Shooters use key positions in its objects to determine where the weapon should b
 #### Target Priority (Toggle)
 Entity actors have a property for setting the target priority. If this toggle is enabled, the shooter will target the Entity with the highest target priority in the engage range.
 
-*Also see "Target Priority" in Entity.*
+*Also see "Target Priority" in Entity.*  
 
 #### Disabled (Toggle)
 This property will disable the targeting behavior of the Shooter. This will cause it to not shoot or acquire targets.
@@ -293,7 +622,7 @@ Pathed Entity cannot path back to a node that was just pathed from, even if the 
 #### Disable Path Obstruction (Toggle)
 Pathed Entities will stop pathing if an actor is in its direct path and has "Obstruct Actor Path" enabled. This toggle will override that behavior, and the actor will path regardless.
 
-*Also see "Obstruct Actor Path" in Entity.*
+*Also see "Obstruct Actor Path" in Entity.*  
 
 #### Start As Landed (Toggle)
 If a Pathed Entity has a height offset, it treats the actor as flying. If this is enabled, the actor will start its path on the ground and then move towards its height offset. Once the height offset has been reached, it will then start pathing.
@@ -310,7 +639,7 @@ Pathed Entities will face the direction of the next node to path to. This toggle
 #### Disable Spin To Backtrack (Toggle)
 Backtracking a node means that it would be directly behind the actor. The actor will have to make a complete 180-degrees turn in order to face the backtrack node. If this toggle is enabled, instead of making a 180-degrees turn, it will snap the facing immediately back to the next node.
 
-*Also see "Disable Ease".*
+*Also see "Disable Ease".*  
 
 #### Disable Ease (Toggle)
 Pathed Entities will turn on paths and also slow down to make said turn. This toggle will disable that behavior, and the actor will snap its facing immediately to the next node. It will not slow down for turns as well.
@@ -475,7 +804,7 @@ These are the times in seconds for how long the elevator should wait before movi
 #### Up Speed (Value)
 This value is how fast the actor with move upwards. The speed of moving up or down are separated. 
 
-#### Up Down (Value)
+#### Down Speed (Value)
 This value is how fast the actor with move downward. The speed of moving up or down are separated. 
 
 #### Rotation (Slider)
@@ -652,8 +981,8 @@ This dropdown controls how and which direction the actor will move it. These mov
 #### Start in End Position (Toggle)
 This toggle tells the Movable Prop to default to its end position. The end position is the actors positions in addition to the offset.
 
-*Also see "Ending Position Offset".*
-*Also see "Ending Rotation".*
+*Also see "Ending Position Offset".*  
+*Also see "Ending Rotation".*  
 
 #### Looping (Toggle)
 This toggle will cause the actor to move back and forth between its starting and ending positions. It will play this loop until instructed to stop.
