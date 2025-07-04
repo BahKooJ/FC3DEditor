@@ -1,6 +1,6 @@
 # Table Of Contents
 **Unknown properties and unsupported actors will not be shown on this list.**
-- [Entity](Entity)
+- [Entity](Actors%20Properties.md#entity)
 	- Properties
 		- Disable Actor Targeting
 
