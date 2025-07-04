@@ -85,7 +85,7 @@
 		- [Disable Ease](Actors%20Properties.md#Disable-Ease-toggle)
 		- [Lock All Rotations](Actors%20Properties.md#Lock-All-Rotations-toggle)
 		- [Fall On Death](Actors%20Properties.md#Fall-On-Death-toggle)
-		- [Walkable](Actors%20Properties.md#Walkable-toggle)
+		- [Walkable](Actors%20Properties.md#Walkable-toggle-1)
 		- [Despawn On Path End](Actors%20Properties.md#Despawn-On-Path-End-toggle)
 		- [Move Speed](Actors%20Properties.md#Move-Speed-value)
 		- [Height Offset](Actors%20Properties.md#Height-Offset-value-1)
@@ -128,105 +128,105 @@
 		- [Number Of Stops](Actors%20Properties.md#Number-Of-Stops-dropdown)
 		- [Starting Position](Actors%20Properties.md#Starting-Position-dropdown)
 		- [1st Height Offset, 2nt Height Offset, and 3rd Height Offset](Actors%20Properties.md#1st-Height-Offset-2nt-Height-Offset-and-3rd-Height-Offset-value)
-		- 1st Stop Time, 2nt Stop Time, and 3rd Stop Time
-		- Up Speed
-		- Down Speed
-		- Rotation
-		- Trigger Type
-		- Tile Effect
-		- End Sound
-	- References
-		- Object
-- Dynamic Prop
-	- Properties
-		- Ground Cast
-		- Rotation
-		- Height Offset
-	- References
-		- Object
-		- Destroyed Object
-- Walkable Prop
-	- Properties
-		- Rotation Y
-		- Rotation X
-		- Height Offset
-		- Tile Effect
-	- References
-		- Object
-		- Destroyed Object
-- Floating Item
-	- Properties
-		- Ground Cast
-		- Reload Gun
-		- Reload Heavy
-		- Reload Special
-		- Power Up Gun
-		- Power Up Heavy
-		- Power Up Special
-		- Restore Health
-		- Invisibility
-		- Invincibility
-		- Rotation Speed
-	- References
-		- Object
-- Pathed Turret
-	- Properties
-		- Turn Speed
-		- Head Rotation
-		- Thruster Behavior Override
-		- Spin Head (No Engaging)
-		- Shoot With Base Object
-		- Look at Target X-Axis
-		- Lock Head
-		- Targetable Head Object
-		- Secondary Explosion
-	- References
-		- Base Object
-		- Destroyed Object
-		- Nav Mesh
-		- Head Object
-- Movable Prop
-	- Properties
-		- Move Axis
-		- Start in End Position
-		- Looping
-		- Walkable
-		- Enabled
-		- Ground Cast
-		- Start Sound
-		- Height Offset
-		- Rotation
-		- Ending Position Offset
-		- Ending Rotation
-		- Position Speed
-		- Rotation Speed
-	- References
-		- Object
-		- Destroyed Object
-- Pathed Multi Turret
-	- Properties
-		- Turn Speed
-		- Independent Object
-		- Thruster Behavior Override
-		- Spin Head (No Engaging)
-		- Shoot With Base Object
-		- Look at Target X-Axis
-		- Lock Head
-		- Targetable Head Object
-		- Duplicate Shooter Properties
-	- References
-		- Base Object
-		- Destroyed Object
-		- Nav Mesh
-		- Head Object 1
-		- Head Object 2
-		- Head Object 3
-		- Head Object 4
-- Teleporter
-	- Properties
-		- X
-		- Y
-		- Trigger Radius
+		- [1st Stop Time, 2nt Stop Time, and 3rd Stop Time](Actors%20Properties.md#1st-Stop-Time-2nt-Stop-Time-and-3rd-Stop-Time-value)
+		- [Up Speed](Actors%20Properties.md#Up-Speed-value)
+		- [Down Speed](Actors%20Properties.md#Down-Speed-value)
+		- [Rotation](Actors%20Properties.md#Rotation-slider-2)
+		- [Trigger Type](Actors%20Properties.md#Trigger-Type-dropdown)
+		- [Tile Effect](Actors%20Properties.md#Tile-Effect-dropdown)
+		- [End Sound](Actors%20Properties.md#End-Sound-sound-effect)
+	- [References](Actors%20Properties.md#References-4)
+		- [Object](Actors%20Properties.md#Object-object-2)
+- [Dynamic Prop](Actors%20Properties.md#Dynamic-Prop--entity)
+	- [Properties](Actors%20Properties.md#Properties-8)
+		- [Ground Cast](Actors%20Properties.md#Ground-Cast-dropdown-1)
+		- [Rotation](Actors%20Properties.md#Rotation-slider-3)
+		- [Height Offset](Actors%20Properties.md#Height-Offset-3)
+	- [References](Actors%20Properties.md#References-5)
+		- [Object](Actors%20Properties.md#object-object-3)
+		- [Destroyed Object](Actors%20Properties.md#Destroyed-Object-object-2)
+- [Walkable Prop](Actors%20Properties.md#Walkable-Prop--entity)
+	- [Properties](Actors%20Properties.md#Properties-9)
+		- [Rotation Y](Actors%20Properties.md#Rotation-Y-slider)
+		- [Rotation X](Actors%20Properties.md#Rotation-X-slider)
+		- [Height Offset](Actors%20Properties.md#Height-Offset-4)
+		- [Tile Effect](Actors%20Properties.md#Tile-Effect-dropdown)
+	- [References](Actors%20Properties.md#References-6)
+		- [Object](Actors%20Properties.md#Object-object-3)
+		- [Destroyed Object](Actors%20Properties.md#Destroyed-Object-object-2)
+- [Floating Item](Actors%20Properties.md#Floating-Item--entity)
+	- [Properties](Actors%20Properties.md#Properties-10)
+		- [Ground Cast](Actors%20Properties.md#Ground-Cast-dropdown-2)
+		- [Reload Gun](Actors%20Properties.md#Reload-Gun-toggle)
+		- [Reload Heavy](Actors%20Properties.md#Reload-Heavy-toggle)
+		- [Reload Special](Actors%20Properties.md#Reload-Special-toggle)
+		- [Power Up Gun](Actors%20Properties.md#Power-Up-Gun-toggle)
+		- [Power Up Heavy](Actors%20Properties.md#Power-Up-Heavy-toggle)
+		- [Power Up Special](Actors%20Properties.md#Power-Up-Special-toggle)
+		- [Restore Health](Actors%20Properties.md#Restore-Health-toggle)
+		- [Invisibility](Actors%20Properties.md#Invisibility-toggle)
+		- [Invincibility](Actors%20Properties.md#Invincibility-toggle)
+		- [Rotation Speed](Actors%20Properties.md#Rotation-Speed-value)
+	- [References](Actors%20Properties.md#References-7)
+		- [Object](Actors%20Properties.md#Object-object-3)
+- [Pathed Turret](Actors%20Properties.md#Pathed-Turret--Pathed-Entity)
+	- [Properties](Actors%20Properties.md#Properties-11)
+		- [Turn Speed](Actors%20Properties.md#Turn-Speed-value-1)
+		- [Head Rotation](Actors%20Properties.md#Head-Rotation-slider)
+		- [Thruster Behavior Override](Actors%20Properties.md#Thruster-Behavior-Override-toggle)
+		- [Spin Head (No Engaging)](Actors%20Properties.md#Spin-Head-No-Engaging-toggle)
+		- [Shoot With Base Object](Actors%20Properties.md#Shoot-With-Base-Object-toggle)
+		- [Look at Target X-Axis](Actors%20Properties.md#Look-at-Target-X-Axis-toggle)
+		- [Lock Head](Actors%20Properties.md#Lock-Head-toggle)
+		- [Targetable Head Object](Actors%20Properties.md#Targetable-Head-Object-toggle)
+		- [Secondary Explosion](Actors%20Properties.md#Secondary-Explosion-explosion)
+	- [References](Actors%20Properties.md#References-8)
+		- [Base Object](Actors%20Properties.md#Base-Object-object-1)
+		- [Destroyed Object](Actors%20Properties.md#Destroyed-Object-object-3)
+		- [Nav Mesh](Actors%20Properties.md#Nav-Mesh-Nav-Mesh-1)
+		- [Head Object](Actors%20Properties.md#Head-Object-object-2)
+- [Movable Prop](Actors%20Properties.md#Movable-Prop--entity)
+	- [Properties](Actors%20Properties.md#Properties-12)
+		- [Move Axis](Actors%20Properties.md#Move-Axis-dropdown)
+		- [Start in End Position](Actors%20Properties.md#Start-in-End-Position-toggle)
+		- [Looping](Actors%20Properties.md#Looping-toggle)
+		- [Walkable](Actors%20Properties.md#Walkable-toggle-2)
+		- [Enabled](Actors%20Properties.md#Enabled-toggle)
+		- [Ground Cast](Actors%20Properties.md#Ground-Cast-dropdown-3)
+		- [Start Sound](Actors%20Properties.md#Start-Sound-sound-effect)
+		- [Height Offset](Actors%20Properties.md#Height-Offset-5)
+		- [Rotation](Actors%20Properties.md#Rotation-slider-4)
+		- [Ending Position Offset](Actors%20Properties.md#Ending-Position-Offset-value)
+		- [Ending Rotation](Actors%20Properties.md#Ending-Rotation-slider)
+		- [Position Speed](Actors%20Properties.md#Position-Speed-value)
+		- [Rotation Speed](Actors%20Properties.md#Rotation-Speed-value)
+	- [References](Actors%20Properties.md#References-9)
+		- [Object](Actors%20Properties.md#Object-object-4)
+		- [Destroyed Object](Actors%20Properties.md#Destroyed-Object-object-4)
+- [Pathed Multi Turret](Actors%20Properties.md#Pathed-Multi-Turret--pathed-entity)
+	- [Properties](Actors%20Properties.md#Properties-13)
+		- [Turn Speed](Actors%20Properties.md#Turn-Speed-value-2)
+		- [Independent Object](Actors%20Properties.md#Independent-Object-toggle)
+		- [Thruster Behavior Override](Actors%20Properties.md#Thruster-Behavior-Override-toggle-1)
+		- [Spin Head (No Engaging)](Actors%20Properties.md#Spin-Head-No-Engaging-toggle-1)
+		- [Shoot With Base Object](Actors%20Properties.md#Shoot-With-Base-Object-toggle-1)
+		- [Look at Target X-Axis](Actors%20Properties.md#Look-at-Target-X-Axis-toggle-1)
+		- [Lock Head](Actors%20Properties.md#Lock-Head-toggle-1)
+		- [Targetable Head Object](Actors%20Properties.md#Targetable-Head-Object-toggle-1)
+		- [Duplicate Shooter Properties](Actors%20Properties.md#--duplicate-shooter-properties--)
+	- [References](Actors%20Properties.md#References-10)
+		- [Base Object](Actors%20Properties.md#Base-Object-object-2)
+		- [Destroyed Object](Actors%20Properties.md#Destroyed-Object-object-5)
+		- [Nav Mesh](Actors%20Properties.md#Nav-Mesh-Nav-Mesh-2)
+		- [Head Object 1](Actors%20Properties.md#Head-Object-1-object)
+		- [Head Object 2](Actors%20Properties.md#Head-Object-2-object)
+		- [Head Object 3](Actors%20Properties.md#Head-Object-3-object)
+		- [Head Object 4](Actors%20Properties.md#Head-Object-4-object)
+- [Teleporter](Actors%20Properties.md#Teleporter--entity)
+	- [Properties](Actors%20Properties.md#Properties-14)
+		- [X ](Actors%20Properties.md#x-value)
+		- [Y ](Actors%20Properties.md#y-value)
+		- [Trigger Radius](Actors%20Properties.md#Trigger-Radius-value)
 	- Callbacks
 		- On Teleport
 		- On New Second
