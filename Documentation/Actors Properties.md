@@ -27,7 +27,7 @@
 		- [Enable Third Callback](Actors%20Properties.md#Enable-Third-Callback-toggle)
 		- [Health](Actors%20Properties.md#Health-value)
 		- [Collide Damage](Actors%20Properties.md#Collide-Damage-value)
-		- [Team](Actors%20Properties.md#Team-toggle-team)
+		- [Team](Actors%20Properties.md#Team-team)
 		- [Group](Actors%20Properties.md#Group-group)
 		- [Map Icon Color](Actors%20Properties.md#Map-Icon-Color-dropdown)
 		- [Target Priority](Actors%20Properties.md#Target-Priority-value)
@@ -39,22 +39,22 @@
 		- [On Hurt](Actors%20Properties.md#On-Hurt)
 		- [On Destroy](Actors%20Properties.md#On-Destroy)
 		- [On New Second](Actors%20Properties.md#On-New-Second)
-- Shooter
-	- Properties
-		- Weapon
-		- Prevent Back Shooting
-		- Shoot When Facing
-		- Fire Alternations
-		- Target Priority
-		- Disabled
-		- Weapon Actor Collision
-		- Attackable Weapon
-		- Allow Switch Target
-		- Acquiring Type
-		- Target Type
-		- Attack
-		- Detection FOV?
-		- Shooting FOV?
+- [Shooter](Actors%20Properties.md#shooter--entity)
+	- [Properties](Actors%20Properties.md#Properties-1)
+		- [Weapon](Actors%20Properties.md#Weapon)
+		- [Prevent Back Shooting](Actors%20Properties.md#Prevent-Back-Shooting-toggle)
+		- [Shoot When Facing](Actors%20Properties.md#Shoot-When-Facing-toggle)
+		- [Fire Alternations](Actors%20Properties.md#Fire-Alternations-toggle)
+		- [Target Priority](Actors%20Properties.md#Target-Priority-toggle)
+		- [Disabled](Actors%20Properties.md#Disabled-toggle)
+		- [Weapon Actor Collision](Actors%20Properties.md#Weapon-Actor-Collision-toggle)
+		- [Attackable Weapon](Actors%20Properties.md#Attackable-Weapon-toggle)
+		- [Allow Switch Target](Actors%20Properties.md#Allow-Switch-Target-toggle)
+		- [Acquiring Type](Actors%20Properties.md#Acquiring-Type-dropdown)
+		- [Target Type](Actors%20Properties.md#Target-Type-dropdown)
+		- [Attack](Actors%20Properties.md#Attack-Overloaded)
+		- [Detection FOV?](Actors%20Properties.md#Detection-FOV?-value)
+		- [Shooting FOV?](Actors%20Properties.md#Shooting-FOV?-value)
 		- Engage Range
 		- Targeting Delay
 - Turret
