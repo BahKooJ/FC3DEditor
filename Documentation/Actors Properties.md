@@ -73,61 +73,61 @@
 	- [References](Actors%20Properties.md#References)
 		- [Head Object](Actors%20Properties.md#Head-Object-object)
 		- [Destroyed Object](Actors%20Properties.md#Destroyed-Object-object)
-- Pathed Entity
-	- Properties
-		- Enable Backtrack
-		- Disable Path Obstruction
-		- Start As Landed
-		- Roll On Turns
-		- Disable Pathing
-		- Lock X Rotation
-		- Disable Spin To Backtrack
-		- Disable Ease
-		- Lock All Rotations
-		- Fall On Death
-		- Walkable
-		- Despawn On Path End
-		- Move Speed
-		- Height Offset
-		- Minimum Speed Multiplier
-		- Acceleration
-		- Unknown Multiplier
-	- References
-		- Object
-		- Destroyed Object
-		- Nav Mesh
-- Player
-	- Properties
-		- Rotation
-- Stationary Turret
-	- Properties
-		- Base Rotation
-	- References
-		- Head Object
-		- Base Object
-		- Destroyed Object
-- Aircraft
-	- Properties
-		- Aircraft Target Type and Aircraft Attack
-		- Target Acquisition
-		- Spawn Type
-		- Target Detection Range
-		- Min Distance From Target
-		- Height Offset
-		- Time To Descend
-		- Turn Rate
-		- Move Speed
-		- Orbit Area Width and Orbit Area Height
-		- Engage Time
-		- Engage Cooldown
-		- Spawn Pos X and Spawn Pos Y
-	- References
-		- Object
-- Elevator
-	- Properties
-		- Number Of Stops
-		- Starting Position
-		- 1st Height Offset, 2nt Height Offset, and 3rd Height Offset
+- [Pathed Entity](Actors%20Properties.md#Pathed-Entity--shooter)
+	- [Properties](Actors%20Properties.md#Properties-3)
+		- [Enable Backtrack](Actors%20Properties.md#Enable-Backtrack-toggle)
+		- [Disable Path Obstruction](Actors%20Properties.md#Disable-Path-Obstruction-toggle)
+		- [Start As Landed](Actors%20Properties.md#Start-As-Landed-toggle)
+		- [Roll On Turns](Actors%20Properties.md#Roll-On-Turns-toggle)
+		- [Disable Pathing](Actors%20Properties.md#Disable-Pathing-toggle)
+		- [Lock X Rotation](Actors%20Properties.md#Lock-X-Rotation-toggle)
+		- [Disable Spin To Backtrack](Actors%20Properties.md#Disable-Spin-To-Backtrack-toggle)
+		- [Disable Ease](Actors%20Properties.md#Disable-Ease-toggle)
+		- [Lock All Rotations](Actors%20Properties.md#Lock-All-Rotations-toggle)
+		- [Fall On Death](Actors%20Properties.md#Fall-On-Death-toggle)
+		- [Walkable](Actors%20Properties.md#Walkable-toggle)
+		- [Despawn On Path End](Actors%20Properties.md#Despawn-On-Path-End-toggle)
+		- [Move Speed](Actors%20Properties.md#Move-Speed-value)
+		- [Height Offset](Actors%20Properties.md#Height-Offset-value-1)
+		- [Minimum Speed Multiplier](Actors%20Properties.md#Minimum-Speed-Multiplier-slider)
+		- [Acceleration](Actors%20Properties.md#Acceleration-slider)
+		- [Unknown Multiplier](Actors%20Properties.md#Unknown-Multiplier-value)
+	- [References](Actors%20Properties.md#References-1)
+		- [Object](Actors%20Properties.md#object-object)
+		- [Destroyed Object](Actors%20Properties.md#Destroyed-Object-object)
+		- [Nav Mesh](Actors%20Properties.md#Nav-Mesh-Nav-Mesh)
+- [Player](Actors%20Properties.md#player--entity)
+	- [Properties](Actors%20Properties.md#Properties-4)
+		- [Rotation](Actors%20Properties.md#Rotation-slider-1)
+- [Stationary Turret](Actors%20Properties.md#Stationary-Turret--turret)
+	- [Properties](Actors%20Properties.md#Properties-5)
+		- [Base Rotation](Actors%20Properties.md#Base-Rotation-slider)
+	- [References](Actors%20Properties.md#References-2)
+		- [Head Object](Actors%20Properties.md#Head-Object-object-1)
+		- [Base Object](Actors%20Properties.md#Base-Object-object)
+		- [Destroyed Object](Actors%20Properties.md#Destroyed-Object-object-1)
+- [Aircraft](Actors%20Properties.md#Aircraft--shooter)
+	- [Properties](Actors%20Properties.md#Properties-6)
+		- [Aircraft Target Type and Aircraft Attack](Actors%20Properties.md#Aircraft-Target-Type-and-Aircraft-Attack)
+		- [Target Acquisition](Actors%20Properties.md#Target-Acquisition-dropdown)
+		- [Spawn Type](Actors%20Properties.md#Spawn-Type-dropdown)
+		- [Target Detection Range](Actors%20Properties.md#Target-Detection-Range-value)
+		- [Min Distance From Target](Actors%20Properties.md#Min-Distance-From-Target-value)
+		- [Height Offset](Actors%20Properties.md#Height-Offset-value-2)
+		- [Time To Descend](Actors%20Properties.md#Time-To-Descend-value)
+		- [Turn Rate](Actors%20Properties.md#Turn-Rate-value)
+		- [Move Speed](Actors%20Properties.md#Move-Speed-value)
+		- [Orbit Area Width and Orbit Area Height](Actors%20Properties.md#Orbit-Area-Width-and-Orbit-Area-Height-value)
+		- [Engage Time](Actors%20Properties.md#Engage-Time-value)
+		- [Engage Cooldown](Actors%20Properties.md#Engage-Cooldown-value)
+		- [Spawn Pos X and Spawn Pos Y](Actors%20Properties.md#Spawn-Pos-X-and-Spawn-Pos-Y-value)
+	- [References](Actors%20Properties.md#References-3)
+		- [Object](Actors%20Properties.md#Object-object-1)
+- [Elevator](Actors%20Properties.md#Elevator--entity)
+	- [Properties](Actors%20Properties.md#Properties-7)
+		- [Number Of Stops](Actors%20Properties.md#Number-Of-Stops-dropdown)
+		- [Starting Position](Actors%20Properties.md#Starting-Position-dropdown)
+		- [1st Height Offset, 2nt Height Offset, and 3rd Height Offset](Actors%20Properties.md#1st-Height-Offset-2nt-Height-Offset-and-3rd-Height-Offset-value)
 		- 1st Stop Time, 2nt Stop Time, and 3rd Stop Time
 		- Up Speed
 		- Down Speed
