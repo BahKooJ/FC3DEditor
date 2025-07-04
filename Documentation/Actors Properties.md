@@ -53,26 +53,26 @@
 		- [Acquiring Type](Actors%20Properties.md#Acquiring-Type-dropdown)
 		- [Target Type](Actors%20Properties.md#Target-Type-dropdown)
 		- [Attack](Actors%20Properties.md#Attack-Overloaded)
-		- [Detection FOV?](Actors%20Properties.md#Detection-FOV?-value)
-		- [Shooting FOV?](Actors%20Properties.md#Shooting-FOV?-value)
-		- Engage Range
-		- Targeting Delay
-- Turret
-	- Properties
-		- Ground Cast
-		- Facing Target Type, Facing Attack and Face Engage Range
-		- Rotation
-		- Height Offset
-		- Turn Speed
-		- Use Shooter Data for Facing
-		- Look at Target X-Axis
-		- Use Turret Data for Facing
-		- Spin Z Axis
-		- Walkable
-		- 135 Degrees Forward Facing
-	- References
-		- Head Object
-		- Destroyed Object
+		- [Detection FOV?](Actors%20Properties.md#Detection-FOV-value)
+		- [Shooting FOV?](Actors%20Properties.md#Shooting-FOV-value)
+		- [Engage Range](Actors%20Properties.md#Engage-Range-value)
+		- [Targeting Delay](Actors%20Properties.md#Targeting-Delay-value)
+- [Turret](Actors%20Properties.md#Turret--shooter)
+	- [Properties](Actors%20Properties.md#Properties-2)
+		- [Ground Cast](Actors%20Properties.md#Ground-Cast-dropdown)
+		- [Facing Target Type, Facing Attack and Face Engage Range](Actors%20Properties.md#facing-target-type-facing-attack-and-face-engage-range)
+		- [Rotation](Actors%20Properties.md#Rotation-slider)
+		- [Height Offset](Actors%20Properties.md#Height-Offset-value)
+		- [Turn Speed](Actors%20Properties.md#Turn-Speed-value)
+		- [Use Shooter Data for Facing](Actors%20Properties.md#Use-Shooter-Data-for-Facing-toggle)
+		- [Look at Target X-Axis](Actors%20Properties.md#Look-at-Target-X-Axis-toggle)
+		- [Use Turret Data for Facing](Actors%20Properties.md#Use-Turret-Data-for-Facing-toggle)
+		- [Spin Z Axis](Actors%20Properties.md#Spin-Z-Axis-toggle)
+		- [Walkable](Actors%20Properties.md#Walkable-toggle)
+		- [135 Degrees Forward Facing](Actors%20Properties.md#135-Degrees-Forward-Facing-toggle)
+	- [References](Actors%20Properties.md#References)
+		- [Head Object](Actors%20Properties.md#Head-Object-object)
+		- [Destroyed Object](Actors%20Properties.md#Destroyed-Object-object)
 - Pathed Entity
 	- Properties
 		- Enable Backtrack
