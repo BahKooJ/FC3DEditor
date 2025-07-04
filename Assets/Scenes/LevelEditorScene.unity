@@ -2725,7 +2725,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
-  message: Actor Editing Mode (WIP)
+  message: Actor Editing Mode
 --- !u!1 &1399091660
 GameObject:
   m_ObjectHideFlags: 0

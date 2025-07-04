@@ -312,9 +312,16 @@ public class AssetManagerView : MonoBehaviour {
     void AddRaw() {
 
         OpenFileWindowUtil.OpenFile("FCEAssets", "", path => {
-            var newFile = level.AddAsset(currentDirectory.storedAssets, File.ReadAllBytes(path));
-            currentDirectory.files.Add(new AssetFile(newFile, currentDirectory.storedAssets, currentDirectory));
-            Refresh();
+            try {
+                var newFile = level.AddAsset(currentDirectory.storedAssets, File.ReadAllBytes(path));
+                currentDirectory.files.Add(new AssetFile(newFile, currentDirectory.storedAssets, currentDirectory));
+                Refresh();
+            }
+            catch {
+
+                DialogWindowUtil.Dialog("Invalid File", "Please select a valid file.");
+
+            }
         });
 
     }

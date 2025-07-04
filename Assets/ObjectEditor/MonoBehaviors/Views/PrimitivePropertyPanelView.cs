@@ -72,7 +72,12 @@ public class PrimitivePropertyPanelView : MonoBehaviour {
 
         materialDropdown.ClearOptions();
 
-        materialDropdown.AddOptions(new List<string>(cases));
+        var spacedCases = new List<string>();
+        foreach (var c in cases) {
+            spacedCases.Add(Utils.AddSpacesToString(c));
+        }
+
+        materialDropdown.AddOptions(spacedCases);
 
         materialDropdown.value = primitive.materialID;
 

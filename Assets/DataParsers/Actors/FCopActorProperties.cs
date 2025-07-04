@@ -849,7 +849,7 @@ namespace FCopParser {
     public enum ElevatorTrigger {
         Implied = 0,
         ActionOnly = 1,
-        Unknown2 = 2,
+        ByScript = 2,
         Unknown3 = 3,
         Unknown4 = 4
     }

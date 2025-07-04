@@ -283,12 +283,22 @@ namespace FCopParser {
 
         public FCopAsset AddAsset(AssetType assetType, byte[] newData) {
 
+            var listData = newData.ToList();
+
             switch (assetType) {
                 case AssetType.WavSound:
+
+                    if (!listData.GetRange(0, 4).SequenceEqual(new List<byte>() { 0x52, 0x49, 0x46, 0x46 })) {
+                        throw new InvalidFileException();
+                    }
 
                     return audio.AddWave(newData, scripting.emptyOffset);
 
                 case AssetType.Object:
+
+                    if (!listData.GetRange(0, 4).SequenceEqual(new List<byte>() { 0x49, 0x47, 0x44, 0x34 })) {
+                        throw new InvalidFileException();
+                    }
 
                     var ids = new List<int>();
 

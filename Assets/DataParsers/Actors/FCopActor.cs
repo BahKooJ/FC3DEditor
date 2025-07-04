@@ -902,7 +902,7 @@ namespace FCopParser {
                 new ToggleActorProperty("Disable Player Targeting", Read1(0x02, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Disable Explosion", Read1(0x04, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Has Shadow", Read1(0x08, false), BitCount.Bit1, "Entity Tags"),
-                new ToggleActorProperty("Enable Thrid Callback", Read1(0x10, false), BitCount.Bit1, "Entity Tags"),
+                new ToggleActorProperty("Enable Third Callback", Read1(0x10, false), BitCount.Bit1, "Entity Tags"),
                 new ToggleActorProperty("Unknown (Scripting)", Read1(0x20, false), BitCount.Bit1, "Entity Tags"),
                 new FillerActorProperty(0, BitCount.Bit1),
                 new FillerActorProperty(0, BitCount.Bit1),
@@ -1149,6 +1149,15 @@ namespace FCopParser {
                 "On Hurt",
                 "On Death",
                 "On New Second"
+            };
+
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("Object 1", AssetType.Object),
+                new ActorAssetReference("None", AssetType.None),
+                new ActorAssetReference("Object 2", AssetType.Object),
+                new ActorAssetReference("Object 3", AssetType.Object),
+                new ActorAssetReference("Object 4", AssetType.Object),
+                new ActorAssetReference("Object 5", AssetType.Object),
             };
 
             properties.Add(new RangeActorProperty("Rotation", Read16(0), -4096, 4096, 4096f / 360f, BitCount.Bit16));
@@ -1857,6 +1866,12 @@ namespace FCopParser {
                 "On New Second"
             };
 
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("Object", AssetType.Object),
+                new ActorAssetReference("Destroyed Object", AssetType.Object),
+                new ActorAssetReference("Nav Mesh", AssetType.NavMesh),
+            };
+
             properties.AddRange(new List<ActorProperty>() {
 
                 new ValueActorProperty("Unknown 80", Read8(0), short.MinValue, short.MaxValue, BitCount.Bit8),
@@ -1885,6 +1900,11 @@ namespace FCopParser {
                 "On Hurt",
                 "On Death",
                 "On New Second"
+            };
+
+            assetReferences = new ActorAssetReference[] {
+                new ActorAssetReference("Object", AssetType.Object),
+                new ActorAssetReference("Destroyed Object", AssetType.Object)
             };
 
             properties.AddRange(new List<ActorProperty>() {
