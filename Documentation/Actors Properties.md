@@ -141,7 +141,7 @@
 	- [Properties](Actors%20Properties.md#Properties-8)
 		- [Ground Cast](Actors%20Properties.md#Ground-Cast-dropdown-1)
 		- [Rotation](Actors%20Properties.md#Rotation-slider-3)
-		- [Height Offset](Actors%20Properties.md#Height-Offset-3)
+		- [Height Offset](Actors%20Properties.md#Height-Offset-value-3)
 	- [References](Actors%20Properties.md#References-5)
 		- [Object](Actors%20Properties.md#object-object-3)
 		- [Destroyed Object](Actors%20Properties.md#Destroyed-Object-object-2)
@@ -149,7 +149,7 @@
 	- [Properties](Actors%20Properties.md#Properties-9)
 		- [Rotation Y](Actors%20Properties.md#Rotation-Y-slider)
 		- [Rotation X](Actors%20Properties.md#Rotation-X-slider)
-		- [Height Offset](Actors%20Properties.md#Height-Offset-4)
+		- [Height Offset](Actors%20Properties.md#Height-Offset-value-4)
 		- [Tile Effect](Actors%20Properties.md#Tile-Effect-dropdown)
 	- [References](Actors%20Properties.md#References-6)
 		- [Object](Actors%20Properties.md#Object-object-3)
@@ -194,7 +194,7 @@
 		- [Enabled](Actors%20Properties.md#Enabled-toggle)
 		- [Ground Cast](Actors%20Properties.md#Ground-Cast-dropdown-3)
 		- [Start Sound](Actors%20Properties.md#Start-Sound-sound-effect)
-		- [Height Offset](Actors%20Properties.md#Height-Offset-5)
+		- [Height Offset](Actors%20Properties.md#Height-Offset-value-5)
 		- [Rotation](Actors%20Properties.md#Rotation-slider-4)
 		- [Ending Position Offset](Actors%20Properties.md#Ending-Position-Offset-value)
 		- [Ending Rotation](Actors%20Properties.md#Ending-Rotation-slider)
@@ -227,112 +227,112 @@
 		- [X ](Actors%20Properties.md#x-value)
 		- [Y ](Actors%20Properties.md#y-value)
 		- [Trigger Radius](Actors%20Properties.md#Trigger-Radius-value)
-	- Callbacks
-		- On Teleport
-		- On New Second
-- Interchanging Entity
-	- References
-		- Object 1
-		- Object 2
-		- Object 3
-		- Object 4
-		- Object 5
-- Reloader
-	- Properties
-		- Ground Cast
-		- Open Radius
-		- Reload Gun
-		- Reload Heavy
-		- Reload Special
-		- Power Up Gun
-		- Power Up Heavy
-		- Power Up Special
-		- Restore Health
-		- Invisibility
-		- Invincibility
-		- Rotation
-	- References
-		- Base Object
-		- Item Object
-	- Callbacks
-		- On Hurt
-		- On Destroy
-		- On Interact
-- Map Objective Nodes
-	- Properties
-		- Show Arrow
-		- Show Satellite
-		- Show Minimap
-		- Map Icon Color
-		- Node X
-		- Node Y
-- Claimable Turret
-	- Properties
-		- 1st Interact Team
-		- 2nt Interact Team
-		- First Map Icon Color
-		- Second Map Icon Color
-		- Interact UV Offset X and Interact UV Offset Y
-		- Trigger Radius
-	- Callbacks
-		- On Hurt
-		- On Destroy
-		- On Interact
-- Trigger
-	- Properties
-		- Width Area, Length Area, Height Area
-		- Ground Cast
-		- Can Retrigger
-		- Trigger By Action
-		- Disable Trigger
-		- Unknown (Crowd Control)
-		- Actor Triggering Type
-		- Triggering Actor
-	- Callbacks
-		- On Trigger
-- Static Prop
-	- Properties
-		- Rotation Y, Rotation Z, and Rotation X
-		- Height Offset
-		- Ground Cast
-		- Disable Rendering
-		- Disable Animation
-		- Reverse Animation
-		- Animation Speed
-		- Scale X, Scale Y, Scale Z
-		- Spin Speed
-		- Spin Angle
-	- References
-		- Object
-- Texture
-	- Properties
-		- Transparent
-		- Additive
-		- Texture Snippet
-		- Height Offset
-		- Width and Height
-		- Rotation Y, Rotation X, and Rotation Z
-		- Ground Cast
-		- Red, Green and Blue
-- Weapon
-	- Properties
-		- Weapon ID
-		- Type
-		- Ammo Count
-		- Reload Count
-		- Burst Shot Count
-		- Fire Delay
-		- Burst Fire Delay
-		- Damage
-		- Blast Radius
-		- Velocity
-		- Max Range
-		- Impact Effect
-		- Weapon Effects
-		- Shoot Sound
-		- Echo Sound
-	- References
-		- Object
+	- [Callbacks](Actors%20Properties.md#Callbacks-1)
+		- [On Teleport](Actors%20Properties.md#On-Teleport)
+		- [On New Second](Actors%20Properties.md#On-New-Second-1)
+- [Interchanging Entity](Actors%20Properties.md#Interchanging-Entity--Turret)
+	- [References](Actors%20Properties.md#References-11)
+		- [Object 1](Actors%20Properties.md#Object-1)
+		- [Object 2](Actors%20Properties.md#Object-2)
+		- [Object 3](Actors%20Properties.md#Object-3)
+		- [Object 4](Actors%20Properties.md#Object-4)
+		- [Object 5](Actors%20Properties.md#Object-5)
+- [Reloader](Actors%20Properties.md#Reloader--entity)
+	- [Properties](Actors%20Properties.md#Properties-15)
+		- [Ground Cast](Actors%20Properties.md#Ground-Cast-dropdown-4)
+		- [Open Radius](Actors%20Properties.md#Open-Radius)
+		- [Reload Gun](Actors%20Properties.md#Reload-Gun-toggle-1)
+		- [Reload Heavy](Actors%20Properties.md#Reload-Heavy-toggle-1)
+		- [Reload Special](Actors%20Properties.md#Reload-Special-toggle-1)
+		- [Power Up Gun](Actors%20Properties.md#Power-Up-Gun-toggle-1)
+		- [Power Up Heavy](Actors%20Properties.md#Power-Up-Heavy-toggle-1)
+		- [Power Up Special](Actors%20Properties.md#Power-Up-Special-toggle-1)
+		- [Restore Health](Actors%20Properties.md#Restore-Health-toggle-1)
+		- [Invisibility](Actors%20Properties.md#Invisibility-toggle-1)
+		- [Invincibility](Actors%20Properties.md#Invincibility-toggle-1)
+		- [Rotation](Actors%20Properties.md#Rotation-slider-5)
+	- [References](Actors%20Properties.md#References-12)
+		- [Base Object](Actors%20Properties.md#Base-Object-object-3)
+		- [Item Object](Actors%20Properties.md#Item-Object)
+	- [Callbacks](Actors%20Properties.md#Callbacks-2)
+		- [On Hurt](Actors%20Properties.md#On-Hurt-1)
+		- [On Destroy](Actors%20Properties.md#On-Destroy-1)
+		- [On Interact](Actors%20Properties.md#On-Interact)
+- [Map Objective Nodes](Actors%20Properties.md#Map-Objective-Nodes)
+	- [Properties](Actors%20Properties.md#Properties-16)
+		- [Show Arrow](Actors%20Properties.md#Show-Arrow-toggle)
+		- [Show Satellite](Actors%20Properties.md#Show-Satellite-toggle)
+		- [Show Minimap](Actors%20Properties.md#Show-Minimap-toggle)
+		- [Map Icon Color](Actors%20Properties.md#Map-Icon-Color-dropdown-1)
+		- [Node X](Actors%20Properties.md#Node-X-value)
+		- [Node Y](Actors%20Properties.md#Node-Y-value)
+- [Claimable Turret](Actors%20Properties.md#Claimable-Turret--Stationary-Turret)
+	- [Properties](Actors%20Properties.md#Properties-17)
+		- [1st Interact Team](Actors%20Properties.md#1st-Interact-Team-team)
+		- [2nt Interact Team](Actors%20Properties.md#2nt-Interact-Team-team)
+		- [First Map Icon Color](Actors%20Properties.md#First-Map-Icon-Color-dropdown)
+		- [Second Map Icon Color](Actors%20Properties.md#Second-Map-Icon-Color-dropdown)
+		- [Interact UV Offset X and Interact UV Offset Y](Actors%20Properties.md#Interact-UV-Offset-X-and-Interact-UV-Offset-Y-value)
+		- [Trigger Radius](Actors%20Properties.md#Trigger-Radius-value)
+	- [Callbacks](Actors%20Properties.md#Callbacks-3)
+		- [On Hurt](Actors%20Properties.md#On-Hurt-2)
+		- [On Destroy](Actors%20Properties.md#On-Destroy-2)
+		- [On Interact](Actors%20Properties.md#On-Interact-1)
+- [Trigger](Actors%20Properties.md#Trigger)
+	- [Properties](Actors%20Properties.md#Properties-18)
+		- [Width Area, Length Area, Height Area](Actors%20Properties.md#Width-Area-Length-Area-Height-Area-value)
+		- [Ground Cast](Actors%20Properties.md#Ground-Cast-dropdown-5)
+		- [Can Retrigger](Actors%20Properties.md#Can-Retrigger-toggle)
+		- [Trigger By Action](Actors%20Properties.md#Trigger-By-Action-toggle)
+		- [Disable Trigger](Actors%20Properties.md#Disable-Trigger-toggle)
+		- [Unknown (Crowd Control)](Actors%20Properties.md#Unknown-Crowd-Control-toggle)
+		- [Actor Triggering Type](Actors%20Properties.md#Actor-Triggering-Type-dropdown)
+		- [Triggering Actor](Actors%20Properties.md#Triggering-Actor-actor)
+	- [Callbacks](Actors%20Properties.md#Callbacks-4)
+		- [On Trigger](Actors%20Properties.md#On-Trigger)
+- [Static Prop](Actors%20Properties.md#Static-Prop)
+	- [Properties](Actors%20Properties.md#Properties-19)
+		- [Rotation Y, Rotation Z, and Rotation X](Actors%20Properties.md#Rotation-Y-Rotation-Z-and-Rotation-X-Slider)
+		- [Height Offset](Actors%20Properties.md#Height-Offset-value-6)
+		- [Ground Cast](Actors%20Properties.md#Ground-Cast-dropdown-6)
+		- [Disable Rendering](Actors%20Properties.md#Disable-Rendering-toggle)
+		- [Disable Animation](Actors%20Properties.md#Disable-Animation-toggle)
+		- [Reverse Animation](Actors%20Properties.md#Reverse-Animation-toggle)
+		- [Animation Speed](Actors%20Properties.md#Animation-Speed-slider)
+		- [Scale X, Scale Y, Scale Z](Actors%20Properties.md#Scale-X-Scale-Y-Scale-Z-slider)
+		- [Spin Speed](Actors%20Properties.md#Spin-Speed-slider)
+		- [Spin Angle](Actors%20Properties.md#Spin-Angle-slider)
+	- [References](Actors%20Properties.md#References-13)
+		- [Object](Actors%20Properties.md#Object-object-5)
+- [Texture](Actors%20Properties.md#Texture)
+	- [Properties](Actors%20Properties.md#Properties-20)
+		- [Transparent](Actors%20Properties.md#Transparent-toggle)
+		- [Additive](Actors%20Properties.md#Additive-toggle)
+		- [Texture Snippet](Actors%20Properties.md#Texture-Snippet-Texture-Snippet)
+		- [Height Offset](Actors%20Properties.md#Height-Offset-value-7)
+		- [Width and Height](Actors%20Properties.md#Width-and-Height-value)
+		- [Rotation Y, Rotation X, and Rotation Z](Actors%20Properties.md#Rotation-Y-Rotation-X-and-Rotation-Z-slider)
+		- [Ground Cast](Actors%20Properties.md#Ground-Cast-dropdown-7)
+		- [Red, Green and Blue](Actors%20Properties.md#Red-Green-and-Blue-slider)
+- [Weapon](Actors%20Properties.md#Weapon)
+	- [Properties](Actors%20Properties.md#Properties-21)
+		- [Weapon ID](Actors%20Properties.md#Weapon-ID-value)
+		- [Type](Actors%20Properties.md#type-dropdown)
+		- [Ammo Count](Actors%20Properties.md#Ammo-Count-value)
+		- [Reload Count](Actors%20Properties.md#Reload-Count-value)
+		- [Burst Shot Count](Actors%20Properties.md#Burst-Shot-Count-value)
+		- [Fire Delay](Actors%20Properties.md#Fire-Delay-value)
+		- [Burst Fire Delay](Actors%20Properties.md#Burst-Fire-Delay-value)
+		- [Damage](Actors%20Properties.md#damage-value)
+		- [Blast Radius](Actors%20Properties.md#Blast-Radius-overloaded)
+		- [Velocity](Actors%20Properties.md#Velocity-value)
+		- [Max Range](Actors%20Properties.md#max-range-overloaded)
+		- [Impact Effect](Actors%20Properties.md#Impact-Effect-special)
+		- [Weapon Effects](Actors%20Properties.md#Weapon-Effects-special)
+		- [Shoot Sound](Actors%20Properties.md#Shoot-Sound-sound-effect)
+		- [Echo Sound](Actors%20Properties.md#Echo-Sound-sound-effect)
+	- [References](Actors%20Properties.md#References-14)
+		- [Object](Actors%20Properties.md#Object-object-6)
 # Concepts
 
 #### Teams
