@@ -32,6 +32,7 @@ public class ActorEditPanelView : MonoBehaviour {
             ("Pathed Entity", () => { controller.StartAdd(FCopParser.ActorBehavior.PathedEntity); }),
             ("Stationary Entity", () => { controller.StartAdd(FCopParser.ActorBehavior.StationaryEntity); }),
             ("Stationary Turret", () => { controller.StartAdd(FCopParser.ActorBehavior.StationaryTurret); }),
+            ("Interchanging Entity", () => { controller.StartAdd(FCopParser.ActorBehavior.InterchangingEntity); }),
             ("Aircraft", () => { controller.StartAdd(FCopParser.ActorBehavior.Aircraft); }),
             ("Pathed Turret", () => { controller.StartAdd(FCopParser.ActorBehavior.PathedTurret); }),
             ("Pathed Multi-Turret", () => { controller.StartAdd(FCopParser.ActorBehavior.PathedMultiTurret); }),

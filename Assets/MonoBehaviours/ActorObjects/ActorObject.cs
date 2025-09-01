@@ -167,7 +167,7 @@ public class ActorObject : MonoBehaviour {
 
         }
 
-        if (actor.behavior is FCopShooter) {
+        if (actor.behavior is FCopShooter || actor.behavior is FCopPathedEntity || actor.behavior is FCopObjectMutating || actor.behavior is FCopBehavior16) {
 
             var hasObj = false;
             foreach (var obj in objects) {

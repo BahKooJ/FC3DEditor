@@ -258,6 +258,10 @@ namespace FCopParser {
                     InitResourceAndRawFile(FCopBehavior29.assetRefCount);
                     this.behavior = new FCopBehavior29(this, new());
                     break;
+                case ActorBehavior.InterchangingEntity:
+                    InitResourceAndRawFile(FCopBehavior30.assetRefCount);
+                    this.behavior = new FCopBehavior30(this, new());
+                    break;
                 case ActorBehavior.Reloader:
                     InitResourceAndRawFile(FCopBehavior32.assetRefCount);
                     this.behavior = new FCopBehavior32(this, new());
@@ -2257,6 +2261,8 @@ namespace FCopParser {
 
     // - Implemented..?, Very script dependent -
     public class FCopBehavior30 : FCopTurret {
+
+        public const int assetRefCount = 5;
 
         public FCopBehavior30(FCopActor actor, List<byte> propertyData) : base(actor, propertyData) {
 
