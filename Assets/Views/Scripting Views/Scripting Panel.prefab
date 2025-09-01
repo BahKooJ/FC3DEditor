@@ -3907,7 +3907,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InfoPopUp: {fileID: 2786590385843242170, guid: 62ff099c4177af34b9a0d0576ae9a2b8, type: 3}
-  message: Add Script/Function
+  message: Add Script/Update Script
 --- !u!114 &6254006987569297919
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9478,7 +9478,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Funcs
+  m_text: Updates
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b66ceec7666a6044fb0168ddf311a4cb, type: 2}
   m_sharedMaterial: {fileID: 446512641697274038, guid: b66ceec7666a6044fb0168ddf311a4cb, type: 2}
@@ -9706,7 +9706,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 630897276203883294, guid: 4c36a30fa36db4f4b89a5b5fbf2ffb91, type: 3}
       propertyPath: m_Size
-      value: 0.5029821
+      value: 0.50835794
       objectReference: {fileID: 0}
     - target: {fileID: 1250400484849478509, guid: 4c36a30fa36db4f4b89a5b5fbf2ffb91, type: 3}
       propertyPath: m_AnchorMax.y

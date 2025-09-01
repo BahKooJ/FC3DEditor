@@ -64,7 +64,7 @@ namespace FCopParser {
                 }
 
                 code.code = new() { runConditionNestingNode };
-                code.name = "Function " + i2;
+                code.name = "Update Script " + i2;
                 item.code = code;
 
                 i2++;
@@ -133,7 +133,8 @@ namespace FCopParser {
         public void AddFunc() {
 
             var code = new FCopScript(0);
-            code.name = "Function";
+            // Changed name for better user expirence.
+            code.name = "Update Script";
             code.code.Add(new ScriptNestingNode(ByteCode.RUN, "Run", ScriptDataType.Void, new() { new ScriptParameter("", ScriptDataType.Bool) }, new() { new LiteralNode(0) }));
 
             var newFunc = new FCopFunction(-1, 55, code);

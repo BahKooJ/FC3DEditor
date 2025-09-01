@@ -1,7 +1,6 @@
 ﻿
 
 using TMPro;
-using UnityEditor.Presets;
 using UnityEngine;
 
 public class UVPresetsDirectoryViewItem : MonoBehaviour {

@@ -523,6 +523,7 @@ public class NavMeshEditMode : EditMode {
         }
 
         script.ClearPaths();
+        view.propertyPanel.Refresh();
 
     }
 

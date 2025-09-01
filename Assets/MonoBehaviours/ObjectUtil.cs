@@ -26,6 +26,16 @@ public abstract class ObjectUtil {
 
         if (Physics.Raycast(castPos, castDirection, out RaycastHit hit, Mathf.Infinity, 1)) {
 
+            if (groundCast == ActorGroundCast.Middle) {
+
+                castPos = new Vector3(position.x + 0.001f, hit.point.y - 0.01f, position.y - 0.001f);
+
+                if (Physics.Raycast(castPos, castDirection, out RaycastHit hit2, Mathf.Infinity, 1)) {
+                    return hit2.point.y;
+                }
+
+            }
+
             return hit.point.y;
 
         }

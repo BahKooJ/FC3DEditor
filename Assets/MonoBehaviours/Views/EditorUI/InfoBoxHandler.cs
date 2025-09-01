@@ -14,6 +14,12 @@ public class InfoBoxHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         if (Main.draggingElement != null) {
             return;
         }
+
+        var views = FindObjectsOfType<InfoPopUpView>();
+
+        foreach (var obj in views) {
+            Destroy(obj.gameObject);
+        }
         
         var view = Instantiate(InfoPopUp);
 

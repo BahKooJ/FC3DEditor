@@ -3384,7 +3384,7 @@ namespace FCopParser {
         }
 
         public int GetID() {
-            return propertiesByName["ID"].GetCompiledValue();
+            return propertiesByName["Weapon ID"].GetCompiledValue();
         }
 
     }

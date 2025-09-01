@@ -609,8 +609,10 @@ public class Main : MonoBehaviour {
         catch {
 
             QuickLogHandler.Log("Auto save failed", LogSeverity.Warning);
-
+            return;
         }
+
+        FindFirstObjectByType<ScriptingPanelView>()?.Refresh();
 
         File.WriteAllBytes("fce_autosave.ncfc", bytes.ToArray());
         QuickLogHandler.Log("Auto save complete", LogSeverity.Success);
