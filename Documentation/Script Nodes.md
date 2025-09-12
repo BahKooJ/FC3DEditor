@@ -1,3 +1,11 @@
+
+- [System](#system)
+  - [If : Void](#if--void)
+  - [Else](#else--void)
+  - [Queue Stream : Void](#queue-stream--void)
+  - [Play Stream : Void](#play-stream--void)
+  - [Random : Int](#random--int)
+
 # System
 
 ## If : Void
@@ -13,7 +21,7 @@ The bool condition for running the statement's code.
 
 Will run the nested code if Red Points is greater than 0, and, Red Chopper Count is less than 20.
 
-## Else:
+## Else : Void
 A statement for running a specific area of code if the provided "If" statement is false. This statement can only be used alongside an "If" statement.
 
 ### Example:
