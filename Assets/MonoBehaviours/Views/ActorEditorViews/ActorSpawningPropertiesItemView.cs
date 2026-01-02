@@ -5,6 +5,7 @@ using UnityEngine;
 using TMPro;
 using System;
 using UnityEngine.UI;
+using System.Linq;
 
 public class ActorSpawningPropertiesItemView : MonoBehaviour {
 
@@ -89,6 +90,8 @@ public class ActorSpawningPropertiesItemView : MonoBehaviour {
 
             actor.spawningProperties = new FCopActorSpawning(actor.DataID);
             Refresh();
+
+            controller.TestSpawningActorsCount();
 
         }
 
