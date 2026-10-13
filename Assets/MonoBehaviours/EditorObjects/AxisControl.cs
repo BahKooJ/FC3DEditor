@@ -101,15 +101,15 @@ public class AxisControl: MonoBehaviour {
 
                 if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, Main.interfaceObjectsMask)) {
 
-                    if (hit.colliderInstanceID == axisX.GetComponent<CapsuleCollider>().GetInstanceID()) {
+                    if (hit.colliderEntityId == axisX.GetComponent<CapsuleCollider>().GetEntityId()) {
                         click = Axis.AxisX;
                         didHit = true;
                     }
-                    else if (hit.colliderInstanceID == axisY.GetComponent<CapsuleCollider>().GetInstanceID()) {
+                    else if (hit.colliderEntityId == axisY.GetComponent<CapsuleCollider>().GetEntityId()) {
                         click = Axis.AxisY;
                         didHit = true;
                     }
-                    else if (hit.colliderInstanceID == axisZ.GetComponent<CapsuleCollider>().GetInstanceID()) {
+                    else if (hit.colliderEntityId == axisZ.GetComponent<CapsuleCollider>().GetEntityId()) {
                         click = Axis.AxisZ;
                         didHit = true;
                     }

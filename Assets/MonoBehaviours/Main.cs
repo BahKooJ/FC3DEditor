@@ -443,7 +443,7 @@ public class Main : MonoBehaviour {
 
             foreach (var section in sectionMeshes) {
 
-                if (hit.colliderInstanceID == section.meshCollider.GetInstanceID()) {
+                if (hit.colliderEntityId == section.meshCollider.GetEntityId()) {
 
                     int clickX = (int)Math.Floor(hit.point.x - section.x);
                     int clickY = (int)Math.Floor(Math.Abs(hit.point.z + section.y));
@@ -489,7 +489,7 @@ public class Main : MonoBehaviour {
 
             foreach (var section in sectionMeshes) {
 
-                if (hit.colliderInstanceID == section.meshCollider.GetInstanceID()) {
+                if (hit.colliderEntityId == section.meshCollider.GetEntityId()) {
 
                     int clickX = (int)Math.Floor(hit.point.x - section.x);
                     int clickY = (int)Math.Floor(Math.Abs(hit.point.z + section.y));

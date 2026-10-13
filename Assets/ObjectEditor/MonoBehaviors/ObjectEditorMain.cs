@@ -101,7 +101,7 @@ public class ObjectEditorMain : MonoBehaviour {
 
         foreach (var vert in gameObjectVertices) {
 
-            if (hit.colliderInstanceID == vert.boxCollider.GetInstanceID()) {
+            if (hit.colliderEntityId == vert.boxCollider.GetEntityId()) {
                 requestedVertexActionCallback(vert);
                 return true;
             }
@@ -114,7 +114,7 @@ public class ObjectEditorMain : MonoBehaviour {
 
     public bool TestObjectMeshRaycast(RaycastHit hit) {
 
-        if (objectMesh.meshCollider.GetInstanceID() == hit.colliderInstanceID) {
+        if (hit.colliderEntityId == objectMesh.meshCollider.GetEntityId()) {
 
             SelectFace(objectMesh.sortedPrimitives[hit.triangleIndex]);
 

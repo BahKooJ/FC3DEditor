@@ -309,13 +309,13 @@ public class NavMeshEditMode : EditMode {
 
             foreach (var node in navNodes) {
 
-                if (hit.colliderInstanceID == node.sphereCollider.GetInstanceID()) {
+                if (hit.colliderEntityId == node.sphereCollider.GetEntityId()) {
 
                     return node;
 
                 }
 
-                if (hit.colliderInstanceID == node.heightOffsetSphere.GetComponent<SphereCollider>().GetInstanceID()) {
+                if (hit.colliderEntityId == node.heightOffsetSphere.GetComponent<SphereCollider>().GetEntityId()) {
                     return node;
                 }
 

@@ -622,7 +622,7 @@ public class ShaderEditMode : TileMutatingEditMode {
 
             foreach (var vertex in vertexColorPoints) {
 
-                if (hit.colliderInstanceID == vertex.boxCollider.GetInstanceID()) {
+                if (hit.colliderEntityId == vertex.boxCollider.GetEntityId()) {
 
                     didHit = true;
 

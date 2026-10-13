@@ -261,7 +261,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
             foreach (var channel in heightPointObjects) {
 
-                if (hit.colliderInstanceID == channel.boxCollider.GetInstanceID()) {
+                if (hit.colliderEntityId == channel.boxCollider.GetEntityId()) {
                     
                     if (Controls.IsDown("Select")) {
 

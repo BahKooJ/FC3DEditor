@@ -370,7 +370,7 @@ public class ActorEditMode : EditMode {
 
         foreach (var node in actorEditingNodes) {
 
-            if (hit.colliderInstanceID == node.nodeCollider.GetInstanceID()) {
+            if (hit.colliderEntityId == node.nodeCollider.GetEntityId()) {
 
                 SelectActorEditingNode(node);
 
@@ -392,14 +392,14 @@ public class ActorEditMode : EditMode {
 
             if (act.missingObjectGameobj != null && act.missingObjectGameobj.activeSelf) {
 
-                if (hit.colliderInstanceID == act.missingObjectGameobj.GetComponentInChildren<Collider>().GetInstanceID()) {
+                if (hit.colliderEntityId == act.missingObjectGameobj.GetComponentInChildren<Collider>().GetEntityId()) {
                     didHit = true;
                 }
 
             }
             else if (act.actCollider != null) {
 
-                if (hit.colliderInstanceID == act.actCollider.GetInstanceID()) {
+                if (hit.colliderEntityId == act.actCollider.GetEntityId()) {
                     didHit = true;
                 }
 
@@ -412,14 +412,14 @@ public class ActorEditMode : EditMode {
                         continue;
                     }
 
-                    if (hit.colliderInstanceID == obj.meshCollider.GetInstanceID()) {
+                    if (hit.colliderEntityId == obj.meshCollider.GetEntityId()) {
                         didHit = true;
                     }
                     else {
 
                         foreach (var specialObj in obj.specialPrimitives) {
 
-                            if (hit.colliderInstanceID == specialObj.GetComponent<MeshCollider>().GetInstanceID()) {
+                            if (hit.colliderEntityId == specialObj.GetComponent<MeshCollider>().GetEntityId()) {
                                 didHit = true;
                                 break;
                             }

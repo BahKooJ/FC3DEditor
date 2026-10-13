@@ -173,6 +173,8 @@ namespace FCopParser {
 
         public static int FindNextInt(List<int> ints) {
 
+            if (ints.Count == 0) return 0;
+
             var intsByAscending = ints.OrderBy(i => i).ToList();
 
             var previousID = intsByAscending[0];

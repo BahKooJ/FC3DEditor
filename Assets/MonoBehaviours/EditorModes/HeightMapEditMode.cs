@@ -268,7 +268,7 @@ public class HeightMapEditMode : EditMode {
 
             foreach (var channel in heightPointObjects) {
 
-                if (hit.colliderInstanceID == channel.boxCollider.GetInstanceID()) {
+                if (hit.colliderEntityId == channel.boxCollider.GetEntityId()) {
 
                     if (Controls.IsDown("ModifierChannelSelect1") && channel.channel != 1) {
                         return;
