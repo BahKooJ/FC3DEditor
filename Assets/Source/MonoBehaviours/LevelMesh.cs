@@ -22,7 +22,6 @@ public class LevelMesh : MonoBehaviour {
     List<Vector3> vertices = new List<Vector3>();
     List<int> triangles = new List<int>();
     List<Vector2> textureCords = new List<Vector2>();
-
     List<Color> vertexColors = new();
 
     public List<Tile> sortedTilesByTriangle = new List<Tile>();
@@ -36,7 +35,6 @@ public class LevelMesh : MonoBehaviour {
     public int arrayX = 0;
     public int arrayY = 0;
 
-    // Start is called before the first frame update
     void Start() {
 
         mesh = new Mesh();
@@ -56,7 +54,6 @@ public class LevelMesh : MonoBehaviour {
 
     }
 
-    // Update is called once per frame
     void Update() {
 
         var didChange = false;
@@ -86,14 +83,14 @@ public class LevelMesh : MonoBehaviour {
     void Generate(FCopLevelSection section) {
 
         var vertexIndex = 0;
-        var index = 0;
+        //var index = 0;
         foreach (var column in section.tileColumns) {
 
             List<Vector3> AddVerticies(Tile tile) {
 
                 var vertices = new List<Vector3>();
 
-                foreach (var point in tile.verticies) {
+                foreach (var point in tile.vertices) {
 
                     switch (point.vertexPosition) {
 
@@ -304,10 +301,10 @@ public class LevelMesh : MonoBehaviour {
 
             foreach (var tile in column.tiles) {
 
-                if (tile.verticies.Count == 3) {
+                if (tile.vertices.Count == 3) {
                     GenerateTriangle(tile);
                     sortedTilesByTriangle.Add(tile);
-                } else if (tile.verticies.Count == 4) {
+                } else if (tile.vertices.Count == 4) {
                     GenerateSquare(tile);
                     sortedTilesByTriangle.Add(tile);
                     sortedTilesByTriangle.Add(tile);
@@ -315,7 +312,7 @@ public class LevelMesh : MonoBehaviour {
 
             }
 
-            index++;
+            //index++;
 
         }
 

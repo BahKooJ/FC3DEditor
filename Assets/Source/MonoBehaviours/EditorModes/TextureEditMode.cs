@@ -559,7 +559,7 @@ public class TextureEditMode : TileMutatingEditMode {
 
         var firstTile = FirstTile;
 
-        var potentialID = MeshType.IDFromVerticies(firstTile.verticies);
+        var potentialID = MeshType.IDFromVerticies(firstTile.vertices);
 
         if (potentialID == null) {
             DialogWindowUtil.Dialog("Cannot Save Preset", "Cannot save preset, tile mesh is invalid!");

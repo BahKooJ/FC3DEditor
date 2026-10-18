@@ -181,7 +181,7 @@ public class Schematic {
 
             var emptyColumn = GetTileColumn(item.columnWorldX - startingX, item.columnWorldY - startingY);
 
-            foreach (var vert in item.tile.verticies) {
+            foreach (var vert in item.tile.vertices) {
 
                 emptyColumn.heights[(int)vert.vertexPosition - 1]
                     .SetPoint(item.column.heights[(int)vert.vertexPosition - 1].GetTruePoint(vert.heightChannel), vert.heightChannel);
@@ -902,7 +902,7 @@ public class Schematic {
 
             foreach (var tile in column.tiles) {
                 total.Append("(");
-                total.Append(((int)MeshType.IDFromVerticies(tile.verticies)).ToString() + ",");
+                total.Append(((int)MeshType.IDFromVerticies(tile.vertices)).ToString() + ",");
                 total.Append(tile.culling.ToString() + ",");
                 total.Append(tile.effectIndex.ToString() + ",");
                 total.Append(new UVPreset(tile).Compile() + ",");

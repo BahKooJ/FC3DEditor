@@ -49,7 +49,7 @@ public class DebugTilePanelView : MonoBehaviour {
                 }
 
                 MeshType.meshes[id] = new(verticies);
-                tile.verticies = verticies;
+                tile.vertices = verticies;
 
                 Refresh();
 
@@ -74,11 +74,11 @@ public class DebugTilePanelView : MonoBehaviour {
 
         debugUVItems.Clear();
 
-        if (MeshType.IDFromVerticies(tile.verticies) == null) {
-            MeshType.meshes[id] = new(tile.verticies);
+        if (MeshType.IDFromVerticies(tile.vertices) == null) {
+            MeshType.meshes[id] = new(tile.vertices);
         }
 
-        id = (int)MeshType.IDFromVerticies(tile.verticies);
+        id = (int)MeshType.IDFromVerticies(tile.vertices);
 
         verticies = MeshType.VerticiesFromID(id);
 

@@ -91,7 +91,7 @@ public class VertexColorPoint : MonoBehaviour {
 
                 var monoShader = (DynamicMonoChromeShader)tile.shaders;
 
-                if (tile.verticies.Count == 4) {
+                if (tile.vertices.Count == 4) {
 
                     if (!(monoShader.values[ShaderColorPickerView.monoDataQuadIndexes[index]] == DynamicMonoChromeShader.white)) {
                         return;
@@ -119,7 +119,7 @@ public class VertexColorPoint : MonoBehaviour {
 
                 var shaderColor = (ColorShader)tile.shaders;
 
-                if (tile.verticies.Count == 4) {
+                if (tile.vertices.Count == 4) {
 
                     if (!shaderColor.values[ShaderColorPickerView.colorDataQuadIndexes[index]].IsWhite()) {
                         return;
@@ -178,7 +178,7 @@ public class VertexColorPoint : MonoBehaviour {
             tile.ChangeShader(originalType);
         }
 
-        if (tile.verticies.Count <= index) {
+        if (tile.vertices.Count <= index) {
             return;
         }
 
@@ -196,7 +196,7 @@ public class VertexColorPoint : MonoBehaviour {
 
                 var monoShader = (DynamicMonoChromeShader)tile.shaders;
 
-                if (tile.verticies.Count == 4) {
+                if (tile.vertices.Count == 4) {
 
                     monoShader.values[ShaderColorPickerView.monoDataQuadIndexes[index]] = controller.colorPicker.dynamicMonoValue;
 
@@ -216,7 +216,7 @@ public class VertexColorPoint : MonoBehaviour {
 
                 var shaderColor = (ColorShader)tile.shaders;
 
-                if (tile.verticies.Count == 4) {
+                if (tile.vertices.Count == 4) {
 
                     shaderColor.values[ShaderColorPickerView.colorDataQuadIndexes[index]] = controller.colorPicker.colorValue.Clone();
 

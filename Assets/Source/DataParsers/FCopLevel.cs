@@ -689,7 +689,7 @@ namespace FCopParser {
 
                     foreach (var tile in tileColumn.tiles) {
 
-                        var meshType = MeshType.IDFromVerticies(tile.verticies);
+                        var meshType = MeshType.IDFromVerticies(tile.vertices);
 
                         if (meshType == null) {
                             throw new MeshIDException();
@@ -2463,7 +2463,7 @@ namespace FCopParser {
                         
                         foreach (var tile in topLeft.tiles) {
 
-                            foreach (var vert in tile.verticies) {
+                            foreach (var vert in tile.vertices) {
 
                                 if (vert.vertexPosition == VertexPosition.BottomRight) {
                                     usedChannels.Add(vert.heightChannel); 
@@ -2478,7 +2478,7 @@ namespace FCopParser {
 
                         foreach (var tile in topRight.tiles) {
 
-                            foreach (var vert in tile.verticies) {
+                            foreach (var vert in tile.vertices) {
 
                                 if (vert.vertexPosition == VertexPosition.BottomLeft) {
                                     usedChannels.Add(vert.heightChannel);
@@ -2493,7 +2493,7 @@ namespace FCopParser {
 
                         foreach (var tile in bottomLeft.tiles) {
 
-                            foreach (var vert in tile.verticies) {
+                            foreach (var vert in tile.vertices) {
 
                                 if (vert.vertexPosition == VertexPosition.TopRight) {
                                     usedChannels.Add(vert.heightChannel);
@@ -2508,7 +2508,7 @@ namespace FCopParser {
 
                         foreach (var tile in bottomRight.tiles) {
 
-                            foreach (var vert in tile.verticies) {
+                            foreach (var vert in tile.vertices) {
 
                                 if (vert.vertexPosition == VertexPosition.TopLeft) {
                                     usedChannels.Add(vert.heightChannel);
@@ -2969,7 +2969,7 @@ namespace FCopParser {
 
         public bool isEndInColumnArray;
         // tile vertex ordering Top-Left, Top-Right, Bottom-Left, Bottom-Right
-        public List<TileVertex> verticies;
+        public List<TileVertex> vertices;
 
         // Something important to note, uvs order is different than tile vertices.
         // It goes from Top-Left, Top-Right, Bottom-Right, Bottom-Left
@@ -2984,8 +2984,8 @@ namespace FCopParser {
         public int culling;
         public int effectIndex;
 
-        public bool isQuad {
-            get { return verticies.Count == 4; }
+        public bool IsQuad {
+            get { return vertices.Count == 4; }
         }
 
         // Original parsed data from file
@@ -2996,12 +2996,11 @@ namespace FCopParser {
 
         public Tile(TileBitfield parsedTile, TileColumn column, FCopLevelSectionParser section) {
 
-
             this.column = column;
 
             isEndInColumnArray = parsedTile.isEndInColumnArray == 1;
 
-            verticies = MeshType.VerticiesFromID(parsedTile.meshID);
+            vertices = MeshType.VerticiesFromID(parsedTile.meshID);
 
             culling = parsedTile.culling;
             effectIndex = parsedTile.number4;
@@ -3050,7 +3049,7 @@ namespace FCopParser {
             }
 
 
-            foreach (var i in Enumerable.Range(textureIndex, verticies.Count)) {
+            foreach (var i in Enumerable.Range(textureIndex, vertices.Count)) {
 
                 uvs.Add(section.textureCoordinates[i]);
 
@@ -3098,9 +3097,9 @@ namespace FCopParser {
 
             isEndInColumnArray = tile.isEndInColumnArray;
 
-            verticies = new List<TileVertex>(tile.verticies);
+            vertices = new List<TileVertex>(tile.vertices);
             uvs = new List<int>(tile.uvs);
-            shaders = tile.shaders.Clone(verticies.Count == 4);
+            shaders = tile.shaders.Clone(vertices.Count == 4);
             animatedUVs = new List<int>(tile.animatedUVs);
             animationSpeed = tile.animationSpeed;
 
@@ -3121,7 +3120,7 @@ namespace FCopParser {
         public Tile(TileColumn column, List<TileVertex> vertices, int culling, List<int> uvs, TileGraphics graphics) {
             this.column = column;
             isEndInColumnArray = true;
-            this.verticies = vertices;
+            this.vertices = vertices;
             this.culling = culling;
             this.uvs = uvs;
             this.texturePalette = graphics.cbmpID;
@@ -3137,10 +3136,10 @@ namespace FCopParser {
         public Tile(TileColumn column, int meshID, int culling) {
 
             this.column = column;
-            verticies = MeshType.VerticiesFromID(meshID);
+            vertices = MeshType.VerticiesFromID(meshID);
             this.culling = culling;
 
-            if (verticies.Count == 4) {
+            if (vertices.Count == 4) {
                 this.uvs = new() { 57200, 57228, 50060, 50032 };
             }
             else {
@@ -3153,7 +3152,7 @@ namespace FCopParser {
             isSemiTransparent = false;
             effectIndex = 0;
 
-            shaders = new MonoChromeShader(116, verticies.Count == 4);
+            shaders = new MonoChromeShader(116, vertices.Count == 4);
 
         }
 
@@ -3162,7 +3161,7 @@ namespace FCopParser {
             TileShaders shaders, int animationSpeed, List<int> animatedUVs) {
 
             this.column = column;
-            verticies = MeshType.VerticiesFromID(meshID);
+            vertices = MeshType.VerticiesFromID(meshID);
             this.culling = culling;
             this.effectIndex = effectIndex;
             this.uvs = new(uvs);
@@ -3183,9 +3182,9 @@ namespace FCopParser {
 
             isEndInColumnArray = tile.isEndInColumnArray;
 
-            verticies = new List<TileVertex>(tile.verticies);
+            vertices = new List<TileVertex>(tile.vertices);
             uvs = new List<int>(tile.uvs);
-            shaders = tile.shaders.Clone(verticies.Count == 4);
+            shaders = tile.shaders.Clone(vertices.Count == 4);
             animatedUVs = new List<int>(tile.animatedUVs);
             animationSpeed = tile.animationSpeed;
 
@@ -3211,7 +3210,7 @@ namespace FCopParser {
             int minHeight = 128;
             int maxHeight = -128;
 
-            foreach (var vert in verticies) {
+            foreach (var vert in vertices) {
 
                 var height = column.heights[((int)vert.vertexPosition) - 1];
 
@@ -3257,7 +3256,7 @@ namespace FCopParser {
             switch (type) {
 
                 case VertexColorType.MonoChrome:
-                    shaders = new MonoChromeShader(verticies.Count == 4);
+                    shaders = new MonoChromeShader(vertices.Count == 4);
                     break;
                 case VertexColorType.DynamicMonoChrome:
                     shaders = new DynamicMonoChromeShader(shaders);
@@ -3266,7 +3265,7 @@ namespace FCopParser {
                     shaders = new ColorShader(shaders);
                     break;
                 case VertexColorType.ColorAnimated:
-                    shaders = new AnimatedShader(verticies.Count == 4);
+                    shaders = new AnimatedShader(vertices.Count == 4);
                     break;
 
             }
@@ -3275,7 +3274,7 @@ namespace FCopParser {
 
         public TileBitfield Compile(int textureIndex, int graphicsIndex) {
 
-            var id = MeshType.IDFromVerticies(verticies);
+            var id = MeshType.IDFromVerticies(vertices);
 
             if (id == null) {
                 throw new MeshIDException();
@@ -3294,7 +3293,7 @@ namespace FCopParser {
 
         public List<TileGraphicsItem> CompileGraphics(Dictionary<ushort, (int, XRGB555)> existingColors) {
 
-            var isRect = verticies.Count == 4;
+            var isRect = vertices.Count == 4;
 
             var potentialNewShaders = shaders.VerifyCorrectShader();
 
@@ -3352,8 +3351,8 @@ namespace FCopParser {
         // animationSpeed, culling, isSemiTransparent
         public bool Compare(Tile tile) {
 
-            var thisID = MeshType.IDFromVerticies(verticies);
-            var otherID = MeshType.IDFromVerticies(tile.verticies);
+            var thisID = MeshType.IDFromVerticies(vertices);
+            var otherID = MeshType.IDFromVerticies(tile.vertices);
 
             if (thisID == null || otherID == null) {
                 throw new MeshIDException();
@@ -3413,12 +3412,12 @@ namespace FCopParser {
 
         public TransformResult MoveHeightChannelsToNextChannel() {
 
-            var previousVerticies = new List<TileVertex>(verticies);
+            var previousVerticies = new List<TileVertex>(vertices);
             var newVerticies = new HashSet<TileVertex>();
 
-            foreach (var index in Enumerable.Range(0, verticies.Count)) {
+            foreach (var index in Enumerable.Range(0, vertices.Count)) {
 
-                var vertex = verticies[index];
+                var vertex = vertices[index];
 
                 if (vertex.heightChannel < 3) {
 
@@ -3431,7 +3430,7 @@ namespace FCopParser {
             }
 
             if (newVerticies.Count == previousVerticies.Count) {
-                verticies = newVerticies.ToList();
+                vertices = newVerticies.ToList();
                 return TransformResult.Success;
             }
             else {
@@ -3444,9 +3443,9 @@ namespace FCopParser {
         Tile MakeTriTile(List<int> vertOrder, List<int> UVOrder) {
 
             var meshID = MeshType.IDFromVerticies(new() {
-                    verticies[vertOrder[0]],
-                    verticies[vertOrder[1]],
-                    verticies[vertOrder[2]],
+                    vertices[vertOrder[0]],
+                    vertices[vertOrder[1]],
+                    vertices[vertOrder[2]],
                 });
 
             Tile tile = null;
@@ -3523,11 +3522,11 @@ namespace FCopParser {
 
             var total = new List<Tile>();
 
-            if (verticies.Count == 3) {
+            if (vertices.Count == 3) {
                 return null;
             }
 
-            int originalMeshID = (int)MeshType.IDFromVerticies(verticies);
+            int originalMeshID = (int)MeshType.IDFromVerticies(vertices);
 
             Tile tile1;
             Tile tile2;
@@ -3588,11 +3587,11 @@ namespace FCopParser {
 
             var total = new List<Tile>();
 
-            if (verticies.Count == 3) {
+            if (vertices.Count == 3) {
                 return null;
             }
 
-            int originalMeshID = (int)MeshType.IDFromVerticies(verticies);
+            int originalMeshID = (int)MeshType.IDFromVerticies(vertices);
 
             Tile tile1 = null;
             Tile tile2 = null;
@@ -3653,11 +3652,11 @@ namespace FCopParser {
 
         public TransformResult MirrorVerticesVertically() {
 
-            int ogMeshID = (int)MeshType.IDFromVerticies(verticies);
+            int ogMeshID = (int)MeshType.IDFromVerticies(vertices);
 
             var mirrorVertices = new List<TileVertex>();
 
-            foreach (var vertex in verticies) {
+            foreach (var vertex in vertices) {
 
                 switch (vertex.vertexPosition) {
 
@@ -3682,7 +3681,7 @@ namespace FCopParser {
 
             if (mirorVID != null) {
 
-                verticies = MeshType.VerticiesFromID((int)mirorVID);
+                vertices = MeshType.VerticiesFromID((int)mirorVID);
 
                 return TransformResult.Success;
 
@@ -3705,7 +3704,7 @@ namespace FCopParser {
 
             // Oddly enough if the order of the UVs are just reversed the textures mirror perfectly for most tiles
 
-            int meshID = (int)MeshType.IDFromVerticies(verticies);
+            int meshID = (int)MeshType.IDFromVerticies(vertices);
 
             // Walls
             if (MeshType.wallMeshes.Contains(meshID)) {
@@ -3732,7 +3731,7 @@ namespace FCopParser {
 
         public void MirrorShadersVertically() {
 
-            int meshID = (int)MeshType.IDFromVerticies(verticies);
+            int meshID = (int)MeshType.IDFromVerticies(vertices);
 
             if (shaders is DynamicMonoChromeShader) {
 
@@ -3787,11 +3786,11 @@ namespace FCopParser {
 
         public TransformResult MirrorVerticesHorizontally() {
 
-            int ogMeshID = (int)MeshType.IDFromVerticies(verticies);
+            int ogMeshID = (int)MeshType.IDFromVerticies(vertices);
 
             var mirrorVertices = new List<TileVertex>();
 
-            foreach (var vertex in verticies) {
+            foreach (var vertex in vertices) {
 
                 switch (vertex.vertexPosition) {
 
@@ -3816,7 +3815,7 @@ namespace FCopParser {
 
             if (mirorVID != null) {
 
-                verticies = MeshType.VerticiesFromID((int)mirorVID);
+                vertices = MeshType.VerticiesFromID((int)mirorVID);
 
                 return TransformResult.Success;
 
@@ -3837,7 +3836,7 @@ namespace FCopParser {
 
         public void MirrorUVsHorizontally() {
 
-            int meshID = (int)MeshType.IDFromVerticies(verticies);
+            int meshID = (int)MeshType.IDFromVerticies(vertices);
 
             // Walls
             if (MeshType.wallMeshes.Contains(meshID)) {
@@ -3885,7 +3884,7 @@ namespace FCopParser {
 
         public void MirrorShadersHorizontally() {
 
-            int meshID = (int)MeshType.IDFromVerticies(verticies);
+            int meshID = (int)MeshType.IDFromVerticies(vertices);
 
             if (shaders is DynamicMonoChromeShader) {
 
@@ -3982,11 +3981,11 @@ namespace FCopParser {
 
         public TransformResult RotateVerticesClockwise() {
 
-            int ogMeshID = (int)MeshType.IDFromVerticies(verticies);
+            int ogMeshID = (int)MeshType.IDFromVerticies(vertices);
 
             var mirrorVertices = new List<TileVertex>();
 
-            foreach (var vertex in verticies) {
+            foreach (var vertex in vertices) {
 
                 switch (vertex.vertexPosition) {
 
@@ -4011,7 +4010,7 @@ namespace FCopParser {
 
             if (mirrorVID != null) {
 
-                verticies = MeshType.VerticiesFromID((int)mirrorVID);
+                vertices = MeshType.VerticiesFromID((int)mirrorVID);
 
                 return TransformResult.Success;
 
@@ -4048,7 +4047,7 @@ namespace FCopParser {
 
                     if (mirrorVID != null) {
 
-                        verticies = MeshType.VerticiesFromID((int)mirrorVID);
+                        vertices = MeshType.VerticiesFromID((int)mirrorVID);
 
                         return TransformResult.MoveColumnPosX;
 
@@ -4065,7 +4064,7 @@ namespace FCopParser {
 
         public void RotateUVsClockwise() {
 
-            int meshID = (int)MeshType.IDFromVerticies(verticies);
+            int meshID = (int)MeshType.IDFromVerticies(vertices);
 
             // Walls
             if (MeshType.wallMeshes.Contains(meshID)) {
@@ -4101,7 +4100,7 @@ namespace FCopParser {
 
         public void RotateShadersClockwise() {
 
-            int meshID = (int)MeshType.IDFromVerticies(verticies);
+            int meshID = (int)MeshType.IDFromVerticies(vertices);
 
             if (shaders is DynamicMonoChromeShader) {
 
@@ -4176,11 +4175,11 @@ namespace FCopParser {
 
         public TransformResult RotateVerticesCounterClockwise() {
 
-            int ogMeshID = (int)MeshType.IDFromVerticies(verticies);
+            int ogMeshID = (int)MeshType.IDFromVerticies(vertices);
 
             var mirrorVertices = new List<TileVertex>();
 
-            foreach (var vertex in verticies) {
+            foreach (var vertex in vertices) {
 
                 switch (vertex.vertexPosition) {
 
@@ -4205,7 +4204,7 @@ namespace FCopParser {
 
             if (mirrorVID != null) {
 
-                verticies = MeshType.VerticiesFromID((int)mirrorVID);
+                vertices = MeshType.VerticiesFromID((int)mirrorVID);
 
                 return TransformResult.Success;
 
@@ -4242,7 +4241,7 @@ namespace FCopParser {
 
                     if (mirrorVID != null) {
 
-                        verticies = MeshType.VerticiesFromID((int)mirrorVID);
+                        vertices = MeshType.VerticiesFromID((int)mirrorVID);
 
                         return TransformResult.MoveColumnPosY;
 
@@ -4259,7 +4258,7 @@ namespace FCopParser {
 
         public void RotateUVsCounterClockwise() {
 
-            int meshID = (int)MeshType.IDFromVerticies(verticies);
+            int meshID = (int)MeshType.IDFromVerticies(vertices);
 
             // Walls
             if (MeshType.wallMeshes.Contains(meshID)) {
@@ -4295,7 +4294,7 @@ namespace FCopParser {
 
         public void RotateShadersCounterClockwise() {
 
-            int meshID = (int)MeshType.IDFromVerticies(verticies);
+            int meshID = (int)MeshType.IDFromVerticies(vertices);
 
             if (shaders is DynamicMonoChromeShader) {
 

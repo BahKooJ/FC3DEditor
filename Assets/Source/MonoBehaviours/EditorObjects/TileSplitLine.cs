@@ -27,7 +27,7 @@ public class TileSplitLine : MonoBehaviour {
 
     void TopBottom() {
 
-        int originalMeshID = (int)MeshType.IDFromVerticies(tile.verticies);
+        int originalMeshID = (int)MeshType.IDFromVerticies(tile.vertices);
 
         float x1 = 0f;
         float y1 = 0f;
@@ -39,55 +39,55 @@ public class TileSplitLine : MonoBehaviour {
         if (MeshType.topWallMeshes.Contains(originalMeshID)) {
 
             x1 = tile.column.x;
-            y1 = tile.column.heights[0].GetPoint(tile.verticies[1].heightChannel);
+            y1 = tile.column.heights[0].GetPoint(tile.vertices[1].heightChannel);
             z1 = tile.column.y;
 
             x2 = tile.column.x + 1;
-            y2 = tile.column.heights[1].GetPoint(tile.verticies[2].heightChannel);
+            y2 = tile.column.heights[1].GetPoint(tile.vertices[2].heightChannel);
             z2 = tile.column.y;
 
         }
         else if (MeshType.leftWallMeshes.Contains(originalMeshID)) {
 
             x1 = tile.column.x;
-            y1 = tile.column.heights[0].GetPoint(tile.verticies[0].heightChannel);
+            y1 = tile.column.heights[0].GetPoint(tile.vertices[0].heightChannel);
             z1 = tile.column.y;
 
             x2 = tile.column.x;
-            y2 = tile.column.heights[2].GetPoint(tile.verticies[3].heightChannel);
+            y2 = tile.column.heights[2].GetPoint(tile.vertices[3].heightChannel);
             z2 = tile.column.y + 1;
 
         }
         else if (MeshType.diagonalTLeftBRightQuadWallMeshes.Contains(originalMeshID)) {
 
             x1 = tile.column.x;
-            y1 = tile.column.heights[0].GetPoint(tile.verticies[1].heightChannel);
+            y1 = tile.column.heights[0].GetPoint(tile.vertices[1].heightChannel);
             z1 = tile.column.y;
 
             x2 = tile.column.x + 1;
-            y2 = tile.column.heights[3].GetPoint(tile.verticies[2].heightChannel);
+            y2 = tile.column.heights[3].GetPoint(tile.vertices[2].heightChannel);
             z2 = tile.column.y + 1;
 
         }
         else if (MeshType.diagonalBLeftTRightQuadWallMeshes.Contains(originalMeshID)) {
 
             x1 = tile.column.x;
-            y1 = tile.column.heights[2].GetPoint(tile.verticies[1].heightChannel);
+            y1 = tile.column.heights[2].GetPoint(tile.vertices[1].heightChannel);
             z1 = tile.column.y + 1;
 
             x2 = tile.column.x + 1;
-            y2 = tile.column.heights[1].GetPoint(tile.verticies[2].heightChannel);
+            y2 = tile.column.heights[1].GetPoint(tile.vertices[2].heightChannel);
             z2 = tile.column.y;
 
         }
         else {
 
             x1 = tile.column.x;
-            y1 = tile.column.heights[0].GetPoint(tile.verticies[0].heightChannel);
+            y1 = tile.column.heights[0].GetPoint(tile.vertices[0].heightChannel);
             z1 = tile.column.y;
 
             x2 = tile.column.x + 1;
-            y2 = tile.column.heights[3].GetPoint(tile.verticies[3].heightChannel);
+            y2 = tile.column.heights[3].GetPoint(tile.vertices[3].heightChannel);
             z2 = tile.column.y + 1;
 
         }
@@ -99,7 +99,7 @@ public class TileSplitLine : MonoBehaviour {
 
     void BottomTop() {
 
-        int originalMeshID = (int)MeshType.IDFromVerticies(tile.verticies);
+        int originalMeshID = (int)MeshType.IDFromVerticies(tile.vertices);
 
         float x1 = 0f;
         float y1 = 0f;
@@ -111,55 +111,55 @@ public class TileSplitLine : MonoBehaviour {
         if (MeshType.topWallMeshes.Contains(originalMeshID)) {
 
             x1 = tile.column.x;
-            y1 = tile.column.heights[0].GetPoint(tile.verticies[0].heightChannel);
+            y1 = tile.column.heights[0].GetPoint(tile.vertices[0].heightChannel);
             z1 = tile.column.y;
 
             x2 = tile.column.x + 1;
-            y2 = tile.column.heights[1].GetPoint(tile.verticies[3].heightChannel);
+            y2 = tile.column.heights[1].GetPoint(tile.vertices[3].heightChannel);
             z2 = tile.column.y;
 
         }
         else if (MeshType.leftWallMeshes.Contains(originalMeshID)) {
 
             x1 = tile.column.x;
-            y1 = tile.column.heights[0].GetPoint(tile.verticies[1].heightChannel);
+            y1 = tile.column.heights[0].GetPoint(tile.vertices[1].heightChannel);
             z1 = tile.column.y;
 
             x2 = tile.column.x;
-            y2 = tile.column.heights[2].GetPoint(tile.verticies[2].heightChannel);
+            y2 = tile.column.heights[2].GetPoint(tile.vertices[2].heightChannel);
             z2 = tile.column.y + 1;
 
         }
         else if (MeshType.diagonalTLeftBRightQuadWallMeshes.Contains(originalMeshID)) {
 
             x1 = tile.column.x;
-            y1 = tile.column.heights[0].GetPoint(tile.verticies[0].heightChannel);
+            y1 = tile.column.heights[0].GetPoint(tile.vertices[0].heightChannel);
             z1 = tile.column.y;
 
             x2 = tile.column.x + 1;
-            y2 = tile.column.heights[3].GetPoint(tile.verticies[3].heightChannel);
+            y2 = tile.column.heights[3].GetPoint(tile.vertices[3].heightChannel);
             z2 = tile.column.y + 1;
 
         }
         else if (MeshType.diagonalBLeftTRightQuadWallMeshes.Contains(originalMeshID)) {
 
             x1 = tile.column.x;
-            y1 = tile.column.heights[2].GetPoint(tile.verticies[0].heightChannel);
+            y1 = tile.column.heights[2].GetPoint(tile.vertices[0].heightChannel);
             z1 = tile.column.y + 1;
 
             x2 = tile.column.x + 1;
-            y2 = tile.column.heights[1].GetPoint(tile.verticies[3].heightChannel);
+            y2 = tile.column.heights[1].GetPoint(tile.vertices[3].heightChannel);
             z2 = tile.column.y;
 
         }
         else {
 
             x1 = tile.column.x;
-            y1 = tile.column.heights[2].GetPoint(tile.verticies[2].heightChannel);
+            y1 = tile.column.heights[2].GetPoint(tile.vertices[2].heightChannel);
             z1 = tile.column.y + 1;
 
             x2 = tile.column.x + 1;
-            y2 = tile.column.heights[1].GetPoint(tile.verticies[1].heightChannel);
+            y2 = tile.column.heights[1].GetPoint(tile.vertices[1].heightChannel);
             z2 = tile.column.y;
 
         }

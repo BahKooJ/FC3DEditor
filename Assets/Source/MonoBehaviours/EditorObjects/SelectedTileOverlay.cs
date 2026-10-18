@@ -60,7 +60,7 @@ public class SelectedTileOverlay : MonoBehaviour {
 
         }
 
-        if (MeshType.IDFromVerticies(tile.verticies) == null) {
+        if (MeshType.IDFromVerticies(tile.vertices) == null) {
             material.color = Color.red;
         } else {
 
@@ -93,7 +93,7 @@ public class SelectedTileOverlay : MonoBehaviour {
 
         void AddVerticies(Tile tile) {
 
-            foreach (var point in tile.verticies) {
+            foreach (var point in tile.vertices) {
 
                 switch (point.vertexPosition) {
 
@@ -127,7 +127,7 @@ public class SelectedTileOverlay : MonoBehaviour {
 
                 var universalTexture = EditorTextures.tileEffectTextures[(TileEffectType)effectType];
 
-                List<int> uvs = universalTexture.UVsFromtVertices(tile.verticies);
+                List<int> uvs = universalTexture.UVsFromtVertices(tile.vertices);
 
                 textureCords.Add(new Vector2(
                     TextureCoordinate.GetX(uvs[0]),
@@ -162,7 +162,7 @@ public class SelectedTileOverlay : MonoBehaviour {
 
                 var universalTexture = EditorTextures.tileEffectTextures[(TileEffectType)effectType];
 
-                List<int> uvs = universalTexture.UVsFromtVertices(tile.verticies);
+                List<int> uvs = universalTexture.UVsFromtVertices(tile.vertices);
 
                 textureCords.Add(new Vector2(
                     TextureCoordinate.GetX(uvs[0]),
@@ -198,9 +198,9 @@ public class SelectedTileOverlay : MonoBehaviour {
 
         }
 
-        if (tile.verticies.Count == 3) {
+        if (tile.vertices.Count == 3) {
             GenerateTriangle(tile);
-        } else if (tile.verticies.Count == 4) {
+        } else if (tile.vertices.Count == 4) {
             GenerateSquare(tile);
         }
 

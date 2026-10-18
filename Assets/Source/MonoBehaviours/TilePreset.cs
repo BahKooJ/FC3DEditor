@@ -15,12 +15,12 @@ public class TilePreset {
     public int MeshID() {
 
         if (transformedTile == null) {
-            var id = MeshType.IDFromVerticies(tile.verticies);
+            var id = MeshType.IDFromVerticies(tile.vertices);
 
             return (int)id;
         }
         else {
-            var id = MeshType.IDFromVerticies(transformedTile.verticies);
+            var id = MeshType.IDFromVerticies(transformedTile.vertices);
 
             return (int)id;
         }

@@ -474,7 +474,7 @@ public class ShaderEditMode : TileMutatingEditMode {
         }
 
 
-        foreach (var i in Enumerable.Range(0, tile.tile.verticies.Count)) {
+        foreach (var i in Enumerable.Range(0, tile.tile.vertices.Count)) {
             InitSingleVertexColorCorner(i, tile);
         }
 
@@ -485,7 +485,7 @@ public class ShaderEditMode : TileMutatingEditMode {
         var worldX = tile.section.x + tile.column.x;
         var worldY = -(tile.section.y + tile.column.y);
 
-        var tileVert = tile.tile.verticies[index];
+        var tileVert = tile.tile.vertices[index];
 
         switch (tileVert.vertexPosition) {
             case VertexPosition.TopRight:
@@ -805,7 +805,7 @@ public class ShaderEditMode : TileMutatingEditMode {
 
             var tile = hover.tile;
             
-            tile.shaders = selectedPreset.shader.Clone(tile.isQuad);
+            tile.shaders = selectedPreset.shader.Clone(tile.IsQuad);
 
         }
 
@@ -905,7 +905,7 @@ public class ShaderEditMode : TileMutatingEditMode {
 
         foreach (var selection in selectedItems.Skip(1)) {
 
-            selection.tile.shaders = FirstTile.shaders.Clone(selection.tile.isQuad);
+            selection.tile.shaders = FirstTile.shaders.Clone(selection.tile.IsQuad);
 
         }
 
@@ -926,7 +926,7 @@ public class ShaderEditMode : TileMutatingEditMode {
 
         if (FirstTile.shaders is AnimatedShader) { return false; }
 
-        var potentialID = MeshType.IDFromVerticies(FirstTile.verticies);
+        var potentialID = MeshType.IDFromVerticies(FirstTile.vertices);
 
         if (potentialID == null) {
             DialogWindowUtil.Dialog("Cannot Save Preset", "Cannot save shader preset, tile mesh is invalid!");

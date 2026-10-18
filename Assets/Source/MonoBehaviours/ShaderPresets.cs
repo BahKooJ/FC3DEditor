@@ -104,9 +104,9 @@ public class ShaderPreset {
     }
 
     public ShaderPreset(Tile tile) {
-        this.shader = tile.shaders.Clone(tile.isQuad);
+        this.shader = tile.shaders.Clone(tile.IsQuad);
         this.name = "Preset";
-        this.meshID = (int)MeshType.IDFromVerticies(tile.verticies);
+        this.meshID = (int)MeshType.IDFromVerticies(tile.vertices);
     }
 
     public string Compile() {
@@ -178,7 +178,7 @@ public class ShaderPreset {
 
     public void ReceiveDataToTile(Tile tile) {
 
-        tile.shaders = shader.Clone(tile.isQuad);
+        tile.shaders = shader.Clone(tile.IsQuad);
 
     }
 

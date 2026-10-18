@@ -112,7 +112,7 @@ public class TileEditPanel : MonoBehaviour {
 
             foreach (var selectedItem in controller.selectedItems) {
 
-                if (MeshType.IDFromVerticies(selectedItem.tile.verticies) == null) {
+                if (MeshType.IDFromVerticies(selectedItem.tile.vertices) == null) {
                     QuickLogHandler.Log("Selection has an invalid mesh ID!", LogSeverity.Error);
                     return;
                 }
@@ -143,7 +143,7 @@ public class TileEditPanel : MonoBehaviour {
             return;
         }
 
-        if (controller.FirstTile.verticies.Count == 3) {
+        if (controller.FirstTile.vertices.Count == 3) {
             return;
         }
 
@@ -168,7 +168,7 @@ public class TileEditPanel : MonoBehaviour {
             return;
         }
 
-        if (controller.FirstTile.verticies.Count == 3) {
+        if (controller.FirstTile.vertices.Count == 3) {
             return;
         }
 

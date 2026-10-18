@@ -269,7 +269,7 @@ public class UVPreset {
         this.uvs = new List<int>(tile.uvs);
         this.texturePalette = tile.texturePalette;
         this.name = "Preset";
-        this.meshID = (int)MeshType.IDFromVerticies(tile.verticies);
+        this.meshID = (int)MeshType.IDFromVerticies(tile.vertices);
         this.isSemiTransparent = tile.isSemiTransparent;
         this.isVectorAnimated = tile.isVectorAnimated;
         this.animationSpeed = tile.animationSpeed;
@@ -299,7 +299,7 @@ public class UVPreset {
             tile.isVectorAnimated = false;
             tile.isSemiTransparent = isSemiTransparent;
 
-            if (tile.verticies.Count == 4) {
+            if (tile.vertices.Count == 4) {
                 tile.uvs = new List<int>(animatedUVs.GetRange(0, 4));
             }
             else {

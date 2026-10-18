@@ -248,7 +248,7 @@ public class ShaderPresetViewItem : MonoBehaviour {
 
             var tile = selection.tile;
             
-            tile.shaders = preset.shader.Clone(tile.isQuad);
+            tile.shaders = preset.shader.Clone(tile.IsQuad);
 
         }
 

@@ -107,7 +107,7 @@ public class SchematicMesh : MonoBehaviour {
 
                 var vertices = new List<Vector3>();
 
-                foreach (var point in tile.verticies) {
+                foreach (var point in tile.vertices) {
 
                     switch (point.vertexPosition) {
 
@@ -206,9 +206,9 @@ public class SchematicMesh : MonoBehaviour {
 
             foreach (var tile in column.tiles) {
 
-                if (tile.verticies.Count == 3) {
+                if (tile.vertices.Count == 3) {
                     GenerateTriangle(tile);
-                } else if (tile.verticies.Count == 4) {
+                } else if (tile.vertices.Count == 4) {
                     GenerateSquare(tile);
                 }
 

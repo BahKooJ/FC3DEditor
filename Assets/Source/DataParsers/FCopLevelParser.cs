@@ -780,7 +780,7 @@ namespace FCopParser {
 
                 foreach (var tile in column.tiles) {
 
-                    foreach (var vert in tile.verticies) {
+                    foreach (var vert in tile.vertices) {
 
                         var hx = column.x;
                         var hy = column.y;

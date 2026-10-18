@@ -43,7 +43,7 @@ public class TextureCoordinatesLines : MonoBehaviour {
         if (textureCoords.Count == 0) { return; }
 
         if (view.controller.HasSelection) {
-            lineRenderer.positionCount = view.controller.FirstTile.verticies.Count + 1;
+            lineRenderer.positionCount = view.controller.FirstTile.vertices.Count + 1;
         }
         else {
             lineRenderer.positionCount = 5;

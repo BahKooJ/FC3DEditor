@@ -268,7 +268,7 @@ public class UVPresentViewItem : MonoBehaviour {
                 tile.isVectorAnimated = false;
                 tile.isSemiTransparent = preset.isSemiTransparent;
                 
-                if (tile.verticies.Count == 4) {
+                if (tile.vertices.Count == 4) {
                     tile.uvs = new List<int>(preset.animatedUVs.GetRange(0, 4));
                 } else {
                     tile.uvs = new List<int>(preset.animatedUVs.GetRange(0, 3));

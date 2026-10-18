@@ -119,7 +119,7 @@ public class TileTexturePreview : MonoBehaviour {
 
         void AddVerticies(Tile tile) {
 
-            foreach (var point in tile.verticies) {
+            foreach (var point in tile.vertices) {
 
                 switch (point.vertexPosition) {
 
@@ -220,9 +220,9 @@ public class TileTexturePreview : MonoBehaviour {
 
         }
 
-        if (tile.verticies.Count == 3) {
+        if (tile.vertices.Count == 3) {
             GenerateTriangle(tile);
-        } else if (tile.verticies.Count == 4) {
+        } else if (tile.vertices.Count == 4) {
             GenerateSquare(tile);
         }
 

@@ -267,7 +267,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
                         if (selectedHeight == null) {
 
-                            var index = FirstTile.verticies.FindIndex(vertex => {
+                            var index = FirstTile.vertices.FindIndex(vertex => {
                                 return vertex.vertexPosition == channel.corner && vertex.heightChannel == channel.channel;
                             });
 
@@ -499,11 +499,11 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
         foreach (var item in selectedItems) {
 
-            var index = item.tile.verticies.FindIndex(vertex => {
+            var index = item.tile.vertices.FindIndex(vertex => {
                 return vertex.vertexPosition == selectedHeight.corner && vertex.heightChannel == selectedHeight.channel;
             });
 
-            var existingVert = item.tile.verticies.FindIndex(vertex => {
+            var existingVert = item.tile.vertices.FindIndex(vertex => {
                 return vertex.vertexPosition == channel.corner && vertex.heightChannel == channel.channel;
             });
 
@@ -523,8 +523,8 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
                 didCreateCounterAction = true;
             }
 
-            var vertex = item.tile.verticies[index];
-            item.tile.verticies[index] = new TileVertex(channel.channel, vertex.vertexPosition);
+            var vertex = item.tile.vertices[index];
+            item.tile.vertices[index] = new TileVertex(channel.channel, vertex.vertexPosition);
 
         }
 
@@ -602,12 +602,12 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
         foreach (var item in selectedItems) {
 
-            var previousVerticies = new List<TileVertex>(item.tile.verticies);
+            var previousVerticies = new List<TileVertex>(item.tile.vertices);
             var newVerticies = new HashSet<TileVertex>();
 
-            foreach (var index in Enumerable.Range(0, item.tile.verticies.Count)) {
+            foreach (var index in Enumerable.Range(0, item.tile.vertices.Count)) {
 
-                var vertex = item.tile.verticies[index];
+                var vertex = item.tile.vertices[index];
 
                 if (vertex.heightChannel < 3) {
 
@@ -620,7 +620,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
             }
 
             if (newVerticies.Count == previousVerticies.Count) {
-                item.tile.verticies = newVerticies.ToList();
+                item.tile.vertices = newVerticies.ToList();
             } else {
                 QuickLogHandler.Log("Tile is already attatched to highest channels", LogSeverity.Error);
             }
@@ -644,12 +644,12 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
         foreach (var item in selectedItems) {
 
-            var previousVerticies = new List<TileVertex>(item.tile.verticies);
+            var previousVerticies = new List<TileVertex>(item.tile.vertices);
             var newVerticies = new HashSet<TileVertex>();
 
-            foreach (var index in Enumerable.Range(0, item.tile.verticies.Count)) {
+            foreach (var index in Enumerable.Range(0, item.tile.vertices.Count)) {
 
-                var vertex = item.tile.verticies[index];
+                var vertex = item.tile.vertices[index];
 
                 if (vertex.heightChannel > 1) {
 
@@ -662,7 +662,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
             }
 
             if (newVerticies.Count == previousVerticies.Count) {
-                item.tile.verticies = newVerticies.ToList();
+                item.tile.vertices = newVerticies.ToList();
             } else {
                 QuickLogHandler.Log("Tile is already attatched to lowest channels", LogSeverity.Error);
             }
@@ -826,7 +826,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
             var emptyColumn = GetTileColumn(item.columnWorldX - startingX, item.columnWorldY - startingY);
 
-            foreach (var vert in item.tile.verticies) {
+            foreach (var vert in item.tile.vertices) {
 
                 emptyColumn.heights[(int)vert.vertexPosition - 1]
                     .SetPoint(item.column.heights[(int)vert.vertexPosition - 1].GetTruePoint(vert.heightChannel), vert.heightChannel);
@@ -850,7 +850,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
                 var tile = column.tiles[0];
 
-                var nullableTileMeshID = MeshType.IDFromVerticies(tile.verticies);
+                var nullableTileMeshID = MeshType.IDFromVerticies(tile.vertices);
 
                 if (nullableTileMeshID == null) {
                     QuickLogHandler.Log("Unable to extrude tiles. Tile has invalid mesh ID!", LogSeverity.Error);
@@ -866,14 +866,14 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
                 }
 
-                if (tile.verticies.Any(vert => { return vert.heightChannel == 3; })) {
+                if (tile.vertices.Any(vert => { return vert.heightChannel == 3; })) {
 
                     QuickLogHandler.Log("Unable to extrude tiles. Tile is already at max height channel!", LogSeverity.Error);
                     return;
 
                 }
 
-                if (!tile.verticies.All(vert => { return vert.heightChannel == tile.verticies[0].heightChannel; })) {
+                if (!tile.vertices.All(vert => { return vert.heightChannel == tile.vertices[0].heightChannel; })) {
 
                     QuickLogHandler.Log("Unable to extrude tiles. Tile has different height channels.", LogSeverity.Error);
                     return;
@@ -891,12 +891,12 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
             counterActions.Add(new TileSaveStateCounterAction(tile));
 
-            var previousVerticies = new List<TileVertex>(tile.verticies);
+            var previousVerticies = new List<TileVertex>(tile.vertices);
             var newVerticies = new HashSet<TileVertex>();
 
-            foreach (var index in Enumerable.Range(0, tile.verticies.Count)) {
+            foreach (var index in Enumerable.Range(0, tile.vertices.Count)) {
 
-                var vertex = tile.verticies[index];
+                var vertex = tile.vertices[index];
 
                 if (vertex.heightChannel < 3) {
 
@@ -909,7 +909,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
             }
 
             if (newVerticies.Count == previousVerticies.Count) {
-                tile.verticies = newVerticies.ToList();
+                tile.vertices = newVerticies.ToList();
             }
             else {
                 QuickLogHandler.Log("Tile is already attatched to highest channels", LogSeverity.Error);
@@ -925,7 +925,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
                 if (virtualColumn.tiles.Count != 0) {
 
-                    if (virtualColumn.tiles[0].verticies[0].heightChannel == heightChannel) {
+                    if (virtualColumn.tiles[0].vertices[0].heightChannel == heightChannel) {
                         return;
 
                     }
@@ -1062,7 +1062,7 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
             foreach (var t in worldColumn.tiles) {
 
                 // Checks to make sure the tile doesn't already exist
-                if (MeshType.IDFromVerticies(t.verticies) == referedPreset.MeshID()) {
+                if (MeshType.IDFromVerticies(t.vertices) == referedPreset.MeshID()) {
                     QuickLogHandler.Log("Tile was not added as tile aready existed.", LogSeverity.Warning);
                     return;
                 }
@@ -1101,36 +1101,36 @@ public class TileEditMode : TileMutatingEditMode, EditMode {
 
                     var tile = virtualColumn.tiles[0];
 
-                    if (tile.verticies.Count == 4) {
-                        CheckAndExtrude(x, y - 1, ExtrudeSide.Top, virtualColumn.tiles[0].verticies[0].heightChannel);
-                        CheckAndExtrude(x - 1, y, ExtrudeSide.Left, virtualColumn.tiles[0].verticies[0].heightChannel);
-                        CheckAndExtrude(x + 1, y, ExtrudeSide.Right, virtualColumn.tiles[0].verticies[0].heightChannel);
-                        CheckAndExtrude(x, y + 1, ExtrudeSide.Bottom, virtualColumn.tiles[0].verticies[0].heightChannel);
+                    if (tile.vertices.Count == 4) {
+                        CheckAndExtrude(x, y - 1, ExtrudeSide.Top, virtualColumn.tiles[0].vertices[0].heightChannel);
+                        CheckAndExtrude(x - 1, y, ExtrudeSide.Left, virtualColumn.tiles[0].vertices[0].heightChannel);
+                        CheckAndExtrude(x + 1, y, ExtrudeSide.Right, virtualColumn.tiles[0].vertices[0].heightChannel);
+                        CheckAndExtrude(x, y + 1, ExtrudeSide.Bottom, virtualColumn.tiles[0].vertices[0].heightChannel);
                     }
                     else {
 
-                        if (!tile.verticies.Any(vert => { return vert.vertexPosition == VertexPosition.TopLeft; })) {
-                            CheckAndExtrude(x, y, ExtrudeSide.BottomLTopRDiagnol, virtualColumn.tiles[0].verticies[0].heightChannel, true);
-                            CheckAndExtrude(x, y + 1, ExtrudeSide.Bottom, virtualColumn.tiles[0].verticies[0].heightChannel);
-                            CheckAndExtrude(x + 1, y, ExtrudeSide.Right, virtualColumn.tiles[0].verticies[0].heightChannel);
+                        if (!tile.vertices.Any(vert => { return vert.vertexPosition == VertexPosition.TopLeft; })) {
+                            CheckAndExtrude(x, y, ExtrudeSide.BottomLTopRDiagnol, virtualColumn.tiles[0].vertices[0].heightChannel, true);
+                            CheckAndExtrude(x, y + 1, ExtrudeSide.Bottom, virtualColumn.tiles[0].vertices[0].heightChannel);
+                            CheckAndExtrude(x + 1, y, ExtrudeSide.Right, virtualColumn.tiles[0].vertices[0].heightChannel);
 
                         }
-                        else if (!tile.verticies.Any(vert => { return vert.vertexPosition == VertexPosition.TopRight; })) {
-                            CheckAndExtrude(x, y, ExtrudeSide.TopLBottomRDiagnol, virtualColumn.tiles[0].verticies[0].heightChannel, true);
-                            CheckAndExtrude(x, y + 1, ExtrudeSide.Bottom, virtualColumn.tiles[0].verticies[0].heightChannel);
-                            CheckAndExtrude(x - 1, y, ExtrudeSide.Left, virtualColumn.tiles[0].verticies[0].heightChannel);
+                        else if (!tile.vertices.Any(vert => { return vert.vertexPosition == VertexPosition.TopRight; })) {
+                            CheckAndExtrude(x, y, ExtrudeSide.TopLBottomRDiagnol, virtualColumn.tiles[0].vertices[0].heightChannel, true);
+                            CheckAndExtrude(x, y + 1, ExtrudeSide.Bottom, virtualColumn.tiles[0].vertices[0].heightChannel);
+                            CheckAndExtrude(x - 1, y, ExtrudeSide.Left, virtualColumn.tiles[0].vertices[0].heightChannel);
 
                         }
-                        else if (!tile.verticies.Any(vert => { return vert.vertexPosition == VertexPosition.BottomLeft; })) {
-                            CheckAndExtrude(x, y, ExtrudeSide.TopLBottomRDiagnol, virtualColumn.tiles[0].verticies[0].heightChannel, true);
-                            CheckAndExtrude(x, y - 1, ExtrudeSide.Top, virtualColumn.tiles[0].verticies[0].heightChannel);
-                            CheckAndExtrude(x + 1, y, ExtrudeSide.Right, virtualColumn.tiles[0].verticies[0].heightChannel);
+                        else if (!tile.vertices.Any(vert => { return vert.vertexPosition == VertexPosition.BottomLeft; })) {
+                            CheckAndExtrude(x, y, ExtrudeSide.TopLBottomRDiagnol, virtualColumn.tiles[0].vertices[0].heightChannel, true);
+                            CheckAndExtrude(x, y - 1, ExtrudeSide.Top, virtualColumn.tiles[0].vertices[0].heightChannel);
+                            CheckAndExtrude(x + 1, y, ExtrudeSide.Right, virtualColumn.tiles[0].vertices[0].heightChannel);
 
                         }
-                        else if (!tile.verticies.Any(vert => { return vert.vertexPosition == VertexPosition.BottomRight; })) {
-                            CheckAndExtrude(x, y, ExtrudeSide.BottomLTopRDiagnol, virtualColumn.tiles[0].verticies[0].heightChannel, true);
-                            CheckAndExtrude(x, y - 1, ExtrudeSide.Top, virtualColumn.tiles[0].verticies[0].heightChannel);
-                            CheckAndExtrude(x - 1, y, ExtrudeSide.Left, virtualColumn.tiles[0].verticies[0].heightChannel);
+                        else if (!tile.vertices.Any(vert => { return vert.vertexPosition == VertexPosition.BottomRight; })) {
+                            CheckAndExtrude(x, y, ExtrudeSide.BottomLTopRDiagnol, virtualColumn.tiles[0].vertices[0].heightChannel, true);
+                            CheckAndExtrude(x, y - 1, ExtrudeSide.Top, virtualColumn.tiles[0].vertices[0].heightChannel);
+                            CheckAndExtrude(x - 1, y, ExtrudeSide.Left, virtualColumn.tiles[0].vertices[0].heightChannel);
 
                         }
 

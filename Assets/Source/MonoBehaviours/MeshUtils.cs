@@ -386,7 +386,7 @@ public class VectorAnimatedTile : AnimatedTile {
 
     public void ChangeTexture(List<Vector2> textureCoords) {
 
-        if (tile.verticies.Count == 4) {
+        if (tile.vertices.Count == 4) {
             textureCoords[textureIndex] = GetTextureCoord(tile, 0);
             textureCoords[textureIndex + 1] = GetTextureCoord(tile, 1);
             textureCoords[textureIndex + 2] = GetTextureCoord(tile, 3);
@@ -447,7 +447,7 @@ public class FrameAnimatedTile : AnimatedTile {
 
     public void ChangeTexture(List<Vector2> textureCoords) {
 
-        if (tile.verticies.Count == 4) {
+        if (tile.vertices.Count == 4) {
             textureCoords[textureIndex] = GetTextureCoord(tile, (frame * 4));
             textureCoords[textureIndex + 1] = GetTextureCoord(tile, (frame * 4) + 1);
             textureCoords[textureIndex + 2] = GetTextureCoord(tile, (frame * 4) + 3);

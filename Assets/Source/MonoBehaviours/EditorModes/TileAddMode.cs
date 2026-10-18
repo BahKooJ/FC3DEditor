@@ -549,7 +549,7 @@ public class TileAddMode : EditMode {
         foreach (var t in hoverSelection.column.tiles) {
 
             // Checks to make sure the tile doesn't already exist
-            if (MeshType.IDFromVerticies(t.verticies) == preset.MeshID()) {
+            if (MeshType.IDFromVerticies(t.vertices) == preset.MeshID()) {
                 QuickLogHandler.Log("Tile already exists!", LogSeverity.Error);
                 return;
             }
@@ -637,7 +637,7 @@ public class TileAddMode : EditMode {
                 var alreadyExists = false;
                 foreach (var itTile in itColumn.tiles) {
 
-                    if (MeshType.IDFromVerticies(itTile.verticies) == preset.MeshID()) {
+                    if (MeshType.IDFromVerticies(itTile.vertices) == preset.MeshID()) {
                         alreadyExists = true;
                     }
 
@@ -722,11 +722,11 @@ public class TileAddMode : EditMode {
                     var addTile = true;
                     if (!removeAllTilesOnSchematicPlacement) {
 
-                        var schemTileMeshID = MeshType.IDFromVerticies(schemTile.verticies);
+                        var schemTileMeshID = MeshType.IDFromVerticies(schemTile.vertices);
 
                         foreach (var tile in itColumn.tiles) {
 
-                            if (MeshType.IDFromVerticies(tile.verticies) == schemTileMeshID) {
+                            if (MeshType.IDFromVerticies(tile.vertices) == schemTileMeshID) {
 
                                 // Mutation
                                 tile.ReceiveData(schemTile, false);

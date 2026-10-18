@@ -48,7 +48,7 @@ public abstract class TileMutatingEditMode : EditMode {
         var lastClickColumnX = tile.column.x;
         var lastClickColumnY = tile.column.y;
 
-        var sameMesh = firstSelection.tile.verticies.SequenceEqual(tile.tile.verticies);
+        var sameMesh = firstSelection.tile.vertices.SequenceEqual(tile.tile.vertices);
 
         if (firstSelection.section == tile.section) {
 
@@ -68,7 +68,7 @@ public abstract class TileMutatingEditMode : EditMode {
 
                         if (sameMesh && trySameMesh) {
 
-                            if (itTile.verticies.SequenceEqual(firstSelection.tile.verticies)) {
+                            if (itTile.vertices.SequenceEqual(firstSelection.tile.vertices)) {
 
                                 MakeSelection(new TileSelection(itTile, itColumn, tile.section), false);
 
@@ -113,7 +113,7 @@ public abstract class TileMutatingEditMode : EditMode {
 
                         if (sameMesh && trySameMesh) {
 
-                            if (itTile.verticies.SequenceEqual(firstSelection.tile.verticies)) {
+                            if (itTile.vertices.SequenceEqual(firstSelection.tile.vertices)) {
 
                                 MakeSelection(new TileSelection(itTile, itColumn, itSection), false);
 
@@ -148,7 +148,7 @@ public abstract class TileMutatingEditMode : EditMode {
 
         if (selectedItems.Count == 0) { return false; }
 
-        return FirstTile.verticies.Count == tile.verticies.Count;
+        return FirstTile.vertices.Count == tile.vertices.Count;
 
     }
 
@@ -194,7 +194,7 @@ public abstract class TileMutatingEditMode : EditMode {
 
         if (selectedItems.Count == 0) { return false; }
 
-        return selectedItems[0].tile.verticies.Count == 4;
+        return selectedItems[0].tile.vertices.Count == 4;
 
     }
 

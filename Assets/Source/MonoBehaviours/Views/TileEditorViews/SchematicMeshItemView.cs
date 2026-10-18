@@ -90,7 +90,7 @@ public class SchematicMeshItemView : MonoBehaviour {
         foreach (var column in schematic.tileColumns) {
 
             foreach (var tile in column.tiles) {
-                tile.shaders = new MonoChromeShader(tile.isQuad);
+                tile.shaders = new MonoChromeShader(tile.IsQuad);
             }
 
         }

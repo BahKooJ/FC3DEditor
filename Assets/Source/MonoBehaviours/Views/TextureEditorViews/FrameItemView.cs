@@ -41,7 +41,7 @@ public class FrameItemView : MonoBehaviour {
 
         void GenerateQuad() {
 
-            var vertices = MeshUtils.FlatScreenVerticies(tile.verticies, 50f);
+            var vertices = MeshUtils.FlatScreenVerticies(tile.vertices, 50f);
 
             // Seems that animation is only in quads
             if (vertices.Count == 3) {

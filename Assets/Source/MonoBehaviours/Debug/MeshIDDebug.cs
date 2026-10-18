@@ -58,7 +58,7 @@ public class MeshIDDebug: MonoBehaviour {
 
             var counterClockVertices = new List<TileVertex>();
 
-            foreach (var vertex in exampleTile.verticies) {
+            foreach (var vertex in exampleTile.vertices) {
 
                 switch (vertex.vertexPosition) {
 
@@ -101,7 +101,7 @@ public class MeshIDDebug: MonoBehaviour {
 
             var counterClockVertices = new List<TileVertex>();
 
-            foreach (var vertex in exampleTile.verticies) {
+            foreach (var vertex in exampleTile.vertices) {
 
                 switch (vertex.vertexPosition) {
 
