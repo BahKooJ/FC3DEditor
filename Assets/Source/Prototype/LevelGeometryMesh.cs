@@ -10,18 +10,26 @@ public class LevelGeometryMesh : MonoBehaviour {
 
     [Header("=== Required References ===")]
     [Space]
+    [SerializeField] Material semiTransparentMaterial;
     [SerializeField] MeshRenderer meshRenderer;
     [SerializeField] MeshFilter meshFilter;
 
     // === Parameters ===
-    [NonSerialized] Texture2D texture;
+    SectionObject sectionObject;
 
     Mesh generatedMesh;
 
-    public LevelGeometryMesh Construct(Texture2D texture) {
+    public LevelGeometryMesh Construct(SectionObject sectionObject, bool isTransparent) {
+        this.sectionObject = sectionObject;
+
         generatedMesh = new();
         meshFilter.mesh = generatedMesh;
-        meshRenderer.material.mainTexture = texture;
+
+        if (isTransparent) {
+            meshRenderer.material = Instantiate(semiTransparentMaterial);
+        }
+
+        meshRenderer.material.mainTexture = sectionObject.texture;
 
         return this;
     }
@@ -30,7 +38,7 @@ public class LevelGeometryMesh : MonoBehaviour {
 
         List<Vector3> vertices = new();
         List<int> triangles = new();
-        List<Vector2> uvs = new();
+        List<Vector4> uvs = new();
         List<Color> colors = new();
         var vertexIndex = 0;
 
@@ -38,7 +46,10 @@ public class LevelGeometryMesh : MonoBehaviour {
 
             vertices.AddRange(LevelGeometryUtils.VerticesFromTile(tile));
             triangles.AddRange(LevelGeometryUtils.TrisFromTile(tile, vertexIndex));
-            uvs.AddRange(LevelGeometryUtils.UvsFromTile(tile));
+            foreach (var uv in LevelGeometryUtils.UvsFromTile(tile)) {
+                if (tile.isVectorAnimated) { uvs.Add(new(uv.x, uv.y, sectionObject.section.animationVector.x, sectionObject.section.animationVector.y)); }
+                else { uvs.Add(uv); }
+            }
             colors.AddRange(LevelGeometryUtils.ColorsFromTile(tile));
 
             vertexIndex += tile.vertices.Count;
@@ -47,13 +58,11 @@ public class LevelGeometryMesh : MonoBehaviour {
 
         generatedMesh.vertices = vertices.ToArray();
         generatedMesh.triangles = triangles.ToArray();
-        generatedMesh.uv = uvs.ToArray();
+        generatedMesh.SetUVs(0, uvs);
         generatedMesh.colors = colors.ToArray();
 
         generatedMesh.RecalculateNormals();
 
     }
-
-
 
 }

@@ -171,7 +171,7 @@ public class Main : MonoBehaviour {
         Physics.queriesHitBackfaces = true;
 
         if (FileManagerMain.level == null) {
-            level = new FCopLevel(new IFFParser(File.ReadAllBytes("MissionFiles/Mp")).parsedData);
+            level = new FCopLevel(new IFFParser(File.ReadAllBytes("MissionFiles/OVMP")).parsedData);
             if (SettingsManager.keyBinds.Count == 0) {
                 SettingsManager.ParseSettings();
             }
@@ -749,16 +749,10 @@ public class Main : MonoBehaviour {
 
             foreach (var x in Enumerable.Range(0, level.width)) {
 
-                var section = Instantiate(meshSection, new Vector3(x * 16, 0, -(y * 16)), Quaternion.identity);
-                var script = section.GetComponent<LevelMesh>();
-                script.section = level.sections[(y * level.width) + x];
-                script.levelTexturePallet = levelTexturePallet;
-                script.controller = this;
-                script.x = x * 16;
-                script.y = y * 16;
-                script.arrayX = x;
-                script.arrayY = y;
-                sectionMeshes.Add(script);
+                var section = Instantiate(meshSection, new Vector3(x * 16, 0, -(y * 16)), Quaternion.identity).GetComponent<SectionObject>();
+                section.Construct(level.sections[(y * level.width) + x], levelTexturePallet, this, new(x * 16, y * 16), new(x, y));
+
+                //sectionMeshes.Add(script);
             }
 
         }

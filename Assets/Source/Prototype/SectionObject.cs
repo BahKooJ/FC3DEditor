@@ -26,6 +26,7 @@ public class SectionObject : MonoBehaviour {
     [NonSerialized] public List<Tile> sortedTilesByTriangle = new();
 
     // === Private Fields ===
+    List<LevelGeometryMesh> levelMeshes = new();
     Mesh collisionMesh;
 
     public SectionObject Construct(FCopLevelSection section, Texture2D texture, Main main, Vector2 position, Vector2Int arrayPosition) {
@@ -38,7 +39,22 @@ public class SectionObject : MonoBehaviour {
         collisionMesh = new();
         tileSelectionCollider.sharedMesh = collisionMesh;
 
+        BuildMeshes();
+
         return this;
+    }
+
+    public void RefreshMesh() {
+
+        foreach (var mesh in levelMeshes) {
+            Destroy(mesh.gameObject);
+        }
+
+        levelMeshes.Clear();
+        sortedTilesByTriangle.Clear();
+
+        BuildMeshes();
+
     }
 
     void BuildMeshes() {
@@ -54,11 +70,31 @@ public class SectionObject : MonoBehaviour {
             foreach (var tile in column.tiles) {
 
                 allTiles.Add(tile);
+                if (tile.isSemiTransparent) {
+                    transparentTiles.Add(tile);
+                }
+                else {
+                    opaqueTiles.Add(tile);
+                }
+
 
             }
 
         }
 
+        CreateMesh(opaqueTiles, false);
+        CreateMesh(transparentTiles, true);
+
+        GenerateCollisionMesh(allTiles);
+
+    }
+
+    void CreateMesh(List<Tile> tiles, bool isTransparent) {
+        var meshObj = Instantiate(levelGeometryMeshPrefab, transform, false).GetComponent<LevelGeometryMesh>();
+        meshObj.Construct(this, isTransparent);
+        meshObj.Generate(tiles);
+
+        levelMeshes.Add(meshObj);
     }
 
     void GenerateCollisionMesh(List<Tile> tiles) {
@@ -70,6 +106,15 @@ public class SectionObject : MonoBehaviour {
         foreach (var tile in tiles) {
             vertices.AddRange(LevelGeometryUtils.VerticesFromTile(tile));
             triangles.AddRange(LevelGeometryUtils.TrisFromTile(tile, i));
+
+            if (tile.IsQuad) {
+                sortedTilesByTriangle.Add(tile);
+                sortedTilesByTriangle.Add(tile);
+            }
+            else {
+                sortedTilesByTriangle.Add(tile);
+            }
+
             i += tile.vertices.Count;
         }
 
